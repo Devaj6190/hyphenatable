@@ -1,15 +1,46 @@
-// Calendar helpers. Company A is in America/Los_Angeles; PDT (-07:00) until 2026-11-01, PST (-08:00) after.
-// Only the dates the seed uses are covered (Aug to Dec 2026).
+// Calendar helpers. Offsets for the two zones the seed uses; US daylight time ends 2026-11-01.
+// Only the dates the seed uses are covered (Aug to Dec 2026). Company A: America/New_York (Pennsylvania);
+// Company B: America/Los_Angeles (the default).
 
 export const DAY_MS = 86_400_000;
 
-export function tzOffset(date: string): string {
-  return date >= "2026-11-01" ? "-08:00" : "-07:00";
+const OFFSETS: Record<string, [string, string]> = {
+  "America/Los_Angeles": ["-07:00", "-08:00"],
+  "America/New_York": ["-04:00", "-05:00"],
+};
+
+export function tzOffset(date: string, tz = "America/Los_Angeles"): string {
+  const o = OFFSETS[tz];
+  if (!o) throw new Error(`no offsets for time zone ${tz}`);
+  if (date < "2026-03-08" || date >= "2027-03-14")
+    throw new Error(`date ${date} outside the covered DST range`);
+  return date >= "2026-11-01" ? o[1] : o[0];
+}
+
+/** The local calendar date (YYYY-MM-DD) of an ISO instant in `tz`. */
+export function localDateOf(iso: string, tz = "America/Los_Angeles"): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: tz,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date(iso));
 }
 
 /** Local wall time (YYYY-MM-DD, HH:MM) to an ISO UTC string. */
-export function local(date: string, hhmm: string): string {
-  return new Date(`${date}T${hhmm}:00${tzOffset(date)}`).toISOString();
+export function local(
+  date: string,
+  hhmm: string,
+  tz = "America/Los_Angeles",
+): string {
+  return new Date(`${date}T${hhmm}:00${tzOffset(date, tz)}`).toISOString();
+}
+
+/** Last Friday on or before `date` (cutoff day). */
+export function fridayOnOrBefore(date: string): string {
+  let d = date;
+  while (weekday(d) !== 5) d = addDays(d, -1);
+  return d;
 }
 
 export function addDays(date: string, n: number): string {
