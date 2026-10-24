@@ -75,6 +75,10 @@ Money is integer cents parsed from the decimal string (no float maths); times ar
 - **Gusto demo company**: payroll history starts 2026-07-04 (7 biweekly regular payrolls at the time of writing).
 - **QBO**: `minorversion=75`; 429 waits 60 s; `intuit-oauth` logging stays off (it would log token JSON).
 
+## Assembled dataset (for the loader)
+
+`bun --env-file=.env run packages/connectors/src/assemble.ts --company a --cycle a-c05` (read-only) pulls every source whose token is in `data/private/`, merges it with the fixture-only records (time entries, payments, past payrolls), and writes `data/private/assembled/<company>-<cycle>.json` (derived, never committed), printing counts only. Each record carries `origin` (`live` | `fixture`), `ourId` (the fixture / answer-key id, or null) and `url` (Jobber web link for jobs, quotes, invoices). Fixture records reference live ids through the pushers' id maps (a fixture time entry's `jobId` is the live `jobber:` job), so every reference resolves inside the dataset; live records the maps do not know are kept with `ourId: null` and counted. A source that is not pulled falls back to its fixture records (`sources` says which).
+
 ## Company R
 
 `src/ingest-r.ts` is the only path for real data: inputs inside `data/private/r/`, anonymized (`anonymize.ts`), output only to `data/private/r/out/`, refused unless stamped `namesAnonymized: true` and free of every real token. See the file header for the commands.
