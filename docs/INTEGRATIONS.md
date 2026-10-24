@@ -16,7 +16,8 @@ Status values: **tested** (ran here, evidence noted), **unverified** (docs read 
 ## Dated notes
 - Sat 02:00 · A1 · Jobber GraphQL 2026-09-25: unauthenticated introspection returns HTTP 200; `users`, `timeSheetEntries` (startAt filter, START_AT sort, `totalCount`), `User.timeSheetsByDay` and `targetItem` exist; the connector's 4 query documents validate against the live schema. **tested** (schema only, no account).
 - Sat 02:15 · A1 · H1 follow-up: the connector gets its refresh token from `packages/connectors/src/jobber/cli.ts auth` (app OAuth, PKCE, `http://localhost:3000/auth`), not GraphiQL. **pending** a browser.
-- Sat 02:00 · A · H2 Gusto developer org "PayrollPilot" and application "PayrollPilot Demo" being created (signup ~01:55). **in progress**.
+- Sat 02:00 · A · H2 Gusto developer org "PayrollPilot" and application "PayrollPilot Demo" created (signup ~01:55, no approval wait); credentials in local `.env` as `GUSTO_CLIENT_ID` / `GUSTO_CLIENT_SECRET`. **tested**.
+- Sat 02:04 · A · H2 demo company requested from the portal at 02:04:32 PDT; status "generating". Ready time: _pending_.
 
 ## Live proofs (fill in as they happen)
 - First real text round trip (G1):
