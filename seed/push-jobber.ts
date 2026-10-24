@@ -29,7 +29,7 @@ export const mapPath = (company: string) => join(PRIVATE_DIR, `${company}-jobber
 
 export function plan(company: string, map: IdMap): PlanResult {
   const { fx, company: co, currentCycleId } = loadFixtures(company);
-  return buildPlan(fx, map, { currentCycleId, companyName: String(co.name).split(" (")[0] });
+  return buildPlan(fx, map, { currentCycleId, companyName: String(co.name).split(" (")[0], timezone: String(co.timezone) });
 }
 
 /** Steps needed for one target step, dependencies first (for --one). */
@@ -111,32 +111,39 @@ async function paginate(client: SeedClient, query: string, root: string, vars: R
 }
 
 /**
- * Refuses (throws) unless the authorized account is allowlisted: its id equals JOBBER_SEED_ACCOUNT_ID,
- * or Jobber reports it as a developer tester account. There is no "any account" fallback: with the env
- * var unset, only a tester account passes. The refusal prints the id and name so it can be set.
+ * Refuses (throws) unless the authorized account id equals JOBBER_SEED_ACCOUNT_ID. There is no fallback:
+ * the live schema has no Account.tester field, so an unset variable always refuses. The refusal prints the
+ * account id and name so it can be copied into .env.
  */
 export async function requireAllowedAccount(
   client: Pick<SeedClient, "gql">,
   env: Record<string, string | undefined> = process.env,
-): Promise<{ id: string; name: string; tester: boolean; via: "allowlist" | "tester" }> {
+): Promise<{ id: string; name: string }> {
   const r = await client.gql(QUERIES.account);
-  const account = r.data?.account as { id: string; name: string; tester: boolean } | undefined;
+  const account = r.data?.account as { id: string; name: string } | undefined;
   if (!account?.id) throw new Error(`account query failed: ${r.errors.map((e) => e.message).join("; ")}`);
   const allowed = env.JOBBER_SEED_ACCOUNT_ID?.trim();
-  if (allowed && account.id === allowed) return { ...account, via: "allowlist" };
-  if (account.tester === true) return { ...account, via: "tester" };
+  if (allowed && account.id === allowed) return account;
   throw new Error(
-    `REFUSED: authorized Jobber account id=${account.id} name="${account.name}" tester=${account.tester} is not allowlisted. ` +
+    `REFUSED: authorized Jobber account id=${account.id} name="${account.name}" is not allowlisted. ` +
       (allowed ? `JOBBER_SEED_ACCOUNT_ID is set to a different account (${allowed}).` : "JOBBER_SEED_ACCOUNT_ID is not set.") +
       " If this is the PayrollPilot seed account, set JOBBER_SEED_ACCOUNT_ID to this id in .env and rerun.",
   );
+}
+
+/** Mutations the steps need that the live schema does not have. Live mode writes nothing if any are missing. */
+export async function missingMutations(client: Pick<SeedClient, "gql">, steps: Step[]): Promise<string[]> {
+  const r = await client.gql(QUERIES.mutationNames);
+  const fields = ((r.data?.__type as { fields?: { name: string }[] } | undefined)?.fields ?? []).map((f) => f.name);
+  if (!fields.length) throw new Error(`could not read the Mutation type: ${r.errors.map((e) => e.message).join("; ")}`);
+  return [...new Set(steps.map((s) => s.mutation))].filter((m) => !fields.includes(m)).sort();
 }
 
 async function live(company: string, opts: { one: boolean }) {
   const auth = seedAuthFromEnv();
   const client = new SeedClient(auth);
   const account = await requireAllowedAccount(client);
-  console.log(`account ${account.id} "${account.name}" allowed (${account.via})`);
+  console.log(`account ${account.id} "${account.name}" allowed (JOBBER_SEED_ACCOUNT_ID)`);
 
   const map: IdMap = readJsonOrNull<IdMap>(mapPath(company)) ?? {};
   const save = () => writePrivateJson(mapPath(company), map);
@@ -187,6 +194,11 @@ async function live(company: string, opts: { one: boolean }) {
     console.log(`--one: creating ${earliest.ourId} (${(earliest.variables.input as Record<string, unknown>).startAt}) and ${steps.length - 1} record(s) it needs`);
   }
 
+  const absent = await missingMutations(client, steps);
+  if (absent.length) {
+    throw new Error(`STOP before any write: the live schema has no ${absent.join(", ")}. Nothing was created. (see the NOT IN THE LIVE SCHEMA notes in seed/lib/jobber-mutations.ts)`);
+  }
+
   let done = 0;
   for (const s of steps) {
     const missingRefs: string[] = [];
@@ -209,6 +221,13 @@ async function live(company: string, opts: { one: boolean }) {
   }
 }
 
+/** The redirected address for auth-code: argument, else PASTED_URL, else stdin. */
+export async function pastedAddress(arg: string | undefined, env: Record<string, string | undefined>, readStdin: () => Promise<string> = () => Bun.stdin.text()): Promise<string> {
+  const v = arg ?? env.PASTED_URL ?? (await readStdin());
+  if (!v?.trim()) throw new Error("no address given: pipe it on stdin or set PASTED_URL");
+  return v.trim();
+}
+
 // ---------------------------------------------------------------- cli
 
 if (import.meta.main) {
@@ -220,9 +239,15 @@ if (import.meta.main) {
   };
   try {
     if (args[0] === "auth-url") {
-      console.log(`Open this URL as the seed account admin, approve, then run auth-code with the ?code= value:\n${authorizeUrl(seedAuthFromEnv().clientId, val("redirect"))}`);
+      console.log(
+        `Open this URL as the seed account admin and approve:\n${authorizeUrl(seedAuthFromEnv().clientId, val("redirect"))}\n\n` +
+          "The browser lands on the callback page. Copy the WHOLE address from the address bar, then either:\n" +
+          "  pbpaste | bun run seed/push-jobber.ts auth-code        (stdin)\n" +
+          "  PASTED_URL='<address>' bun run seed/push-jobber.ts auth-code\n" +
+          "The code is single-use and expires within minutes.",
+      );
     } else if (args[0] === "auth-code") {
-      await exchangeCode(seedAuthFromEnv(), args[1]);
+      await exchangeCode(seedAuthFromEnv(), await pastedAddress(args[1], process.env));
       console.log("seed-app token saved under data/private/");
     } else {
       const company = val("company");
