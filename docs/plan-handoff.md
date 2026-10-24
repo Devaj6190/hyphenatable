@@ -160,6 +160,15 @@ Required in the plan:
 - **Demo and pitch** owned from hour one: video opening with the moment, live demo, judge-scenario readiness, Devpost text, project image.
 - **Two proposed roles** for Devaj and Varnika, plus Shanin's role, for the team to assign.
 
+## 9b. How to work on the plan
+
+- **Be thorough. This plan decides whether we win.** Make it in-depth and specific enough that each teammate can start their part without a meeting.
+- **Research before deciding.** For every tool and integration (Jobber GraphQL API and developer testing accounts, QuickBooks sandbox, Gusto demo environment, Photon, the memory options, Playwright and browser tools, hosting, the sponsor tracks you recommend), read the official docs or run a quick test. Label anything you could not verify, and give it a first-hour check with an owner.
+- **Pick the best option, not the familiar one.** Compare real alternatives where the choice matters (memory system, number of agents, backend framework, database) and say why you chose.
+- **Design for three people working in parallel.** Split work so nobody waits on anyone else: agree on the shared data shapes first, give each person files they alone own, let each start with fake data that matches the shapes, and set clear hand-off points. Plan when the three pieces come together and how to test them together.
+- **Use the time well.** Front-load the risky integrations, put gates on the clock, protect time for sleep, the video, rehearsal and submission before 9:00 AM Sunday.
+- **Ask Shanin** only for decisions that truly block the plan, in one short list. Make reversible technical choices yourself and note them.
+
 ## 10. Lessons from the earlier build (PayrollPilot, Oct 20)
 
 - **Data came last, so the demo ran on fixtures.** This time, seed the sandbox and pull real data first.
