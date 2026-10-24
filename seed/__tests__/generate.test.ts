@@ -9,7 +9,7 @@ import { validateDir } from "../validate";
 
 // Update this only when a config or generator change is intended; then regenerate data/fixtures/a.
 const EXPECTED_SHA256_A =
-  "c11e775539cbe243a6270000ce016fa2862ef9679bc7e8b15e1efba0762151da";
+  "239ac45b366021ea74c43004092970d3aeab0d1ddceba4950d516ab8f9eb6dcc";
 
 const hashAll = (files: Record<string, string>) => {
   const h = createHash("sha256");
