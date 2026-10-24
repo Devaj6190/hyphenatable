@@ -8,8 +8,7 @@ import type { DataKind } from "@/components/DataLabel";
 import { FlagCard } from "@/components/FlagCard";
 import { Button } from "@/components/ui/button";
 import { checkTitle } from "@/lib/checks";
-import { fixtureMessages } from "@/lib/fixtures";
-import { affectsLabel, flagAgents, questionFor, recipient } from "@/lib/home";
+import { affectsLabel, type FlagInfo, infoFor } from "@/lib/home";
 import type { Flag } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -20,6 +19,7 @@ const LIMIT = 3;
 // one-line confirmation with Undo while its neighbours move up (--dur-archive; instant with reduced motion).
 export function NeedsYouList({
   items,
+  info,
   decisions,
   onDecide,
   dataKind,
@@ -28,6 +28,7 @@ export function NeedsYouList({
 }: {
   /** Items that need the owner, plus the ones decided on this screen (kept in place). */
   items: Flag[];
+  info: Record<string, FlagInfo>;
   decisions: Record<string, Decision>;
   onDecide: (flag: Flag, decision: Decision | null) => void;
   dataKind: DataKind;
@@ -69,6 +70,7 @@ export function NeedsYouList({
               <Item
                 key={f.id}
                 flag={f}
+                info={infoFor(info, f.id)}
                 decision={decisions[f.id]}
                 onDecide={(d) => onDecide(f, d)}
                 dataKind={dataKind}
@@ -104,28 +106,23 @@ function AllClear() {
 
 function Item({
   flag,
+  info,
   decision,
   onDecide,
   dataKind,
 }: {
   flag: Flag;
+  info: FlagInfo;
   decision: Decision | undefined;
   onDecide: (d: Decision | null) => void;
   dataKind: DataKind;
 }) {
   const router = useRouter();
   const undo = useRef<HTMLButtonElement>(null);
-  const q = questionFor(flag);
-  const who = recipient(q);
+  const { question: q, recipient: who, reply } = info;
   const detail = `/c/${flag.companyId}/flags/${flag.id}`;
   // A reply came in (the flag is answered) or a drafted text waits for approval. `flag` keeps its
   // status from the source; this screen's decision lives in `decision`.
-  const reply =
-    flag.status === "answered"
-      ? fixtureMessages.find(
-          (m) => m.questionId === q?.id && m.direction === "in",
-        )
-      : undefined;
   const kind: "reply" | "draft" | "decide" = reply
     ? "reply"
     : q?.status === "draft"
@@ -133,7 +130,7 @@ function Item({
       : "decide";
 
   // Keep keyboard focus on the item: the folded side goes inert, so focus moves to Undo and,
-  // after Undo, back to the card's primary action.
+  // after Undo, back to the card's first visible button (source chips in the closed details are hidden).
   const card = useRef<HTMLDivElement>(null);
   const decided = useRef(false);
   useEffect(() => {
@@ -141,7 +138,9 @@ function Item({
       decided.current = true;
       undo.current?.focus({ preventScroll: true });
     } else if (decided.current) {
-      card.current?.querySelector("button")?.focus({ preventScroll: true });
+      [...(card.current?.querySelectorAll("button") ?? [])]
+        .find((b) => b.checkVisibility())
+        ?.focus({ preventScroll: true });
     }
   }, [decision]);
 
@@ -170,7 +169,7 @@ function Item({
                     : checkTitle(flag.checkId)
               }
               affectsLabel={affectsLabel(flag.checkId)}
-              agents={flagAgents(flag.id)}
+              agents={info.agents}
               approveLabel={
                 kind === "draft"
                   ? "Approve and send"

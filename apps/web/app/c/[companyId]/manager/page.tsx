@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { ManagerInbox } from "@/components/ManagerInbox";
 import { companies } from "@/lib/companies";
+import { managerInbox } from "@/lib/server/fixtures";
 
 // Params are read inside Suspense so the shell stays instant (Next 16).
 export default function ManagerPage({
@@ -28,5 +29,11 @@ async function Body({
   const { companyId } = await params;
   const company = companies[companyId];
   if (!company) notFound();
-  return <ManagerInbox companyId={companyId} dataKind={company.kind} />;
+  return (
+    <ManagerInbox
+      data={managerInbox(companyId)}
+      dataKind={company.kind}
+      timezone={company.timezone}
+    />
+  );
 }

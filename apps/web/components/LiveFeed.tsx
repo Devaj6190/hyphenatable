@@ -10,8 +10,8 @@ import { LiveBoundary } from "@/components/LiveBoundary";
 import { useRole } from "@/components/RoleProvider";
 import { SimulatedChip } from "@/components/SimulatedChip";
 import { forViewerEvents, isSimulated } from "@/lib/audit";
-import { AUDIT_FIXTURE_SOURCE, fixtureAudit } from "@/lib/fixtures";
-import { clock, FIXTURE_NOW } from "@/lib/home";
+import { clock } from "@/lib/home";
+import { AUDIT_FIXTURE_SOURCE } from "@/lib/sources";
 import type { AuditEvent } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -52,24 +52,21 @@ export function LiveFeed({
   companyId,
   cycleId,
   timeZone,
+  fixtureEvents,
+  visibleFlagIds,
   extra = [],
 }: {
   companyId: string;
   cycleId: string;
   timeZone: string;
+  /** The cycle's audit fixture, already filtered and redacted on the server for this viewer. */
+  fixtureEvents: AuditEvent[];
+  /** Flags this viewer may see, so live events about other flags are dropped for a manager. */
+  visibleFlagIds: ReadonlySet<string>;
   extra?: AuditEvent[];
 }) {
   const fixture = (note: string) =>
-    render(
-      fixtureAudit.filter(
-        (e) =>
-          e.companyId === companyId &&
-          e.cycleId === cycleId &&
-          e.at <= FIXTURE_NOW,
-      ),
-      `${AUDIT_FIXTURE_SOURCE} (${note})`,
-      false,
-    );
+    render(fixtureEvents, `${AUDIT_FIXTURE_SOURCE} (${note})`, false);
   const render: Render = (events, source, live) => (
     <Feed
       events={[...extra, ...events]}
@@ -78,6 +75,7 @@ export function LiveFeed({
       live={live}
       timeZone={timeZone}
       companyId={companyId}
+      visibleFlagIds={visibleFlagIds}
     />
   );
   if (!hasConvex) return fixture("Convex not configured");
@@ -97,6 +95,7 @@ function Feed({
   live,
   timeZone,
   companyId,
+  visibleFlagIds,
 }: {
   events: AuditEvent[];
   freshIds: Set<string>;
@@ -104,9 +103,10 @@ function Feed({
   live: boolean;
   timeZone: string;
   companyId: string;
+  visibleFlagIds: ReadonlySet<string>;
 }) {
   const { role } = useRole();
-  const shown = forViewerEvents(events, role)
+  const shown = forViewerEvents(events, role, visibleFlagIds)
     .sort((a, b) => b.at.localeCompare(a.at))
     .slice(0, SHOWN);
 

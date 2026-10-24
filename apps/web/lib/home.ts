@@ -1,10 +1,11 @@
 import type { AgentKind } from "@/components/AgentChip";
-import { fixtureEvents, fixtureQuestions, workerName } from "@/lib/fixtures";
-import type { Flag, Question, SourceSystem } from "@/lib/types";
-import cyclesA from "../../../data/fixtures/a/cycles.json";
-import rulesA from "../../../data/fixtures/a/rules.json";
-import syncRunsA from "../../../data/fixtures/a/syncRuns.json";
-import workersA from "../../../data/fixtures/a/workers.json";
+import type {
+  AuditEvent,
+  Flag,
+  Question,
+  SourceSystem,
+  ThreadMessage,
+} from "@/lib/types";
 
 // Section 6 shapes, the slices the home and inputs pages read. B's schema replaces these.
 export type Cycle = {
@@ -54,41 +55,37 @@ export type RosterWorker = {
   venmoRateCents: number | null;
 };
 
-// Generated fixtures from A (data/fixtures/<id>). Only Company A has them so far.
-const fixtures: Record<
-  string,
-  { cycles: Cycle[]; syncRuns: SyncRun[]; ruleStatuses: string[] }
-> = {
-  a: {
-    cycles: cyclesA as Cycle[],
-    syncRuns: syncRunsA as SyncRun[],
-    ruleStatuses: rulesA.map((r) => r.status),
-  },
+/** What one flag's card needs beyond the flag. Built on the server (lib/server/home.ts). */
+export type FlagInfo = {
+  question: Question | null;
+  recipient: string;
+  /** The worker's text back, when the flag is answered. */
+  reply: ThreadMessage | null;
+  agents: AgentKind[];
 };
 
-export function homeFixture(companyId: string) {
-  const f = fixtures[companyId];
-  if (!f) return null;
-  const sorted = [...f.cycles].sort((a, b) => a.number - b.number);
-  const raw = sorted.at(-1);
-  if (!raw) return null;
-  // ponytail: cycles.json is the pre-run snapshot (stage "setup"); app/_fixtures show the same cycle
-  // mid-way with questions out, so the tracker shows "asking". cycles.get replaces both.
-  const cycle: Cycle = { ...raw, stage: "asking" };
-  return {
-    cycle,
-    previous: sorted.at(-2) ?? null,
-    syncRuns: f.syncRuns.filter((r) => r.cycleId === cycle.id),
-    rulesProposed: f.ruleStatuses.filter((s) => s === "proposed").length,
-  };
-}
+// What the server hands the home and inputs pages, already filtered and redacted for the viewer.
+export type HomeData = {
+  flags: Flag[];
+  info: Record<string, FlagInfo>;
+  audit: AuditEvent[];
+  cycle: Cycle | null;
+  previousQuestionsAsked: number | null;
+  /** Fixture questions sent or answered this cycle. */
+  questionsAsked: number;
+  syncRuns: SyncRun[];
+  rulesProposed: number;
+};
 
-// ponytail: app/_fixtures/audit.json runs past the moment flags.json shows (it goes on to Gate 1 and the
-// Gusto draft), so the fixture feed stops at the correction proposal. Live audit.list has no cutoff.
-export const FIXTURE_NOW = "2026-10-24T08:41:00.000Z";
-
-export const roster = (companyId: string): RosterWorker[] =>
-  companyId === "a" ? (workersA as RosterWorker[]) : [];
+// Live Convex flags have no fixture info yet; the controller found it if nobody else is on record.
+const NO_INFO: FlagInfo = {
+  question: null,
+  recipient: "the right person",
+  reply: null,
+  agents: ["controller"],
+};
+export const infoFor = (info: Record<string, FlagInfo>, flagId: string) =>
+  info[flagId] ?? NO_INFO;
 
 // The eight stages from the C plan (4.5), mapped from Cycle.stage.
 export const STAGES = [
@@ -151,23 +148,6 @@ export function countFlags(flags: Flag[], runs: SyncRun[]) {
     open: by(["open", "answered", "asked"]),
     held: by(["held"]),
   };
-}
-
-export const questionFor = (f: Flag): Question | undefined =>
-  fixtureQuestions.find((q) => q.id === f.questionId);
-
-export function recipient(q: Question | undefined): string {
-  if (!q) return "the right person";
-  const name = workerName(q.toWorkerId);
-  return q.toRole === "employee" ? name : `${name}, ${q.toRole}`;
-}
-
-// Agents that touched this flag, from its events; the controller found it if nobody else did.
-export function flagAgents(flagId: string): AgentKind[] {
-  const agents = fixtureEvents
-    .filter((e) => e.flagId === flagId && e.actor.agent)
-    .map((e) => e.actor.agent as AgentKind);
-  return agents.length ? [...new Set(agents)] : ["controller"];
 }
 
 export function affectsLabel(checkId: string): string {

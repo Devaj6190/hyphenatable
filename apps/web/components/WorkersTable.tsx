@@ -6,7 +6,7 @@ import { Money } from "@/components/Money";
 import { useRole } from "@/components/RoleProvider";
 import { SourceChip } from "@/components/SourceChip";
 import { flagStatus, StatusBadge } from "@/components/StatusBadge";
-import { type RosterWorker, roster } from "@/lib/home";
+import type { RosterWorker } from "@/lib/home";
 import type { Flag } from "@/lib/types";
 
 const paidBy: Record<RosterWorker["payType"], string> = {
@@ -20,10 +20,18 @@ const paidBy: Record<RosterWorker["payType"], string> = {
 const urgency: Flag["status"][] = ["open", "answered", "held", "asked"];
 
 // Who is in this payroll and the rate each system holds, as pulled. Rates are shown side by side,
-// never reconciled here; hours and pay are computed in the workbook. Rates are owner-only.
-export function WorkersTable({ companyId }: { companyId: string }) {
+// never reconciled here; hours and pay are computed in the workbook. Rates are owner-only: the server
+// sends a manager none (lib/server/home.ts rosterView), and the columns are hidden too.
+export function WorkersTable({
+  companyId,
+  workers,
+  flags: fixtureFlags,
+}: {
+  companyId: string;
+  workers: RosterWorker[];
+  flags: Flag[];
+}) {
   const { role } = useRole();
-  const workers = roster(companyId);
   if (workers.length === 0)
     return (
       <p className="rounded-card border bg-card p-6 text-muted-foreground">
@@ -31,7 +39,7 @@ export function WorkersTable({ companyId }: { companyId: string }) {
       </p>
     );
   return (
-    <FlagsSource companyId={companyId}>
+    <FlagsSource companyId={companyId} fixtureFlags={fixtureFlags}>
       {(flags) => (
         <div className="overflow-x-auto rounded-card border bg-card">
           <table className="w-full min-w-[40rem] text-sm">

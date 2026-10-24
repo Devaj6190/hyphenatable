@@ -12,7 +12,9 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { bucket, must } from "./lib/must";
 import {
+  ACCOUNT_MARKER,
   buildQboPlan,
+  OURS_SUFFIX,
   PRIVATE_DIR,
   QBO_SEED_TOKEN_PATH,
   type QboFixtures,
@@ -23,6 +25,7 @@ import {
   type Rec,
   readJsonOrNull,
   resolveQboRefs,
+  VENDOR_MARKER,
   writePrivateJson,
 } from "./lib/qbo";
 
@@ -183,6 +186,30 @@ async function live(company: string, opts: { reseed: boolean }) {
     .sort();
   const [from, to] = [dates[0], must(dates.at(-1))];
 
+  // Mapped accounts/vendors must be ours (suffix + marker). An earlier run could adopt or create a bare-named
+  // one ("Disposal"); such mappings are dropped so ours is ensured instead. The bare record is left untouched.
+  for (const [object, entity, field, marker] of [
+    ["accounts", "Account", "Description", ACCOUNT_MARKER],
+    ["vendors", "Vendor", "Notes", VENDOR_MARKER],
+  ] as const) {
+    for (const [key, id] of Object.entries(map[object] ?? {})) {
+      const rows = await selectAll(client, entity, `Id = '${q(id)}'`);
+      const r = rows[0];
+      const name = String(r?.FullyQualifiedName ?? r?.DisplayName ?? "");
+      if (
+        r &&
+        name.endsWith(OURS_SUFFIX) &&
+        String(r[field] ?? "").includes(marker)
+      )
+        continue;
+      console.log(
+        `DROPPED mapping ${object} "${key}" -> ${id} ("${name}"): not one of ours; left as is in the sandbox`,
+      );
+      delete (map[object] as Record<string, string>)[key];
+    }
+  }
+  save();
+
   const existing = await ourTxns(client, from, to);
   if (opts.reseed) {
     for (const t of existing) {
@@ -205,7 +232,7 @@ async function live(company: string, opts: { reseed: boolean }) {
       const rows = await selectAll(
         client,
         s.entity,
-        `${s.lookup.field} = '${q(s.lookup.value)}'`,
+        `${s.lookup.field} = '${q(s.lookup.value)}' AND Active = true`,
       );
       if (rows.length > 1)
         throw new Error(
@@ -214,10 +241,12 @@ async function live(company: string, opts: { reseed: boolean }) {
       if (rows[0]) {
         if (
           s.requireMarker &&
-          !String(rows[0].Notes ?? "").includes(s.requireMarker)
+          !String(rows[0][s.requireMarker.field] ?? "").includes(
+            s.requireMarker.value,
+          )
         ) {
           throw new Error(
-            `${s.entity} '${s.lookup.value}' exists in the sandbox but is not ours (no ${s.requireMarker} in Notes); rename it or pick another sandbox company`,
+            `${s.entity} '${s.lookup.value}' exists in the sandbox but is not ours (no ${s.requireMarker.value} in ${s.requireMarker.field}); refusing to adopt it`,
           );
         }
         bucket(map, s.object)[s.key] = rows[0].Id as string;

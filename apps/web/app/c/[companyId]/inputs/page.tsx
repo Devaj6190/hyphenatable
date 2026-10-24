@@ -7,7 +7,8 @@ import { PageHeader } from "@/components/PageHeader";
 import { SyncStrip } from "@/components/SyncStrip";
 import { WorkersTable } from "@/components/WorkersTable";
 import { companies } from "@/lib/companies";
-import { homeFixture } from "@/lib/home";
+import { currentViewer } from "@/lib/server/fixtures";
+import { homeView, rosterView } from "@/lib/server/home";
 
 // Board 2, reached from the home's sync strip ("See every input") and "See all problems".
 export default function InputsPage({
@@ -26,7 +27,9 @@ async function Inputs({
   const { companyId } = await params;
   const company = companies[companyId];
   if (!company) notFound();
-  const fx = homeFixture(companyId);
+  // Fixture mode: filtered and redacted on the server for the viewer in the role cookie.
+  const viewer = await currentViewer(companyId);
+  const fx = homeView(viewer, companyId);
 
   return (
     <div className="flex flex-col gap-8">
@@ -53,7 +56,7 @@ async function Inputs({
           comes up short is red and holds everything it covers.
         </p>
         <SyncStrip
-          runs={fx?.syncRuns ?? []}
+          runs={fx.syncRuns}
           timeZone={company.timezone}
           companyId={companyId}
           detailed
@@ -68,7 +71,12 @@ async function Inputs({
         <h2 id="problems-title" className="text-xl font-semibold">
           Problems found
         </h2>
-        <FlagsList companyId={companyId} />
+        <FlagsList
+          companyId={companyId}
+          flags={fx.flags}
+          info={fx.info}
+          viewerId={viewer.workerId}
+        />
       </section>
 
       <section aria-labelledby="workers-title" className="flex flex-col gap-3">
@@ -84,7 +92,11 @@ async function Inputs({
             <ArrowRight aria-hidden className="size-4" />
           </Link>
         </div>
-        <WorkersTable companyId={companyId} />
+        <WorkersTable
+          companyId={companyId}
+          workers={rosterView(viewer, companyId)}
+          flags={fx.flags}
+        />
         <p className="text-xs text-muted-foreground">
           Source: data/fixtures/a/workers.json, {company.kind}. Rates are shown
           as each system holds them, side by side.

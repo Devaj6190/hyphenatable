@@ -63,6 +63,10 @@ export interface TimesheetRow {
   category: string | null;
   approved: boolean | null;
   hasNote: boolean;
+  /** CSV export: the name carried a " Team Leader" role suffix (stripped from workerName) */
+  teamLeader?: boolean;
+  /** free text from "Working on" that is neither a job nor a category (real text: anonymize drops it) */
+  label?: string | null;
 }
 
 function approvedOf(c: Cell | undefined): boolean | null {

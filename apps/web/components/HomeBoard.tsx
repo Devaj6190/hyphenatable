@@ -12,8 +12,7 @@ import { flagStatus, StatusBadge } from "@/components/StatusBadge";
 import { SyncStrip } from "@/components/SyncStrip";
 import { checkTitle } from "@/lib/checks";
 import { companies } from "@/lib/companies";
-import { fixtureQuestions } from "@/lib/fixtures";
-import { countFlags, homeFixture, questionFor, recipient } from "@/lib/home";
+import { countFlags, type FlagInfo, type HomeData, infoFor } from "@/lib/home";
 import type { AuditEvent, Flag } from "@/lib/types";
 
 // Answered first (a reply is the fastest thing to finish), then drafted texts, then the rest.
@@ -21,9 +20,16 @@ const order: Partial<Record<Flag["status"], number>> = { answered: 0, open: 1 };
 
 // The owner home (boards 1 and 1b). Decisions made here stay on this screen until B's
 // questions.approve / corrections.approve are live; each one is labelled as not saved.
-export function HomeBoard({ companyId }: { companyId: string }) {
+export function HomeBoard({
+  companyId,
+  data,
+}: {
+  companyId: string;
+  /** Filtered and redacted on the server for this viewer (lib/server/home.ts). */
+  data: HomeData;
+}) {
   const company = companies[companyId];
-  const fx = homeFixture(companyId);
+  const { cycle, info } = data;
   const [decisions, setDecisions] = useState<Record<string, Decision>>({});
   const [extra, setExtra] = useState<AuditEvent[]>([]);
 
@@ -32,16 +38,16 @@ export function HomeBoard({ companyId }: { companyId: string }) {
       d ? { ...rest, [flag.id]: d } : rest,
     );
     setExtra((prev) => [
-      ...(d ? [ownEvent(flag, d)] : []),
+      ...(d ? [ownEvent(flag, d, infoFor(info, flag.id))] : []),
       ...prev.filter((e) => e.refs.flagId !== flag.id),
     ]);
   }
 
   return (
-    <FlagsSource companyId={companyId}>
+    <FlagsSource companyId={companyId} fixtureFlags={data.flags}>
       {(raw, source) => {
         const flags = raw.map((f) => applyDecision(f, decisions[f.id]));
-        const counts = countFlags(flags, fx?.syncRuns ?? []);
+        const counts = countFlags(flags, data.syncRuns);
         const items = raw
           .filter((f) => f.status === "open" || f.status === "answered")
           .sort((a, b) => (order[a.status] ?? 2) - (order[b.status] ?? 2));
@@ -49,11 +55,7 @@ export function HomeBoard({ companyId }: { companyId: string }) {
           (f) => f.status === "asked" || f.status === "held",
         );
         const asked =
-          fixtureQuestions.filter(
-            (q) =>
-              q.cycleId === fx?.cycle.id &&
-              !["draft", "approved", "denied"].includes(q.status),
-          ).length +
+          data.questionsAsked +
           Object.entries(decisions).filter(
             ([id, d]) =>
               d === "approved" &&
@@ -66,10 +68,10 @@ export function HomeBoard({ companyId }: { companyId: string }) {
               needsYou={counts.needsYou}
               waiting={counts.waiting}
               held={counts.held}
-              hasCycle={Boolean(fx)}
+              hasCycle={Boolean(cycle)}
               questions={
-                fx && fx.cycle.number >= 2
-                  ? { now: asked, last: fx.previous?.questionsAsked ?? null }
+                cycle && cycle.number >= 2
+                  ? { now: asked, last: data.previousQuestionsAsked }
                   : null
               }
             />
@@ -78,8 +80,8 @@ export function HomeBoard({ companyId }: { companyId: string }) {
               aria-label="Where this payroll is"
               className="flex flex-col gap-5 rounded-card border bg-card p-5 shadow-card"
             >
-              {fx ? (
-                <StageTracker stage={fx.cycle.stage} />
+              {cycle ? (
+                <StageTracker stage={cycle.stage} />
               ) : (
                 <p className="text-muted-foreground">
                   No pay cycle is loaded for {company.label} yet. Stages show
@@ -88,7 +90,7 @@ export function HomeBoard({ companyId }: { companyId: string }) {
               )}
               <div className="border-t pt-4">
                 <SyncStrip
-                  runs={fx?.syncRuns ?? []}
+                  runs={data.syncRuns}
                   timeZone={company.timezone}
                   companyId={companyId}
                 />
@@ -99,27 +101,27 @@ export function HomeBoard({ companyId }: { companyId: string }) {
               <div className="flex min-w-0 flex-col gap-8">
                 <NeedsYouList
                   items={items}
+                  info={info}
                   decisions={decisions}
                   onDecide={decide}
                   dataKind={company.kind}
                   companyId={companyId}
                   total={raw.length}
                 />
-                {waiting.length > 0 && <Waiting flags={waiting} />}
+                {waiting.length > 0 && <Waiting flags={waiting} info={info} />}
               </div>
               <aside className="flex flex-col gap-8">
                 <Counts
                   counts={counts}
                   source={`flags from ${source}; records from data/fixtures/a/syncRuns.json`}
                 />
-                <Learns
-                  companyId={companyId}
-                  proposed={fx?.rulesProposed ?? 0}
-                />
+                <Learns companyId={companyId} proposed={data.rulesProposed} />
                 <LiveFeed
                   companyId={companyId}
-                  cycleId={fx?.cycle.id ?? ""}
+                  cycleId={cycle?.id ?? ""}
                   timeZone={company.timezone}
+                  fixtureEvents={data.audit}
+                  visibleFlagIds={new Set(raw.map((f) => f.id))}
                   extra={extra}
                 />
               </aside>
@@ -141,8 +143,8 @@ function applyDecision(f: Flag, d: Decision | undefined): Flag {
   return { ...f, status: f.status === "answered" ? "corrected" : "asked" };
 }
 
-function ownEvent(flag: Flag, d: Decision): AuditEvent {
-  const who = recipient(questionFor(flag));
+function ownEvent(flag: Flag, d: Decision, info: FlagInfo): AuditEvent {
+  const who = info.recipient;
   const title = checkTitle(flag.checkId).toLowerCase();
   const reply = flag.status === "answered";
   return {
@@ -209,7 +211,13 @@ function Hero({
   );
 }
 
-function Waiting({ flags }: { flags: Flag[] }) {
+function Waiting({
+  flags,
+  info,
+}: {
+  flags: Flag[];
+  info: Record<string, FlagInfo>;
+}) {
   return (
     <section aria-labelledby="waiting-title" className="flex flex-col gap-3">
       <h2 id="waiting-title" className="text-xl font-semibold">
@@ -218,7 +226,6 @@ function Waiting({ flags }: { flags: Flag[] }) {
       <ul className="flex flex-col overflow-hidden rounded-card border bg-card">
         {flags.map((f) => {
           const s = flagStatus[f.status];
-          const q = questionFor(f);
           return (
             <li
               key={f.id}
@@ -234,7 +241,7 @@ function Waiting({ flags }: { flags: Flag[] }) {
               <span className="text-sm text-muted-foreground">
                 {f.status === "held"
                   ? "Only this item waits. Payroll keeps moving."
-                  : `Asked ${recipient(q)}.`}
+                  : `Asked ${infoFor(info, f.id).recipient}.`}
               </span>
             </li>
           );
