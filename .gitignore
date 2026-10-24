@@ -1,0 +1,21 @@
+# Local secrets and private data
+.env
+.env.*
+!.env.example
+data/private/
+
+# Dependencies and builds
+node_modules/
+.next/
+.convex/
+dist/
+.venv/
+__pycache__/
+
+# OS and editor
+.DS_Store
+.idea/
+.vscode/
+
+# Tool state
+.claude/settings.local.json
