@@ -81,7 +81,7 @@ bun run seed/push-qbo.ts --company a --live --reseed   # deletes OUR Purchases/B
 
 - **Host:** `sandbox-quickbooks.api.intuit.com` only. Every URL is built in one function that refuses any other host.
 - **What is created:**
-  - Accounts and vendors are looked up by name and created only if missing.
+  - Accounts and vendors are **ours only**: named with the suffix ` (payrollpilot)` (e.g. `Equipment Rental (payrollpilot)`, AccountType Expense, `Description: payrollpilot:account`; vendors with `Notes: payrollpilot:vendor`), looked up by FullyQualifiedName (vendors by DisplayName) among Active records, created if absent. The sandbox sample chart is never adopted or modified, and a bare name is never used for lookup. A mapping left by an older run that points at a non-suffixed record is dropped (printed as DROPPED) and ours is ensured instead. The read connector strips the suffix to recover the fixture names.
   - One parent customer per client, and one sub-customer per job (`Job: true`, `DisplayName` = job number, marker in `Notes`). A name match without our marker is refused, never adopted.
   - One Purchase per QuickBooks expense (CreditCard, from the "Company A Card (payrollpilot)" account), with the expense account on the line and `CustomerRef` only when the fixture is job-tagged. a-ex-0003 (CHK-14) has none.
   - Bills for two vendor invoices: the first two past-cycle Equipment Rental expenses. The current cycle's Purchase count therefore equals the fixtures (6).
@@ -119,7 +119,22 @@ Jobber has no API to create time entries. Every hour in Company A comes from the
    - **12:00 PM – 4:00 PM** (4 h) → becomes `a-te-0113`
 
    These intentionally overlap by 3 h 30 m. Enter each one once; a second copy makes adopt report AMBIGUOUS. Leave the notes empty.
-2. **Approve them.** Timesheets > Approve Timesheets > approve both of Sam Okafor's Oct 14 entries. In the fixtures they are approved by Dakota Brennan, the manager.
+1b. **More planted entries, optional (each makes one more check fire on a real Jobber record).** Timesheets, Eastern times, one entry each unless noted, no notes needed:
+
+    | Fixture id | Check | User | Day | Job | Time (ET) |
+    |---|---|---|---|---|---|
+    | a-te-0121 | CHK-01 no job | **Casey Lindqvist** | Fri Oct 16, 2026 | **no job** (category General) | 8:00 AM – 12:00 PM (4 h) |
+    | a-te-0130 | CHK-03 long shift | **Quinn Takahashi** | Wed Oct 21, 2026 | Irrigation system install - Alder Run [payrollpilot:a-j05] | 6:00 AM – 7:00 PM (13 h) |
+    | a-te-0137 | CHK-05 zero minutes | **Riley Moreno** | Thu Oct 22, 2026 | Irrigation system install - Alder Run [payrollpilot:a-j05] | 10:15 AM – 10:15 AM (0 min) |
+    | a-te-0106 | CHK-05 duplicate (1st) | **Jordan Ellis** | Tue Oct 13, 2026 | Front yard sod install - Larkspur Ln [payrollpilot:a-j01] | 7:00 AM – 3:30 PM (8 h 30 m) |
+    | a-te-0146 | CHK-05 duplicate (2nd) | **Jordan Ellis** | Tue Oct 13, 2026 | same job | 7:00 AM – 3:30 PM, entered **again, after** the first |
+    | a-te-0183 | CHK-06 unapproved | **Avery Reed** | Fri Oct 23, 2026 | Backyard patio and drainage - Birchwood Ave [payrollpilot:a-j02] | 7:00 AM – 3:30 PM (8 h 30 m) |
+    | a-te-0184 | CHK-06 unapproved | **Sam Okafor** | Fri Oct 23, 2026 | Backyard patio and drainage - Birchwood Ave [payrollpilot:a-j02] | 7:00 AM – 3:30 PM (8 h 30 m) |
+    | a-te-0185 | CHK-06 unapproved | **Riley Moreno** | Fri Oct 23, 2026 | Backyard patio and drainage - Birchwood Ave [payrollpilot:a-j02] | 7:00 AM – 5:00 PM (10 h) |
+
+    - The duplicate pair must be two separate entries with the same times. Adopt maps the one created first to a-te-0106 and the second to a-te-0146.
+    - If the zero-minute entry can't be saved in the UI, skip it. CHK-05 then comes from the fixtures.
+2. **Approve.** Timesheets > Approve Timesheets: approve Sam Okafor's two Oct 14 entries and every entry in 1b, **except the three Fri Oct 23 entries** (Avery Reed, Sam Okafor, Riley Moreno). Those stay unapproved for CHK-06. In the fixtures, the approved ones are approved by Dakota Brennan, the manager.
 3. **CHK-02 open timer, optional.** Just before the demo pull, log in as **Casey Lindqvist** (or start it as admin for that user) and **start a timer** on the same job, "Backyard patio and drainage - Birchwood Ave [payrollpilot:a-j02]". Leave it running and don't approve it.
    - A timer can't be back-dated. It starts "now", not on Fri Oct 23 at 1:00 PM ET as in the fixture, so it falls **outside** the a-c05 pull window (Oct 10–23). Only a pull window that reaches today will show it.
    - Skip this step if CHK-02 should come from the fixtures.
@@ -127,12 +142,12 @@ Jobber has no API to create time entries. Every hour in Company A comes from the
 5. **Adopt the entries into the id map.** This step is read-only against Jobber. From the main checkout:
    ```bash
    cd ~/Development/Hackathons/hyphenatable
-   bun run seed/push-jobber.ts --company a --live --adopt-entries                       # a-te-0111, a-te-0113, a-te-0140
+   bun run seed/push-jobber.ts --company a --live --adopt-entries                       # the default set: overlap pair, timer, and every 1b entry (missing ones print NOT FOUND)
    bun run seed/push-jobber.ts --company a --live --adopt-entries --ids a-te-0111,a-te-0113   # without the timer
    ```
    - It matches by Jobber user, job and start time to the minute. A running timer is matched by user, job and `ticking`.
    - Each match prints `ADOPTED <ours> -> <jobber id>` and is written into `data/private/a-jobber-map.json` (`entries` and `adopted`). Anything else prints `NOT FOUND` or `AMBIGUOUS` and is never guessed. Rerunning is safe.
-6. **Pull and compare:** `bun run packages/connectors/src/jobber/cli.ts pull --company a --from 2026-10-10 --to 2026-10-23 --tz America/New_York --compare data/fixtures/a`. timeSheetEntries should show 2 pulled and 2 matched (a-te-0111, a-te-0113). The other 83 remain fixture-only.
+6. **Pull and compare:** `bun run packages/connectors/src/jobber/cli.ts pull --company a --from 2026-10-10 --to 2026-10-23 --tz America/New_York --compare data/fixtures/a`. timeSheetEntries should show as many pulled and matched as were adopted: 2 for the overlap pair, up to 10 with every 1b entry, plus the timer. Everything else stays fixture-only. The 3 Oct 23 entries should come back `approved=false`.
 
 **Gusto note for the demo:** the demo company has one employee of its own whose onboarding is not finished and who is **not** mapped to any Company A worker. Gusto shows it as not onboarded. Company A's CHK-09 is about **a-w14** (Reese Calloway) only. That extra employee is Gusto's sample data, not a Company A error.
 

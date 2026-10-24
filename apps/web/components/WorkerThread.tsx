@@ -4,37 +4,34 @@ import { type DataKind, DataLabel } from "@/components/DataLabel";
 import { SimulatedChip } from "@/components/SimulatedChip";
 import { Card, CardContent } from "@/components/ui/card";
 import { useDemoLocal } from "@/lib/demoLocal";
-import { fixtureMessages, workerName } from "@/lib/fixtures";
+import { formatWhen } from "@/lib/time";
 import { cn } from "@/lib/utils";
+import type { ThreadView } from "@/lib/view-types";
 
-// Texts only: who, when, words. No pay, no phone numbers. Fixture messages plus anything recorded in this
+// Texts only: who, when, words. No pay, no phone numbers. The server's thread plus anything recorded in this
 // browser (demo panel replies, answers given in the inbox), so a reply shows up the moment it is recorded.
 // `title` (+ `dataKind`) wraps the thread in its own card, as the problem detail page uses it.
 export function WorkerThread({
-  questionId,
-  timeZone = "America/Los_Angeles",
+  thread,
+  questionId = thread.messages[0]?.questionId,
   title,
   dataKind,
+  timezone,
 }: {
-  questionId: string;
-  timeZone?: string;
+  thread: ThreadView;
+  questionId?: string;
   title?: string;
   dataKind?: DataKind;
+  timezone: string;
 }) {
   const local = useDemoLocal();
-  const messages = [...fixtureMessages, ...local.messages]
-    .filter((m) => m.questionId === questionId)
-    .sort((a, b) => a.at.localeCompare(b.at));
+  const messages = [
+    ...thread.messages,
+    ...local.messages.filter((m) => m.questionId === questionId),
+  ].sort((a, b) => a.at.localeCompare(b.at));
   if (messages.length === 0) return null;
-  const when = new Intl.DateTimeFormat("en-US", {
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-    timeZone,
-  });
 
-  const thread = (
+  const list = (
     <ol aria-label="Texts" className="flex flex-col gap-3">
       {messages.map((m) => {
         const out = m.direction === "out";
@@ -59,9 +56,9 @@ export function WorkerThread({
                 ? "PayrollPilot"
                 : m.simulated
                   ? "Simulated reply"
-                  : workerName(m.workerId)}
+                  : thread.workerName}
               <span aria-hidden>·</span>
-              <time dateTime={m.at}>{when.format(new Date(m.at))}</time>
+              <time dateTime={m.at}>{formatWhen(m.at, timezone)}</time>
               {m.simulated && <SimulatedChip />}
             </p>
             {m.interpretation && (
@@ -72,15 +69,15 @@ export function WorkerThread({
       })}
     </ol>
   );
-  if (!title) return thread;
+  if (!title) return list;
   return (
     <Card>
       <CardContent className="flex flex-col gap-3">
         <h2 className="flex flex-wrap items-center gap-2 text-lg font-semibold">
-          {title} · {workerName(messages[0].workerId)}
+          {title} · {thread.workerName}
           {dataKind && <DataLabel kind={dataKind} />}
         </h2>
-        {thread}
+        {list}
       </CardContent>
     </Card>
   );

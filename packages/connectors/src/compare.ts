@@ -38,6 +38,8 @@ export interface CompareRow {
   extra: number;
   /** the source cannot hold this object (pusher skipped it): its gaps are expected, never a failure */
   fixtureOnly?: boolean;
+  /** QBO: records without a seed marker or map entry in a seeded company (sample / other data); not extra */
+  unmarked?: number;
   /** short explanation printed after the row (counts and reasons only) */
   note?: string;
 }
@@ -283,14 +285,35 @@ export function compareQbo(
       x.date >= from &&
       x.date <= to,
   );
+  // A company the pusher seeded (it has a QBO map): records with no seed marker and no map entry are the
+  // sandbox's own sample data (Intuit regenerates it with current dates) or other books entries. They stay in
+  // the pull; the compare only counts them apart instead of as extra / MISMATCH.
+  const seeded =
+    Object.keys(bucket(map, "purchases")).length +
+      Object.keys(bucket(map, "bills")).length >
+    0;
+  const ids = [...perRecord.values()];
+  const unmarked = seeded ? ids.filter((id) => id === null).length : 0;
+  const row = compareIds(
+    "expenses(qbo)",
+    scope.map((x) => x.id),
+    seeded ? ids.filter((id) => id !== null) : ids,
+  );
+  if (!seeded) return [row];
   return [
-    compareIds(
-      "expenses(qbo)",
-      scope.map((x) => x.id),
-      [...perRecord.values()],
-    ),
+    {
+      ...row,
+      pulled: ids.length,
+      unmarked,
+      ...(unmarked
+        ? { note: `${unmarked} unmarked (sample/other data, kept in the pull)` }
+        : {}),
+    },
   ];
 }
+
+const bucket = (m: Record<string, unknown>, k: string) =>
+  (m[k] ?? {}) as Record<string, string>;
 
 /** Gusto employees vs fixtures, through data/private/<company>-gusto-map.json (workers[ourId].employeeUuid). */
 export function compareGustoEmployees(

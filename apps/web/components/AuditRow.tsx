@@ -2,19 +2,18 @@
 
 import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
-import { AgentChip } from "@/components/AgentChip";
+import { AgentChip, type AgentKind } from "@/components/AgentChip";
 import { Money } from "@/components/Money";
 import { SimulatedChip } from "@/components/SimulatedChip";
 import { SourceChip } from "@/components/SourceChip";
 import {
-  actorKind,
   categoryLabel,
   cycleLabel,
   eventSource,
   isSimulated,
   sourceRecord,
 } from "@/lib/audit";
-import { fixtureFlags } from "@/lib/fixtures";
+import { formatWhen } from "@/lib/time";
 import type { AuditEvent } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -28,16 +27,16 @@ const refLabel: Record<string, string> = {
   draftId: "draft",
   ruleId: "rule",
 };
-const knownFlags = new Set(fixtureFlags.map((f) => f.id));
-
 function Refs({
   event,
   item,
   onItem,
+  linkable,
 }: {
   event: AuditEvent;
   item: string | null;
   onItem: (id: string | null) => void;
+  linkable: ReadonlySet<string>;
 }) {
   return (
     <ul className="flex flex-wrap gap-1.5">
@@ -64,7 +63,7 @@ function Refs({
             </span>{" "}
             {v}
           </button>
-          {k === "flagId" && knownFlags.has(v) && (
+          {k === "flagId" && linkable.has(v) && (
             <Link
               href={`/c/${event.companyId}/flags/${v}`}
               aria-label={`Open flag ${v}`}
@@ -83,14 +82,18 @@ function Refs({
 // `showPay` is true only for the owner; managers get events with the pay effect already removed.
 export function AuditRow({
   event: e,
-  when,
+  timezone,
+  actor,
+  linkable,
   showPay,
   dataKind,
   item,
   onItem,
 }: {
   event: AuditEvent;
-  when: Intl.DateTimeFormat;
+  timezone: string;
+  actor: AgentKind;
+  linkable: ReadonlySet<string>;
   showPay: boolean;
   dataKind: string;
   item: string | null;
@@ -98,11 +101,11 @@ export function AuditRow({
 }) {
   const source = sourceRecord(e);
   const pay = showPay ? e.data?.effectPayCents : undefined;
-  const chip = <AgentChip agent={actorKind(e.actor)} />;
+  const chip = <AgentChip agent={actor} />;
   return (
     <tr className="border-b align-top transition-colors duration-(--dur-hover) last:border-0 hover:bg-muted/40">
       <td className="py-3 pr-2 pl-4 text-muted-foreground tabular-nums md:pr-3 md:whitespace-nowrap">
-        <time dateTime={e.at}>{when.format(new Date(e.at))}</time>
+        <time dateTime={e.at}>{formatWhen(e.at, timezone)}</time>
         <div className="text-xs">{cycleLabel(e.cycleId)}</div>
       </td>
       <td className="hidden px-3 py-3 md:table-cell">{chip}</td>
@@ -149,11 +152,11 @@ export function AuditRow({
           </p>
         )}
         <div className="mt-2 md:hidden">
-          <Refs event={e} item={item} onItem={onItem} />
+          <Refs event={e} item={item} onItem={onItem} linkable={linkable} />
         </div>
       </td>
       <td className="hidden py-3 pr-4 pl-3 md:table-cell">
-        <Refs event={e} item={item} onItem={onItem} />
+        <Refs event={e} item={item} onItem={onItem} linkable={linkable} />
       </td>
     </tr>
   );

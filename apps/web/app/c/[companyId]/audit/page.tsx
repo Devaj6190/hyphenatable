@@ -3,6 +3,8 @@ import { Suspense } from "react";
 import { AuditLog } from "@/components/AuditLog";
 import { PageHeader } from "@/components/PageHeader";
 import { companies } from "@/lib/companies";
+import { managerIds } from "@/lib/server/demo";
+import { auditView, currentViewer } from "@/lib/server/fixtures";
 
 // Params are read inside Suspense so the shell stays instant (Next 16).
 export default function AuditPage({
@@ -27,5 +29,15 @@ async function Body({
   const { companyId } = await params;
   const company = companies[companyId];
   if (!company) notFound();
-  return <AuditLog companyId={companyId} dataKind={company.kind} />;
+  const viewer = await currentViewer(companyId);
+  return (
+    <AuditLog
+      data={auditView(viewer, companyId)}
+      dataKind={company.kind}
+      timezone={company.timezone}
+      companyId={companyId}
+      companyLabel={`${company.label}${company.cycle ? `, cycle ${company.cycle.number}` : ""}`}
+      managerIds={managerIds(companyId)}
+    />
+  );
 }

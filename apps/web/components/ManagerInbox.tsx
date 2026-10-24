@@ -14,22 +14,17 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { WorkerThread } from "@/components/WorkerThread";
-import { companies } from "@/lib/companies";
 import {
   LOCAL_SOURCE,
   recordLocal,
   useDemoLocal,
   withLocal,
 } from "@/lib/demoLocal";
-import {
-  FIXTURE_SOURCE,
-  fixtureFlags,
-  fixtureQuestions,
-  fixtureWorkers,
-  workerName,
-} from "@/lib/fixtures";
 import { MAX_QUESTION_LEN, questionTextError } from "@/lib/question";
+import { FIXTURE_SOURCE } from "@/lib/sources";
+import { formatWhen } from "@/lib/time";
 import type { Flag, Question } from "@/lib/types";
+import type { ManagerInboxData, ThreadView } from "@/lib/view-types";
 
 // What the inbox renders has no pay field at all: dollarsCents is dropped here, before any component sees it.
 type CrewFlag = Omit<Flag, "affects"> & {
@@ -42,32 +37,46 @@ function crewView({
   return { ...f, affects };
 }
 
-type Item = { flag: CrewFlag; question: Question | undefined };
+type Item = {
+  flag: CrewFlag;
+  question: Question | undefined;
+  thread: ThreadView;
+  name: (workerId: string) => string;
+};
 
 const OPEN_TO_MANAGER: Question["status"][] = ["sent", "reminded"];
 
-// The manager's view, whoever is switched in: only flags routed to the manager, never pay.
+// The manager's view, whoever is switched in. The server already picked the crew's flags and removed pay;
+// crewView drops the pay field from the type as a second guard.
 export function ManagerInbox({
-  companyId,
+  data,
   dataKind,
+  timezone: tz,
+  companyLabel,
+  manager,
+  names,
 }: {
-  companyId: string;
+  data: ManagerInboxData;
   dataKind: DataKind;
+  timezone: string;
+  companyLabel: string;
+  manager: { id: string; displayName: string } | null;
+  names: Record<string, string>;
 }) {
   const local = useDemoLocal();
-  const company = companies[companyId];
-  const tz = company?.timezone ?? "UTC";
-  const manager = fixtureWorkers.find(
-    (w) => w.role === "manager" && w.id.startsWith(`${companyId}-`),
-  );
   const firstName = manager?.displayName.split(" ")[0];
+  const name = (id: string) => names[id] ?? id;
 
-  const items: Item[] = fixtureFlags
-    .filter((f) => f.companyId === companyId && f.routeTo === "manager")
-    .map((f) => {
-      const q = fixtureQuestions.find((x) => x.id === f.questionId);
-      return { flag: crewView(f), question: q && withLocal(q, local) };
-    });
+  const items: Item[] = [...data.needsOk, ...data.rest].map((i) => ({
+    flag: crewView(i.flag),
+    question: i.question ? withLocal(i.question, local) : undefined,
+    thread: i.thread ?? {
+      workerName:
+        i.recipientName ?? (i.question ? name(i.question.toWorkerId) : "Reply"),
+      messages: [],
+    },
+    name,
+  }));
 
   const needsYou = items.filter(({ question: q }) =>
     q?.toRole === "employee"
@@ -97,10 +106,7 @@ export function ManagerInbox({
         description="Answer here or by text. Hours and jobs only; pay is never shown to managers."
       />
       <div className="-mt-3 mb-5 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-        <DataLabel
-          kind={dataKind}
-          detail={`${company?.label ?? companyId}${company?.cycle ? `, cycle ${company.cycle.number}` : ""}`}
-        />
+        <DataLabel kind={dataKind} detail={companyLabel} />
         <span>Your crew · Source: {FIXTURE_SOURCE}</span>
       </div>
 
@@ -120,11 +126,11 @@ export function ManagerInbox({
                 item={i}
                 question={i.question}
                 onDecide={(status, text) => {
-                  const who = workerName(i.question?.toWorkerId ?? "");
+                  const who = name(i.question?.toWorkerId ?? "");
                   const edited = text !== i.question?.text;
                   recordLocal({
                     event: {
-                      companyId,
+                      companyId: i.flag.companyId,
                       cycleId: i.flag.cycleId,
                       actor,
                       type:
@@ -159,7 +165,7 @@ export function ManagerInbox({
                   const q = i.question as Question;
                   recordLocal({
                     event: {
-                      companyId,
+                      companyId: i.flag.companyId,
                       cycleId: i.flag.cycleId,
                       actor,
                       type: "message.received",
@@ -207,9 +213,11 @@ export function ManagerInbox({
               status="closed"
               statusLabel="Answered"
             >
-              {i.question && (
-                <WorkerThread questionId={i.question.id} timeZone={tz} />
-              )}
+              <WorkerThread
+                thread={i.thread}
+                questionId={i.question?.id}
+                timezone={tz}
+              />
               <p className="text-sm text-muted-foreground">
                 The owner approves any change this answer makes.
               </p>
@@ -228,7 +236,7 @@ export function ManagerInbox({
 
 // Shared frame: status, agents, headline, then who / job / where it came from. No money anywhere.
 function ItemCard({
-  item: { flag, question },
+  item: { flag, question, name },
   status,
   statusLabel,
   eyebrow,
@@ -254,7 +262,7 @@ function ItemCard({
         <h3 className="text-lg leading-snug font-semibold">{flag.seen}</h3>
         <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
           {[
-            flag.affects.workerId && workerName(flag.affects.workerId),
+            flag.affects.workerId && name(flag.affects.workerId),
             flag.affects.jobId && `Job ${flag.affects.jobId}`,
           ]
             .filter(Boolean)
@@ -297,7 +305,7 @@ function ApproveText({
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(question.text);
   const error = questionTextError(editing ? draft : text);
-  const who = workerName(question.toWorkerId);
+  const who = item.name(question.toWorkerId);
   const first = who.split(" ")[0];
 
   return (
@@ -423,13 +431,7 @@ function AnswerQuestion({
   onAnswer: (answer: string) => void;
 }) {
   const [text, setText] = useState("");
-  const sent =
-    question.sentAt &&
-    new Intl.DateTimeFormat("en-US", {
-      hour: "numeric",
-      minute: "2-digit",
-      timeZone,
-    }).format(new Date(question.sentAt));
+  const sent = question.sentAt && formatWhen(question.sentAt, timeZone);
   return (
     <ItemCard
       item={item}
@@ -484,7 +486,7 @@ function AnswerQuestion({
 
 function Waiting({ item, timeZone }: { item: Item; timeZone: string }) {
   const q = item.question;
-  const who = q ? workerName(q.toWorkerId) : null;
+  const who = q ? item.name(q.toWorkerId) : null;
   const [status, label, note]: [Status, string, string] =
     q?.status === "denied"
       ? ["held", "You denied it", "Nothing was sent. The owner sees it."]
@@ -504,7 +506,11 @@ function Waiting({ item, timeZone }: { item: Item; timeZone: string }) {
   return (
     <ItemCard item={item} status={status} statusLabel={label}>
       <p className="text-sm text-muted-foreground">{note}</p>
-      {q && <WorkerThread questionId={q.id} timeZone={timeZone} />}
+      <WorkerThread
+        thread={item.thread}
+        questionId={q?.id}
+        timezone={timeZone}
+      />
     </ItemCard>
   );
 }

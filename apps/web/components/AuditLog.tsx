@@ -17,11 +17,12 @@ import {
   eventSource,
   forViewerEvents,
   isSimulated,
+  NO_CYCLE,
 } from "@/lib/audit";
-import { companies } from "@/lib/companies";
 import { LOCAL_SOURCE, useDemoLocal } from "@/lib/demoLocal";
-import { AUDIT_FIXTURE_SOURCE, fixtureAudit } from "@/lib/fixtures";
+import { AUDIT_FIXTURE_SOURCE } from "@/lib/sources";
 import { cn } from "@/lib/utils";
+import type { AuditViewData } from "@/lib/view-types";
 
 const selectClass =
   "h-10 rounded-control border border-input bg-card px-3 text-sm text-foreground outline-none focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ring";
@@ -55,18 +56,25 @@ function Chip({
   );
 }
 
-// Everything shown comes from the events passed through forViewerEvents, so manager mode never holds pay.
+// The server already redacted for this viewer; forViewerEvents re-applies the same policy (also to this
+// browser's demo rows) for the moment after a role switch, before the refresh lands.
 export function AuditLog({
-  companyId,
+  data,
   dataKind,
+  timezone: tz,
+  companyId,
+  companyLabel,
+  managerIds,
 }: {
-  companyId: string;
+  data: AuditViewData;
   dataKind: DataKind;
+  timezone: string;
+  companyId: string;
+  companyLabel: string;
+  managerIds: string[];
 }) {
   const { role } = useRole();
   const local = useDemoLocal();
-  const company = companies[companyId];
-  const tz = company?.timezone ?? "UTC";
   const [type, setType] = useState("all");
   const [actor, setActor] = useState("all");
   const [cycle, setCycle] = useState("all");
@@ -76,43 +84,39 @@ export function AuditLog({
   const [simulatedOnly, setSimulatedOnly] = useState(false);
   const [order, setOrder] = useState<"oldest" | "newest">("oldest");
 
-  const { when, dayOf } = useMemo(() => {
+  const dayOf = useMemo(() => {
     const d = new Intl.DateTimeFormat("en-US", {
       month: "short",
       day: "numeric",
       timeZone: tz,
     });
-    return {
-      when: new Intl.DateTimeFormat("en-US", {
-        month: "short",
-        day: "numeric",
-        hour: "numeric",
-        minute: "2-digit",
-        timeZone: tz,
-      }),
-      dayOf: (at: string) => d.format(new Date(at)),
-    };
+    return (at: string) => d.format(new Date(at));
   }, [tz]);
+  const managers = useMemo(() => new Set(managerIds), [managerIds]);
+  const linkable = useMemo(
+    () => new Set(data.linkableFlagIds),
+    [data.linkableFlagIds],
+  );
 
   const visible = useMemo(
     () =>
       forViewerEvents(
-        [...fixtureAudit, ...local.events].filter(
-          (e) => e.companyId === companyId,
-        ),
+        [
+          ...data.events,
+          ...local.events.filter((e) => e.companyId === companyId),
+        ],
         role,
+        linkable,
       ).sort((a, b) => a.at.localeCompare(b.at)),
-    [companyId, role, local.events],
+    [data.events, companyId, role, local.events, linkable],
   );
   const options = useMemo(
     () => ({
-      cycles: [
-        ...new Set(visible.map((e) => e.cycleId).filter(Boolean)),
-      ] as string[],
+      cycles: [...new Set(visible.map((e) => e.cycleId ?? NO_CYCLE))],
       days: [...new Set(visible.map((e) => dayOf(e.at)))],
-      actors: [...new Set(visible.map((e) => actorKind(e.actor)))],
+      actors: [...new Set(visible.map((e) => actorKind(e.actor, managers)))],
     }),
-    [visible, dayOf],
+    [visible, dayOf, managers],
   );
 
   const shown = useMemo(() => {
@@ -120,8 +124,8 @@ export function AuditLog({
     const rows = visible.filter(
       (e) =>
         (type === "all" || category(e) === type) &&
-        (actor === "all" || actorKind(e.actor) === actor) &&
-        (cycle === "all" || e.cycleId === cycle) &&
+        (actor === "all" || actorKind(e.actor, managers) === actor) &&
+        (cycle === "all" || (e.cycleId ?? NO_CYCLE) === cycle) &&
         (day === "all" || dayOf(e.at) === day) &&
         (item === null || Object.values(e.refs).includes(item)) &&
         (!simulatedOnly || isSimulated(e)) &&
@@ -142,6 +146,7 @@ export function AuditLog({
     query,
     order,
     dayOf,
+    managers,
   ]);
 
   const filtered =
@@ -165,10 +170,7 @@ export function AuditLog({
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-        <DataLabel
-          kind={dataKind}
-          detail={`${company?.label ?? companyId}${company?.cycle ? `, cycle ${company.cycle.number}` : ""}`}
-        />
+        <DataLabel kind={dataKind} detail={companyLabel} />
         <span className="tabular-nums">{visible.length} events</span>
         <span aria-hidden>·</span>
         <span>
@@ -216,7 +218,7 @@ export function AuditLog({
             <option value="all">All cycles</option>
             {options.cycles.map((c) => (
               <option key={c} value={c}>
-                {cycleLabel(c)}
+                {cycleLabel(c === NO_CYCLE ? null : c)}
               </option>
             ))}
           </select>
@@ -332,7 +334,9 @@ export function AuditLog({
               <AuditRow
                 key={e.id}
                 event={e}
-                when={when}
+                timezone={tz}
+                actor={actorKind(e.actor, managers)}
+                linkable={linkable}
                 showPay={role === "owner"}
                 dataKind={dataKind}
                 item={item}

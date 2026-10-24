@@ -1,5 +1,5 @@
 import { type AgentKind, agentFromActor } from "@/components/AgentChip";
-import { fixtureWorkers } from "@/lib/fixtures";
+import { canSeeAuditEvent, redactAuditEvent, viewerFor } from "@/lib/policy";
 import type { AuditEvent, SourceSystem, ViewerRole } from "@/lib/types";
 
 // Filter chips (docs/plans/C-product-messaging-demo.md, C-10), with Shannin's "Answers" split out of messages.
@@ -26,12 +26,14 @@ export const categoryLabel = (e: AuditEvent) =>
 
 export const isSimulated = (e: AuditEvent) => e.data?.simulated === true;
 
-// Users are owner or manager by their worker role; everyone else maps as AgentChip does.
-export function actorKind(actor: AuditEvent["actor"]): AgentKind {
+// Users are owner or manager by their worker role (the server passes the manager ids); everyone else maps as
+// AgentChip does.
+export function actorKind(
+  actor: AuditEvent["actor"],
+  managerIds: ReadonlySet<string>,
+): AgentKind {
   if (actor.kind !== "user") return agentFromActor(actor);
-  return fixtureWorkers.find((w) => w.id === actor.id)?.role === "manager"
-    ? "manager"
-    : "owner";
+  return actor.id && managerIds.has(actor.id) ? "manager" : "owner";
 }
 
 // Every row says where it came from. B's events may not carry data.source yet, so fall back to the actor.
@@ -53,22 +55,29 @@ export function sourceRecord(
   return system && recordId ? { system, recordId } : null;
 }
 
+// Company A's two demo cycles (docs/DEMO.md): Cycle 1 is a-c05, Cycle 2 is a-c06. Other ids show as they are,
+// because the digits in an id are not the cycle number (a-c01 to a-c04 are past history cycles).
+const cycleLabels: Record<string, string> = {
+  "a-c05": "Cycle 1",
+  "a-c06": "Cycle 2",
+};
+
+export const NO_CYCLE = "none";
+
 export function cycleLabel(cycleId: string | null): string {
-  const n = cycleId?.match(/c0*(\d+)$/)?.[1];
-  return n ? `Cycle ${n}` : (cycleId ?? "No cycle");
+  if (cycleId === null) return "Onboarding";
+  return cycleLabels[cycleId] ?? cycleId;
 }
 
-// Manager views never see pay: owner-only events are dropped and the pay effect is removed before render.
+// Defense in depth for the role switch: the server already redacts, but a client that has just switched from
+// owner to manager still holds owner data until the refresh lands. Same policy as the server (lib/policy.ts).
 export function forViewerEvents(
   events: AuditEvent[],
   role: ViewerRole,
+  visibleFlagIds: ReadonlySet<string>,
 ): AuditEvent[] {
-  if (role === "owner") return events;
+  const viewer = viewerFor(role, "", []);
   return events
-    .filter((e) => e.data?.ownerOnly !== true)
-    .map((e) => {
-      if (!e.data) return e;
-      const { effectPayCents: _pay, ...rest } = e.data;
-      return { ...e, data: rest };
-    });
+    .filter((e) => canSeeAuditEvent(viewer, e, visibleFlagIds))
+    .map((e) => redactAuditEvent(viewer, e));
 }

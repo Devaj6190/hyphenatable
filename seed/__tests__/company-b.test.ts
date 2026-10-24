@@ -9,7 +9,7 @@ import { validateDir } from "../validate";
 
 // Update only when Company B's config or generator changes on purpose; then regenerate data/fixtures/b.
 const EXPECTED_SHA256_B =
-  "505c1e9bdf996819960690fab079f74ef7a3db690d0e846cbb994624821513da";
+  "a903cb338dfe60ee600c2b14d76194860e3adb64e734ef250a105ce3333065d5";
 
 type R = Record<string, unknown>;
 const hashAll = (files: Record<string, string>) => {

@@ -20,7 +20,6 @@ import {
   useDemoLocal,
   withLocal,
 } from "@/lib/demoLocal";
-import { fixtureQuestions, workerName } from "@/lib/fixtures";
 import type { Question } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -114,10 +113,15 @@ function Section({
 export function DemoPanel({
   companyId,
   dataKind,
+  questions: serverQuestions,
+  names,
 }: {
   companyId: string;
   dataKind: DataKind;
+  questions: Question[];
+  names: Record<string, string>;
 }) {
+  const name = (id: string) => names[id] ?? id;
   const local = useDemoLocal();
   const company = companies[companyId];
   const tz = company?.timezone ?? "UTC";
@@ -126,9 +130,7 @@ export function DemoPanel({
     minute: "2-digit",
     timeZone: tz,
   });
-  const questions = fixtureQuestions
-    .filter((q) => q.companyId === companyId)
-    .map((q) => withLocal(q, local));
+  const questions = serverQuestions.map((q) => withLocal(q, local));
 
   return (
     <div className="flex flex-col gap-5">
@@ -160,8 +162,9 @@ export function DemoPanel({
               (e) => e.type === "demo.simulated_reply",
             )}
             time={time}
+            name={name}
           />
-          <TimersCard questions={questions} time={time} />
+          <TimersCard questions={questions} time={time} name={name} />
         </div>
       </div>
     </div>
@@ -297,11 +300,13 @@ function SimulatedReplyCard({
   questions,
   last,
   time,
+  name,
 }: {
   companyId: string;
   questions: Question[];
   last: { at: string; summary: string } | undefined;
   time: Intl.DateTimeFormat;
+  name: (workerId: string) => string;
 }) {
   const [qid, setQid] = useState(questions[0]?.id ?? "");
   const [persona, setPersona] = useState<"manager" | "owner">("manager");
@@ -316,7 +321,7 @@ function SimulatedReplyCard({
         cycleId: q.cycleId,
         actor: { kind: "agent", id: `persona:${persona}`, agent: null },
         type: "demo.simulated_reply",
-        summary: `Simulated ${persona} replied "${reply.trim()}" to the question for ${workerName(q.toWorkerId)}.`,
+        summary: `Simulated ${persona} replied "${reply.trim()}" to the question for ${name(q.toWorkerId)}.`,
         refs: {
           questionId: q.id,
           ...(q.flagIds[0] && { flagId: q.flagIds[0] }),
@@ -373,7 +378,7 @@ function SimulatedReplyCard({
             >
               {questions.map((x) => (
                 <option key={x.id} value={x.id}>
-                  {workerName(x.toWorkerId)} · {x.id} · {statusWord[x.status]}
+                  {name(x.toWorkerId)} · {x.id} · {statusWord[x.status]}
                 </option>
               ))}
             </select>
@@ -493,9 +498,11 @@ function ScenarioCard() {
 function TimersCard({
   questions,
   time,
+  name,
 }: {
   questions: Question[];
   time: Intl.DateTimeFormat;
+  name: (workerId: string) => string;
 }) {
   const pending = questions.filter(
     (q) => (q.status === "sent" || q.status === "reminded") && q.remindAt,
@@ -518,7 +525,7 @@ function TimersCard({
               className="flex flex-wrap items-center justify-between gap-2 py-2.5 text-sm"
             >
               <span>
-                {workerName(q.toWorkerId)} · {q.id}
+                {name(q.toWorkerId)} · {q.id}
               </span>
               <span className="text-muted-foreground tabular-nums">
                 {q.status === "reminded"
