@@ -47,12 +47,12 @@ export const VISITS_QUERY = conn(
 export const QUOTES_QUERY = conn(
   "quotes",
   range("sentAt"),
-  `id quoteStatus salesperson { id } sentAt amounts { total } ${nestedIds("jobs")}`,
+  `id quoteStatus salesperson { id } sentAt amounts { total } jobberWebUri ${nestedIds("jobs")}`,
 );
 export const INVOICES_QUERY = conn(
   "invoices",
   range("issuedDate"),
-  `id invoiceStatus issuedDate dueDate amounts { total } ${nestedIds("jobs")}`,
+  `id invoiceStatus issuedDate dueDate amounts { total } jobberWebUri ${nestedIds("jobs")}`,
 );
 export const PAYMENT_RECORDS_QUERY = conn(
   "paymentRecords",
@@ -84,7 +84,7 @@ export const JOBS_BY_ID_QUERY = conn(
   "{ ids: $ids }",
   // the job's quote inline: quotes converted to jobs are often never "sent" (sentAt null), so a sentAt
   // filter alone misses them; every in-scope job brings its quote
-  "id jobNumber title jobStatus client { id } salesperson { id } quote { id quoteStatus salesperson { id } sentAt amounts { total } } startAt endAt total",
+  "id jobNumber title jobStatus client { id } salesperson { id } quote { id quoteStatus salesperson { id } sentAt amounts { total } jobberWebUri } startAt endAt total jobberWebUri",
   "$after: String, $first: Int!, $ids: [EncodedId!]!",
 );
 
@@ -99,6 +99,8 @@ export interface RawVisit {
   assignedUsers: Nested;
 }
 export interface RawQuote {
+  /** Jobber web link to the record (traceability: Flag.where[].url) */
+  jobberWebUri?: string | null;
   id: string;
   quoteStatus: string;
   salesperson: Id;
@@ -107,6 +109,7 @@ export interface RawQuote {
   jobs: Nested;
 }
 export interface RawInvoice {
+  jobberWebUri?: string | null;
   id: string;
   invoiceStatus: string;
   issuedDate: string | null;
@@ -136,6 +139,7 @@ export interface RawExpense {
   reimbursableTo: Id;
 }
 export interface RawJob {
+  jobberWebUri?: string | null;
   id: string;
   jobNumber: number;
   title: string | null;
@@ -310,6 +314,8 @@ export interface ObjectRecords {
   invoices: Invoice[];
   payments: Payment[];
   expenses: Expense[];
+  /** Jobber web links by Jobber id (jobs, quotes, invoices): where a person checks the record */
+  webUris?: Record<string, string>;
 }
 export type ObjectRun = {
   object: string;
@@ -504,8 +510,19 @@ export async function pullObjects(
     };
   }
 
+  const webUris: Record<string, string> = {};
+  for (const r of [
+    ...jobs,
+    ...quotes,
+    ...invoices,
+    ...jobs.map((j) => j.quote),
+  ]) {
+    if (r?.jobberWebUri) webUris[r.id] = r.jobberWebUri;
+  }
+
   return {
     records: {
+      webUris,
       jobs: jobs.map((r) => normalizeJob(r, companyId)),
       visits: visits.map((r) => normalizeVisit(r, companyId)),
       quotes: quoteRecords,
