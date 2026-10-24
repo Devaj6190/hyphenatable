@@ -1,4 +1,4 @@
-// Jobber seed plan: which mutations push a company's fixtures into the Jobber tester account, in order.
+// Jobber seed plan: which mutations push a company's fixtures into the allowlisted Jobber seed account, in order.
 // Pure: no network, no tokens. seed/push-jobber.ts prints the plan (dry run) or executes it (live).
 //
 // Mutation and field NAMES are verified by introspection (docs/sources/research/jobber.md section 4).
@@ -213,7 +213,7 @@ export function manualChecklists(fx: Fixtures, currentCycleId: string): PlanResu
   const byId = new Map(fx.workers.map((w) => [w.id as string, w]));
   const name = (id: string) => `${byId.get(id)?.displayName} (${id})`;
   const before = [
-    "In the Jobber tester account: Settings (gear) > Manage Team > Add team member, one per worker below, with exactly this name (the pusher maps users by name). The account owner user can be renamed to the owner. If the account refuses before all are added, stop and use the reduced config (plan A-01 fallback).",
+    "In the Jobber seed account: Settings (gear) > Manage Team > Add team member, one per worker below, with exactly this name (the pusher maps users by name). The account owner user can be renamed to the owner. If the account refuses before all are added, stop and use the reduced config (plan A-01 fallback).",
     ...fx.workers.map((w) => `  [ ] ${w.displayName} (${w.id}) - ${w.role}, ${rate(w)}${w.status === "inactive" ? " - keep ACTIVE until its entries exist" : ""}`),
   ];
   const cur = fx.timeEntries.filter((e) => e.cycleId === currentCycleId);
