@@ -1,0 +1,32 @@
+[
+  {
+    "id": "a-in01",
+    "companyId": "a",
+    "sourceId": "a-in01",
+    "jobId": "a-j01",
+    "issuedDate": "2026-10-14",
+    "dueDate": "2026-10-28",
+    "status": "paid",
+    "totalCents": 184000
+  },
+  {
+    "id": "a-in02",
+    "companyId": "a",
+    "sourceId": "a-in02",
+    "jobId": "a-j03",
+    "issuedDate": "2026-10-17",
+    "dueDate": "2026-10-31",
+    "status": "awaiting_payment",
+    "totalCents": 96000
+  },
+  {
+    "id": "a-in03",
+    "companyId": "a",
+    "sourceId": "a-in03",
+    "jobId": "a-j05",
+    "issuedDate": null,
+    "dueDate": null,
+    "status": "draft",
+    "totalCents": 278000
+  }
+]

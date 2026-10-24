@@ -1,0 +1,340 @@
+[
+  {
+    "id": "a-rule-01",
+    "companyId": "a",
+    "type": "overtime_policy",
+    "params": {
+      "weeklyHours": 40,
+      "multiplier": 1.5,
+      "dailyHours": null
+    },
+    "status": "proposed",
+    "source": "history",
+    "provenance": {
+      "lessonId": null,
+      "flagId": null,
+      "answeredBy": null,
+      "approvedBy": null,
+      "approvedAt": null,
+      "evidence": [
+        "a-c01",
+        "a-c02",
+        "a-c03",
+        "a-c04"
+      ]
+    },
+    "backtest": null,
+    "confidence": 0.95
+  },
+  {
+    "id": "a-rule-02",
+    "companyId": "a",
+    "type": "long_shift_threshold",
+    "params": {
+      "hours": 11
+    },
+    "status": "proposed",
+    "source": "history",
+    "provenance": {
+      "lessonId": null,
+      "flagId": null,
+      "answeredBy": null,
+      "approvedBy": null,
+      "approvedAt": null,
+      "evidence": [
+        "a-c01",
+        "a-c02",
+        "a-c03",
+        "a-c04"
+      ]
+    },
+    "backtest": null,
+    "confidence": 0.9
+  },
+  {
+    "id": "a-rule-03",
+    "companyId": "a",
+    "type": "expense_account_kind",
+    "params": {
+      "accountName": "Materials",
+      "kind": "job_cost"
+    },
+    "status": "proposed",
+    "source": "history",
+    "provenance": {
+      "lessonId": null,
+      "flagId": null,
+      "answeredBy": null,
+      "approvedBy": null,
+      "approvedAt": null,
+      "evidence": [
+        "a-c01",
+        "a-c02",
+        "a-c03",
+        "a-c04"
+      ]
+    },
+    "backtest": null,
+    "confidence": 0.95
+  },
+  {
+    "id": "a-rule-04",
+    "companyId": "a",
+    "type": "expense_account_kind",
+    "params": {
+      "accountName": "Equipment Rental",
+      "kind": "job_cost"
+    },
+    "status": "proposed",
+    "source": "history",
+    "provenance": {
+      "lessonId": null,
+      "flagId": null,
+      "answeredBy": null,
+      "approvedBy": null,
+      "approvedAt": null,
+      "evidence": [
+        "a-c01",
+        "a-c02",
+        "a-c03",
+        "a-c04"
+      ]
+    },
+    "backtest": null,
+    "confidence": 0.9
+  },
+  {
+    "id": "a-rule-05",
+    "companyId": "a",
+    "type": "expense_account_kind",
+    "params": {
+      "accountName": "Disposal",
+      "kind": "job_cost"
+    },
+    "status": "proposed",
+    "source": "history",
+    "provenance": {
+      "lessonId": null,
+      "flagId": null,
+      "answeredBy": null,
+      "approvedBy": null,
+      "approvedAt": null,
+      "evidence": [
+        "a-c01",
+        "a-c02",
+        "a-c03",
+        "a-c04"
+      ]
+    },
+    "backtest": null,
+    "confidence": 0.9
+  },
+  {
+    "id": "a-rule-06",
+    "companyId": "a",
+    "type": "expense_account_kind",
+    "params": {
+      "accountName": "Software",
+      "kind": "overhead"
+    },
+    "status": "proposed",
+    "source": "history",
+    "provenance": {
+      "lessonId": null,
+      "flagId": null,
+      "answeredBy": null,
+      "approvedBy": null,
+      "approvedAt": null,
+      "evidence": [
+        "a-c01",
+        "a-c02",
+        "a-c03",
+        "a-c04"
+      ]
+    },
+    "backtest": null,
+    "confidence": 0.95
+  },
+  {
+    "id": "a-rule-07",
+    "companyId": "a",
+    "type": "expense_account_kind",
+    "params": {
+      "accountName": "Insurance",
+      "kind": "overhead"
+    },
+    "status": "proposed",
+    "source": "history",
+    "provenance": {
+      "lessonId": null,
+      "flagId": null,
+      "answeredBy": null,
+      "approvedBy": null,
+      "approvedAt": null,
+      "evidence": [
+        "a-c01",
+        "a-c02",
+        "a-c03",
+        "a-c04"
+      ]
+    },
+    "backtest": null,
+    "confidence": 0.9
+  },
+  {
+    "id": "a-rule-08",
+    "companyId": "a",
+    "type": "venmo_rate",
+    "params": {
+      "workerId": "a-w09",
+      "rateCents": 2500
+    },
+    "status": "proposed",
+    "source": "history",
+    "provenance": {
+      "lessonId": null,
+      "flagId": null,
+      "answeredBy": null,
+      "approvedBy": null,
+      "approvedAt": null,
+      "evidence": [
+        "a-c01",
+        "a-c02",
+        "a-c03",
+        "a-c04"
+      ]
+    },
+    "backtest": null,
+    "confidence": 0.95
+  },
+  {
+    "id": "a-rule-09",
+    "companyId": "a",
+    "type": "commission_plan",
+    "params": {
+      "pctOfJobTotal": 5,
+      "when": "quote_in_person",
+      "payee": "quote_salesperson"
+    },
+    "status": "proposed",
+    "source": "history",
+    "provenance": {
+      "lessonId": null,
+      "flagId": null,
+      "answeredBy": null,
+      "approvedBy": null,
+      "approvedAt": null,
+      "evidence": [
+        "a-c01",
+        "a-c02",
+        "a-c03",
+        "a-c04"
+      ]
+    },
+    "backtest": null,
+    "confidence": 0.7
+  },
+  {
+    "id": "a-rule-10",
+    "companyId": "a",
+    "type": "tip_policy",
+    "params": {
+      "split": "by_hours_on_job"
+    },
+    "status": "proposed",
+    "source": "history",
+    "provenance": {
+      "lessonId": null,
+      "flagId": null,
+      "answeredBy": null,
+      "approvedBy": null,
+      "approvedAt": null,
+      "evidence": [
+        "a-c01",
+        "a-c02",
+        "a-c03",
+        "a-c04"
+      ]
+    },
+    "backtest": null,
+    "confidence": 0.7
+  },
+  {
+    "id": "a-rule-11",
+    "companyId": "a",
+    "type": "manager_split",
+    "params": {
+      "workerId": "a-w11",
+      "pctOfJobProfit": 10
+    },
+    "status": "proposed",
+    "source": "history",
+    "provenance": {
+      "lessonId": null,
+      "flagId": null,
+      "answeredBy": null,
+      "approvedBy": null,
+      "approvedAt": null,
+      "evidence": [
+        "a-c01",
+        "a-c02",
+        "a-c03",
+        "a-c04"
+      ]
+    },
+    "backtest": null,
+    "confidence": 0.7
+  },
+  {
+    "id": "a-rule-12",
+    "companyId": "a",
+    "type": "routing",
+    "params": {
+      "jobFacts": "a-w11",
+      "money": "a-w12"
+    },
+    "status": "proposed",
+    "source": "history",
+    "provenance": {
+      "lessonId": null,
+      "flagId": null,
+      "answeredBy": null,
+      "approvedBy": null,
+      "approvedAt": null,
+      "evidence": [
+        "a-c01",
+        "a-c02",
+        "a-c03",
+        "a-c04"
+      ]
+    },
+    "backtest": null,
+    "confidence": 0.85
+  },
+  {
+    "id": "a-rule-13",
+    "companyId": "a",
+    "type": "deposit_vs_final",
+    "params": {
+      "quotePayment": "deposit",
+      "invoicePayment": "final"
+    },
+    "status": "proposed",
+    "source": "history",
+    "provenance": {
+      "lessonId": null,
+      "flagId": null,
+      "answeredBy": null,
+      "approvedBy": null,
+      "approvedAt": null,
+      "evidence": [
+        "a-c01",
+        "a-c02",
+        "a-c03",
+        "a-c04"
+      ]
+    },
+    "backtest": null,
+    "confidence": 0.85
+  }
+]

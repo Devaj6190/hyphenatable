@@ -1,0 +1,13 @@
+{
+  "id": "a",
+  "name": "Company A (synthetic landscaping crew)",
+  "kind": "synthetic",
+  "payFrequency": "biweekly",
+  "timezone": "America/Los_Angeles",
+  "settings": {
+    "longShiftHours": 11,
+    "otWeeklyHours": 40,
+    "grossChangePct": 25,
+    "employeesMayBeTexted": true
+  }
+}

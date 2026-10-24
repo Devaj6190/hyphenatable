@@ -1,0 +1,24 @@
+[
+  {
+    "id": "a-pay01",
+    "companyId": "a",
+    "sourceId": "a-pay01",
+    "invoiceId": null,
+    "quoteId": "a-q02",
+    "entryDate": "2026-10-05",
+    "amountCents": 50000,
+    "paymentType": "credit_card",
+    "kind": "deposit"
+  },
+  {
+    "id": "a-pay02",
+    "companyId": "a",
+    "sourceId": "a-pay02",
+    "invoiceId": "a-in01",
+    "quoteId": null,
+    "entryDate": "2026-10-20",
+    "amountCents": 184000,
+    "paymentType": "check",
+    "kind": "final"
+  }
+]

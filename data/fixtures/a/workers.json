@@ -1,0 +1,286 @@
+[
+  {
+    "id": "a-w01",
+    "companyId": "a",
+    "displayName": "Avery Reed",
+    "role": "field",
+    "payType": "hourly",
+    "status": "active",
+    "managerId": "a-w11",
+    "contactRef": "contact:a-w01",
+    "jobber": {
+      "userId": "jobber-user:a-w01",
+      "labourRateCents": 2800,
+      "status": "ACTIVATED"
+    },
+    "gusto": {
+      "employeeUuid": "00000000-0000-4000-a000-000000000001",
+      "contractorUuid": null,
+      "jobUuid": "00000000-0000-4000-b000-000000000001",
+      "rateCents": 2800,
+      "paymentUnit": "Hour",
+      "flsaStatus": "Nonexempt",
+      "onboarded": true
+    },
+    "venmoRateCents": null
+  },
+  {
+    "id": "a-w02",
+    "companyId": "a",
+    "displayName": "Jordan Ellis",
+    "role": "field",
+    "payType": "hourly",
+    "status": "active",
+    "managerId": "a-w11",
+    "contactRef": "contact:a-w02",
+    "jobber": {
+      "userId": "jobber-user:a-w02",
+      "labourRateCents": 2600,
+      "status": "ACTIVATED"
+    },
+    "gusto": {
+      "employeeUuid": "00000000-0000-4000-a000-000000000002",
+      "contractorUuid": null,
+      "jobUuid": "00000000-0000-4000-b000-000000000002",
+      "rateCents": 2500,
+      "paymentUnit": "Hour",
+      "flsaStatus": "Nonexempt",
+      "onboarded": true
+    },
+    "venmoRateCents": null
+  },
+  {
+    "id": "a-w03",
+    "companyId": "a",
+    "displayName": "Sam Okafor",
+    "role": "field",
+    "payType": "hourly",
+    "status": "active",
+    "managerId": "a-w11",
+    "contactRef": "contact:a-w03",
+    "jobber": {
+      "userId": "jobber-user:a-w03",
+      "labourRateCents": 2400,
+      "status": "ACTIVATED"
+    },
+    "gusto": {
+      "employeeUuid": "00000000-0000-4000-a000-000000000003",
+      "contractorUuid": null,
+      "jobUuid": "00000000-0000-4000-b000-000000000003",
+      "rateCents": 2400,
+      "paymentUnit": "Hour",
+      "flsaStatus": "Nonexempt",
+      "onboarded": true
+    },
+    "venmoRateCents": null
+  },
+  {
+    "id": "a-w04",
+    "companyId": "a",
+    "displayName": "Riley Moreno",
+    "role": "field",
+    "payType": "hourly",
+    "status": "active",
+    "managerId": "a-w11",
+    "contactRef": "contact:a-w04",
+    "jobber": {
+      "userId": "jobber-user:a-w04",
+      "labourRateCents": 2400,
+      "status": "ACTIVATED"
+    },
+    "gusto": {
+      "employeeUuid": "00000000-0000-4000-a000-000000000004",
+      "contractorUuid": null,
+      "jobUuid": "00000000-0000-4000-b000-000000000004",
+      "rateCents": 2400,
+      "paymentUnit": "Hour",
+      "flsaStatus": "Nonexempt",
+      "onboarded": true
+    },
+    "venmoRateCents": null
+  },
+  {
+    "id": "a-w05",
+    "companyId": "a",
+    "displayName": "Casey Lindqvist",
+    "role": "field",
+    "payType": "hourly",
+    "status": "active",
+    "managerId": "a-w11",
+    "contactRef": "contact:a-w05",
+    "jobber": {
+      "userId": "jobber-user:a-w05",
+      "labourRateCents": 2200,
+      "status": "ACTIVATED"
+    },
+    "gusto": {
+      "employeeUuid": "00000000-0000-4000-a000-000000000005",
+      "contractorUuid": null,
+      "jobUuid": "00000000-0000-4000-b000-000000000005",
+      "rateCents": 2200,
+      "paymentUnit": "Hour",
+      "flsaStatus": "Nonexempt",
+      "onboarded": true
+    },
+    "venmoRateCents": null
+  },
+  {
+    "id": "a-w06",
+    "companyId": "a",
+    "displayName": "Morgan Achebe",
+    "role": "field",
+    "payType": "hourly",
+    "status": "active",
+    "managerId": "a-w11",
+    "contactRef": "contact:a-w06",
+    "jobber": {
+      "userId": "jobber-user:a-w06",
+      "labourRateCents": 2200,
+      "status": "ACTIVATED"
+    },
+    "gusto": {
+      "employeeUuid": "00000000-0000-4000-a000-000000000006",
+      "contractorUuid": null,
+      "jobUuid": "00000000-0000-4000-b000-000000000006",
+      "rateCents": 2200,
+      "paymentUnit": "Hour",
+      "flsaStatus": "Nonexempt",
+      "onboarded": true
+    },
+    "venmoRateCents": null
+  },
+  {
+    "id": "a-w07",
+    "companyId": "a",
+    "displayName": "Quinn Takahashi",
+    "role": "field",
+    "payType": "hourly",
+    "status": "active",
+    "managerId": "a-w11",
+    "contactRef": "contact:a-w07",
+    "jobber": {
+      "userId": "jobber-user:a-w07",
+      "labourRateCents": 2000,
+      "status": "ACTIVATED"
+    },
+    "gusto": {
+      "employeeUuid": "00000000-0000-4000-a000-000000000007",
+      "contractorUuid": null,
+      "jobUuid": "00000000-0000-4000-b000-000000000007",
+      "rateCents": 2000,
+      "paymentUnit": "Hour",
+      "flsaStatus": "Nonexempt",
+      "onboarded": true
+    },
+    "venmoRateCents": null
+  },
+  {
+    "id": "a-w08",
+    "companyId": "a",
+    "displayName": "Rowan Castillo",
+    "role": "field",
+    "payType": "salary",
+    "status": "active",
+    "managerId": "a-w11",
+    "contactRef": "contact:a-w08",
+    "jobber": {
+      "userId": "jobber-user:a-w08",
+      "labourRateCents": 3000,
+      "status": "ACTIVATED"
+    },
+    "gusto": {
+      "employeeUuid": "00000000-0000-4000-a000-000000000008",
+      "contractorUuid": null,
+      "jobUuid": "00000000-0000-4000-b000-000000000008",
+      "rateCents": 6240000,
+      "paymentUnit": "Year",
+      "flsaStatus": "Exempt",
+      "onboarded": true
+    },
+    "venmoRateCents": null
+  },
+  {
+    "id": "a-w09",
+    "companyId": "a",
+    "displayName": "Emerson Vale",
+    "role": "field",
+    "payType": "contractor_venmo",
+    "status": "active",
+    "managerId": "a-w11",
+    "contactRef": "contact:a-w09",
+    "jobber": {
+      "userId": "jobber-user:a-w09",
+      "labourRateCents": 2500,
+      "status": "ACTIVATED"
+    },
+    "gusto": null,
+    "venmoRateCents": 2500
+  },
+  {
+    "id": "a-w10",
+    "companyId": "a",
+    "displayName": "Harper Nakamura",
+    "role": "field",
+    "payType": "contractor_venmo",
+    "status": "active",
+    "managerId": "a-w11",
+    "contactRef": "contact:a-w10",
+    "jobber": {
+      "userId": "jobber-user:a-w10",
+      "labourRateCents": 2200,
+      "status": "ACTIVATED"
+    },
+    "gusto": null,
+    "venmoRateCents": null
+  },
+  {
+    "id": "a-w11",
+    "companyId": "a",
+    "displayName": "Dakota Brennan",
+    "role": "manager",
+    "payType": "salary",
+    "status": "active",
+    "managerId": "a-w12",
+    "contactRef": "contact:a-w11",
+    "jobber": {
+      "userId": "jobber-user:a-w11",
+      "labourRateCents": null,
+      "status": "ACTIVATED"
+    },
+    "gusto": {
+      "employeeUuid": "00000000-0000-4000-a000-000000000011",
+      "contractorUuid": null,
+      "jobUuid": "00000000-0000-4000-b000-000000000011",
+      "rateCents": 7280000,
+      "paymentUnit": "Year",
+      "flsaStatus": "Exempt",
+      "onboarded": true
+    },
+    "venmoRateCents": null
+  },
+  {
+    "id": "a-w12",
+    "companyId": "a",
+    "displayName": "Skyler Ashford",
+    "role": "owner",
+    "payType": "salary",
+    "status": "active",
+    "managerId": null,
+    "contactRef": "contact:a-w12",
+    "jobber": {
+      "userId": "jobber-user:a-w12",
+      "labourRateCents": null,
+      "status": "ACTIVATED"
+    },
+    "gusto": {
+      "employeeUuid": "00000000-0000-4000-a000-000000000012",
+      "contractorUuid": null,
+      "jobUuid": "00000000-0000-4000-b000-000000000012",
+      "rateCents": 9100000,
+      "paymentUnit": "Year",
+      "flsaStatus": "Exempt",
+      "onboarded": true
+    },
+    "venmoRateCents": null
+  }
+]
