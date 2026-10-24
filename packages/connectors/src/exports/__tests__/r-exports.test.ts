@@ -10,6 +10,7 @@ import {
   sectionKind,
 } from "../gusto-payroll-journal-sectioned.ts";
 import {
+  accountKey,
   classifyWorkingOn,
   normalizeWorkerName,
   readJobberTimesheetsCsv,
@@ -26,7 +27,7 @@ const gj = (text = GUSTO_JOURNAL_SECTIONED_CSV) =>
   readGustoPayrollJournalSectionedCsv({ text, fileName: "j.csv" }, opts);
 
 describe("Jobber Timesheets CSV", () => {
-  it("normalizes names and the Team Leader suffix; classifies Working on", () => {
+  it("normalizes names, keys accounts by raw spelling, classifies Working on", () => {
     expect(normalizeWorkerName("Avery Reed Team Leader ")).toEqual({
       name: "Avery Reed",
       teamLeader: true,
@@ -35,6 +36,11 @@ describe("Jobber Timesheets CSV", () => {
       name: "Jordan Ellis",
       teamLeader: false,
     });
+    expect([
+      accountKey("Avery Reed Team Leader"),
+      accountKey("Jordan Ellis "),
+      accountKey("Jordan Ellis"),
+    ]).toEqual(["Avery Reed", "Jordan Ellis ", "Jordan Ellis"]);
     expect(classifyWorkingOn("Job #518 - Brookside Dental")).toEqual({
       jobText: "Job #518",
       category: null,
@@ -52,21 +58,21 @@ describe("Jobber Timesheets CSV", () => {
     });
   });
 
-  it("parses every detail row and reconciles per-user, Total Hours and Report totals", async () => {
+  it("parses every row; rounding drift, merged accounts and an account missing from the totals block are notes", async () => {
     const r = await ts();
     expect(r.namesAnonymized).toBe(false);
     expect(r.syncRun).toMatchObject({
       object: "timeSheetEntries",
-      pulled: 6,
-      expected: 6,
+      pulled: 7,
+      expected: 7,
       complete: true,
     });
-    // rounding drift and merged accounts are notes, not problems
     expect(r.syncRun.error).toBe(
       "note: 1 worker(s) have 2+ Jobber accounts (name variants); merged into one worker in the output (mergedAccounts 1); " +
-        "note: Total Hours 25.26 h vs detail sum 25.25 h: per-row rounding drift; " +
-        "note: Report totals 25.26 h vs detail sum 25.25 h: per-row rounding drift; " +
-        "note: 1 user total(s) differ from their rows by per-row rounding only (within 0.005 h per row)",
+        "note: Total Hours 27.26 h vs detail sum 27.25 h: per-row rounding drift; " +
+        "note: Report totals 27.26 h vs detail sum 27.25 h: per-row rounding drift; " +
+        "note: 1 user total(s) differ from their rows by per-row rounding only (within 0.005 h per row); " +
+        "note: account not in totals block: 1 name variant(s) of listed workers, 2 row(s), 2.00 h (merged into their worker in the output)",
     );
     const [a1, a2, , j2, s0] = r.rows;
     expect(a1).toMatchObject({
@@ -83,7 +89,6 @@ describe("Jobber Timesheets CSV", () => {
     });
     expect(a2).toMatchObject({
       workerName: "Avery Reed",
-      teamLeader: false,
       category: "GENERAL",
       jobText: null,
     });
@@ -93,38 +98,37 @@ describe("Jobber Timesheets CSV", () => {
       hasNote: true,
     });
     expect(s0).toMatchObject({
+      workerName: "Sam Okafor",
       durationSec: 0,
       label: "Request for hedge quote",
     });
-    // the job's client name never travels in jobText
+    // every Sam spelling is one worker in the output
+    expect(r.rows.filter((x) => x.workerName === "Sam Okafor")).toHaveLength(3);
     expect(r.rows.map((x) => x.jobText).filter(Boolean)).toEqual([
       "Job #518",
+      "Job #521",
       "Job #521",
     ]);
   });
 
-  it("a user total that disagrees makes the run incomplete, naming the user by ordinal only", async () => {
-    // 0.10 h over 2 rows is beyond rounding (max 0.01 h)
+  it("a user total beyond rounding is a problem, named by ordinal only", async () => {
     const r = await ts(
       JOBBER_TIMESHEETS_CSV.replace(
         "Sam Okafor,3.50",
         "Sam Okafor,3.60",
-      ).replace("Total Hours,25.26", "Total Hours,25.50"),
+      ).replace("Total Hours,27.26", "Total Hours,27.50"),
     );
     expect(r.syncRun.complete).toBe(false);
     expect(r.syncRun.error).toContain(
       "user #4: detail 3.50 h vs total row 3.60 h",
     );
     expect(r.syncRun.error).toContain(
-      "detail sum 25.25 h vs Total Hours 25.50 h",
+      "detail sum 27.25 h vs Total Hours 27.50 h",
     );
     expect(r.syncRun.error).not.toMatch(/Sam|Okafor/);
   });
 
-  it("two accounts of one person are compared separately (merging them would fail)", async () => {
-    // "Jordan Ellis" 4.25 and "Jordan Ellis " 5.00 match their own rows exactly; a merged comparison would be 9.25 vs each
-    const ok = await ts();
-    expect(ok.syncRun.error).not.toContain("user #");
+  it("two listed accounts of one person are compared separately", async () => {
     const bad = await ts(
       JOBBER_TIMESHEETS_CSV.replace("Jordan Ellis ,5.00", "Jordan Ellis ,9.25"),
     );
@@ -134,15 +138,21 @@ describe("Jobber Timesheets CSV", () => {
     expect(bad.syncRun.error).not.toContain("user #2");
   });
 
-  it("a detail spelling the totals block does not list falls back to that person's one account", async () => {
+  it("the one listed account is compared to its exact spelling only (the live 77.61 vs 13.58 case)", async () => {
+    // Sam's total (3.50) covers "Sam Okafor" only; "Sam Okafor " (2 rows, 2.00 h) is reported, not added
+    const r = await ts();
+    expect(r.syncRun.error).not.toContain("user #4");
+  });
+
+  it("a person whose only spelling differs from the total line falls back to that account", async () => {
     const r = await ts(
-      JOBBER_TIMESHEETS_CSV.replace(
-        'Sam Okafor,"Sep 3, 2026"',
-        'Sam Okafor ,"Sep 3, 2026"',
+      JOBBER_TIMESHEETS_CSV.replaceAll(
+        'Avery Reed Team Leader,"',
+        'Avery Reed ,"',
       ),
     );
     expect(r.syncRun.complete).toBe(true);
-    expect(r.rows.filter((x) => x.workerName === "Sam Okafor")).toHaveLength(2);
+    expect(r.syncRun.error).toContain("1 user total(s) differ");
   });
 
   it("an unreadable row is counted against completeness", async () => {
@@ -150,8 +160,8 @@ describe("Jobber Timesheets CSV", () => {
       JOBBER_TIMESHEETS_CSV.replace('"Sep 3, 2026"', '"Sepember 3"'),
     );
     expect(r.syncRun).toMatchObject({
-      pulled: 5,
-      expected: 6,
+      pulled: 6,
+      expected: 7,
       complete: false,
     });
     expect(r.syncRun.error).toContain("unreadable date");
@@ -170,14 +180,15 @@ describe("Gusto Payroll Journal Report (sectioned)", () => {
     ]).toEqual(["regular", "regular", "off_cycle", "other"]);
   });
 
-  it("reads employees per section with pay-type lines and Gross; totals reconcile", async () => {
+  it("gross = the sum of pay-type Amounts; a no-pay-line employee is gross 0 with a note; totals reconcile", async () => {
     const r = await gj();
     expect(r.syncRun).toMatchObject({
       object: "payrollJournal",
-      pulled: 5,
-      expected: 5,
+      pulled: 6,
+      expected: 6,
       complete: true,
-      error: null,
+      error:
+        "note: 1 employee row(s) with no pay lines: gross 0 from the source",
     });
     expect(
       r.rows.map((x) => [
@@ -187,13 +198,23 @@ describe("Gusto Payroll Journal Report (sectioned)", () => {
         x.periodStart,
         x.checkDate,
         x.grossCents,
+        x.payKind,
       ]),
     ).toEqual([
-      [1, "regular", "Avery Reed", "2026-08-29", "2026-09-16", 111250],
-      [1, "regular", "Sam Okafor", "2026-08-29", "2026-09-16", 200000],
-      [2, "off_cycle", "Avery Reed", "2026-08-29", "2026-09-18", 20000],
-      [3, "regular", "Avery Reed", "2026-09-12", "2026-09-30", 100000],
-      [3, "regular", "Jordan Ellis", "2026-09-12", "2026-09-30", 66000],
+      [1, "regular", "Avery Reed", "2026-08-29", "2026-09-16", 111250, "wage"],
+      [
+        1,
+        "regular",
+        "Sam Okafor",
+        "2026-08-29",
+        "2026-09-16",
+        200000,
+        "owner_draw",
+      ],
+      [2, "off_cycle", "Avery Reed", "2026-08-29", "2026-09-18", 20000, "wage"],
+      [3, "regular", "Avery Reed", "2026-09-12", "2026-09-30", 100000, "wage"],
+      [3, "regular", "Jordan Ellis", "2026-09-12", "2026-09-30", 66000, "wage"],
+      [3, "regular", "Pat Quinlan", "2026-09-12", "2026-09-30", 0, "wage"],
     ]);
     expect(r.rows[0]).toMatchObject({
       employeeType: "Paid by the hour",
@@ -220,9 +241,11 @@ describe("Gusto Payroll Journal Report (sectioned)", () => {
     });
   });
 
-  it("never reads taxes, addresses, net pay, check amount, employer cost or donations", async () => {
+  it("never reads Payment (the payment method), taxes, addresses, net pay, check amount, employer cost or donations", async () => {
     const json = JSON.stringify(await gj());
     for (const s of [
+      "Direct Deposit",
+      "Check",
       "901.11",
       "914.44",
       "1234.56",
@@ -233,55 +256,44 @@ describe("Gusto Payroll Journal Report (sectioned)", () => {
       "Fake Street",
       "9999.99",
       "Federal",
-    ])
+    ]) {
       expect(json).not.toContain(s);
+    }
     for (const n of [90111, 123456, 77777, 888888, 555])
       expect(json).not.toContain(String(n));
   });
 
-  it("gross comes from Payment (Gross line only as fallback); owner draws are marked", async () => {
-    const r = await gj();
-    expect(r.rows.map((x) => x.payKind)).toEqual([
-      "wage",
-      "owner_draw",
-      "wage",
-      "wage",
-      "wage",
-    ]);
-    // section 2's employee has an empty Payment: its Gross line is used
-    expect(r.rows[2]?.grossCents).toBe(20000);
-  });
-
-  it("employee gross not adding up to the Payroll Totals Payment is incomplete; so is a Payment / Gross disagreement", async () => {
+  it("a Gross line that disagrees with the pay lines is a problem", async () => {
     const r = await gj(
       GUSTO_JOURNAL_SECTIONED_CSV.replace(
-        "Paid by the hour,1112.50,",
-        "Paid by the hour,1100.00,",
+        ',Gross,,,"1,112.50"',
+        ',Gross,,,"1,100.00"',
+      ),
+    );
+    expect(r.syncRun.complete).toBe(false);
+    expect(r.syncRun.error).toMatch(
+      /section 1 row \d+: Gross line 110000¢ vs pay lines 111250¢/,
+    );
+  });
+
+  it("employee gross not adding up to the Payroll Totals amount is incomplete", async () => {
+    const r = await gj(
+      GUSTO_JOURNAL_SECTIONED_CSV.replace(
+        'Gross,,,"3,112.50"',
+        'Gross,,,"3,200.00"',
       ),
     );
     expect(r.syncRun.complete).toBe(false);
     expect(r.syncRun.error).toContain(
-      "section 1: employee gross sum 310000¢ vs Payroll Totals 311250¢",
+      "section 1: employee gross sum 311250¢ vs Payroll Totals 320000¢",
     );
-    expect(r.syncRun.error).toContain("Payment 110000¢ vs Gross line 111250¢");
   });
 
-  it("an employee with neither Payment nor a Gross line stays an error", async () => {
-    // section 2's employee has an empty Payment; drop its Gross line too
-    const csv = GUSTO_JOURNAL_SECTIONED_CSV.replace(
-      /\n[^\n]*,Crew,Gross,,,200\.00/,
-      "",
+  it("a section without any totals amount is incomplete", async () => {
+    const r = await gj(
+      GUSTO_JOURNAL_SECTIONED_CSV.replace(/\n[^\n]*,Gross,,,"1,660\.00"/, ""),
     );
-    expect(csv).not.toBe(GUSTO_JOURNAL_SECTIONED_CSV);
-    const r = await gj(csv);
-    expect(r.syncRun).toMatchObject({
-      complete: false,
-      pulled: 4,
-      expected: 5,
-    });
-    expect(r.syncRun.error).toContain("section 2 row");
-    expect(r.syncRun.error).toContain(
-      "employee without Payment or a Gross line",
-    );
+    expect(r.syncRun.complete).toBe(false);
+    expect(r.syncRun.error).toContain("section 3: no Payroll Totals amount");
   });
 });
