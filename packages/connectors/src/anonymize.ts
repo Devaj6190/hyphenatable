@@ -287,6 +287,8 @@ export interface AnonPaid {
   sectionKind?: "regular" | "off_cycle" | "other";
   /** owner draws ("Owner’s draw" employee type) are kept but are not wages */
   payKind?: "wage" | "owner_draw";
+  /** owner draws on this row (sectioned journal); grossCents excludes them */
+  ownerDrawCents?: number;
   employeeType?: string | null;
   /** per pay-type amounts in cents (Regular, Overtime, Commission, ...); no taxes */
   earningsCents?: Record<string, number>;
@@ -329,8 +331,11 @@ export function paidByPeriod(paid: AnonPaid[]): AnonPaidPeriod[] {
       ownerDrawCents: 0,
     };
     const kind = p.sectionKind ?? "regular";
-    if (p.payKind === "owner_draw") {
-      row.ownerDrawCents += p.grossCents;
+    // grossCents is wage gross; owner draws come in ownerDrawCents (older rows: a draw row carries it in grossCents)
+    const legacyDraw =
+      p.payKind === "owner_draw" && p.ownerDrawCents === undefined;
+    row.ownerDrawCents += p.ownerDrawCents ?? (legacyDraw ? p.grossCents : 0);
+    if (legacyDraw) {
       by.set(k, row);
       continue;
     }
@@ -477,6 +482,7 @@ export function anonymizeExports(
               earningsCents: r.earningsCents,
               hours: r.hours,
               jobLines: r.jobLines ?? [],
+              ownerDrawCents: r.ownerDrawCents ?? 0,
             }
           : {}),
       });

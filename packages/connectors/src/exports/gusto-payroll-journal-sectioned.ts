@@ -95,24 +95,57 @@ class LineBlock {
     return true;
   }
 
+  /** pay types given only as a Totals line (live: Owner's Draw), promoted to itemized by finalize() */
+  readonly promoted = new Map<string, number>();
+  private finalized = false;
+
+  /** A pay type with a Totals line but no itemized lines: the Totals line IS its itemized amount. */
+  finalize(): void {
+    if (this.finalized) return;
+    this.finalized = true;
+    for (const [type, sub] of this.subtotals) {
+      if (this.byType.has(type)) continue;
+      this.promoted.set(type, sub);
+      this.byType.set(type, sub);
+      this.itemized += sub;
+      this.items++;
+    }
+  }
+
+  /** Owner draws among the itemized amounts (Gusto's Gross line excludes them). */
+  ownerDraw(): number {
+    this.finalize();
+    let d = 0;
+    for (const [type, amount] of this.byType)
+      if (isOwnerDraw(type)) d += amount;
+    return d;
+  }
+
   /** cross-checks; problems are pushed with `where` (row / section numbers only) */
   check(where: string, problems: string[]): void {
+    this.finalize();
     for (const [type, sub] of this.subtotals) {
+      if (this.promoted.has(type)) continue;
       const items = this.byType.get(type) ?? 0;
       if (sub !== items)
         problems.push(
           `${where}: "${type}" Totals line ${sub}¢ vs its itemized lines ${items}¢`,
         );
     }
-    if (this.gross !== null && this.items > 0 && this.gross !== this.itemized) {
+    const wages = this.itemized - this.ownerDraw();
+    if (this.gross !== null && this.items > 0 && this.gross !== wages) {
       problems.push(
-        `${where}: Gross line ${this.gross}¢ vs itemized lines ${this.itemized}¢`,
+        `${where}: Gross line ${this.gross}¢ vs itemized lines excluding owner draws ${wages}¢`,
       );
     }
   }
 
+  /** wage gross (owner draws excluded): the Gross line, else itemized minus owner draws; null with no lines */
   value(): number | null {
-    return this.gross ?? (this.items > 0 ? this.itemized : null);
+    this.finalize();
+    return (
+      this.gross ?? (this.items > 0 ? this.itemized - this.ownerDraw() : null)
+    );
   }
 }
 
@@ -132,6 +165,7 @@ export async function readGustoPayrollJournalSectionedCsv(
   let expected = 0;
   let sections = 0;
   let zeroGross = 0;
+  let promotedLines = 0;
 
   const lastTitle = (before: number): string => {
     for (let i = before - 1; i >= 0; i--) {
@@ -200,13 +234,27 @@ export async function readGustoPayrollJournalSectionedCsv(
     let block = new LineBlock();
     let totalsBlock: LineBlock | null = null;
     let sectionGross = 0;
+    let sectionDraws = 0;
     const finish = () => {
       if (current) {
         block.check(`${where} row ${current.rowNumber}`, problems);
         const gross = block.value();
+        const draw = block.ownerDraw();
         if (gross === null) zeroGross++;
+        // pay types that came only as a Totals line count as earnings too
+        for (const [type, amount] of block.promoted) {
+          current.earningsCents[type] =
+            (current.earningsCents[type] ?? 0) + amount;
+          promotedLines++;
+        }
+        // grossCents is WAGE gross (Gusto's Gross excludes owner draws); draws are reported apart
         current.grossCents = gross ?? 0;
+        current.ownerDrawCents = draw;
+        if (draw > 0 && current.grossCents === 0)
+          current.payKind = "owner_draw";
+        else if (current.grossCents > 0) current.payKind = "wage";
         sectionGross += current.grossCents;
+        sectionDraws += draw;
         rows.push(current);
       }
       current = null;
@@ -303,13 +351,28 @@ export async function readGustoPayrollJournalSectionedCsv(
       problems.push(
         `${where}: employee gross sum ${sectionGross}¢ vs Payroll Totals ${totals}¢`,
       );
+    // owner draws reconcile on their own, when the totals block carries them
+    const totalsDraws = tb?.ownerDraw() ?? 0;
+    if (tb && (totalsDraws || sectionDraws) && totalsDraws !== sectionDraws) {
+      problems.push(
+        `${where}: employee owner draws ${sectionDraws}¢ vs Payroll Totals owner draws ${totalsDraws}¢`,
+      );
+    }
+    promotedLines += tb?.promoted.size ?? 0;
   }
   if (!sections) problems.push("no payroll sections (no 'Pay period' line)");
-  const notes = zeroGross
-    ? [
-        `${zeroGross} employee row(s) with no pay lines: gross 0 from the source`,
-      ]
-    : [];
+  const notes = [
+    ...(zeroGross
+      ? [
+          `${zeroGross} employee row(s) with no pay lines: gross 0 from the source`,
+        ]
+      : []),
+    ...(promotedLines
+      ? [
+          `${promotedLines} pay type(s) given only as a Totals line (e.g. Owner's Draw): used as the itemized amount`,
+        ]
+      : []),
+  ];
   return {
     rows,
     namesAnonymized: false,

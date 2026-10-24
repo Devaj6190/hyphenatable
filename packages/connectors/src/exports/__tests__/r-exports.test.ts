@@ -188,7 +188,7 @@ describe("Gusto Payroll Journal Report (sectioned)", () => {
       expected: 6,
       complete: true,
       error:
-        "note: 1 employee row(s) with no pay lines: gross 0 from the source",
+        "note: 1 employee row(s) with no pay lines: gross 0 from the source; note: 2 pay type(s) given only as a Totals line (e.g. Owner's Draw): used as the itemized amount",
     });
     expect(
       r.rows.map((x) => [
@@ -208,7 +208,7 @@ describe("Gusto Payroll Journal Report (sectioned)", () => {
         "Sam Okafor",
         "2026-08-29",
         "2026-09-16",
-        200000,
+        0, // wage gross: Gusto's Gross excludes owner draws
         "owner_draw",
       ],
       [2, "off_cycle", "Avery Reed", "2026-08-29", "2026-09-18", 20000, "wage"],
@@ -266,6 +266,8 @@ describe("Gusto Payroll Journal Report (sectioned)", () => {
     expect(r.rows[1]).toMatchObject({
       employeeType: "Owner’s draw",
       earningsCents: { "Owner's Draw": 200000 },
+      ownerDrawCents: 200000,
+      grossCents: 0,
     });
     expect(r.rows[2]?.earningsCents).toEqual({
       Commission: 15000,
@@ -313,7 +315,7 @@ describe("Gusto Payroll Journal Report (sectioned)", () => {
     );
     expect(r.syncRun.complete).toBe(false);
     expect(r.syncRun.error).toMatch(
-      /section 1 row \d+: Gross line 110000¢ vs itemized lines 116250¢/,
+      /section 1 row \d+: Gross line 110000¢ vs itemized lines excluding owner draws 116250¢/,
     );
   });
 
@@ -333,17 +335,45 @@ describe("Gusto Payroll Journal Report (sectioned)", () => {
   it("employee gross not adding up to the Payroll Totals is incomplete; the totals block is checked the same way", async () => {
     const r = await gj(
       GUSTO_JOURNAL_SECTIONED_CSV.replace(
-        "Totals,Gross,,,3162.50",
-        "Totals,Gross,,,3200.00",
+        "Totals,Gross,,,1162.50",
+        "Totals,Gross,,,1200.00",
       ),
     );
     expect(r.syncRun.complete).toBe(false);
     expect(r.syncRun.error).toContain(
-      "section 1 Payroll Totals: Gross line 320000¢ vs itemized lines 316250¢",
+      "section 1 Payroll Totals: Gross line 120000¢ vs itemized lines excluding owner draws 116250¢",
     );
     expect(r.syncRun.error).toContain(
-      "section 1: employee gross sum 316250¢ vs Payroll Totals 320000¢",
+      "section 1: employee gross sum 116250¢ vs Payroll Totals 120000¢",
     );
+  });
+
+  it("owner draws: a Totals-only line is itemized; the Gross line excludes it; draws reconcile on their own", async () => {
+    const r = await gj();
+    expect(r.syncRun.error).not.toMatch(/Owner's Draw" Totals line/);
+    expect(r.syncRun.error).not.toMatch(/owner draws \d+¢ vs/);
+    // a section whose employee draws and totals draws disagree
+    const bad = await gj(
+      GUSTO_JOURNAL_SECTIONED_CSV.replace(
+        "Totals,Owner's Draw,,,2000.00\n,,,,,,,,,,,,,,,,,,,,,,,,,Totals,Gross,,,0.00",
+        "Totals,Owner's Draw,,,1500.00\n,,,,,,,,,,,,,,,,,,,,,,,,,Totals,Gross,,,0.00",
+      ),
+    );
+    expect(bad.syncRun.error).toContain(
+      "section 1: employee owner draws 150000¢ vs Payroll Totals owner draws 200000¢",
+    );
+    // wages and a draw on one employee: wage gross excludes the draw
+    const mixed = await gj(
+      GUSTO_JOURNAL_SECTIONED_CSV.replace(
+        ",,Gross,,,1162.50",
+        ",,Owner's Draw,,,100.00\n,,,,,,,,,,,,,,,,,,,,,,,,,,Gross,,,1162.50",
+      ),
+    );
+    expect(mixed.rows[0]).toMatchObject({
+      grossCents: 116250,
+      ownerDrawCents: 10000,
+      payKind: "wage",
+    });
   });
 
   it("a section without any totals amount is incomplete", async () => {

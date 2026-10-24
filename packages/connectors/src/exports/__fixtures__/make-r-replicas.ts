@@ -148,9 +148,10 @@ export const GUSTO_JOURNAL_SECTIONED_CSV = [
   ),
   pay("", "Gross", "", "", "1162.50"),
   person("Okafor", "Sam", "Owner’s draw", "Check"),
-  pay("", "Owner's Draw", "", "", "2000.00"),
+  // the owner draw appears ONLY as a Totals line (no itemized line)
   pay("Totals", "Owner's Draw", "", "", "2000.00"),
-  pay("Totals", "Gross", "", "", "2000.00"),
+  // Gusto's Gross excludes owner draws
+  pay("Totals", "Gross", "", "", "0.00"),
   line({
     "Last Name": "Payroll Totals",
     "Employee Taxes": "3333.33",
@@ -163,8 +164,9 @@ export const GUSTO_JOURNAL_SECTIONED_CSV = [
   pay("Totals", "Regular", "", "", "1050.00"),
   pay("", "Overtime", "", "", "75.00"),
   pay("", "Overtime (adjustment 08/15/26 - 08/28/26)", "", "", "37.50"),
-  pay("", "Owner's Draw", "", "", "2000.00"),
-  pay("Totals", "Gross", "", "", "3162.50"),
+  pay("Totals", "Owner's Draw", "", "", "2000.00"),
+  // Gusto's Gross excludes owner draws
+  pay("Totals", "Gross", "", "", "1162.50"),
   "",
   "Off-Cycle (Bonus)",
   "Pay period, 08/29/2026 - 09/11/2026",
