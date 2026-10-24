@@ -1,10 +1,10 @@
 # UI foundation
 
 Shared tokens, shell and components for every `/c/[companyId]` page. See them all, in both themes, at
-`/c/a/styleguide` (dev page, not in the nav).
+`/styleguide` (dev page outside the company shell, 404 in production).
 
 Sources: style from `docs/plans/design-style-handoff.md` (Host Grotesk, light and dark, motion table), content and
-page placement from Shannin's boards, product rules from `AGENTS.md` and `docs/plans/C-product-messaging-demo.md`
+page placement from the mockup boards, product rules from `AGENTS.md` and `docs/plans/C-product-messaging-demo.md`
 sections 4 and 5. Where the style brief and C plan 4.1/4.2 disagree on tokens or font, the style brief wins.
 
 ## Rules for page sessions
@@ -39,13 +39,13 @@ sections 4 and 5. Where the style brief and C plan 4.1/4.2 disagree on tokens or
 | `/c/[id]/onboarding` | 4 Onboarding | Onboarding |
 | `/c/[id]/audit` | 10 Audit log | Audit |
 | `/c/[id]/demo` | 12 Demo panel (404 unless `NEXT_PUBLIC_DEMO_MODE=1`) | Demo |
-| `/c/[id]/styleguide` | none (dev) | none |
+| `/styleguide` (outside the shell; 404 in production) | none (dev) | none |
 
-**Decision: Inputs, Ready and Learned get their own routes but no nav entries.** On Shannin's boards the
+**Decision: Inputs, Ready and Learned get their own routes but no nav entries.** On the mockup boards the
 Inputs board highlights Home, Ready highlights Workbook and Learned highlights Rules, and none of them is in
-her nav. They are reached from links on the parent page ("see all", "See every input", "All 11 rules"). Own
+the nav. They are reached from links on the parent page ("see all", "See every input", "All 11 rules"). Own
 routes keep each page session in its own file. The nav stays at the six C-plan items (plus Demo in demo mode),
-so the phone tab bar keeps Shannin's five slots: Home, Rules, Workbook, Audit, More (Manager, Onboarding, Demo).
+so the phone tab bar keeps the mockup's five slots: Home, Rules, Workbook, Audit, More (Manager, Onboarding, Demo).
 
 ## Shell
 
@@ -121,7 +121,8 @@ one link or button). 16px radius, padding from `--card-spacing`.
 
 ### `StatusBadge`
 `{ status: "needs-you" | "held" | "asked" | "verified" | "sync-incomplete" | "closed"; label?: string; className? }`.
-`label` changes the word, never the icon or color. `flagStatus[flag.status]` maps a `Flag.status` to
+`label` changes the word, never the icon or color, and it must not contradict `status`: "Waiting on manager"
+on `asked` is fine, but "Fixed" on `held` is not. `flagStatus[flag.status]` maps a `Flag.status` to
 `{ status, label }`.
 
 ### `DataLabel`
@@ -140,8 +141,11 @@ above; green stays reserved for verified).
 to `/c/[id]/rules#<ruleId>`.
 
 ### `AgentChip`
-`{ agent: "analyst" | "auditor" | "messenger" | "controller" | "you" | "owner" | "manager"; label?: string }`.
-`agentFromActor(event.actor)` maps an `AuditEvent.actor` to a kind.
+`{ agent: AgentKind; label?: string }` or `{ actor: AuditEvent["actor"]; label?: string }`.
+Every kind: `analyst`, `auditor`, `messenger` (agent hues); `controller`, `courier`, `system` (grey);
+`simulated` (red outline, the word "Simulated manager"); `you`, `owner`, `manager` (dark).
+Always pass `actor` or use `agentFromActor(event.actor)` for audit and timeline rows. It is the only path that
+labels the demo persona (`actor.id` starting with `persona:`) as `simulated`. Never hand-pick a kind for an actor.
 
 ### `SimulatedChip`
 `{ className? }`. Red outline "Simulated", on every message or reply from `demo.simulatedReply`.
@@ -169,6 +173,9 @@ are always solid. `SheetContent side="bottom"` for phone sheets. Use `render={<B
   viewerRole?: "owner" | "manager";    // defaults to useRole(); dollars only for "owner"
   headline?: string;                    // defaults to flag.seen
   affectsLabel?: string;                // "Wages", "Job cost", "Commission"
+  amountSource?: { system: SourceSystem; recordId: string; url?: string | null };
+                                        // where the dollar amount was computed (e.g. Workbook line);
+                                        // no amountSource → the amount is not rendered
   agents?: AgentKind[];                 // chips, e.g. ["auditor", "messenger"]
   children?: ReactNode;                 // body: proposed text, match picker, diff
   onApprove?, onEdit?, onDeny?: () => void;   // each button renders only if its handler is set
@@ -178,7 +185,7 @@ are always solid. `SheetContent side="bottom"` for phone sheets. Use `render={<B
   href?: string | null;                 // "Open problem" link; null hides it
 }
 ```
-Shannin's eight elements: status tag, headline, Where, Precedent, Affects, Check, Approve / Edit / Deny.
+the mockup's eight elements: status tag, headline, Where, Precedent, Affects, Check, Approve / Edit / Deny.
 
 ### `PageHeader`, `Placeholder`, `ThemeToggle`, `RoleSwitch`, `ShellHeader`, `Nav`
 `PageHeader { title; description?; actions? }`. `Placeholder` is the route stub; replace the whole page file.

@@ -27,7 +27,7 @@ type Item = {
   label: string;
   path: string;
   icon: LucideIcon;
-  /** Sub-routes that highlight this item (Shannin's boards: Inputs and problem detail sit under Home). */
+  /** Sub-routes that highlight this item (mockup boards: Inputs and problem detail sit under Home). */
   owns?: string[];
   /** Shown in the phone tab bar; the rest go under More. */
   tab?: boolean;
@@ -101,7 +101,7 @@ export function Nav() {
         })}
       </nav>
 
-      {/* Phone: bottom tabs (Shannin's HomePhone board: Home, Rules, Workbook, Audit, More) */}
+      {/* Phone: bottom tabs (mockup HomePhone board: Home, Rules, Workbook, Audit, More) */}
       <nav
         aria-label="Main"
         className="frosted fixed inset-x-0 bottom-0 z-40 flex border-t pb-[env(safe-area-inset-bottom)] lg:hidden"
