@@ -33,11 +33,21 @@ export const OBJECTS = [
   "entries",
   "expenses",
   "invoices",
-  "invoiceSends",
   "payments",
 ] as const;
 export type ObjectKind = (typeof OBJECTS)[number] | "users";
-export type IdMap = Partial<Record<ObjectKind, Record<string, string>>>;
+/** What live mode left out because the token's schema has no mutation for it (recorded in the id map). */
+export type SkipRecord = {
+  checkedAt: string;
+  accountId: string;
+  objects: Record<
+    string,
+    { mutations: string[]; count: number; reason: string }
+  >;
+};
+export type IdMap = Partial<Record<ObjectKind, Record<string, string>>> & {
+  skipped?: SkipRecord;
+};
 
 /** A value filled from the id map at execution time. */
 export type Ref = { $ref: `${ObjectKind}:${string}` };
@@ -75,7 +85,7 @@ export const MUTATIONS = {
   // LIVE: jobCreate(input: { propertyId!, invoicing! { invoicingType: FIXED_PRICE|VISIT_BASED, invoicingSchedule: ON_COMPLETION|... }, quoteId, salespersonId, title, lineItems [{ name!, saveToProductsAndServices!, unitPrice!, quantity! }] })
   jobCreate: `mutation($input: JobCreateAttributes!) { jobCreate(input: $input) { job { id jobNumber } userErrors { message path } } }`,
   // LIVE: visitCreate(jobId!, input: { visits: [{ title, schedule: { startAt/endAt: { date!, time, timezone! }, teamMemberIdsToAssign } }] })
-  visitCreate: `mutation($jobId: EncodedId!, $input: VisitCreateInput!) { visitCreate(jobId: $jobId, input: $input) { visits { id } userErrors { message path } } }`,
+  visitCreate: `mutation($jobId: EncodedId!, $input: VisitCreateInput!) { visitCreate(jobId: $jobId, input: $input) { createdVisits { id } userErrors { message path } } }`,
   // LIVE: visitComplete(visitId!, input: { completedAt })
   visitComplete: `mutation($visitId: EncodedId!) { visitComplete(visitId: $visitId) { visit { id isComplete } userErrors { message path } } }`,
   // NOT IN THE LIVE SCHEMA. Kept so the plan shows what time entries need; live mode stops before any write.
@@ -83,9 +93,8 @@ export const MUTATIONS = {
   // LIVE: expenseCreate(input: { title!, date!, total, description, reimbursableToId, linkedJobId, accountingCodeId })
   expenseCreate: `mutation($input: ExpenseCreateInput!) { expenseCreate(input: $input) { expense { id } userErrors { message path } } }`,
   // NOT IN THE LIVE SCHEMA (invoiceCreate exists: clientId!, dueDetails!, tax!, lineItems!, jobIds; not wired yet).
-  invoiceCreateFromJob: `mutation($input: InvoiceCreateFromJobInput!) { invoiceCreateFromJob(input: $input) { invoice { id invoiceNumber } userErrors { message path } } }`,
-  // LIVE: invoiceMarkAsSent(id!)
-  invoiceMarkAsSent: `mutation($id: EncodedId!) { invoiceMarkAsSent(id: $id) { invoice { id } userErrors { message path } } }`,
+  // LIVE (seed token): invoiceCreate(input: { clientId!, propertyId, jobIds, subject, issuedDate, markSent, dueDetails! { dueDate, invoiceNet }, tax! { taxCalculationMethod: EXCLUSIVE|INCLUSIVE }, lineItems! [{ name!, quantity, unitPrice }] })
+  invoiceCreate: `mutation($input: InvoiceCreateInput!) { invoiceCreate(input: $input) { invoice { id invoiceNumber } userErrors { message path } } }`,
   // NOT IN THE LIVE SCHEMA.
   invoiceCreatePaymentRecord: `mutation($input: InvoiceCreatePaymentRecordInput!) { invoiceCreatePaymentRecord(input: $input) { paymentRecord { id } userErrors { message path } } }`,
   // NOT IN THE LIVE SCHEMA.
@@ -97,6 +106,7 @@ export const QUERIES = {
   // LIVE: Account has no `tester` field (and User has no labourRate, Expense no accountingCode).
   account: `query { account { id name } }`,
   mutationNames: `query { __type(name: "Mutation") { fields { name } } }`,
+  invoices: `query($after: String) { invoices(searchTerm: "payrollpilot:", first: 50, after: $after) { nodes { id subject } pageInfo { hasNextPage endCursor } } }`,
   users: `query($status: UsersStatusFilterEnum!, $after: String) { users(filter: { status: $status }, first: 50, after: $after) { nodes { id name { full } status } pageInfo { hasNextPage endCursor } } }`,
   // note is read only to find our marker; it is never stored.
   entries: `query($after: String, $from: ISO8601DateTime!, $to: ISO8601DateTime!) { timeSheetEntries(filter: { startAt: { after: $from, before: $to } }, first: 50, after: $after) { nodes { id note } pageInfo { hasNextPage endCursor } } }`,
@@ -271,7 +281,7 @@ export function buildPlan(
       object: "visits",
       ourId: v.id as string,
       mutation: "visitCreate",
-      idPath: "visitCreate.visits.0.id",
+      idPath: "visitCreate.createdVisits.0.id",
       variables: {
         jobId: ref("jobs", v.jobId as string),
         input: {
@@ -362,31 +372,37 @@ export function buildPlan(
     });
   }
 
+  // invoiceCreateFromJob is not in the live schema: invoiceCreate with the job linked, sent unless draft
+  const noon = (d: unknown) => (d ? `${d}T16:00:00Z` : null);
   for (const i of fx.invoices) {
+    const job = jobs.get(i.jobId as string);
+    if (!job) throw new Error(`invoice ${i.id}: unknown job ${i.jobId}`);
+    const clientRef = job.clientRef as string;
     push({
       object: "invoices",
       ourId: i.id as string,
-      mutation: "invoiceCreateFromJob",
-      idPath: "invoiceCreateFromJob.invoice.id",
+      mutation: "invoiceCreate",
+      idPath: "invoiceCreate.invoice.id",
       variables: {
         input: {
-          jobId: ref("jobs", i.jobId as string),
+          clientId: ref("clients", clientRef),
+          propertyId: ref("properties", clientRef),
+          jobIds: [ref("jobs", i.jobId as string)],
           subject: marker(i.id as string),
-          issuedDate: i.issuedDate,
-          dueDate: i.dueDate,
+          issuedDate: noon(i.issuedDate),
+          markSent: i.status !== "draft",
+          dueDetails: i.dueDate ? { dueDate: noon(i.dueDate) } : {},
+          tax: { taxCalculationMethod: "EXCLUSIVE" },
+          lineItems: [
+            {
+              name: String(job.title),
+              quantity: 1,
+              unitPrice: dollars(i.totalCents as number),
+            },
+          ],
         },
       },
       note: i.status === "draft" ? "left as draft" : undefined,
-    });
-  }
-  for (const i of fx.invoices) {
-    if (i.status === "draft") continue;
-    push({
-      object: "invoiceSends",
-      ourId: i.id as string,
-      mutation: "invoiceMarkAsSent",
-      idPath: "invoiceMarkAsSent.invoice.id",
-      variables: { id: ref("invoices", i.id as string) },
     });
   }
 
@@ -506,4 +522,40 @@ export function resolveRefs(
     );
   }
   return v;
+}
+
+/**
+ * Splits the plan into what the token can create and what it cannot. A step is skipped when its mutation
+ * is absent from the live schema, or when it needs a record of a skipped kind. Nothing is guessed.
+ */
+export function partitionSupported(
+  steps: Step[],
+  available: Set<string>,
+): { run: Step[]; skipped: SkipRecord["objects"] } {
+  const skippedKinds = new Set<string>();
+  const skipped: SkipRecord["objects"] = {};
+  const run: Step[] = [];
+  for (const s of steps) {
+    const refs: string[] = [];
+    JSON.stringify(s.variables, (_, v) => {
+      if (v && typeof v === "object" && "$ref" in v)
+        refs.push(String(v.$ref).split(":")[0]);
+      return v;
+    });
+    const missingMutation = !available.has(s.mutation);
+    const blockedBy = refs.find((k) => skippedKinds.has(k));
+    if (missingMutation || blockedBy) {
+      skippedKinds.add(s.object);
+      const rec = skipped[s.object] ?? { mutations: [], count: 0, reason: "" };
+      skipped[s.object] = rec;
+      if (!rec.mutations.includes(s.mutation)) rec.mutations.push(s.mutation);
+      rec.count++;
+      rec.reason = missingMutation
+        ? `${s.mutation} is not in this token's schema`
+        : `needs ${blockedBy}, which is skipped`;
+      continue;
+    }
+    run.push(s);
+  }
+  return { run, skipped };
 }

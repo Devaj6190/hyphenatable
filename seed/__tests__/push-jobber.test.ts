@@ -4,6 +4,7 @@ import {
   type IdMap,
   marker,
   OBJECTS,
+  partitionSupported,
   QUERIES,
   resolveRefs,
 } from "../lib/jobber-mutations";
@@ -16,9 +17,10 @@ import {
 } from "../lib/jobber-seed-client";
 import { bucket, must } from "../lib/must";
 import {
+  availableMutations,
   closure,
   loadFixtures,
-  missingMutations,
+  oneTarget,
   pastedAddress,
   printDryRun,
   requireAllowedAccount,
@@ -227,34 +229,80 @@ describe("live safety", () => {
   test("account query asks only for fields the live schema has", () => {
     expect(QUERIES.account).not.toContain("tester");
   });
-  test("preflight lists mutations the live schema lacks (time entries, payment records, invoiceCreateFromJob)", async () => {
-    const live = [
-      "clientCreate",
-      "propertyCreate",
-      "quoteCreate",
-      "jobCreate",
-      "visitCreate",
-      "visitComplete",
-      "expenseCreate",
-      "invoiceMarkAsSent",
-      "invoiceCreate",
-    ];
+  // Mutations the seed token's schema has (read-only introspection, 2026-10-24).
+  const SEED_LIVE = [
+    "clientCreate",
+    "propertyCreate",
+    "quoteCreate",
+    "jobCreate",
+    "visitCreate",
+    "visitComplete",
+    "expenseCreate",
+    "invoiceCreate",
+    "invoiceMarkAsSent",
+  ];
+  test("unsupported kinds are skipped and recorded, not refused: entries and payments", () => {
+    const steps = buildPlan(fx, {}, opts).steps;
+    const { run, skipped } = partitionSupported(steps, new Set(SEED_LIVE));
+    expect(Object.keys(skipped).sort()).toEqual(["entries", "payments"]);
+    expect(skipped.entries.count).toBe(
+      steps.filter((s) => s.object === "entries").length,
+    );
+    expect(skipped.entries.mutations).toEqual(["timeSheetEntryCreate"]);
+    expect(skipped.payments.mutations.sort()).toEqual([
+      "invoiceCreatePaymentRecord",
+      "quoteCreatePaymentRecord",
+    ]);
+    expect(
+      run.some((s) => s.object === "entries" || s.object === "payments"),
+    ).toBe(false);
+    expect(new Set(run.map((s) => s.object))).toEqual(
+      new Set([
+        "clients",
+        "properties",
+        "quotes",
+        "jobs",
+        "visits",
+        "visitCompletes",
+        "expenses",
+        "invoices",
+      ]),
+    );
+  });
+  test("a step that needs a skipped kind is skipped too", () => {
+    const steps = buildPlan(fx, {}, opts).steps;
+    const { skipped } = partitionSupported(
+      steps,
+      new Set(SEED_LIVE.filter((m) => m !== "visitCreate")),
+    );
+    expect(skipped.visits.reason).toContain("visitCreate");
+    expect(skipped.visitCompletes.reason).toContain("needs visits");
+  });
+  test("availableMutations reads names from the schema", async () => {
     const fake = {
       gql: async () => ({
-        data: { __type: { fields: live.map((name) => ({ name })) } },
+        data: { __type: { fields: SEED_LIVE.map((name) => ({ name })) } },
         errors: [],
       }),
     };
-    expect(await missingMutations(fake, buildPlan(fx, {}, opts).steps)).toEqual(
-      [
-        "invoiceCreateFromJob",
-        "invoiceCreatePaymentRecord",
-        "quoteCreatePaymentRecord",
-        "timeSheetEntryCreate",
-      ],
-    );
+    expect((await availableMutations(fake)).has("invoiceCreate")).toBe(true);
   });
-  test("visits use the live schedule shape in the company's time zone; invoiceMarkAsSent takes id", () => {
+  test("--one targets the earliest visit when entries are unsupported", () => {
+    const { run } = partitionSupported(
+      buildPlan(fx, {}, opts).steps,
+      new Set(SEED_LIVE),
+    );
+    const t = must(oneTarget(run));
+    expect(t.object).toBe("visits");
+    const c = closure(run, t, {});
+    expect(c.map((s) => s.object)).toEqual(
+      ["clients", "properties", "quotes", "jobs", "visits"].filter((k) =>
+        c.some((s) => s.object === k),
+      ),
+    );
+    expect(c.at(-1)).toBe(t);
+  });
+  test("visits use the live schedule shape in the company's time zone; invoices use invoiceCreate", () => {
     const steps = buildPlan(fx, {}, opts).steps;
     const v = must(
       steps.find((s) => s.ourId === "a-v01" && s.object === "visits"),
@@ -271,11 +319,16 @@ describe("live safety", () => {
       timezone: "America/New_York",
     });
     expect(Array.isArray(sched.teamMemberIdsToAssign)).toBe(true);
-    expect(
-      Object.keys(
-        must(steps.find((s) => s.object === "invoiceSends")).variables,
-      ),
-    ).toEqual(["id"]);
+    expect(v.idPath).toBe("visitCreate.createdVisits.0.id");
+    const inv = must(
+      steps.find((s) => s.object === "invoices" && s.ourId === "a-in03"),
+    );
+    const input = inv.variables.input as Record<string, unknown>;
+    expect(inv.mutation).toBe("invoiceCreate");
+    expect(input.markSent).toBe(false);
+    expect(input.tax).toEqual({ taxCalculationMethod: "EXCLUSIVE" });
+    expect(input.dueDetails).toEqual({});
+    expect(input.subject).toBe("payrollpilot:a-in03");
   });
   test("refuses when the account query fails", async () => {
     const broken = {
