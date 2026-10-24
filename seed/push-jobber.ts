@@ -13,6 +13,11 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import {
+  DEFAULT_ADOPT_IDS,
+  type JobberEntry,
+  matchEntries,
+} from "./lib/jobber-adopt";
+import {
   buildPlan,
   type Fixtures,
   type IdMap,
@@ -412,6 +417,58 @@ async function live(company: string, opts: { one: boolean }) {
   }
 }
 
+/**
+ * --live --adopt-entries [--ids a,b]: read-only against Jobber. Finds hand-entered time entries (morning
+ * checklist) by user, job and start time, and writes their Jobber ids into the id map (`entries` and
+ * `adopted`). Never creates or edits anything in Jobber.
+ */
+async function adopt(company: string, ids: string[]) {
+  const client = new SeedClient(seedAuthFromEnv());
+  const account = await requireAllowedAccount(client);
+  console.log(
+    `account ${account.id} "${account.name}" allowed (JOBBER_SEED_ACCOUNT_ID); adopting ${ids.join(", ")}`,
+  );
+  const map: IdMap & {
+    adopted?: Record<
+      string,
+      { jobberId: string; matchedBy: string; at: string }
+    >;
+  } = readJsonOrNull<IdMap>(mapPath(company)) ?? {};
+  const { fx } = loadFixtures(company);
+  const targets = fx.timeEntries.filter((e) => ids.includes(e.id as string));
+  const starts = targets.map((e) => Date.parse(e.startAt as string));
+  const from = new Date(Math.min(...starts) - 86_400_000).toISOString();
+  // an open timer is started on the morning of the demo, so the window reaches to now
+  const to = new Date(
+    Math.max(Date.now(), ...starts) + 86_400_000,
+  ).toISOString();
+  const nodes = (await paginate(
+    client,
+    QUERIES.entriesForAdopt,
+    "timeSheetEntries",
+    { from, to },
+  )) as unknown as JobberEntry[];
+  const r = matchEntries(fx.timeEntries, nodes, map, ids);
+  const at = new Date().toISOString();
+  for (const [ourId, a] of Object.entries(r.adopted)) {
+    bucket(map, "entries")[ourId] = a.jobberId;
+    map.adopted = { ...(map.adopted ?? {}), [ourId]: { ...a, at } };
+    console.log(`ADOPTED ${ourId} -> ${a.jobberId} (${a.matchedBy})`);
+  }
+  for (const ourId of r.notFound)
+    console.log(
+      `NOT FOUND ${ourId}: no Jobber entry with that user, job and start time (see the morning checklist)`,
+    );
+  for (const [ourId, c] of Object.entries(r.ambiguous))
+    console.log(
+      `AMBIGUOUS ${ourId}: ${c.length} candidates (${c.join(", ")}); nothing written, delete the extra one in Jobber`,
+    );
+  writePrivateJson(mapPath(company), map);
+  console.log(
+    `scanned ${nodes.length} Jobber entries ${from} .. ${to}; map saved to ${mapPath(company)}`,
+  );
+}
+
 /** The redirected address for auth-code: argument, else PASTED_URL, else stdin. */
 export async function pastedAddress(
   arg: string | undefined,
@@ -454,7 +511,12 @@ if (import.meta.main) {
         throw new Error(
           "usage: bun run seed/push-jobber.ts --company <a|b> [--live [--one]] [--verbose]",
         );
-      if (flag("live")) await live(company, { one: flag("one") });
+      if (flag("live") && flag("adopt-entries"))
+        await adopt(
+          company,
+          (val("ids") ?? DEFAULT_ADOPT_IDS.join(",")).split(","),
+        );
+      else if (flag("live")) await live(company, { one: flag("one") });
       else {
         const map = readJsonOrNull<IdMap>(mapPath(company)) ?? {};
         printDryRun(company, plan(company, map), map, {
