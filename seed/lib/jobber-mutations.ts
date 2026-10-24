@@ -109,6 +109,8 @@ export const QUERIES = {
   invoices: `query($after: String) { invoices(searchTerm: "payrollpilot:", first: 50, after: $after) { nodes { id subject } pageInfo { hasNextPage endCursor } } }`,
   users: `query($status: UsersStatusFilterEnum!, $after: String) { users(filter: { status: $status }, first: 50, after: $after) { nodes { id name { full } status } pageInfo { hasNextPage endCursor } } }`,
   // note is read only to find our marker; it is never stored.
+  // read only, for --adopt-entries: hand-entered entries carry no marker, so they are matched by user, job and start
+  entriesForAdopt: `query($after: String, $from: ISO8601DateTime!, $to: ISO8601DateTime!) { timeSheetEntries(filter: { startAt: { after: $from, before: $to } }, first: 50, after: $after) { nodes { id startAt ticking user { id } job { id } } pageInfo { hasNextPage endCursor } } }`,
   entries: `query($after: String, $from: ISO8601DateTime!, $to: ISO8601DateTime!) { timeSheetEntries(filter: { startAt: { after: $from, before: $to } }, first: 50, after: $after) { nodes { id note } pageInfo { hasNextPage endCursor } } }`,
   jobs: `query($after: String) { jobs(searchTerm: "payrollpilot:", first: 50, after: $after) { nodes { id title } pageInfo { hasNextPage endCursor } } }`,
   expenses: `query($after: String) { expenses(searchTerm: "payrollpilot:", first: 50, after: $after) { nodes { id title } pageInfo { hasNextPage endCursor } } }`,

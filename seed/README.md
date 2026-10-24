@@ -108,3 +108,30 @@ bun run seed/generate.ts --company a                  # fixtures now carry the r
 ## Company B (A-14): `companies/b.json`, `lib/company-b.ts`
 
 `bun run seed/generate.ts --company b` writes `data/fixtures/b/`. The config sets `"generator": "hvac-weekly"`, so `generate.ts` hands it to `lib/company-b.ts`; Company A's generator and hash are unchanged. B is a weekly, 30-person HVAC company in California with daily overtime (`caOvertime` in `lib/company-b.ts`, tested), two crews with separate managers, commission on install profit, no tips, and its own expense chart. It is fixtures only; the pushers are not run for B. `__tests__/company-b.test.ts` pins `EXPECTED_SHA256_B`. The 8 planted errors and their answer key are listed in `data/fixtures/README.md`.
+
+## Morning checklist (Shanin): hand steps in the Jobber trial
+
+Jobber has no API to create time entries. Every hour in Company A comes from the fixtures, **except** the few entries below, which are entered by hand so the demo-moment overlap (CHK-04) has real Jobber ids. The Jobber account is "Hyphenate Landscaping" (the allowlisted `JOBBER_SEED_ACCOUNT_ID`). Its 14 users and 32 jobs already exist from the seed push.
+
+0. **Time zone first.** Settings > Company settings: the company time zone must be **Eastern (America/New_York)**, because Company A is in Pennsylvania. If it is left on another zone, the times below land at the wrong instant and adopt reports NOT FOUND.
+1. **CHK-04 overlap pair, required.** Timesheets > select **Sam Okafor** > day **Wed Oct 14, 2026** > add two time entries, both on the job **"Backyard patio and drainage - Birchwood Ave [payrollpilot:a-j02]"** (no visit):
+   - **7:00 AM – 3:30 PM** (8 h 30 m) → becomes `a-te-0111`
+   - **12:00 PM – 4:00 PM** (4 h) → becomes `a-te-0113`
+
+   These intentionally overlap by 3 h 30 m. Enter each one once; a second copy makes adopt report AMBIGUOUS. Leave the notes empty.
+2. **Approve them.** Timesheets > Approve Timesheets > approve both of Sam Okafor's Oct 14 entries. In the fixtures they are approved by Dakota Brennan, the manager.
+3. **CHK-02 open timer, optional.** Just before the demo pull, log in as **Casey Lindqvist** (or start it as admin for that user) and **start a timer** on the same job, "Backyard patio and drainage - Birchwood Ave [payrollpilot:a-j02]". Leave it running and don't approve it.
+   - A timer can't be back-dated. It starts "now", not on Fri Oct 23 at 1:00 PM ET as in the fixture, so it falls **outside** the a-c05 pull window (Oct 10–23). Only a pull window that reaches today will show it.
+   - Skip this step if CHK-02 should come from the fixtures.
+4. **Deactivate a-w13, optional.** Settings > Manage Team > **Parker Whitfield** > Deactivate. a-w13's two a-c05 entries exist only in the fixtures, so CHK-08 comes from the fixtures either way. Deactivating makes the Jobber user status match.
+5. **Adopt the entries into the id map.** This step is read-only against Jobber. From the main checkout:
+   ```bash
+   cd ~/Development/Hackathons/hyphenatable
+   bun run seed/push-jobber.ts --company a --live --adopt-entries                       # a-te-0111, a-te-0113, a-te-0140
+   bun run seed/push-jobber.ts --company a --live --adopt-entries --ids a-te-0111,a-te-0113   # without the timer
+   ```
+   - It matches by Jobber user, job and start time to the minute. A running timer is matched by user, job and `ticking`.
+   - Each match prints `ADOPTED <ours> -> <jobber id>` and is written into `data/private/a-jobber-map.json` (`entries` and `adopted`). Anything else prints `NOT FOUND` or `AMBIGUOUS` and is never guessed. Rerunning is safe.
+6. **Pull and compare:** `bun run packages/connectors/src/jobber/cli.ts pull --company a --from 2026-10-10 --to 2026-10-23 --tz America/New_York --compare data/fixtures/a`. timeSheetEntries should show 2 pulled and 2 matched (a-te-0111, a-te-0113). The other 83 remain fixture-only.
+
+**Gusto note for the demo:** the demo company has one employee of its own whose onboarding is not finished and who is **not** mapped to any Company A worker. Gusto shows it as not onboarded. Company A's CHK-09 is about **a-w14** (Reese Calloway) only. That extra employee is Gusto's sample data, not a Company A error.
