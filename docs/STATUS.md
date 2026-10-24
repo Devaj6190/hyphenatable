@@ -2,6 +2,8 @@
 
 Format: `HH:MM PDT · who · what landed on main / what I'm on / what I need`. Decisions that change the plan go here too, with the file they changed.
 
+- Sat 02:25 · A2 · Merged #8 (d7dff95): `seed/push-jobber.ts`: dry run by default (691-step plan + manual checklists), `--live` via the separate seed app (`JOBBER_SEED_*`, own token file), idempotent by `payrollpilot:` markers, `--one` single past-dated test. Not run live. H1: tester signup broken; Shanin created a regular Jobber **free trial** instead (14 days); pusher's tester-only guard becomes an account-id allowlist (follow-up PR).
+
 - Sat 02:45 · A1 · Merged #6 (773c00a): Gusto read connector: `pullEmployees` (+ compensations, `onboarded`), `pullContractors`, `pullPayrolls` (processed, per-employee gross/net and lines in cents), `pullUnprocessed` (list only). GET-only and `api.gusto-demo.com`-only enforced in code; no prepare/update/calculate/submit. 70 tests. Not run live (needs `gusto/cli.ts auth`).
   - **Ask → Devaj (B):** section 6 has no payroll table; the connector returns a local `GustoPayroll`. Contract table, or only feeds `Draft` and `eval`? Gusto worker ids are `gusto:employee:<uuid>` / `gusto:contractor:<uuid>`; mapping to Jobber workers is A-07's map.
   - **Blocked (A, H1):** Jobber developer-testing signup fails server-side (CORS on `secure.getjobber.com/signup.json`) in two browsers; trying a regular free trial next.
