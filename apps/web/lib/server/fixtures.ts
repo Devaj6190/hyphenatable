@@ -264,3 +264,34 @@ export function rosterView(viewer: Viewer, companyId: string): RosterWorker[] {
       venmoRateCents: null,
     }));
 }
+
+/** The manager and the names of their crew, so the inbox can say who a text is for. */
+export function managerCrew(companyId: string) {
+  const viewer = viewerForRole(companyId, "manager");
+  const crew = viewer.role === "manager" ? viewer.crew : new Set<string>();
+  const ws = workersOf(companyId).filter((w) => crew.has(w.id));
+  return {
+    manager: ws.find((w) => w.role === "manager") ?? null,
+    names: Object.fromEntries(ws.map((w) => [w.id, w.displayName])),
+  };
+}
+
+/** Users who are managers, so the audit log can chip them as Manager rather than Owner. */
+export const managerIds = (companyId: string) =>
+  workersOf(companyId)
+    .filter((w) => w.role === "manager")
+    .map((w) => w.id);
+
+/** Questions for the demo panel: only those about a flag this viewer may see, with the names they mention. */
+export function demoQuestions(viewer: Viewer, companyId: string) {
+  const visibleIds = new Set(visibleFlags(viewer, companyId).map((f) => f.id));
+  return {
+    questions: allQuestions.filter(
+      (q) =>
+        q.companyId === companyId && q.flagIds.some((id) => visibleIds.has(id)),
+    ),
+    names: Object.fromEntries(
+      workersOf(companyId).map((w) => [w.id, w.displayName]),
+    ),
+  };
+}
