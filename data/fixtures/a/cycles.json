@@ -9,7 +9,7 @@
     "stage": "closed",
     "gustoPayrollId": null,
     "gustoOffCyclePayrollId": null,
-    "questionsAsked": 0
+    "questionsAsked": 1
   },
   {
     "id": "a-c02",
@@ -21,7 +21,7 @@
     "stage": "closed",
     "gustoPayrollId": null,
     "gustoOffCyclePayrollId": null,
-    "questionsAsked": 0
+    "questionsAsked": 2
   },
   {
     "id": "a-c03",
@@ -33,7 +33,7 @@
     "stage": "closed",
     "gustoPayrollId": null,
     "gustoOffCyclePayrollId": null,
-    "questionsAsked": 0
+    "questionsAsked": 2
   },
   {
     "id": "a-c04",
@@ -45,7 +45,7 @@
     "stage": "closed",
     "gustoPayrollId": null,
     "gustoOffCyclePayrollId": null,
-    "questionsAsked": 0
+    "questionsAsked": 1
   },
   {
     "id": "a-c05",

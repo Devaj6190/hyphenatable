@@ -214,6 +214,44 @@ export const Rule = z.strictObject({
   confidence: z.number().min(0).max(1),
 });
 
+export const Question = z.strictObject({
+  id,
+  companyId: id,
+  cycleId: id,
+  flagIds: z.array(id),
+  toWorkerId: id,
+  toRole: z.enum(["owner", "manager", "employee"]),
+  text: z.string().max(240),
+  options: z.array(z.string()).max(4).nullable(),
+  kind: z.enum(["text", "poll"]),
+  status: z.enum(["draft", "approved", "sent", "reminded", "answered", "expired", "denied"]),
+  approvedBy: nid,
+  approvedAt: isoTime.nullable(),
+  sentAt: isoTime.nullable(),
+  remindAt: isoTime.nullable(),
+  expiresAt: isoTime.nullable(),
+  interpretationId: nid,
+});
+
+// Not a section 6 table: what was actually paid in past cycles. Stand-in for A-08's Gusto past
+// payrolls (regular and off-cycle) plus the owner's Venmo list. Feeds onboarding and CHK-22.
+export const PastPayroll = z.strictObject({
+  id,
+  companyId: id,
+  cycleId: id,
+  workerId: id,
+  paidVia: z.enum(["gusto_regular", "gusto_off_cycle", "venmo"]),
+  earnings: z.array(
+    z.strictObject({
+      name: z.string(),
+      hours: z.number().nonnegative().nullable(),
+      rateCents: cents.nullable(),
+      amountCents: cents,
+    }),
+  ),
+  grossCents: cents,
+});
+
 export const CheckId = z.string().regex(/^CHK-(0[1-9]|1[0-9]|2[0-3])$/);
 
 // Answer key (shared-context section 13): matched to flags by checkId + overlapping subject ids.
@@ -250,6 +288,8 @@ const FILES: Record<string, { schema: z.ZodType; array: boolean }> = {
   "payments.json": { schema: Payment, array: true },
   "expenses.json": { schema: Expense, array: true },
   "rules.json": { schema: Rule, array: true },
+  "pastPayrolls.json": { schema: PastPayroll, array: true },
+  "questions.json": { schema: Question, array: true },
   "answer-key.json": { schema: AnswerKeyRow, array: true },
 };
 
@@ -344,6 +384,17 @@ export function validateDir(dir: string): string[] {
     ref("payments.json", r, "quoteId", quotes);
   }
   for (const r of data["expenses.json"]) ref("expenses.json", r, "matchedJobId", jobs);
+  for (const r of data["pastPayrolls.json"]) {
+    ref("pastPayrolls.json", r, "cycleId", cycles);
+    ref("pastPayrolls.json", r, "workerId", workers);
+    const sum = (r.earnings as Rec[]).reduce((s, e) => s + (e.amountCents as number), 0);
+    if (sum !== r.grossCents) errors.push(`pastPayrolls.json: ${r.id} grossCents ${r.grossCents} != sum of earnings ${sum}`);
+  }
+  for (const r of data["questions.json"]) {
+    ref("questions.json", r, "cycleId", cycles);
+    ref("questions.json", r, "toWorkerId", workers);
+    ref("questions.json", r, "approvedBy", workers);
+  }
   for (const r of data["answer-key.json"]) {
     const s = r.subject as Rec;
     ref("answer-key.json", s as Rec & { id: unknown }, "workerId", workers);

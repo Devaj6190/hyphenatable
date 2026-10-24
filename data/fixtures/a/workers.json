@@ -192,7 +192,7 @@
       "employeeUuid": "00000000-0000-4000-a000-000000000008",
       "contractorUuid": null,
       "jobUuid": "00000000-0000-4000-b000-000000000008",
-      "rateCents": 6240000,
+      "rateCents": 6760000,
       "paymentUnit": "Year",
       "flsaStatus": "Exempt",
       "onboarded": true
@@ -280,6 +280,56 @@
       "paymentUnit": "Year",
       "flsaStatus": "Exempt",
       "onboarded": true
+    },
+    "venmoRateCents": null
+  },
+  {
+    "id": "a-w13",
+    "companyId": "a",
+    "displayName": "Parker Whitfield",
+    "role": "field",
+    "payType": "hourly",
+    "status": "inactive",
+    "managerId": "a-w11",
+    "contactRef": "contact:a-w13",
+    "jobber": {
+      "userId": "jobber-user:a-w13",
+      "labourRateCents": 2200,
+      "status": "DEACTIVATED"
+    },
+    "gusto": {
+      "employeeUuid": "00000000-0000-4000-a000-000000000013",
+      "contractorUuid": null,
+      "jobUuid": "00000000-0000-4000-b000-000000000013",
+      "rateCents": 2200,
+      "paymentUnit": "Hour",
+      "flsaStatus": "Nonexempt",
+      "onboarded": true
+    },
+    "venmoRateCents": null
+  },
+  {
+    "id": "a-w14",
+    "companyId": "a",
+    "displayName": "Reese Calloway",
+    "role": "field",
+    "payType": "hourly",
+    "status": "active",
+    "managerId": "a-w11",
+    "contactRef": "contact:a-w14",
+    "jobber": {
+      "userId": "jobber-user:a-w14",
+      "labourRateCents": 2000,
+      "status": "ACTIVATED"
+    },
+    "gusto": {
+      "employeeUuid": "00000000-0000-4000-a000-000000000014",
+      "contractorUuid": null,
+      "jobUuid": "00000000-0000-4000-b000-000000000014",
+      "rateCents": 2000,
+      "paymentUnit": "Hour",
+      "flsaStatus": "Nonexempt",
+      "onboarded": false
     },
     "venmoRateCents": null
   }
