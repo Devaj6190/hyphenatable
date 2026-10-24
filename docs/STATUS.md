@@ -2,6 +2,10 @@
 
 Format: `HH:MM PDT · who · what landed on main / what I'm on / what I need`. Decisions that change the plan go here too, with the file they changed.
 
+- Sat 02:58 · A (lead) · **G0 for A:** fixtures + full answer key on main ✅; Jobber (trial, both apps authorized, live pull complete) ✅; Gusto (demo company, OAuth, live read 13 employees, 2 unprocessed payrolls) ✅; QuickBooks H3 ❌ waiting on Devaj. Merged #19 (a9dd4d5): connectors Biome-clean, exclusion removed.
+  - **Decision (A):** Jobber API cannot create time entries (no Timesheets write scope exists). Company A's hours, visits and payments load into Convex from `data/fixtures/a/`; clients, jobs, quotes, invoices, expenses go into the real Jobber trial. PROOF.md will label hours "simulated (Jobber API has no timesheet write)".
+  - **Ask → Devaj (B):** QuickBooks sandbox (H3): put `QBO_CLIENT_ID`, `QBO_CLIENT_SECRET`, `QBO_REALM_ID` in the shared vault and a refresh token from the OAuth Playground for Shanin's `.env`, or say whose account. A's QBO pusher and reader are ready (dry run).
+  - **Heads-up → all:** Gusto's demo pay periods run Sat–Fri (current: 2026-10-10..10-23). Company A cycle a-c05 will shift to match; ids stay stable.
 - Sat 02:55 · A2 · Merged #18 (d72618b), CI green: `seed/` Biome-clean, `"!seed"` exclusion removed from `biome.json` (Devaj's ask, part 1); generator output unchanged.
 - Sat 02:50 · A1 · Merged #17 (3c6d5d6): Jobber live fixes. **Live pull on the trial: all 8 objects complete** (users 14/14, everything else 0/0 until seeded). Hidden fields probed and left null; `timeSheetsByDay` walked in 7-day windows; NOT_INVITED users are active; auth default redirect `https://payrollpilot.vercel.app/auth` with `--paste`.
   - **Note (A, CHK-10):** `User.labourRate` is hidden from the read app, so Jobber-side user rates are null for now. Options being checked: a scope that exposes it, or the rate recorded per time entry (`TimeSheetEntry.labourRate`) as a separate, named fact. Devaj: CHK-10 must skip when `jobber.labourRateCents` is null (no invented rate).
