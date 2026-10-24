@@ -47,4 +47,43 @@ New ids never reuse v1 (#1) ids. v1 a-c05 time entries `a-te-0101..0140` are pin
 
 ## Pushers (A-05..A-07)
 
-Not built yet. They will run `--dry-run` by default against these fixtures, read credentials only from the env vars in shared-context section 16, and write id maps to `data/private/` (gitignored).
+Each pusher is a dry run unless given `--live`. A dry run reads only the fixtures (and the id map, if present), makes no network call and reads no credentials.
+
+### Jobber (A-05): `push-jobber.ts`, `lib/jobber-mutations.ts`, `lib/jobber-seed-client.ts`
+
+```bash
+bun run seed/push-jobber.ts --company a [--verbose]      # plan: counts per object, mutations, both manual checklists
+# live, once the seed account and the "PayrollPilot Seed" app exist (needs JOBBER_SEED_CLIENT_ID / _SECRET / _ACCOUNT_ID):
+bun run seed/push-jobber.ts auth-url                      # a person opens the URL as the seed account admin
+bun run seed/push-jobber.ts auth-code <code>              # stores data/private/jobber-seed-tokens.json (not the read app's token)
+bun run seed/push-jobber.ts --company a --live --one      # step 4: one past-dated entry plus what it needs; check it in Jobber
+bun run seed/push-jobber.ts --company a --live            # the rest; rerunnable
+```
+
+- **Safety:** live mode queries `account { id name tester }` first and refuses unless the id equals `JOBBER_SEED_ACCOUNT_ID` (the free-trial account made for seeding, since the developer-testing signup is broken) or Jobber reports `tester = true`. With the variable unset only a tester account passes; there is no "any account" fallback. The refusal prints the account id and name to copy into `.env`. Writes go only to `api.getjobber.com` with the seed app's token. Never uses GraphiQL on the read app.
+- **Order:** clients, properties, quotes, jobs (linked to their quote), visits, visit completes, time entries, Jobber expenses, invoices (from job), mark sent, payment records (quote deposits on the quote; the CHK-19 deposit on the invoice).
+- **Idempotent:** every record carries `payrollpilot:<id>` (entry note, title, company name, invoice subject, payment details). Before writing, live mode looks up existing markers in the account. The id map `data/private/<company>-jobber-map.json` is saved after every create. A rerun creates only what is missing.
+- **Not pushed:** the open timer (a-te-0140), which has to be started by hand just before the pull; tip payments (history only); QuickBooks purchases (A-06). `labourRate` is not sent per entry: Jobber costs entries at the user's labour rate, set by hand in Manage Team.
+- **Manual steps** (printed by the dry run): before the push, add every worker in Manage Team with the exact display name. After the push, approve all but the CHK-06 entries, start the CHK-02 timer, and deactivate a-w13.
+- **UNVERIFIED input shapes** (names are verified by introspection; see the comments in `lib/jobber-mutations.ts`): clientCreate, propertyCreate, quoteCreate line items, jobCreate `invoicing`, visitCreate argument placement, invoiceCreateFromJob, payment-record enums. Check them once in GraphiQL on the seed app, or let `--one` surface the error; the run stops on the first `userErrors`.
+
+### QuickBooks (A-06): `push-qbo.ts`, `lib/qbo.ts`
+
+```bash
+bun run seed/push-qbo.ts --company a [--verbose]       # plan: accounts, vendors, customers, job sub-customers, purchases, bills
+# live, once H3 gives sandbox credentials (QBO_CLIENT_ID / QBO_CLIENT_SECRET / QBO_REALM_ID):
+bun run seed/push-qbo.ts init-token <refresh token>    # OAuth Playground, sandbox; stored in data/private/qbo-seed-token.json
+bun run seed/push-qbo.ts --company a --live            # creates what is missing; rerunnable
+bun run seed/push-qbo.ts --company a --live --reseed   # deletes OUR Purchases/Bills by API first, then pushes
+```
+
+- **Host:** `sandbox-quickbooks.api.intuit.com` only. Every URL is built in one function that refuses any other host.
+- **What is created:**
+  - Accounts and vendors are looked up by name and created only if missing.
+  - One parent customer per client, and one sub-customer per job (`Job: true`, `DisplayName` = job number, marker in `Notes`). A name match without our marker is refused, never adopted.
+  - One Purchase per QuickBooks expense (CreditCard, from the "Company A Card (payrollpilot)" account), with the expense account on the line and `CustomerRef` only when the fixture is job-tagged. a-ex-0003 (CHK-14) has none.
+  - Bills for two vendor invoices: the first two past-cycle Equipment Rental expenses. The current cycle's Purchase count therefore equals the fixtures (6).
+- **Idempotent:** our marker `payrollpilot:<id>` is in `PrivateNote`. Live mode scans the fixture date range for marked Purchases and Bills (PrivateNote is not filterable in a query) and maps them before creating anything. The id map is `data/private/<company>-qbo-map.json`.
+- **Re-seed:** deletes only marked Purchases and Bills, one by one with `?operation=delete` (`Id` + `SyncToken`). Customers, vendors and accounts are reused. Never "Clear data and reset".
+- **Limits:** at most 10 requests/s; on a 429 it sleeps 60 s.
+- **Token file:** separate from the read connector's `qbo-token.json`. If both are initialized from the same Playground authorization, refreshing one may rotate the other's token. Authorize twice, or refresh only one.
