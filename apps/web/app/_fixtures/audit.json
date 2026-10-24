@@ -1,0 +1,381 @@
+[
+  {
+    "id": "a-au-01",
+    "companyId": "a",
+    "cycleId": "a-c04",
+    "at": "2026-10-10T15:00:00.000Z",
+    "actor": {
+      "kind": "agent",
+      "id": "analyst",
+      "agent": "analyst"
+    },
+    "type": "rule.proposed",
+    "summary": "Analyst proposed a rule from past cycles: entries with no job usually belong to the crew's current job.",
+    "refs": {
+      "ruleId": "R-14"
+    },
+    "data": {
+      "source": "Past cycles (Jobber, QuickBooks, Gusto)"
+    }
+  },
+  {
+    "id": "a-au-02",
+    "companyId": "a",
+    "cycleId": "a-c04",
+    "at": "2026-10-10T16:10:00.000Z",
+    "actor": {
+      "kind": "user",
+      "id": "a-w12",
+      "agent": null
+    },
+    "type": "rule.approved",
+    "summary": "Owner approved rule R-14. It applies from the next run.",
+    "refs": {
+      "ruleId": "R-14"
+    },
+    "data": {
+      "source": "Rules screen"
+    }
+  },
+  {
+    "id": "a-au-03",
+    "companyId": "a",
+    "cycleId": "a-c05",
+    "at": "2026-10-24T08:00:00.000Z",
+    "actor": {
+      "kind": "system",
+      "id": "controller",
+      "agent": null
+    },
+    "type": "sync.run",
+    "summary": "Pulled 41 of 41 time entries from Jobber. Complete.",
+    "refs": {
+      "syncRunId": "a-sr-01"
+    },
+    "data": {
+      "source": "Jobber"
+    }
+  },
+  {
+    "id": "a-au-04",
+    "companyId": "a",
+    "cycleId": "a-c05",
+    "at": "2026-10-24T08:01:00.000Z",
+    "actor": {
+      "kind": "system",
+      "id": "controller",
+      "agent": null
+    },
+    "type": "sync.run",
+    "summary": "Pulled 9 of 9 purchases from QuickBooks. Complete.",
+    "refs": {
+      "syncRunId": "a-sr-02"
+    },
+    "data": {
+      "source": "QuickBooks"
+    }
+  },
+  {
+    "id": "a-au-05",
+    "companyId": "a",
+    "cycleId": "a-c05",
+    "at": "2026-10-24T08:02:00.000Z",
+    "actor": {
+      "kind": "system",
+      "id": "controller",
+      "agent": null
+    },
+    "type": "sync.run",
+    "summary": "Pulled 12 of 12 workers from Gusto. Complete.",
+    "refs": {
+      "syncRunId": "a-sr-03"
+    },
+    "data": {
+      "source": "Gusto"
+    }
+  },
+  {
+    "id": "a-au-06",
+    "companyId": "a",
+    "cycleId": "a-c05",
+    "at": "2026-10-24T08:12:00.000Z",
+    "actor": {
+      "kind": "system",
+      "id": "controller",
+      "agent": null
+    },
+    "type": "check.fired",
+    "summary": "CHK-04 found two overlapping entries for the same worker.",
+    "refs": {
+      "flagId": "a-flag-04",
+      "entryId": "a-te-0141"
+    },
+    "data": {
+      "source": "Checks engine (rule: certain)"
+    }
+  },
+  {
+    "id": "a-au-07",
+    "companyId": "a",
+    "cycleId": "a-c05",
+    "at": "2026-10-24T08:12:30.000Z",
+    "actor": {
+      "kind": "agent",
+      "id": "auditor",
+      "agent": "auditor"
+    },
+    "type": "check.matched",
+    "summary": "Auditor's best match for a purchase with no job is job a-j02 at 72%, below the 85% bar, so it asks.",
+    "refs": {
+      "flagId": "a-flag-09",
+      "expenseId": "a-exp-0231"
+    },
+    "data": {
+      "source": "Auditor agent (Claude), QuickBooks purchase"
+    }
+  },
+  {
+    "id": "a-au-08",
+    "companyId": "a",
+    "cycleId": "a-c05",
+    "at": "2026-10-24T08:13:00.000Z",
+    "actor": {
+      "kind": "agent",
+      "id": "messenger",
+      "agent": "messenger"
+    },
+    "type": "message.drafted",
+    "summary": "Messenger drafted one question for Casey Lindqvist. Nothing is sent until a person approves.",
+    "refs": {
+      "flagId": "a-flag-04",
+      "questionId": "a-q-01"
+    },
+    "data": {
+      "source": "Messenger agent (Claude)"
+    }
+  },
+  {
+    "id": "a-au-09",
+    "companyId": "a",
+    "cycleId": "a-c05",
+    "at": "2026-10-24T08:30:00.000Z",
+    "actor": {
+      "kind": "user",
+      "id": "a-w12",
+      "agent": null
+    },
+    "type": "message.approved",
+    "summary": "Owner approved the question to Rowan Castillo.",
+    "refs": {
+      "flagId": "a-flag-02",
+      "questionId": "a-q-02"
+    },
+    "data": {
+      "source": "Dashboard approval sheet"
+    }
+  },
+  {
+    "id": "a-au-10",
+    "companyId": "a",
+    "cycleId": "a-c05",
+    "at": "2026-10-24T08:31:00.000Z",
+    "actor": {
+      "kind": "system",
+      "id": "courier",
+      "agent": null
+    },
+    "type": "message.sent",
+    "summary": "Question sent to Rowan Castillo by text.",
+    "refs": {
+      "flagId": "a-flag-02",
+      "questionId": "a-q-02"
+    },
+    "data": {
+      "source": "Courier (Photon)"
+    }
+  },
+  {
+    "id": "a-au-11",
+    "companyId": "a",
+    "cycleId": "a-c05",
+    "at": "2026-10-24T08:40:00.000Z",
+    "actor": {
+      "kind": "system",
+      "id": "courier",
+      "agent": null
+    },
+    "type": "message.received",
+    "summary": "Reply received from Rowan Castillo: option 1.",
+    "refs": {
+      "flagId": "a-flag-02",
+      "questionId": "a-q-02"
+    },
+    "data": {
+      "source": "Courier (Photon)"
+    }
+  },
+  {
+    "id": "a-au-12",
+    "companyId": "a",
+    "cycleId": "a-c05",
+    "at": "2026-10-24T08:40:30.000Z",
+    "actor": {
+      "kind": "agent",
+      "id": "messenger",
+      "agent": "messenger"
+    },
+    "type": "message.interpreted",
+    "summary": "Messenger read the reply as option 1, job a-j01, with 95% confidence.",
+    "refs": {
+      "flagId": "a-flag-02",
+      "questionId": "a-q-02"
+    },
+    "data": {
+      "source": "Messenger agent (Claude Haiku)"
+    }
+  },
+  {
+    "id": "a-au-13",
+    "companyId": "a",
+    "cycleId": "a-c05",
+    "at": "2026-10-24T08:41:00.000Z",
+    "actor": {
+      "kind": "agent",
+      "id": "auditor",
+      "agent": "auditor"
+    },
+    "type": "correction.proposed",
+    "summary": "Auditor proposed moving entry a-te-0177 to job a-j01 in the workbook. Jobber is not changed.",
+    "refs": {
+      "flagId": "a-flag-02",
+      "correctionId": "a-co-01",
+      "entryId": "a-te-0177"
+    },
+    "data": {
+      "source": "Auditor agent (Claude)"
+    }
+  },
+  {
+    "id": "a-au-14",
+    "companyId": "a",
+    "cycleId": "a-c05",
+    "at": "2026-10-24T08:45:00.000Z",
+    "actor": {
+      "kind": "user",
+      "id": "a-w12",
+      "agent": null
+    },
+    "type": "correction.approved",
+    "summary": "Owner approved the correction. The workbook is now version 3.",
+    "refs": {
+      "flagId": "a-flag-02",
+      "correctionId": "a-co-01"
+    },
+    "data": {
+      "source": "Dashboard approval sheet",
+      "effectPayCents": 12350
+    }
+  },
+  {
+    "id": "a-au-15",
+    "companyId": "a",
+    "cycleId": "a-c05",
+    "at": "2026-10-24T08:46:00.000Z",
+    "actor": {
+      "kind": "system",
+      "id": "controller",
+      "agent": null
+    },
+    "type": "draft.updated",
+    "summary": "Stage 1 workbook recomputed from version 3.",
+    "refs": {
+      "draftId": "a-dr-01"
+    },
+    "data": {
+      "source": "Workbook",
+      "ownerOnly": true
+    }
+  },
+  {
+    "id": "a-au-16",
+    "companyId": "a",
+    "cycleId": "a-c05",
+    "at": "2026-10-24T08:50:00.000Z",
+    "actor": {
+      "kind": "user",
+      "id": "a-w12",
+      "agent": null
+    },
+    "type": "draft.gate1_approved",
+    "summary": "Owner approved Gate 1.",
+    "refs": {
+      "draftId": "a-dr-01"
+    },
+    "data": {
+      "source": "Dashboard gate",
+      "ownerOnly": true
+    }
+  },
+  {
+    "id": "a-au-17",
+    "companyId": "a",
+    "cycleId": "a-c05",
+    "at": "2026-10-24T08:52:00.000Z",
+    "actor": {
+      "kind": "system",
+      "id": "controller",
+      "agent": null
+    },
+    "type": "draft.gusto_filled",
+    "summary": "Gusto draft filled and calculated. Draft only, never submitted.",
+    "refs": {
+      "draftId": "a-dr-01"
+    },
+    "data": {
+      "source": "Gusto demo API",
+      "ownerOnly": true
+    }
+  },
+  {
+    "id": "a-au-18",
+    "companyId": "a",
+    "cycleId": "a-c05",
+    "at": "2026-10-24T09:05:00.000Z",
+    "actor": {
+      "kind": "agent",
+      "id": "persona:manager",
+      "agent": null
+    },
+    "type": "demo.simulated_reply",
+    "summary": "Simulated manager replied 2 to the purchase question.",
+    "refs": {
+      "flagId": "a-flag-09",
+      "questionId": "a-q-03"
+    },
+    "data": {
+      "source": "Simulated manager (Claude persona)",
+      "simulated": true
+    }
+  },
+  {
+    "id": "a-au-19",
+    "companyId": "a",
+    "cycleId": "a-c05",
+    "at": "2026-10-24T09:05:30.000Z",
+    "actor": {
+      "kind": "agent",
+      "id": "messenger",
+      "agent": "messenger"
+    },
+    "type": "message.interpreted",
+    "summary": "Messenger read the simulated reply as option 2, job a-j01, with 90% confidence.",
+    "refs": {
+      "flagId": "a-flag-09",
+      "questionId": "a-q-03"
+    },
+    "data": {
+      "source": "Messenger agent (Claude Haiku), from a simulated reply",
+      "simulated": true
+    }
+  }
+]

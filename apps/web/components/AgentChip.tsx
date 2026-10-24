@@ -8,19 +8,29 @@ const agentStyle = {
 } as const;
 
 const label = (actor: FlagEvent["actor"]) => {
+  if (actor.id.startsWith("persona:")) return "Simulated manager";
   if (actor.agent) return actor.agent[0].toUpperCase() + actor.agent.slice(1);
   if (actor.kind === "user") return "Owner";
-  return actor.id === "controller" ? "Controller" : "System";
+  if (actor.id === "controller") return "Controller";
+  if (actor.id === "courier") return "Courier";
+  return "System";
 };
 
 export function AgentChip({ actor }: { actor: FlagEvent["actor"] }) {
-  const cls = actor.agent
-    ? agentStyle[actor.agent]
-    : actor.kind === "user"
-      ? "bg-foreground text-background"
-      : "bg-muted text-muted-foreground";
+  const cls = actor.id.startsWith("persona:")
+    ? "border-destructive text-destructive"
+    : actor.agent
+      ? agentStyle[actor.agent]
+      : actor.kind === "user"
+        ? "bg-foreground text-background"
+        : "bg-muted text-muted-foreground";
   return (
-    <Badge variant="outline" className={`border-transparent ${cls}`}>
+    <Badge
+      variant="outline"
+      className={
+        actor.id.startsWith("persona:") ? cls : `border-transparent ${cls}`
+      }
+    >
       {label(actor)}
     </Badge>
   );
