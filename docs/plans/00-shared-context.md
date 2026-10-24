@@ -215,7 +215,7 @@ Lesson    = { id, companyId, text, structured: { ruleType: RuleType|null, params
               status: "new"|"confirmed"|"superseded"|"conflict"|"promoted"|"rejected", relatedLessonIds: string[],
               evaluation: { expected: string, actual: string, source: "answer"|"answer_key"|"paid" } | null,
               createdFrom: { flagId|null, questionId|null, messageId|null } }
-Draft     = { id, companyId, cycleId, stage: 1|2, lines: DraftLine[], workbookVersion: number, gustoPayrollId|null,
+Draft     = { id, companyId, cycleId, stage: 1|2, lines: DraftLine[], venmoList: { workerId, hours, rateCents, amountCents }[], workbookVersion: number, gustoPayrollId|null,
               status: "computed"|"approved"|"filled"|"calculated", totals: { grossCents, hours } }
 DraftLine = { workerId, excluded: boolean, hourly: { name: "Regular Hours"|"Overtime"|"Double Overtime", hours: number }[],
               fixed: { name: "Bonus"|"Commission"|"Paycheck Tips"|"Cash Tips"|"Reimbursement"|"Correction Payment", amountCents }[],
@@ -225,7 +225,7 @@ AuditEvent= { id, companyId, cycleId|null, at, actor: { kind: "system"|"agent"|"
 AccessEvent={ id, companyId, at, userId, action: "view"|"export", what: string }
 ```
 
-Convex function names (binding; B implements, C and A consume): `cycles.start`, `cycles.get`, `cycles.list`, `sync.run`, `checks.run`, `flags.list`, `flags.get`, `questions.approve`, `questions.deny`, `questions.edit`, `messages.pendingOutbound` (courier query), `messages.markSent`, `messages.inbound` (courier mutation), `corrections.approve`, `corrections.reject`, `rules.list`, `rules.approve`, `rules.toggle`, `rules.stateInPlainWords`, `onboarding.run`, `onboarding.questions`, `drafts.get`, `drafts.approveGate`, `drafts.fillGusto`, `audit.list`, `eval.summary`, `demo.reset`, `demo.simulatedReply`.
+Convex function names (binding; B implements, C and A consume): `cycles.start`, `cycles.get`, `cycles.list`, `sync.run`, `checks.run`, `flags.list`, `flags.get`, `questions.approve`, `questions.deny`, `questions.edit`, `messages.pendingOutbound` (courier query), `messages.markSent`, `messages.inbound` (courier mutation), `corrections.approve`, `corrections.reject`, `rules.list`, `rules.approve`, `rules.toggle`, `rules.stateInPlainWords`, `onboarding.run`, `onboarding.questions`, `drafts.get`, `drafts.approveGate`, `drafts.fillGusto`, `audit.list`, `eval.summary`, `sync.recordRun` (connectors report a `SyncRun`), `demo.reset`, `demo.scenario` (enter a judge's scenario), `demo.simulatedReply`.
 
 ---
 

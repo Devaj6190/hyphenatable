@@ -1,4 +1,4 @@
-# Implementation plan handoff
+# Implementation plan handoff (historical; superseded by docs/plans/ on Oct 24)
 
 Written 2026-10-24 ~12:30 AM PT by the previous planning chat, so a fresh chat can write the implementation plan without that conversation. Read this whole file first, then the files it points to.
 
