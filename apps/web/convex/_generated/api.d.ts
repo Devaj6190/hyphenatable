@@ -20,6 +20,7 @@ import type * as http from "../http.js";
 import type * as lib_ingest from "../lib/ingest.js";
 import type * as lib_stub from "../lib/stub.js";
 import type * as lib_validators from "../lib/validators.js";
+import type * as lib_viewer from "../lib/viewer.js";
 import type * as messages from "../messages.js";
 import type * as messaging_contract from "../messaging/contract.js";
 import type * as onboarding from "../onboarding.js";
@@ -48,6 +49,7 @@ declare const fullApi: ApiFromModules<{
   "lib/ingest": typeof lib_ingest;
   "lib/stub": typeof lib_stub;
   "lib/validators": typeof lib_validators;
+  "lib/viewer": typeof lib_viewer;
   messages: typeof messages;
   "messaging/contract": typeof messaging_contract;
   onboarding: typeof onboarding;

@@ -51,10 +51,12 @@ const SOURCE_KEYS = new Set(["sourceId", "recordId", "providerId", "checkId"]);
  * Whether a string under `key` (inside `parent`) is a reference to one of our records.
  * Allowlist, so free text that happens to equal an id ("a") is never rewritten:
  * `*Id`, `*Ids`, `*By` (approvedBy, answeredBy: user ids are worker ids), userId,
- * Rule.provenance.evidence, Correction.target.id and every AuditEvent.refs value.
+ * Rule.provenance.evidence, Correction.target.id / before / after and every AuditEvent.refs value.
  */
 function isRef(key: string, parent: string): boolean {
   if (parent === "refs" || key === "evidence" || key === "userId") return true;
+  // Correction.before/after hold a record id when the corrected field is a reference (e.g. jobId).
+  if (key === "before" || key === "after") return true;
   if (parent === "target" && key === "id") return true;
   return /(Id|Ids|By)$/.test(key) && !SOURCE_KEYS.has(key);
 }
