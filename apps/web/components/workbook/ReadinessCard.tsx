@@ -137,10 +137,10 @@ export function ReadinessCard({
               </p>
             )}
             {fillTried && (
-              <p role="status" className="max-w-sm text-right text-sm">
-                Not connected yet: drafts.fillGusto isn’t live in this build,
-                so nothing was sent to Gusto.
-              </p>
+              <output className="block max-w-sm text-right text-sm">
+                Not connected yet: drafts.fillGusto isn’t live in this build, so
+                nothing was sent to Gusto.
+              </output>
             )}
           </div>
         )}
@@ -253,9 +253,7 @@ export function ReadinessCard({
                     aria-current={i === reached ? "step" : undefined}
                     className={cn(
                       "inline-flex items-center gap-1",
-                      i <= reached
-                        ? "font-semibold"
-                        : "text-muted-foreground",
+                      i <= reached ? "font-semibold" : "text-muted-foreground",
                     )}
                   >
                     {i <= reached && (

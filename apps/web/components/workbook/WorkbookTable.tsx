@@ -136,7 +136,9 @@ export function Stage1Table({
     <div className="flex flex-col gap-3">
       <SectionTitle
         title={
-          wb.basis === "paid" ? "Wages paid in Gusto" : "Stage 1 · Wages in Gusto"
+          wb.basis === "paid"
+            ? "Wages paid in Gusto"
+            : "Stage 1 · Wages in Gusto"
         }
         aside={
           <span className="flex items-center gap-2">
@@ -181,13 +183,7 @@ export function Stage1Table({
   );
 }
 
-export function VenmoList({
-  names,
-  wb,
-}: {
-  names: Names;
-  wb: CycleWorkbook;
-}) {
+export function VenmoList({ names, wb }: { names: Names; wb: CycleWorkbook }) {
   const { venmo, venmoHeld } = wb.stage1;
   if (venmo.length === 0 && venmoHeld.length === 0) return null;
   const system = sourceOf(wb);
@@ -374,7 +370,9 @@ export function ReconTable({ wb }: { wb: CycleWorkbook }) {
               className={cn(j.low && "bg-hold-soft/50 hover:bg-hold-soft/70")}
             >
               <TableCell className="max-w-56 whitespace-normal">
-                <span className="font-medium">Job {j.jobNumber ?? j.jobId}</span>
+                <span className="font-medium">
+                  Job {j.jobNumber ?? j.jobId}
+                </span>
                 <span className="block text-xs text-muted-foreground">
                   {j.title}
                 </span>
@@ -390,7 +388,9 @@ export function ReconTable({ wb }: { wb: CycleWorkbook }) {
               </TableCell>
               <TableCell className="max-w-80 text-sm whitespace-normal">
                 <span className="flex flex-col gap-1">
-                  {j.low && <StatusBadge status="needs-you" label="Low profit" />}
+                  {j.low && (
+                    <StatusBadge status="needs-you" label="Low profit" />
+                  )}
                   {j.hints.map((h) => (
                     <span key={h}>{h}</span>
                   ))}

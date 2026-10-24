@@ -7,18 +7,18 @@ import { useState } from "react";
 import { DataLabel } from "@/components/DataLabel";
 import { PageHeader } from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { companies } from "@/lib/companies";
 import { CycleArchive } from "./CycleArchive";
 import { periodLabel, type WorkbookData, workbookCsv } from "./data";
 import { approveGate, useGateApproved } from "./gate-store";
 import { ReadinessCard } from "./ReadinessCard";
-import { ReconTable, Stage1Table, Stage2Table, VenmoList } from "./WorkbookTable";
+import {
+  ReconTable,
+  Stage1Table,
+  Stage2Table,
+  VenmoList,
+} from "./WorkbookTable";
 
 const PANEL_ID = "workbook-cycle-panel";
 
@@ -33,8 +33,7 @@ export function WorkbookView({
   const company = companies[companyId];
   const [picked, setPicked] = useState(params.get("cycle"));
   const { cycles, names } = data;
-  const wb =
-    cycles.find((c) => c.cycle.id === picked) ?? cycles.at(-1);
+  const wb = cycles.find((c) => c.cycle.id === picked) ?? cycles.at(-1);
   const approved = useGateApproved(wb?.draftId ?? null);
 
   if (!wb)
@@ -80,7 +79,8 @@ export function WorkbookView({
         actions={
           <>
             {wb.basis === "engine" && (
-              <Button nativeButton={false}
+              <Button
+                nativeButton={false}
                 variant="secondary"
                 render={
                   <Link

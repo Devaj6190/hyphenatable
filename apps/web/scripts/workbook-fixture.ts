@@ -152,13 +152,10 @@ function build(companyId: "a" | "b") {
     }
 
     const cycleEntries = entries.filter((e) => e.cycleId === cycle.id);
-    const s1 = computeStage1(
-      cycle,
-      cycleEntries as never,
-      workers,
-      rules,
-      { company: company as never, expenses },
-    );
+    const s1 = computeStage1(cycle, cycleEntries as never, workers, rules, {
+      company: company as never,
+      expenses,
+    });
     const s2 = computeStage2({
       cycle,
       company: {
@@ -191,7 +188,8 @@ function build(companyId: "a" | "b") {
                 ?.heldFlagIds ?? [];
             return {
               workerId: p.workerId,
-              kind: p.kind === "salary" ? ("salary" as const) : ("hourly" as const),
+              kind:
+                p.kind === "salary" ? ("salary" as const) : ("hourly" as const),
               regularHours: hoursOf(p.earnings, "Regular Hours"),
               overtimeHours: hoursOf(p.earnings, "Overtime"),
               rateCents: p.rateCents,

@@ -86,7 +86,8 @@ export function ReadyView({
             : "The Gusto draft isn’t filled yet. This is what the workbook will put in it."
         }
         actions={
-          <Button nativeButton={false}
+          <Button
+            nativeButton={false}
             variant={ready ? "secondary" : "primary"}
             render={
               <Link href={`/c/${companyId}/workbook?cycle=${wb.cycle.id}`} />
@@ -112,9 +113,7 @@ export function ReadyView({
             ) : (
               <StatusBadge status="needs-you" label="Not in Gusto yet" />
             )}
-            <p className="font-semibold">
-              Gusto draft: {STATUS_WORDS[status]}
-            </p>
+            <p className="font-semibold">Gusto draft: {STATUS_WORDS[status]}</p>
           </div>
           <p className="text-muted-foreground">
             {status === "computed"
@@ -185,7 +184,9 @@ export function ReadyView({
                 >
                   <span className="flex min-w-0 flex-col gap-1">
                     <span className="font-medium first-letter:uppercase">
-                      {h.workerId ? `${workerLabel(data.names, h.workerId)} · ` : ""}
+                      {h.workerId
+                        ? `${workerLabel(data.names, h.workerId)} · `
+                        : ""}
                       {h.what}
                     </span>
                     <HoldReason reason={h.reason} />

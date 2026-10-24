@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { WorkbookView } from "@/components/workbook/WorkbookView";
 import { PageHeader } from "@/components/PageHeader";
+import { WorkbookView } from "@/components/workbook/WorkbookView";
 import { companies } from "@/lib/companies";
 import { currentViewer, workbookView } from "@/lib/server/fixtures";
 
