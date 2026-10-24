@@ -63,3 +63,85 @@ export interface TimeEntry {
   label: string | null;
   hasNote: boolean;
 }
+
+// Money fields below are null only when the source omits them (Invoice.amounts, Expense.total are nullable in Jobber).
+
+export interface Job {
+  id: string;
+  companyId: string;
+  sourceId: string;
+  jobNumber: number;
+  title: string | null;
+  /** `jobber:<clientId>`: an opaque id, never the client's name. */
+  clientRef: string;
+  status: string;
+  salespersonWorkerId: string | null;
+  quoteId: string | null;
+  /** Jobber has no parent / sub-job link: always null from the connector. */
+  parentJobId: string | null;
+  startAt: string | null;
+  endAt: string | null;
+  totalCents: number | null;
+}
+
+export interface Visit {
+  id: string;
+  companyId: string;
+  jobId: string;
+  sourceId: string;
+  startAt: string | null;
+  endAt: string | null;
+  isComplete: boolean;
+  assignedWorkerIds: string[];
+}
+
+export interface Quote {
+  id: string;
+  companyId: string;
+  sourceId: string;
+  jobId: string | null;
+  salespersonWorkerId: string | null;
+  sentAt: string | null;
+  status: string;
+  amountCents: number | null;
+}
+
+export interface Invoice {
+  id: string;
+  companyId: string;
+  sourceId: string;
+  jobId: string | null;
+  issuedDate: string | null;
+  dueDate: string | null;
+  status: string;
+  totalCents: number | null;
+}
+
+export interface Payment {
+  id: string;
+  companyId: string;
+  sourceId: string;
+  invoiceId: string | null;
+  quoteId: string | null;
+  entryDate: string;
+  amountCents: number | null;
+  paymentType: string | null;
+  kind: "deposit" | "final" | "unknown";
+}
+
+export interface Expense {
+  id: string;
+  companyId: string;
+  source: "qbo" | "jobber";
+  sourceId: string;
+  date: string;
+  amountCents: number | null;
+  vendor: string | null;
+  description: string | null;
+  accountName: string | null;
+  customerRef: string | null;
+  paymentType: string | null;
+  kind: "job_cost" | "overhead" | "unknown";
+  matchedJobId: string | null;
+  matchConfidence: number | null;
+}

@@ -6,6 +6,7 @@ import type { SyncRun, TimeEntry, Worker } from "../types.ts";
 import { type JobberAuth, JobberClient, JOBBER_GRAPHQL_VERSION } from "./client.ts";
 import { type CompletenessResult, connectionCompleteness, timeEntryCompleteness } from "./completeness.ts";
 import { normalizeTimeSheetEntry, normalizeUser } from "./normalize.ts";
+import { type ObjectRecords, pullObjects } from "./objects.ts";
 import {
   type Connection,
   paginate,
@@ -28,9 +29,11 @@ export interface PullOptions {
   /** Inject a pre-built client (tests, or a shared client in Convex). */
   client?: JobberClient;
   now?: () => Date;
+  /** false = users and time entries only (v1). Default true. */
+  objects?: boolean;
 }
 
-export interface JobberRecords {
+export interface JobberRecords extends ObjectRecords {
   workers: Worker[];
   timeEntries: TimeEntry[];
 }
@@ -146,11 +149,17 @@ export async function pullCycle(
     }
   }
 
+  const timeEntries = rawEntries.map((e) => normalizeTimeSheetEntry(e, companyId, cycleId));
+  let objects: ObjectRecords = { jobs: [], visits: [], quotes: [], invoices: [], payments: [], expenses: [] };
+  if (opts.objects !== false) {
+    const entryJobIds = timeEntries.flatMap((e) => (e.jobId ? [e.jobId.slice("jobber:".length)] : []));
+    const pulled = await pullObjects(client, companyId, period, entryJobIds, now);
+    objects = pulled.records;
+    for (const r of pulled.runs) syncRuns.push(run(r.object, `${METHOD} ${r.method.replace(/^jobber-graphql /, "")}`, r.startedAt, r.result));
+  }
+
   return {
-    records: {
-      workers: (rawUsers ?? []).map((u) => normalizeUser(u, companyId)),
-      timeEntries: rawEntries.map((e) => normalizeTimeSheetEntry(e, companyId, cycleId)),
-    },
+    records: { workers: (rawUsers ?? []).map((u) => normalizeUser(u, companyId)), timeEntries, ...objects },
     syncRuns,
   };
 }

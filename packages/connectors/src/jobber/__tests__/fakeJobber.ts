@@ -1,11 +1,12 @@
 // In-memory Jobber: serves the recorded fixtures by operation name. No network.
 import { JOBBER_GRAPHQL_URL, JOBBER_TOKEN_URL, type StoredTokens, type TokenStore } from "../client.ts";
 import entriesFixture from "../__fixtures__/timeSheetEntries.json";
+import objectsFixture from "../__fixtures__/objects.json";
 import usersFixture from "../__fixtures__/users.json";
 
-export type Fixtures = { users: typeof usersFixture; entries: typeof entriesFixture };
+export type Fixtures = { users: typeof usersFixture; entries: typeof entriesFixture; objects: typeof objectsFixture };
 
-export const fixtures = (): Fixtures => structuredClone({ users: usersFixture, entries: entriesFixture });
+export const fixtures = (): Fixtures => structuredClone({ users: usersFixture, entries: entriesFixture, objects: objectsFixture });
 
 export function memoryTokenStore(initial: StoredTokens | null): TokenStore & { saved: StoredTokens[] } {
   let current = initial;
@@ -60,6 +61,18 @@ export function fakeJobberFetch(fx: Fixtures, opts: { rotate?: boolean } = {}): 
           data: { user: { id: v.userId, timeSheetsByDay: { totalCount: days.length, pageInfo: { hasNextPage: false, endCursor: null }, nodes: days } } },
           extensions: { cost: { throttleStatus: { maximumAvailable: 10000, currentlyAvailable: 9800, restoreRate: 500 } } },
         });
+      }
+      case "PayrollPilot_visits":
+      case "PayrollPilot_quotes":
+      case "PayrollPilot_invoices":
+      case "PayrollPilot_paymentRecords":
+      case "PayrollPilot_expenses":
+      case "PayrollPilot_jobs": {
+        const object = operation.slice("PayrollPilot_".length) as "visits" | "jobs";
+        let nodes = fx.objects[object] as { id: string }[];
+        if (object === "jobs") nodes = nodes.filter((n) => (v.ids as string[]).includes(n.id));
+        const totalCount = (fx.objects.totalCounts as Record<string, number>)[object] ?? nodes.length;
+        return json({ data: { [object]: { totalCount, pageInfo: { hasNextPage: false, endCursor: null }, nodes } } });
       }
       default:
         return json({ errors: [{ message: `unexpected operation ${operation}` }] });

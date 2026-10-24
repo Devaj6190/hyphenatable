@@ -6,7 +6,7 @@ import { fakeJobberFetch, fixtures, memoryTokenStore } from "./fakeJobber.ts";
 const tokens = () => memoryTokenStore({ accessToken: null, accessTokenExpiresAt: null, refreshToken: "fake-refresh-0" });
 const auth = (fetchImpl: typeof fetch) => ({ clientId: "cid", clientSecret: "csecret", tokenStore: tokens(), fetchImpl, sleepImpl: async () => {} });
 const PERIOD = ["2026-10-11", "2026-10-24"] as const;
-const opts = { timezone: "America/Los_Angeles", cycleId: "a-c05", now: () => new Date("2026-10-24T12:00:00Z") };
+const opts = { timezone: "America/Los_Angeles", cycleId: "a-c05", now: () => new Date("2026-10-24T12:00:00Z"), objects: false };
 
 describe("pullCycle (recorded fixtures)", () => {
   it("pulls users and entries across pages; every SyncRun complete", async () => {
