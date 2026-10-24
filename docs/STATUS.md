@@ -2,6 +2,8 @@
 
 Format: `HH:MM PDT · who · what landed on main / what I'm on / what I need`. Decisions that change the plan go here too, with the file they changed.
 
+- Sat 02:50 · A1 · Merged #17 (3c6d5d6): Jobber live fixes. **Live pull on the trial: all 8 objects complete** (users 14/14, everything else 0/0 until seeded). Hidden fields probed and left null; `timeSheetsByDay` walked in 7-day windows; NOT_INVITED users are active; auth default redirect `https://payrollpilot.vercel.app/auth` with `--paste`.
+  - **Note (A, CHK-10):** `User.labourRate` is hidden from the read app, so Jobber-side user rates are null for now. Options being checked: a scope that exposes it, or the rate recorded per time entry (`TimeSheetEntry.labourRate`) as a separate, named fact. Devaj: CHK-10 must skip when `jobber.labourRateCents` is null (no invented rate).
 - Sat 02:45 · A2 · Merged #16 (9e97606): Jobber seed auth by pasted address (callback `https://payrollpilot.vercel.app/auth`); pusher aligned with the live schema (`Account.tester` doesn't exist live, so allowlist-only via `JOBBER_SEED_ACCOUNT_ID`; preflight refuses if any needed mutation is missing).
   - **Risk (A):** with the *read* app's token, the live schema shows no `timeSheetEntryCreate`, `invoiceCreateFromJob`, `invoiceCreatePaymentRecord`, `quoteCreatePaymentRecord`. Likely hidden by scope (read app has no write scopes); checking with the seed app's token next. If truly absent, Company A's time entries and payments can't be pushed to Jobber by API → load them into Convex from fixtures and label Jobber "partly simulated" in PROOF.md.
 - Sat 02:39 · A · Jobber trial holds all 14 Company A users (no cap hit); owner display name set to the fake "Skyler Ashford".
