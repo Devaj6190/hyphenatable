@@ -22,6 +22,9 @@ export type Config = {
   courierKey: string;
   stubPort: number;
   contactsFile: string;
+  // Base URL of the web dashboard for links in texts; unset renders a placeholder in the link.
+  dashboardUrl: string | null;
+  fixturesDir: string;
 };
 
 export function readConfig(env = process.env): Config {
@@ -37,5 +40,7 @@ export function readConfig(env = process.env): Config {
     courierKey,
     stubPort: Number(env.STUB_PORT || 3210),
     contactsFile: env.CONTACTS_FILE || join(COURIER_DIR, "contacts.json"),
+    dashboardUrl: env.DASHBOARD_URL || null,
+    fixturesDir: env.FIXTURES_DIR || join(COURIER_DIR, "../../data/fixtures"),
   };
 }

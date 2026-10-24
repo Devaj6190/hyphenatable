@@ -1,14 +1,22 @@
 import { describe, expect, test } from "bun:test";
+import { DASHBOARD_URL_PLACEHOLDER } from "@payrollpilot/engine/messages/summary";
 import { getFunctionName } from "convex/server";
 import type { Message } from "spectrum-ts";
 import { api } from "../../web/convex/_generated/api";
-import { Contacts, conversationKey } from "./contacts.ts";
+import { readConfig } from "./config.ts";
+import {
+  Contacts,
+  conversationKey,
+  opaqueId,
+  redactPhones,
+} from "./contacts.ts";
 import { FakeTransport } from "./fake.ts";
 import { mask } from "./log.ts";
 import { toInboundEvent } from "./photon.ts";
 import { numberedText } from "./polls.ts";
 import { Relay } from "./relay.ts";
 import { StubBackend } from "./stub.ts";
+import { summaryFromFixtures } from "./summary.ts";
 
 const EMPLOYEE = "+15555550100";
 const MANAGER = "+15555550101";
@@ -68,7 +76,7 @@ describe("outbound", () => {
     ).toHaveLength(1);
     expect(fake.outbox[0]?.phone).toBe(MANAGER);
     expect(m.status).toBe("sent");
-    expect(m.providerId).toBe(fake.outbox[0]?.providerId as string);
+    expect(m.providerId).toBe(opaqueId(fake.outbox[0]?.providerId as string));
     expect(m.conversationKey).toBe(conversationKey(MANAGER)); // markSent carries it (contract PR #15)
   });
 
@@ -123,7 +131,7 @@ describe("inbound", () => {
     expect(stub.messages[0]).toMatchObject({ text: "STOP", kind: "text" });
   });
 
-  test("a poll vote carries the poll's providerId as pollTarget", async () => {
+  test("a poll vote's pollTarget matches the poll's providerId as Convex holds it", async () => {
     const { stub, fake, relay } = setup();
     stub.enqueue({
       contactRef: "contact:a-w11",
@@ -137,8 +145,10 @@ describe("inbound", () => {
     expect(vote).toMatchObject({
       kind: "poll_vote",
       text: "Job 121",
-      pollTarget: fake.outbox[0]?.providerId as string,
+      pollTarget: opaqueId(fake.outbox[0]?.providerId as string),
     });
+    const poll = stub.messages.find((m) => m.kind === "poll");
+    expect(vote?.pollTarget).toBe(poll?.providerId as string);
   });
 
   test("replies from unregistered phones are dropped", async () => {
@@ -222,9 +232,102 @@ describe("contract (PR #15)", () => {
       {
         courierKey: KEY,
         messageId: m.messageId,
-        providerId: fake.outbox[0]?.providerId,
+        providerId: opaqueId(fake.outbox[0]?.providerId as string),
         conversationKey: conversationKey(EMPLOYEE),
       },
     ]);
+  });
+});
+
+// Anything phone-like: 7 or more digits, allowing the separators people type between them.
+const PHONE_LIKE = /\+?\d[\d\s().-]{5,}\d/g;
+const phoneLike = (text: string) =>
+  (text.match(PHONE_LIKE) ?? []).filter(
+    (m) => m.replace(/\D/g, "").length >= 7,
+  );
+
+describe("privacy: no phone number leaves the courier", () => {
+  test("nothing sent to Convex carries a phone-like digit run, even when Photon's ids and texts do", async () => {
+    const { stub, fake, relay } = setup();
+    const sentToConvex: unknown[] = [];
+    for (const name of ["markSent", "inbound"] as const) {
+      const real = stub[name].bind(stub) as (args: never) => Promise<void>;
+      stub[name] = async (args: never) => {
+        sentToConvex.push(args);
+        await real(args);
+      };
+    }
+    // Photon's outbound id for the poll, and a vote id in the shape H4 saw: poll guid, voter, guid, selected, n.
+    const pollGuid = "spc-msg-0cf612d1-3329-42f4-9435-3f4651a24afe";
+    const send = fake.send.bind(fake);
+    fake.send = async (...args) => ({
+      ...(await send(...args)),
+      providerId: pollGuid,
+    });
+    stub.enqueue({
+      contactRef: "contact:a-w11",
+      text: "Which job? Please tap Job 121.",
+      kind: "poll",
+      options: ["Job 118", "Job 121", "Not sure"],
+    });
+    await settle();
+    await relay.handleInbound({
+      providerId: `${pollGuid}:${MANAGER}:F1C88B4A-A805-4C9D-869D-CC14D00592CA:selected:${MANAGER}`,
+      phone: MANAGER,
+      text: "Job 118",
+      kind: "poll_vote",
+      pollTarget: pollGuid,
+    });
+    await relay.handleInbound(
+      fake.inject(EMPLOYEE, {
+        text: "call me at (555) 555-0100 or +1 555 555 0101",
+      }),
+    );
+
+    expect(sentToConvex).toHaveLength(3);
+    const wire = JSON.stringify(sentToConvex);
+    expect(phoneLike(wire)).toEqual([]);
+    for (const phone of [MANAGER, EMPLOYEE])
+      expect(wire).not.toContain(phone.slice(-10));
+    const vote = stub.messages.find((m) => m.kind === "poll_vote");
+    const poll = stub.messages.find((m) => m.kind === "poll");
+    expect(vote?.pollTarget).toBe(poll?.providerId as string);
+    expect(stub.messages.at(-1)?.text).toBe("call me at [phone] or [phone]");
+  });
+
+  test("the check itself catches a raw phone, so the test above can fail", () => {
+    expect(
+      phoneLike(JSON.stringify({ providerId: `x:${MANAGER}:y` })),
+    ).not.toEqual([]);
+  });
+
+  test("redactPhones leaves times, dates, hours and job numbers alone", () => {
+    for (const text of [
+      "4:30pm",
+      "7:30-15:30",
+      "2026-10-22",
+      "10.5h",
+      "Job 121",
+      "1",
+    ])
+      expect(redactPhones(text)).toBe(text);
+  });
+});
+
+describe("manager summary from the fixtures", () => {
+  test("Company A's current cycle, queued for the manager phone through the stub", async () => {
+    const { stub, fake } = setup();
+    const { text, cycleId } = summaryFromFixtures({
+      fixturesDir: readConfig({}).fixturesDir,
+      companyId: "a",
+      dashboardUrl: null,
+    });
+    expect(cycleId).toBe("a-c05");
+    expect(text).toBe(
+      `Rollpay: 10 items need you before payroll (Oct 10–23): 3 hour mix-ups, 1 running timer, 1 long shift… Review: ${DASHBOARD_URL_PLACEHOLDER}/c/a/manager`,
+    );
+    stub.enqueue({ contactRef: "contact:a-w11", text: text as string });
+    await settle();
+    expect(fake.outbox.at(-1)).toMatchObject({ phone: MANAGER, text });
   });
 });

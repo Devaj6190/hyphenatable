@@ -1,3 +1,4 @@
+import { PRODUCT_NAME } from "@payrollpilot/engine/messages/brand";
 import { loadEnvFile, readConfig } from "./config.ts";
 import { Contacts } from "./contacts.ts";
 import { createConvexBackend } from "./convex.ts";
@@ -26,13 +27,16 @@ if (config.convexUrl) {
   backend = createConvexBackend(config.convexUrl, config.courierKey);
 } else {
   const stub = new StubBackend(config.courierKey);
-  const server = serveStubControl(stub, contacts, fake, config.stubPort);
+  const server = serveStubControl(stub, contacts, fake, config.stubPort, {
+    fixturesDir: config.fixturesDir,
+    dashboardUrl: config.dashboardUrl,
+  });
   stopStub = () => server.stop();
   backend = stub;
 }
 
 log(
-  `started: texts via ${transport.name}${config.spectrum ? "" : " (no SPECTRUM_PROJECT_ID/SECRET in apps/courier/.env)"},`,
+  `${PRODUCT_NAME} courier started: texts via ${transport.name}${config.spectrum ? "" : " (no SPECTRUM_PROJECT_ID/SECRET in apps/courier/.env)"},`,
   `messages via ${config.convexUrl ? "convex" : "local stub"}, contacts: ${contacts.refs.join(", ") || "none"}`,
 );
 

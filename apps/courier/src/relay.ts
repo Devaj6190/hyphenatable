@@ -1,4 +1,9 @@
-import { type Contacts, conversationKey } from "./contacts.ts";
+import {
+  type Contacts,
+  conversationKey,
+  opaqueId,
+  redactPhones,
+} from "./contacts.ts";
 import { log } from "./log.ts";
 import type {
   Backend,
@@ -62,12 +67,13 @@ export class Relay {
 
     this.inFlight.add(id);
     try {
-      const { providerId } = await this.transport.send(
+      const sent = await this.transport.send(
         phone,
         row.kind,
         row.text,
         row.options,
       );
+      const providerId = opaqueId(sent.providerId);
       this.sent.set(id, providerId);
       log(
         `sent ${id} (${row.kind}) via ${this.transport.name} to ${phone} as ${providerId}`,
@@ -99,30 +105,28 @@ export class Relay {
   async handleInbound(event: InboundEvent): Promise<void> {
     if (this.seenInbound.has(event.providerId)) return;
     this.seenInbound.add(event.providerId);
+    // Nothing raw from the provider leaves the courier: ids are hashed, phones in the text are replaced.
+    const providerId = opaqueId(event.providerId);
     if (!this.contacts.isRegistered(event.phone)) {
-      log(
-        `dropped inbound ${event.providerId} from unregistered ${event.phone}`,
-      );
+      log(`dropped inbound ${providerId} from unregistered ${event.phone}`);
       return;
     }
     // STOP goes through unchanged as text; Convex handles it in code before any model sees it.
     const args = {
       courierKey: this.courierKey,
       conversationKey: conversationKey(event.phone),
-      providerId: event.providerId,
-      text: event.text,
+      providerId,
+      text: redactPhones(event.text),
       kind: event.kind,
-      pollTarget: event.pollTarget,
+      pollTarget: event.pollTarget && opaqueId(event.pollTarget),
     };
     await withRetry(
-      `inbound ${event.providerId}`,
+      `inbound ${providerId}`,
       () => this.backend.inbound(args),
       3,
       this.retryBaseMs,
-    ).catch(() => log(`inbound ${event.providerId} gave up after retries`));
-    log(
-      `relayed inbound ${event.providerId} (${event.kind}) from ${event.phone}`,
-    );
+    ).catch(() => log(`inbound ${providerId} gave up after retries`));
+    log(`relayed inbound ${providerId} (${event.kind}) from ${event.phone}`);
   }
 
   async run(): Promise<void> {
