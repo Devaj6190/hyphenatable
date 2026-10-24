@@ -285,6 +285,8 @@ export interface AnonPaid {
   sourceId: string;
   /** sectioned journal: regular vs off-cycle payroll (absent for the flat journal) */
   sectionKind?: "regular" | "off_cycle" | "other";
+  /** owner draws ("Owner’s draw" employee type) are kept but are not wages */
+  payKind?: "wage" | "owner_draw";
   employeeType?: string | null;
   /** per pay-type amounts in cents (Regular, Overtime, Commission, ...); no taxes */
   earningsCents?: Record<string, number>;
@@ -301,6 +303,8 @@ export interface AnonPaidPeriod {
   offCycleGrossCents: number;
   /** sections whose title is neither regular nor off-cycle */
   otherGrossCents: number;
+  /** owner draws, any section: never part of the wage comparison */
+  ownerDrawCents: number;
 }
 
 export function paidByPeriod(paid: AnonPaid[]): AnonPaidPeriod[] {
@@ -314,8 +318,14 @@ export function paidByPeriod(paid: AnonPaid[]): AnonPaidPeriod[] {
       regularGrossCents: 0,
       offCycleGrossCents: 0,
       otherGrossCents: 0,
+      ownerDrawCents: 0,
     };
     const kind = p.sectionKind ?? "regular";
+    if (p.payKind === "owner_draw") {
+      row.ownerDrawCents += p.grossCents;
+      by.set(k, row);
+      continue;
+    }
     if (kind === "regular") row.regularGrossCents += p.grossCents;
     else if (kind === "off_cycle") row.offCycleGrossCents += p.grossCents;
     else row.otherGrossCents += p.grossCents;
@@ -454,6 +464,7 @@ export function anonymizeExports(
         ...(r.sectionKind
           ? {
               sectionKind: r.sectionKind,
+              payKind: r.payKind ?? "wage",
               employeeType: r.employeeType ?? null,
               earningsCents: r.earningsCents,
               hours: r.hours,

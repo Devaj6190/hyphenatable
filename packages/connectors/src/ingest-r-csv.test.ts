@@ -34,11 +34,12 @@ describe("ingest-r with the real-layout CSVs (replicas)", () => {
       paidRows: 5,
       paidPeriods: 4,
       paidPeriodsWithOffCycle: 1,
+      ownerDrawRows: 1,
       jobs: 2,
       clients: 2,
     });
     expect(c.syncRuns).toEqual([
-      { object: "timeSheetEntries", pulled: 6, expected: 6, complete: true },
+      { object: "timeSheetEntries", pulled: 6, expected: 6, complete: true }, // drift and merged accounts are notes
       { object: "payrollJournal", pulled: 5, expected: 5, complete: true },
     ]);
 
@@ -48,6 +49,13 @@ describe("ingest-r with the real-layout CSVs (replicas)", () => {
     expect(
       b.workers.find((w: { id: string }) => w.id === avery)?.teamLeader,
     ).toBe(true);
+    // an owner draw is kept but never counted as regular wage gross
+    const sam = b.paid.find(
+      (p: { payKind: string }) => p.payKind === "owner_draw",
+    )?.workerId;
+    expect(
+      b.paidByPeriod.find((p: { workerId: string }) => p.workerId === sam),
+    ).toMatchObject({ regularGrossCents: 0, ownerDrawCents: 200000 });
     // the same person in both files is one worker
     const averyPeriods = b.paidByPeriod.filter(
       (p: { workerId: string }) => p.workerId === avery,
@@ -60,6 +68,7 @@ describe("ingest-r with the real-layout CSVs (replicas)", () => {
         regularGrossCents: 111250,
         offCycleGrossCents: 20000,
         otherGrossCents: 0,
+        ownerDrawCents: 0,
       },
       {
         workerId: avery,
@@ -68,6 +77,7 @@ describe("ingest-r with the real-layout CSVs (replicas)", () => {
         regularGrossCents: 100000,
         offCycleGrossCents: 0,
         otherGrossCents: 0,
+        ownerDrawCents: 0,
       },
     ]);
     expect(

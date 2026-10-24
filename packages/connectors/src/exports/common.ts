@@ -167,6 +167,8 @@ export function exportSyncRun(
   pulled: number,
   expected: number,
   problems: string[],
+  /** observations that do not make the run incomplete (printed after the problems, prefixed "note:") */
+  notes: string[] = [],
 ): SyncRun {
   return {
     id: `${companyId}:export:${object}:${startedAt}`,
@@ -180,6 +182,9 @@ export function exportSyncRun(
     expected,
     complete: problems.length === 0,
     method,
-    error: problems.length ? problems.join("; ") : null,
+    error:
+      problems.length || notes.length
+        ? [...problems, ...notes.map((n) => `note: ${n}`)].join("; ")
+        : null,
   };
 }

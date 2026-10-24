@@ -5,7 +5,9 @@
 //   including a "Gross" line)  /  Payroll Totals ...
 // Read ONLY: names, employee type, pay type, hours, rate, amount; period, pay day, section kind. Tax columns,
 // Work Address, Net Pay, Check Amount, Employer Cost and Donations are never read (only mapped columns are).
-// Completeness: every employee has a Gross line; per section, sum of employee Gross == Payroll Totals gross.
+// Gross: the Payment column of the employee's first row (Gross line only as fallback); "Owner’s draw"
+// rows are owner draws (payKind owner_draw). Completeness: every employee has a gross; per section, the sum of
+// employee gross == the Payroll Totals Payment.
 
 import { readFile } from "node:fs/promises";
 import { basename } from "node:path";
@@ -139,21 +141,41 @@ export async function readGustoPayrollJournalSectionedCsv(
       cols[k] === undefined ? null : (x[cols[k] as number] ?? null);
     r += header.headerRow + 1;
 
+    // Gross per employee: the Payment column of the employee's first row (live finding: most employees have
+    // no Gross pay-type line); a Gross line is the fallback only when Payment is empty. Section total: the
+    // Payroll Totals row's Payment column (a Gross line is the fallback).
     let current: PayrollJournalRow | null = null;
-    let currentHasGross = false;
+    let currentPayment: number | null = null;
+    let currentGrossLine: number | null = null;
     let sectionGross = 0;
-    let totalsGross: number | null = null;
+    let totalsPayment: number | null = null;
+    let totalsGrossLine: number | null = null;
     let inTotals = false;
     const finish = () => {
       if (current) {
-        if (!currentHasGross)
+        const gross = currentPayment ?? currentGrossLine;
+        if (gross === null)
           problems.push(
-            `${where} row ${current.rowNumber}: employee without a Gross line`,
+            `${where} row ${current.rowNumber}: employee without Payment or a Gross line`,
           );
-        else rows.push(current);
+        else {
+          if (
+            currentPayment !== null &&
+            currentGrossLine !== null &&
+            currentPayment !== currentGrossLine
+          ) {
+            problems.push(
+              `${where} row ${current.rowNumber}: Payment ${currentPayment}¢ vs Gross line ${currentGrossLine}¢`,
+            );
+          }
+          current.grossCents = gross;
+          sectionGross += gross;
+          rows.push(current);
+        }
       }
       current = null;
-      currentHasGross = false;
+      currentPayment = null;
+      currentGrossLine = null;
     };
     for (; r < grid.length; r++) {
       const x = grid[r] ?? [];
@@ -165,25 +187,23 @@ export async function readGustoPayrollJournalSectionedCsv(
       if (last && /^payroll totals?$/i.test(last)) {
         finish();
         inTotals = true;
-        // a Payment value on the totals row is the fallback total gross
-        const pay = text(at(x, "payment"));
         const type = text(at(x, "payType"));
         try {
+          totalsPayment = toCents(text(at(x, "payment")));
           if (type && /^gross$/i.test(type))
-            totalsGross = toCents(text(at(x, "amount")));
-          else if (pay !== null) totalsGross = toCents(pay);
+            totalsGrossLine = toCents(text(at(x, "amount")));
         } catch {
           problems.push(`${where}: unreadable Payroll Totals`);
         }
         continue;
       }
       if (inTotals) {
-        // continuation lines of the totals block; a Gross line wins over the Payment fallback
+        // continuation lines of the totals block (a Gross line there is the fallback total)
         const type = text(at(x, "payType"));
         if (last || firstName || (!type && first0)) break; // something else began: the section is over
         try {
           if (type && /^gross$/i.test(type))
-            totalsGross = toCents(text(at(x, "amount")));
+            totalsGrossLine = toCents(text(at(x, "amount")));
         } catch {
           problems.push(`${where}: unreadable Payroll Totals gross`);
         }
@@ -205,8 +225,16 @@ export async function readGustoPayrollJournalSectionedCsv(
           sectionKind: kind,
           section,
           employeeType: text(at(x, "employeeType")),
+          payKind: /owner/i.test(text(at(x, "employeeType")) ?? "")
+            ? "owner_draw"
+            : "wage",
           ratesCents: {},
         };
+        try {
+          currentPayment = toCents(text(at(x, "payment")));
+        } catch {
+          problems.push(`${where} row ${r + 1}: unreadable Payment`);
+        }
       }
       const type = text(at(x, "payType"));
       if (!type) continue;
@@ -219,9 +247,7 @@ export async function readGustoPayrollJournalSectionedCsv(
         const amount = toCents(text(at(x, "amount")));
         if (/^gross$/i.test(type)) {
           if (amount === null) throw new Error("no gross");
-          cur.grossCents = amount;
-          currentHasGross = true;
-          sectionGross += amount;
+          currentGrossLine = amount;
           continue;
         }
         if (amount !== null)
@@ -235,11 +261,14 @@ export async function readGustoPayrollJournalSectionedCsv(
       }
     }
     finish();
+    const totalsGross = totalsPayment ?? totalsGrossLine;
     if (totalsGross === null)
-      problems.push(`${where}: no Payroll Totals gross`);
+      problems.push(
+        `${where}: no Payroll Totals gross (Payment or Gross line)`,
+      );
     else if (totalsGross !== sectionGross)
       problems.push(
-        `${where}: employee Gross sum ${sectionGross}¢ vs Payroll Totals ${totalsGross}¢`,
+        `${where}: employee gross sum ${sectionGross}¢ vs Payroll Totals ${totalsGross}¢`,
       );
   }
   if (!sections) problems.push("no payroll sections (no 'Pay period' line)");
