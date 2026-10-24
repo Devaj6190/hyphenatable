@@ -1,4 +1,5 @@
 import { formatCents } from "@/lib/money";
+import type { SourceSystem } from "@/lib/types";
 
 // Workbook values come from app/_fixtures/workbook.json (scripts/workbook-fixture.ts) through
 // workbookView in lib/server/fixtures.ts until drafts.get is live. Nothing here computes pay: amounts are read
@@ -14,6 +15,8 @@ export type Stage1Line = {
   held: boolean;
   reason: string | null;
   heldFlagIds: string[];
+  /** Time entries (Jobber), the draft line (Workbook) or the paid record (Gusto). Ids are ", "-joined. */
+  recordSystem: SourceSystem;
   recordId: string;
 };
 
@@ -61,11 +64,14 @@ export type CycleWorkbook = {
       hours: number | null;
       rateCents: number | null;
       amountCents: number;
+      recordSystem: SourceSystem;
       recordId: string;
     }[];
     venmoHeld: { workerId: string; reason: string }[];
   };
   stage2: {
+    /** The Stage 2 off-cycle draft; null for a closed cycle. */
+    draftId: string | null;
     lines: {
       workerId: string;
       name: string;

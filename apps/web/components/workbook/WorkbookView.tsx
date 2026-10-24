@@ -11,7 +11,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { companies } from "@/lib/companies";
 import { CycleArchive } from "./CycleArchive";
 import { periodLabel, type WorkbookData, workbookCsv } from "./data";
-import { approveGate, useGateApproved } from "./gate-store";
 import { ReadinessCard } from "./ReadinessCard";
 import {
   ReconTable,
@@ -34,7 +33,6 @@ export function WorkbookView({
   const [picked, setPicked] = useState(params.get("cycle"));
   const { cycles, names } = data;
   const wb = cycles.find((c) => c.cycle.id === picked) ?? cycles.at(-1);
-  const approved = useGateApproved(wb?.draftId ?? null);
 
   if (!wb)
     return (
@@ -125,8 +123,6 @@ export function WorkbookView({
           wb={wb}
           readiness={wb.readiness}
           lastQuestions={wb.lastQuestions}
-          approved={approved}
-          onApprove={() => wb.draftId && approveGate(wb.draftId)}
         />
 
         <Tabs defaultValue="stage1">

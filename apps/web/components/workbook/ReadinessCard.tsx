@@ -11,6 +11,7 @@ import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import type { CycleWorkbook, Readiness } from "./data";
 import { GateDialog } from "./GateDialog";
+import { PaidSum, PreviewNote } from "./WorkbookTable";
 
 const STEPS = [
   { key: "computed", label: "Computed" },
@@ -46,21 +47,46 @@ function Stat({
   );
 }
 
+/** What keeps Gate 1 closed, with a way to it. Nothing when nothing blocks. */
+export function GateBlockers({
+  companyId,
+  readiness: r,
+  className,
+}: {
+  companyId: string;
+  readiness: Readiness;
+  className?: string;
+}) {
+  if (r.open + r.incompleteSyncs === 0) return null;
+  return (
+    <p className={cn("text-sm", className)}>
+      Gate 1 is blocked by{" "}
+      {r.open > 0 && `${r.open} open problem${r.open === 1 ? "" : "s"}`}
+      {r.open > 0 && r.incompleteSyncs > 0 && " and "}
+      {r.incompleteSyncs > 0 &&
+        `${r.incompleteSyncs} incomplete sync${r.incompleteSyncs === 1 ? "" : "s"}`}{" "}
+      ·{" "}
+      <Link
+        href={`/c/${companyId}`}
+        className="text-link underline-offset-4 hover:underline"
+      >
+        Open problems
+      </Link>
+    </p>
+  );
+}
+
 export function ReadinessCard({
   companyId,
   wb,
   readiness: r,
   lastQuestions,
-  approved,
-  onApprove,
 }: {
   companyId: string;
   wb: CycleWorkbook;
   readiness: Readiness;
   /** Questions asked in the previous cycle; null for the first cycle. */
   lastQuestions: number | null;
-  approved: boolean;
-  onApprove: () => void;
 }) {
   const [fillTried, setFillTried] = useState(false);
   const paid = wb.basis === "paid";
@@ -72,7 +98,10 @@ export function ReadinessCard({
     wb.stage1.venmoHeld.length;
   const heldWorkers = workers - cleared;
   const blocked = r.open + r.incompleteSyncs;
-  const status = approved ? "approved" : (wb.draftStatus ?? "computed");
+  // The draft's own status only moves forward; the gate is offered only while it is computed.
+  const status = wb.draftStatus ?? "computed";
+  const incomplete = wb.syncRuns.filter((s) => !s.complete);
+  const entriesShort = r.pulled !== null && !r.pulled.complete;
   const reached = STEPS.findIndex((s) => s.key === status);
 
   return (
@@ -96,55 +125,62 @@ export function ReadinessCard({
         {!paid && (
           <div className="flex flex-col items-end gap-2">
             <div className="flex flex-wrap justify-end gap-2">
-              {approved ? (
-                <StatusBadge
-                  status="verified"
-                  label="Gate 1 approved"
-                  className="h-10 px-3 text-sm"
-                />
-              ) : (
+              {status === "computed" && (
                 <GateDialog
                   cycleNumber={wb.cycle.number}
                   cleared={cleared}
                   held={heldWorkers}
                   totalCents={wb.stage1.totalCents}
                   disabled={blocked > 0}
-                  onApprove={onApprove}
                 />
               )}
-              <Button
-                variant={approved ? "primary" : "secondary"}
-                disabled={!approved}
-                onClick={() => setFillTried(true)}
-              >
-                Fill Gusto draft
-              </Button>
-            </div>
-            {blocked > 0 && !approved && (
-              <p className="text-right text-sm text-hold">
-                {r.open > 0 &&
-                  `${r.open} open problem${r.open === 1 ? "" : "s"}`}
-                {r.open > 0 && r.incompleteSyncs > 0 && " and "}
-                {r.incompleteSyncs > 0 &&
-                  `${r.incompleteSyncs} incomplete sync${r.incompleteSyncs === 1 ? "" : "s"}`}{" "}
-                first ·{" "}
-                <Link
-                  href={`/c/${companyId}`}
-                  className="text-link underline-offset-4 hover:underline"
+              {(status === "computed" || status === "approved") && (
+                <Button
+                  variant={status === "approved" ? "primary" : "secondary"}
+                  disabled={status !== "approved"}
+                  onClick={() => setFillTried(true)}
                 >
-                  Open problems
-                </Link>
-              </p>
+                  Fill Gusto draft
+                </Button>
+              )}
+            </div>
+            {status === "computed" && (
+              <GateBlockers
+                companyId={companyId}
+                readiness={r}
+                className="text-right"
+              />
             )}
             {fillTried && (
               <output className="block max-w-sm text-right text-sm">
-                Not connected yet: drafts.fillGusto isn’t live in this build, so
-                nothing was sent to Gusto.
+                Not connected to Gusto yet. Nothing was sent.
               </output>
             )}
           </div>
         )}
       </div>
+
+      {incomplete.length > 0 && (
+        <div className="flex flex-col gap-2 border-t px-5 py-4">
+          <ul className="flex flex-wrap gap-x-4 gap-y-2">
+            {incomplete.map((s) => (
+              <li key={s.id} className="flex flex-wrap items-center gap-2">
+                <StatusBadge status="sync-incomplete" />
+                <span className="text-sm">
+                  <span className="capitalize">{s.source}</span>{" "}
+                  {s.object === "timeSheetEntries" ? "time entries" : s.object}:{" "}
+                  {s.pulled} of {s.expected} pulled
+                </span>
+              </li>
+            ))}
+          </ul>
+          <p className="text-sm text-muted-foreground">
+            {paid
+              ? "Counts that come from this sync are short, so they aren’t shown."
+              : "Gate 1 waits until it completes. Counts that come from this sync are short, so they aren’t shown."}
+          </p>
+        </div>
+      )}
 
       <dl className="grid grid-cols-2 gap-x-6 gap-y-5 border-t px-5 py-5 sm:grid-cols-3 lg:grid-cols-7">
         <div className="col-span-2 flex flex-col gap-0.5 sm:col-span-3 lg:col-span-2">
@@ -155,14 +191,22 @@ export function ReadinessCard({
             <Money cents={wb.stage1.totalCents} />
           </dd>
           <dd className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-            {paid
-              ? "From Gusto’s payroll records"
-              : "Computed by the engine, not by Gusto"}
-            <SourceChip
-              system={paid ? "Gusto" : "Workbook"}
-              recordId={wb.draftId ?? wb.cycle.id}
-            />
+            {paid ? (
+              <PaidSum records={wb.stage1.lines.length} />
+            ) : (
+              <>
+                Computed by the engine, not by Gusto
+                {wb.draftId && (
+                  <SourceChip system="Workbook" recordId={wb.draftId} />
+                )}
+              </>
+            )}
           </dd>
+          {!paid && (
+            <dd>
+              <PreviewNote />
+            </dd>
+          )}
         </div>
         {paid ? (
           <>
@@ -177,11 +221,13 @@ export function ReadinessCard({
             />
             <Stat
               label="Synced"
-              value={r.pulled ? r.pulled.pulled : "—"}
+              value={r.pulled && !entriesShort ? r.pulled.pulled : "—"}
               note={
-                r.pulled
-                  ? `of ${r.pulled.expected} time entries expected`
-                  : "no time-entry sync recorded"
+                !r.pulled
+                  ? "no time-entry sync recorded"
+                  : entriesShort
+                    ? "time-entry sync incomplete"
+                    : `of ${r.pulled.expected} time entries expected`
               }
             />
           </>
@@ -189,11 +235,13 @@ export function ReadinessCard({
           <>
             <Stat
               label="Clean"
-              value={r.clean ?? "—"}
+              value={entriesShort ? "—" : (r.clean ?? "—")}
               note={
-                r.pulled
-                  ? `of ${r.pulled.pulled} entries, no problem`
-                  : "no time-entry sync recorded"
+                !r.pulled
+                  ? "no time-entry sync recorded"
+                  : entriesShort
+                    ? "time-entry sync incomplete"
+                    : `of ${r.pulled.pulled} entries, no problem`
               }
             />
             <Stat
@@ -234,7 +282,7 @@ export function ReadinessCard({
         {paid ? (
           <p className="flex flex-wrap items-center gap-2 text-sm">
             <StatusBadge status="closed" label="Paid" />
-            Gusto’s own totals are the numbers above.
+            Summed from Gusto’s payroll records for this cycle.
           </p>
         ) : (
           <>

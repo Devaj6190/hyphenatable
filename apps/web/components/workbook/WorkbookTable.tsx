@@ -31,6 +31,28 @@ const hours = (h: number | null) => (h === null ? "—" : h.toFixed(2));
 const sourceOf = (wb: CycleWorkbook): SourceSystem =>
   wb.basis === "paid" ? "Gusto" : "Workbook";
 
+/** Closed-cycle totals are summed from Gusto records by the fixture script, not read from one Gusto record. */
+export function PaidSum({ records }: { records: number }) {
+  return (
+    <span className="text-xs text-muted-foreground">
+      Sum of {records} Gusto payroll record{records === 1 ? "" : "s"}{" "}
+      (synthetic)
+    </span>
+  );
+}
+
+/** Open-cycle totals use rules that are still proposed. */
+export function PreviewNote() {
+  return (
+    <span className="text-xs text-hold">
+      Computed with proposed rules treated as approved (preview)
+    </span>
+  );
+}
+
+const offCycleRecords = (wb: CycleWorkbook) =>
+  new Set(wb.stage2.lines.map((l) => l.recordId)).size;
+
 /** Turns "no Venmo rate (CHK-11): …" into a plain title, keeping the engine's words as the detail. */
 export function HoldReason({ reason }: { reason: string }) {
   const chk = reason.match(/CHK-\d+/)?.[0];
@@ -73,7 +95,6 @@ export function Stage1Table({
 }) {
   const cleared = wb.stage1.lines.filter((l) => !l.held);
   const held = wb.stage1.lines.filter((l) => l.held);
-  const system = sourceOf(wb);
   const row = (l: Stage1Line) => (
     <TableRow
       key={l.workerId}
@@ -126,7 +147,7 @@ export function Stage1Table({
                 : ""}
             </span>
           )}
-          <SourceChip system={system} recordId={l.recordId} />
+          <SourceChip system={l.recordSystem} recordId={l.recordId} />
         </span>
       </TableCell>
     </TableRow>
@@ -141,12 +162,21 @@ export function Stage1Table({
             : "Stage 1 · Wages in Gusto"
         }
         aside={
-          <span className="flex items-center gap-2">
-            <Money
-              cents={wb.stage1.totalCents}
-              className="text-xl font-semibold"
-            />
-            <SourceChip system={system} recordId={wb.draftId ?? wb.cycle.id} />
+          <span className="flex flex-col items-end gap-1">
+            <span className="flex items-center gap-2">
+              <Money
+                cents={wb.stage1.totalCents}
+                className="text-xl font-semibold"
+              />
+              {wb.draftId && (
+                <SourceChip system="Workbook" recordId={wb.draftId} />
+              )}
+            </span>
+            {wb.basis === "paid" ? (
+              <PaidSum records={wb.stage1.lines.length} />
+            ) : (
+              <PreviewNote />
+            )}
           </span>
         }
       >
@@ -186,7 +216,6 @@ export function Stage1Table({
 export function VenmoList({ names, wb }: { names: Names; wb: CycleWorkbook }) {
   const { venmo, venmoHeld } = wb.stage1;
   if (venmo.length === 0 && venmoHeld.length === 0) return null;
-  const system = sourceOf(wb);
   return (
     <div className="flex flex-col gap-3 rounded-card border border-dashed p-4">
       <SectionTitle title="Paid outside payroll">
@@ -212,7 +241,7 @@ export function VenmoList({ names, wb }: { names: Names; wb: CycleWorkbook }) {
                 )}
               </span>
               <Money cents={v.amountCents} className="font-semibold" />
-              <SourceChip system={system} recordId={v.recordId} />
+              <SourceChip system={v.recordSystem} recordId={v.recordId} />
             </span>
           </li>
         ))}
@@ -252,10 +281,22 @@ export function Stage2Table({
             : "Stage 2 · Commissions and splits"
         }
         aside={
-          <Money
-            cents={wb.stage2.totalCents}
-            className="text-xl font-semibold"
-          />
+          <span className="flex flex-col items-end gap-1">
+            <span className="flex items-center gap-2">
+              <Money
+                cents={wb.stage2.totalCents}
+                className="text-xl font-semibold"
+              />
+              {wb.stage2.draftId && (
+                <SourceChip system="Workbook" recordId={wb.stage2.draftId} />
+              )}
+            </span>
+            {wb.basis === "paid" ? (
+              <PaidSum records={offCycleRecords(wb)} />
+            ) : (
+              <PreviewNote />
+            )}
+          </span>
         }
       >
         Commission, tips and the manager split, each from its rule

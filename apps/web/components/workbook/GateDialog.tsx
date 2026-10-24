@@ -13,27 +13,26 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { PreviewNote } from "./WorkbookTable";
 
 // Gate 1: the owner approves the Stage 1 workbook as shown. Approving changes nothing in Gusto; filling the
-// draft is the next, separate button.
+// draft is the next, separate button. drafts.approveGate isn't wired yet, so approving records nothing and says so.
 export function GateDialog({
   cycleNumber,
   cleared,
   held,
   totalCents,
   disabled,
-  onApprove,
 }: {
   cycleNumber: number;
   cleared: number;
   held: number;
   totalCents: number;
   disabled: boolean;
-  onApprove: () => void;
 }) {
-  const [open, setOpen] = useState(false);
+  const [tried, setTried] = useState(false);
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog onOpenChange={(open) => open || setTried(false)}>
       <DialogTrigger render={<Button disabled={disabled} />}>
         Approve Gate 1
       </DialogTrigger>
@@ -50,6 +49,9 @@ export function GateDialog({
           <dd className="text-right font-semibold">
             <Money cents={totalCents} />
           </dd>
+          <dd className="col-span-2 text-right">
+            <PreviewNote />
+          </dd>
           <dt className="text-muted-foreground">Workers cleared</dt>
           <dd className="text-right font-medium">{cleared}</dd>
           <dt className="text-muted-foreground">Held, left out</dt>
@@ -65,16 +67,17 @@ export function GateDialog({
             Draft only. PayrollPilot never submits payroll.
           </li>
         </ul>
+        {tried && (
+          <output className="block rounded-control border border-hold/40 bg-hold-soft/40 px-4 py-3 text-sm">
+            <span className="font-medium">Not connected yet.</span> Nothing was
+            recorded, so Gate 1 stays unapproved.
+          </output>
+        )}
         <DialogFooter>
           <DialogClose render={<Button variant="secondary" />}>
-            Not yet
+            {tried ? "Close" : "Not yet"}
           </DialogClose>
-          <Button
-            onClick={() => {
-              onApprove();
-              setOpen(false);
-            }}
-          >
+          <Button disabled={tried} onClick={() => setTried(true)}>
             Approve Gate 1
           </Button>
         </DialogFooter>

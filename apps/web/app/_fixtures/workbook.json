@@ -96,6 +96,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "a-pp-101"
               },
               {
@@ -108,6 +109,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "a-pp-102"
               },
               {
@@ -120,6 +122,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "a-pp-103"
               },
               {
@@ -132,6 +135,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "a-pp-104"
               },
               {
@@ -144,6 +148,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "a-pp-105"
               },
               {
@@ -156,6 +161,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "a-pp-107"
               },
               {
@@ -168,6 +174,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "a-pp-108"
               },
               {
@@ -180,6 +187,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "a-pp-109"
               },
               {
@@ -192,6 +200,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "a-pp-111"
               },
               {
@@ -204,6 +213,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "a-pp-113"
               },
               {
@@ -216,6 +226,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "a-pp-114"
               }
             ],
@@ -226,12 +237,14 @@
                 "hours": 51,
                 "rateCents": 2500,
                 "amountCents": 127500,
+                "recordSystem": "Gusto",
                 "recordId": "a-pp-110"
               }
             ],
             "venmoHeld": []
           },
           "stage2": {
+            "draftId": null,
             "lines": [
               {
                 "workerId": "a-w05",
@@ -287,6 +300,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "a-pp-201"
               },
               {
@@ -299,6 +313,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "a-pp-202"
               },
               {
@@ -311,6 +326,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "a-pp-203"
               },
               {
@@ -323,6 +339,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "a-pp-204"
               },
               {
@@ -335,6 +352,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "a-pp-205"
               },
               {
@@ -347,6 +365,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "a-pp-206"
               },
               {
@@ -359,6 +378,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "a-pp-207"
               },
               {
@@ -371,6 +391,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "a-pp-208"
               },
               {
@@ -383,6 +404,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "a-pp-210"
               },
               {
@@ -395,6 +417,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "a-pp-212"
               },
               {
@@ -407,6 +430,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "a-pp-213"
               }
             ],
@@ -417,12 +441,14 @@
                 "hours": 51,
                 "rateCents": 2500,
                 "amountCents": 127500,
+                "recordSystem": "Gusto",
                 "recordId": "a-pp-209"
               }
             ],
             "venmoHeld": []
           },
           "stage2": {
+            "draftId": null,
             "lines": [
               {
                 "workerId": "a-w11",
@@ -472,6 +498,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "a-pp-301"
               },
               {
@@ -484,6 +511,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "a-pp-303"
               },
               {
@@ -496,6 +524,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "a-pp-305"
               },
               {
@@ -508,6 +537,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "a-pp-307"
               },
               {
@@ -520,6 +550,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "a-pp-309"
               },
               {
@@ -532,6 +563,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "a-pp-311"
               },
               {
@@ -544,6 +576,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "a-pp-313"
               },
               {
@@ -556,6 +589,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "a-pp-315"
               },
               {
@@ -568,6 +602,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "a-pp-318"
               },
               {
@@ -580,6 +615,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "a-pp-320"
               },
               {
@@ -592,6 +628,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "a-pp-321"
               }
             ],
@@ -602,12 +639,14 @@
                 "hours": 51,
                 "rateCents": 2500,
                 "amountCents": 128378,
+                "recordSystem": "Gusto",
                 "recordId": "a-pp-317"
               }
             ],
             "venmoHeld": []
           },
           "stage2": {
+            "draftId": null,
             "lines": [
               {
                 "workerId": "a-w01",
@@ -717,6 +756,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "a-pp-401"
               },
               {
@@ -729,6 +769,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "a-pp-402"
               },
               {
@@ -741,6 +782,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "a-pp-403"
               },
               {
@@ -753,6 +795,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "a-pp-404"
               },
               {
@@ -765,6 +808,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "a-pp-405"
               },
               {
@@ -777,6 +821,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "a-pp-406"
               },
               {
@@ -789,6 +834,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "a-pp-407"
               },
               {
@@ -801,6 +847,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "a-pp-408"
               },
               {
@@ -813,6 +860,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "a-pp-410"
               },
               {
@@ -825,6 +873,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "a-pp-412"
               },
               {
@@ -837,6 +886,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "a-pp-413"
               }
             ],
@@ -847,12 +897,14 @@
                 "hours": 51,
                 "rateCents": 2500,
                 "amountCents": 127500,
+                "recordSystem": "Gusto",
                 "recordId": "a-pp-409"
               }
             ],
             "venmoHeld": []
           },
           "stage2": {
+            "draftId": null,
             "lines": [
               {
                 "workerId": "a-w11",
@@ -934,7 +986,8 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
-                "recordId": "a-c05-draft-s1"
+                "recordSystem": "Jobber",
+                "recordId": "a-te-0101, a-te-0110, a-te-0122, a-te-0131, a-te-0145, a-te-0157, a-te-0162, a-te-0169, a-te-0179, a-te-0183"
               },
               {
                 "workerId": "a-w02",
@@ -946,7 +999,8 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
-                "recordId": "a-c05-draft-s1"
+                "recordSystem": "Jobber",
+                "recordId": "a-te-0106, a-te-0114, a-te-0126, a-te-0134, a-te-0141, a-te-0146, a-te-0152, a-te-0163, a-te-0165, a-te-0174"
               },
               {
                 "workerId": "a-w03",
@@ -958,7 +1012,8 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
-                "recordId": "a-c05-draft-s1"
+                "recordSystem": "Jobber",
+                "recordId": "a-te-0102, a-te-0111, a-te-0113, a-te-0123, a-te-0147, a-te-0158, a-te-0164, a-te-0170, a-te-0175, a-te-0184"
               },
               {
                 "workerId": "a-w04",
@@ -970,7 +1025,8 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
-                "recordId": "a-c05-draft-s1"
+                "recordSystem": "Jobber",
+                "recordId": "a-te-0107, a-te-0117, a-te-0127, a-te-0137, a-te-0142, a-te-0153, a-te-0159, a-te-0166, a-te-0176, a-te-0185"
               },
               {
                 "workerId": "a-w05",
@@ -982,7 +1038,8 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
-                "recordId": "a-c05-draft-s1"
+                "recordSystem": "Jobber",
+                "recordId": "a-te-0103, a-te-0108, a-te-0115, a-te-0121, a-te-0124, a-te-0132, a-te-0135, a-te-0140, a-te-0154, a-te-0171"
               },
               {
                 "workerId": "a-w06",
@@ -994,7 +1051,8 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
-                "recordId": "a-c05-draft-s1"
+                "recordSystem": "Workbook",
+                "recordId": "a-c05-draft-s1/a-w06"
               },
               {
                 "workerId": "a-w07",
@@ -1006,7 +1064,8 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
-                "recordId": "a-c05-draft-s1"
+                "recordSystem": "Jobber",
+                "recordId": "a-te-0104, a-te-0118, a-te-0128, a-te-0130, a-te-0148, a-te-0155, a-te-0160, a-te-0167, a-te-0180"
               },
               {
                 "workerId": "a-w08",
@@ -1018,7 +1077,8 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
-                "recordId": "a-c05-draft-s1"
+                "recordSystem": "Jobber",
+                "recordId": "a-te-0105, a-te-0112, a-te-0125, a-te-0133, a-te-0149, a-te-0161, a-te-0172, a-te-0181"
               },
               {
                 "workerId": "a-w11",
@@ -1030,7 +1090,8 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
-                "recordId": "a-c05-draft-s1"
+                "recordSystem": "Workbook",
+                "recordId": "a-c05-draft-s1/a-w11"
               },
               {
                 "workerId": "a-w12",
@@ -1042,7 +1103,8 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
-                "recordId": "a-c05-draft-s1"
+                "recordSystem": "Workbook",
+                "recordId": "a-c05-draft-s1/a-w12"
               },
               {
                 "workerId": "a-w13",
@@ -1054,7 +1116,8 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
-                "recordId": "a-c05-draft-s1"
+                "recordSystem": "Jobber",
+                "recordId": "a-te-0144, a-te-0151"
               },
               {
                 "workerId": "a-w14",
@@ -1066,7 +1129,8 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
-                "recordId": "a-c05-draft-s1"
+                "recordSystem": "Jobber",
+                "recordId": "a-te-0168, a-te-0173, a-te-0178, a-te-0182"
               }
             ],
             "totalCents": 2224383,
@@ -1076,7 +1140,8 @@
                 "hours": 51,
                 "rateCents": 2500,
                 "amountCents": 127500,
-                "recordId": "a-c05-draft-s1"
+                "recordSystem": "Jobber",
+                "recordId": "a-te-0116, a-te-0119, a-te-0136, a-te-0138, a-te-0143, a-te-0150"
               }
             ],
             "venmoHeld": [
@@ -1087,6 +1152,7 @@
             ]
           },
           "stage2": {
+            "draftId": "a-c05-draft-s2",
             "lines": [],
             "totalCents": 0,
             "held": [
@@ -1385,6 +1451,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-101"
               },
               {
@@ -1397,6 +1464,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-102"
               },
               {
@@ -1409,6 +1477,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-103"
               },
               {
@@ -1421,6 +1490,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-104"
               },
               {
@@ -1433,6 +1503,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-105"
               },
               {
@@ -1445,6 +1516,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-106"
               },
               {
@@ -1457,6 +1529,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-107"
               },
               {
@@ -1469,6 +1542,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-108"
               },
               {
@@ -1481,6 +1555,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-109"
               },
               {
@@ -1493,6 +1568,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-110"
               },
               {
@@ -1505,6 +1581,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-111"
               },
               {
@@ -1517,6 +1594,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-112"
               },
               {
@@ -1529,6 +1607,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-113"
               },
               {
@@ -1541,6 +1620,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-114"
               },
               {
@@ -1553,6 +1633,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-115"
               },
               {
@@ -1565,6 +1646,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-116"
               },
               {
@@ -1577,6 +1659,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-117"
               },
               {
@@ -1589,6 +1672,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-118"
               },
               {
@@ -1601,6 +1685,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-119"
               },
               {
@@ -1613,6 +1698,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-120"
               },
               {
@@ -1625,6 +1711,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-121"
               },
               {
@@ -1637,6 +1724,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-122"
               },
               {
@@ -1649,6 +1737,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-123"
               },
               {
@@ -1661,6 +1750,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-124"
               },
               {
@@ -1673,6 +1763,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-125"
               },
               {
@@ -1685,6 +1776,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-126"
               },
               {
@@ -1697,6 +1789,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-127"
               },
               {
@@ -1709,6 +1802,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-128"
               },
               {
@@ -1721,6 +1815,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-129"
               },
               {
@@ -1733,6 +1828,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-131"
               }
             ],
@@ -1741,6 +1837,7 @@
             "venmoHeld": []
           },
           "stage2": {
+            "draftId": null,
             "lines": [
               {
                 "workerId": "b-w29",
@@ -1796,6 +1893,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-201"
               },
               {
@@ -1808,6 +1906,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-202"
               },
               {
@@ -1820,6 +1919,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-203"
               },
               {
@@ -1832,6 +1932,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-204"
               },
               {
@@ -1844,6 +1945,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-205"
               },
               {
@@ -1856,6 +1958,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-206"
               },
               {
@@ -1868,6 +1971,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-207"
               },
               {
@@ -1880,6 +1984,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-208"
               },
               {
@@ -1892,6 +1997,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-209"
               },
               {
@@ -1904,6 +2010,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-210"
               },
               {
@@ -1916,6 +2023,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-211"
               },
               {
@@ -1928,6 +2036,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-212"
               },
               {
@@ -1940,6 +2049,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-213"
               },
               {
@@ -1952,6 +2062,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-214"
               },
               {
@@ -1964,6 +2075,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-215"
               },
               {
@@ -1976,6 +2088,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-216"
               },
               {
@@ -1988,6 +2101,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-217"
               },
               {
@@ -2000,6 +2114,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-218"
               },
               {
@@ -2012,6 +2127,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-219"
               },
               {
@@ -2024,6 +2140,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-220"
               },
               {
@@ -2036,6 +2153,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-221"
               },
               {
@@ -2048,6 +2166,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-222"
               },
               {
@@ -2060,6 +2179,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-223"
               },
               {
@@ -2072,6 +2192,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-224"
               },
               {
@@ -2084,6 +2205,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-225"
               },
               {
@@ -2096,6 +2218,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-226"
               },
               {
@@ -2108,6 +2231,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-227"
               },
               {
@@ -2120,6 +2244,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-228"
               },
               {
@@ -2132,6 +2257,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-229"
               },
               {
@@ -2144,6 +2270,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-231"
               }
             ],
@@ -2152,6 +2279,7 @@
             "venmoHeld": []
           },
           "stage2": {
+            "draftId": null,
             "lines": [
               {
                 "workerId": "b-w29",
@@ -2207,6 +2335,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-301"
               },
               {
@@ -2219,6 +2348,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-302"
               },
               {
@@ -2231,6 +2361,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-303"
               },
               {
@@ -2243,6 +2374,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-304"
               },
               {
@@ -2255,6 +2387,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-305"
               },
               {
@@ -2267,6 +2400,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-306"
               },
               {
@@ -2279,6 +2413,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-307"
               },
               {
@@ -2291,6 +2426,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-308"
               },
               {
@@ -2303,6 +2439,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-309"
               },
               {
@@ -2315,6 +2452,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-310"
               },
               {
@@ -2327,6 +2465,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-311"
               },
               {
@@ -2339,6 +2478,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-312"
               },
               {
@@ -2351,6 +2491,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-313"
               },
               {
@@ -2363,6 +2504,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-314"
               },
               {
@@ -2375,6 +2517,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-315"
               },
               {
@@ -2387,6 +2530,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-316"
               },
               {
@@ -2399,6 +2543,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-317"
               },
               {
@@ -2411,6 +2556,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-318"
               },
               {
@@ -2423,6 +2569,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-319"
               },
               {
@@ -2435,6 +2582,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-320"
               },
               {
@@ -2447,6 +2595,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-321"
               },
               {
@@ -2459,6 +2608,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-322"
               },
               {
@@ -2471,6 +2621,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-323"
               },
               {
@@ -2483,6 +2634,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-324"
               },
               {
@@ -2495,6 +2647,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-325"
               },
               {
@@ -2507,6 +2660,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-326"
               },
               {
@@ -2519,6 +2673,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-327"
               },
               {
@@ -2531,6 +2686,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-328"
               },
               {
@@ -2543,6 +2699,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-329"
               },
               {
@@ -2555,6 +2712,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-331"
               }
             ],
@@ -2563,6 +2721,7 @@
             "venmoHeld": []
           },
           "stage2": {
+            "draftId": null,
             "lines": [
               {
                 "workerId": "b-w29",
@@ -2618,6 +2777,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-401"
               },
               {
@@ -2630,6 +2790,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-402"
               },
               {
@@ -2642,6 +2803,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-403"
               },
               {
@@ -2654,6 +2816,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-404"
               },
               {
@@ -2666,6 +2829,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-405"
               },
               {
@@ -2678,6 +2842,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-406"
               },
               {
@@ -2690,6 +2855,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-407"
               },
               {
@@ -2702,6 +2868,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-408"
               },
               {
@@ -2714,6 +2881,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-409"
               },
               {
@@ -2726,6 +2894,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-410"
               },
               {
@@ -2738,6 +2907,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-411"
               },
               {
@@ -2750,6 +2920,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-412"
               },
               {
@@ -2762,6 +2933,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-413"
               },
               {
@@ -2774,6 +2946,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-414"
               },
               {
@@ -2786,6 +2959,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-415"
               },
               {
@@ -2798,6 +2972,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-416"
               },
               {
@@ -2810,6 +2985,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-417"
               },
               {
@@ -2822,6 +2998,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-418"
               },
               {
@@ -2834,6 +3011,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-419"
               },
               {
@@ -2846,6 +3024,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-420"
               },
               {
@@ -2858,6 +3037,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-421"
               },
               {
@@ -2870,6 +3050,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-422"
               },
               {
@@ -2882,6 +3063,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-423"
               },
               {
@@ -2894,6 +3076,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-424"
               },
               {
@@ -2906,6 +3089,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-425"
               },
               {
@@ -2918,6 +3102,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-426"
               },
               {
@@ -2930,6 +3115,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-427"
               },
               {
@@ -2942,6 +3128,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-428"
               },
               {
@@ -2954,6 +3141,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-429"
               },
               {
@@ -2966,6 +3154,7 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
+                "recordSystem": "Gusto",
                 "recordId": "b-pp-431"
               }
             ],
@@ -2974,6 +3163,7 @@
             "venmoHeld": []
           },
           "stage2": {
+            "draftId": null,
             "lines": [
               {
                 "workerId": "b-w29",
@@ -3061,7 +3251,8 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
-                "recordId": "b-c05-draft-s1"
+                "recordSystem": "Workbook",
+                "recordId": "b-c05-draft-s1/b-w01"
               },
               {
                 "workerId": "b-w02",
@@ -3073,7 +3264,8 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
-                "recordId": "b-c05-draft-s1"
+                "recordSystem": "Workbook",
+                "recordId": "b-c05-draft-s1/b-w02"
               },
               {
                 "workerId": "b-w03",
@@ -3085,7 +3277,8 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
-                "recordId": "b-c05-draft-s1"
+                "recordSystem": "Workbook",
+                "recordId": "b-c05-draft-s1/b-w03"
               },
               {
                 "workerId": "b-w04",
@@ -3097,7 +3290,8 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
-                "recordId": "b-c05-draft-s1"
+                "recordSystem": "Jobber",
+                "recordId": "b-te-5013, b-te-5050, b-te-5087, b-te-5125, b-te-5162"
               },
               {
                 "workerId": "b-w05",
@@ -3109,7 +3303,8 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
-                "recordId": "b-c05-draft-s1"
+                "recordSystem": "Jobber",
+                "recordId": "b-te-5001, b-te-5038, b-te-5076, b-te-5113, b-te-5150"
               },
               {
                 "workerId": "b-w06",
@@ -3121,7 +3316,8 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
-                "recordId": "b-c05-draft-s1"
+                "recordSystem": "Jobber",
+                "recordId": "b-te-5002, b-te-5039, b-te-5077, b-te-5114, b-te-5151"
               },
               {
                 "workerId": "b-w07",
@@ -3133,7 +3329,8 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
-                "recordId": "b-c05-draft-s1"
+                "recordSystem": "Jobber",
+                "recordId": "b-te-5003, b-te-5040, b-te-5075, b-te-5115, b-te-5152"
               },
               {
                 "workerId": "b-w08",
@@ -3145,7 +3342,8 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
-                "recordId": "b-c05-draft-s1"
+                "recordSystem": "Jobber",
+                "recordId": "b-te-5004, b-te-5041, b-te-5078, b-te-5116, b-te-5153"
               },
               {
                 "workerId": "b-w09",
@@ -3157,7 +3355,8 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
-                "recordId": "b-c05-draft-s1"
+                "recordSystem": "Jobber",
+                "recordId": "b-te-5005, b-te-5042, b-te-5079, b-te-5117, b-te-5154"
               },
               {
                 "workerId": "b-w10",
@@ -3169,7 +3368,8 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
-                "recordId": "b-c05-draft-s1"
+                "recordSystem": "Jobber",
+                "recordId": "b-te-5006, b-te-5043, b-te-5080, b-te-5118, b-te-5155"
               },
               {
                 "workerId": "b-w11",
@@ -3181,7 +3381,8 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
-                "recordId": "b-c05-draft-s1"
+                "recordSystem": "Jobber",
+                "recordId": "b-te-5007, b-te-5044, b-te-5081, b-te-5119, b-te-5156"
               },
               {
                 "workerId": "b-w12",
@@ -3193,7 +3394,8 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
-                "recordId": "b-c05-draft-s1"
+                "recordSystem": "Jobber",
+                "recordId": "b-te-5008, b-te-5045, b-te-5082, b-te-5120, b-te-5157, b-te-5187"
               },
               {
                 "workerId": "b-w13",
@@ -3205,7 +3407,8 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
-                "recordId": "b-c05-draft-s1"
+                "recordSystem": "Jobber",
+                "recordId": "b-te-5009, b-te-5046, b-te-5083, b-te-5121, b-te-5158, b-te-5188"
               },
               {
                 "workerId": "b-w14",
@@ -3217,7 +3420,8 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
-                "recordId": "b-c05-draft-s1"
+                "recordSystem": "Jobber",
+                "recordId": "b-te-5010, b-te-5047, b-te-5084, b-te-5122, b-te-5159, b-te-5189"
               },
               {
                 "workerId": "b-w15",
@@ -3229,7 +3433,8 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
-                "recordId": "b-c05-draft-s1"
+                "recordSystem": "Jobber",
+                "recordId": "b-te-5011, b-te-5048, b-te-5085, b-te-5123, b-te-5160, b-te-5190"
               },
               {
                 "workerId": "b-w16",
@@ -3241,7 +3446,8 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
-                "recordId": "b-c05-draft-s1"
+                "recordSystem": "Jobber",
+                "recordId": "b-te-5012, b-te-5049, b-te-5086, b-te-5124, b-te-5161, b-te-5191"
               },
               {
                 "workerId": "b-w17",
@@ -3253,7 +3459,8 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
-                "recordId": "b-c05-draft-s1"
+                "recordSystem": "Jobber",
+                "recordId": "b-te-5014, b-te-5026, b-te-5051, b-te-5063, b-te-5088, b-te-5100, b-te-5126, b-te-5139, b-te-5163, b-te-5175"
               },
               {
                 "workerId": "b-w18",
@@ -3265,7 +3472,8 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
-                "recordId": "b-c05-draft-s1"
+                "recordSystem": "Jobber",
+                "recordId": "b-te-5015, b-te-5027, b-te-5052, b-te-5064, b-te-5089, b-te-5101, b-te-5112, b-te-5127, b-te-5140, b-te-5164, b-te-5176"
               },
               {
                 "workerId": "b-w19",
@@ -3277,7 +3485,8 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
-                "recordId": "b-c05-draft-s1"
+                "recordSystem": "Jobber",
+                "recordId": "b-te-5016, b-te-5028, b-te-5053, b-te-5065, b-te-5090, b-te-5102, b-te-5128, b-te-5141, b-te-5165, b-te-5177"
               },
               {
                 "workerId": "b-w20",
@@ -3289,7 +3498,8 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
-                "recordId": "b-c05-draft-s1"
+                "recordSystem": "Jobber",
+                "recordId": "b-te-5017, b-te-5029, b-te-5054, b-te-5066, b-te-5091, b-te-5103, b-te-5129, b-te-5142, b-te-5166, b-te-5178"
               },
               {
                 "workerId": "b-w21",
@@ -3301,7 +3511,8 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
-                "recordId": "b-c05-draft-s1"
+                "recordSystem": "Jobber",
+                "recordId": "b-te-5018, b-te-5030, b-te-5055, b-te-5067, b-te-5092, b-te-5104, b-te-5130, b-te-5138, b-te-5167, b-te-5179"
               },
               {
                 "workerId": "b-w22",
@@ -3313,7 +3524,8 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
-                "recordId": "b-c05-draft-s1"
+                "recordSystem": "Jobber",
+                "recordId": "b-te-5019, b-te-5031, b-te-5056, b-te-5068, b-te-5093, b-te-5105, b-te-5131, b-te-5143, b-te-5168, b-te-5180, b-te-5192"
               },
               {
                 "workerId": "b-w23",
@@ -3325,7 +3537,8 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
-                "recordId": "b-c05-draft-s1"
+                "recordSystem": "Jobber",
+                "recordId": "b-te-5020, b-te-5032, b-te-5057, b-te-5069, b-te-5094, b-te-5106, b-te-5132, b-te-5144, b-te-5169, b-te-5181"
               },
               {
                 "workerId": "b-w24",
@@ -3337,7 +3550,8 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
-                "recordId": "b-c05-draft-s1"
+                "recordSystem": "Jobber",
+                "recordId": "b-te-5021, b-te-5033, b-te-5058, b-te-5070, b-te-5095, b-te-5107, b-te-5133, b-te-5145, b-te-5170, b-te-5182"
               },
               {
                 "workerId": "b-w25",
@@ -3349,7 +3563,8 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
-                "recordId": "b-c05-draft-s1"
+                "recordSystem": "Jobber",
+                "recordId": "b-te-5022, b-te-5034, b-te-5059, b-te-5071, b-te-5096, b-te-5108, b-te-5134, b-te-5146, b-te-5171, b-te-5183"
               },
               {
                 "workerId": "b-w26",
@@ -3361,7 +3576,8 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
-                "recordId": "b-c05-draft-s1"
+                "recordSystem": "Jobber",
+                "recordId": "b-te-5023, b-te-5035, b-te-5060, b-te-5072, b-te-5097, b-te-5109, b-te-5135, b-te-5147, b-te-5172, b-te-5184"
               },
               {
                 "workerId": "b-w27",
@@ -3373,7 +3589,8 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
-                "recordId": "b-c05-draft-s1"
+                "recordSystem": "Jobber",
+                "recordId": "b-te-5024, b-te-5036, b-te-5061, b-te-5073, b-te-5098, b-te-5110, b-te-5136, b-te-5148, b-te-5173, b-te-5185"
               },
               {
                 "workerId": "b-w28",
@@ -3385,7 +3602,8 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
-                "recordId": "b-c05-draft-s1"
+                "recordSystem": "Jobber",
+                "recordId": "b-te-5025, b-te-5037, b-te-5062, b-te-5074, b-te-5099, b-te-5111, b-te-5137, b-te-5149, b-te-5174, b-te-5186"
               },
               {
                 "workerId": "b-w29",
@@ -3397,7 +3615,8 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
-                "recordId": "b-c05-draft-s1"
+                "recordSystem": "Workbook",
+                "recordId": "b-c05-draft-s1/b-w29"
               },
               {
                 "workerId": "b-w30",
@@ -3409,7 +3628,8 @@
                 "held": false,
                 "reason": null,
                 "heldFlagIds": [],
-                "recordId": "b-c05-draft-s1"
+                "recordSystem": "Workbook",
+                "recordId": "b-c05-draft-s1/b-w30"
               }
             ],
             "totalCents": 4257900,
@@ -3417,6 +3637,7 @@
             "venmoHeld": []
           },
           "stage2": {
+            "draftId": "b-c05-draft-s2",
             "lines": [
               {
                 "workerId": "b-w29",

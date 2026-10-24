@@ -1,7 +1,8 @@
 // Writes app/_fixtures/workbook.json: the workbook for every cycle of companies A and B, until drafts.get is live.
 // Open cycles: Stage 1 and Stage 2 straight from the engine (computeStage1 / computeStage2), the same way its golden
-// tests run them (every proposed rule treated as approved). Closed cycles: what Gusto and Venmo actually paid
-// (pastPayrolls). The web app only displays these values; it never computes pay.
+// tests run them. Every rule in the fixtures is still proposed, so open-cycle totals are a preview with proposed
+// rules treated as approved; the UI says so beside the totals. Closed cycles: what Gusto and Venmo actually paid
+// (pastPayrolls), summed here (ponytail: move the sum into the engine). The web app never computes pay.
 // Run: bun apps/web/scripts/workbook-fixture.ts
 import { execFileSync } from "node:child_process";
 import { readFileSync, writeFileSync } from "node:fs";
@@ -46,12 +47,15 @@ function build(companyId: "a" | "b") {
   ) as { lowMarginPct?: number };
   const cycles = load<Cycle[]>(companyId, "cycles");
   const workers = load<Worker[]>(companyId, "workers");
-  const entries = load<{ cycleId: string | null }[]>(companyId, "timeEntries");
+  const entries = load<
+    { id: string; cycleId: string | null; workerId: string }[]
+  >(companyId, "timeEntries");
   const expenses = load<never[]>(companyId, "expenses");
   const jobs = load<{ id: string; jobNumber: number; title: string }[]>(
     companyId,
     "jobs",
   );
+  // Preview: proposed rules treated as approved, as the engine's golden tests do. Labelled in the UI.
   const rules = load<Rule[]>(companyId, "rules").map(
     (r): Rule => ({ ...r, status: "active" }),
   );
@@ -115,6 +119,7 @@ function build(companyId: "a" | "b") {
             held: false,
             reason: null,
             heldFlagIds: [],
+            recordSystem: "Gusto" as const,
             recordId: p.id,
           })),
           totalCents: regular.reduce((s, p) => s + p.grossCents, 0),
@@ -126,11 +131,13 @@ function build(companyId: "a" | "b") {
               rateCents:
                 p.earnings.find((e) => e.name === "Hours")?.rateCents ?? null,
               amountCents: p.grossCents,
+              recordSystem: "Gusto" as const,
               recordId: p.id,
             })),
           venmoHeld: [],
         },
         stage2: {
+          draftId: null,
           lines: paid
             .filter((p) => p.paidVia === "gusto_off_cycle")
             .flatMap((p) =>
@@ -152,6 +159,18 @@ function build(companyId: "a" | "b") {
     }
 
     const cycleEntries = entries.filter((e) => e.cycleId === cycle.id);
+    // A line traces to the worker's time entries; a line with none (salary) to its draft line.
+    const sourceOf = (draftId: string, workerId: string) => {
+      const ids = cycleEntries
+        .filter((e) => e.workerId === workerId)
+        .map((e) => e.id);
+      return ids.length > 0
+        ? { recordSystem: "Jobber" as const, recordId: ids.join(", ") }
+        : {
+            recordSystem: "Workbook" as const,
+            recordId: `${draftId}/${workerId}`,
+          };
+    };
     const s1 = computeStage1(cycle, cycleEntries as never, workers, rules, {
       company: company as never,
       expenses,
@@ -197,19 +216,20 @@ function build(companyId: "a" | "b") {
               held: p.excluded || heldFlagIds.length > 0,
               reason: p.reason,
               heldFlagIds,
-              recordId: s1.draft.id,
+              ...sourceOf(s1.draft.id, p.workerId),
             };
           }),
         totalCents: s1.draft.totals.grossCents,
         venmo: s1.draft.venmoList.map((v) => ({
           ...v,
-          recordId: s1.draft.id,
+          ...sourceOf(s1.draft.id, v.workerId),
         })),
         venmoHeld: pay
           .filter((p) => p.kind === "venmo" && p.excluded)
           .map((p) => ({ workerId: p.workerId, reason: p.reason ?? "" })),
       },
       stage2: {
+        draftId: s2.draft.id,
         lines: [...s2.report.payouts, ...s2.report.venmoTips].map((p) => ({
           workerId: p.workerId,
           name: p.name,

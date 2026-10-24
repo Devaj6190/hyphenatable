@@ -12,8 +12,8 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { companies } from "@/lib/companies";
 import { holdsOf, periodLabel, type WorkbookData, workerLabel } from "./data";
-import { useGateApproved } from "./gate-store";
-import { HoldReason } from "./WorkbookTable";
+import { GateBlockers } from "./ReadinessCard";
+import { HoldReason, PreviewNote } from "./WorkbookTable";
 
 const STATUS_WORDS = {
   computed: "Computed, Gate 1 not approved",
@@ -54,7 +54,6 @@ export function ReadyView({
   const open = data.cycles.filter((c) => c.basis === "engine");
   const wb =
     open.find((c) => c.cycle.id === params.get("cycle")) ?? open.at(-1);
-  const approved = useGateApproved(wb?.draftId ?? null);
 
   if (!wb)
     return (
@@ -69,7 +68,7 @@ export function ReadyView({
       </>
     );
 
-  const status = approved ? "approved" : (wb.draftStatus ?? "computed");
+  const status = wb.draftStatus ?? "computed";
   const ready = status === "calculated";
   const holds = holdsOf(wb);
   const inGusto = wb.stage1.lines.filter((l) => !l.held).length;
@@ -119,9 +118,12 @@ export function ReadyView({
             {status === "computed"
               ? "Approve Gate 1 on the workbook, then fill the Gusto draft. Nothing is paid until you check the draft and finish it in Gusto yourself."
               : status === "approved"
-                ? "You approved Gate 1. Fill the Gusto draft from the workbook next."
+                ? "Gate 1 is approved. Fill the Gusto draft from the workbook next."
                 : "Nothing is paid until you open the draft, check it and finish it in Gusto yourself."}
           </p>
+          {status === "computed" && (
+            <GateBlockers companyId={companyId} readiness={wb.readiness} />
+          )}
           <p className="flex flex-wrap items-center gap-2 font-medium">
             Draft only. PayrollPilot never submits payroll.
             {wb.cycle.gustoPayrollId && (
@@ -134,11 +136,14 @@ export function ReadyView({
           <Figure
             label="Stage 1 · Wages in Gusto"
             note={
-              <span className="flex flex-wrap items-center gap-2">
-                {inGusto} people
-                {wb.draftId && (
-                  <SourceChip system="Workbook" recordId={wb.draftId} />
-                )}
+              <span className="flex flex-col gap-1">
+                <span className="flex flex-wrap items-center gap-2">
+                  {inGusto} people
+                  {wb.draftId && (
+                    <SourceChip system="Workbook" recordId={wb.draftId} />
+                  )}
+                </span>
+                <PreviewNote />
               </span>
             }
           >
@@ -146,16 +151,40 @@ export function ReadyView({
           </Figure>
           <Figure
             label="Stage 2 · Commissions and splits"
-            note={`${wb.stage2.lines.length} lines · ${wb.stage2.held.length} held`}
+            note={
+              <span className="flex flex-col gap-1">
+                <span className="flex flex-wrap items-center gap-2">
+                  {wb.stage2.lines.length} lines · {wb.stage2.held.length} held
+                  {wb.stage2.draftId && (
+                    <SourceChip
+                      system="Workbook"
+                      recordId={wb.stage2.draftId}
+                    />
+                  )}
+                </span>
+                <PreviewNote />
+              </span>
+            }
           >
             <Money cents={wb.stage2.totalCents} />
           </Figure>
           <Figure
             label="Cycle profit"
             note={
-              wb.totalProfitCents === null
-                ? "Not known yet: at least one job has no total or invoice."
-                : "Revenue minus labor and job costs"
+              wb.totalProfitCents === null ? (
+                "Not known yet: at least one job has no total or invoice."
+              ) : (
+                <span className="flex flex-wrap items-center gap-2">
+                  Revenue minus labor and job costs, from the Stage 2
+                  reconciliation
+                  {wb.stage2.draftId && (
+                    <SourceChip
+                      system="Workbook"
+                      recordId={wb.stage2.draftId}
+                    />
+                  )}
+                </span>
+              )
             }
           >
             {wb.totalProfitCents === null ? (

@@ -177,9 +177,8 @@ function Sleeve({
         "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
         selected ? "w-[64%]" : "w-[44%]",
         selected
-          ? "z-10 bg-raised shadow-raised ring-1 ring-primary-edge/60 sm:[transform:translateY(-6px)_translateZ(28px)]"
-          : "bg-[color-mix(in_srgb,var(--accent)_70%,var(--card))] shadow-card ring-1 ring-black/5 hover:bg-[color-mix(in_srgb,var(--accent)_40%,var(--card))] focus-visible:bg-[color-mix(in_srgb,var(--accent)_40%,var(--card))] sm:[transform:translateX(var(--part))_rotateX(11deg)] sm:hover:[transform:translateX(var(--part))_translateY(-4px)_rotateX(7deg)] sm:focus-visible:[transform:translateX(var(--part))_translateY(-4px)_rotateX(7deg)] dark:ring-white/5",
-        "motion-reduce:[transform:none] motion-reduce:hover:[transform:none] motion-reduce:focus-visible:[transform:none]",
+          ? "z-10 bg-raised shadow-raised ring-1 ring-primary-edge/60 motion-safe:sm:[transform:translateY(-6px)_translateZ(28px)]"
+          : "bg-[color-mix(in_srgb,var(--accent)_70%,var(--card))] shadow-card ring-1 ring-black/5 hover:bg-[color-mix(in_srgb,var(--accent)_40%,var(--card))] focus-visible:bg-[color-mix(in_srgb,var(--accent)_40%,var(--card))] motion-safe:sm:[transform:translateX(var(--part))_rotateX(11deg)] motion-safe:sm:hover:[transform:translateX(var(--part))_translateY(-4px)_rotateX(7deg)] motion-safe:sm:focus-visible:[transform:translateX(var(--part))_translateY(-4px)_rotateX(7deg)] dark:ring-white/5",
       )}
     >
       {/* Folder tab, in the sleeve's own material. */}
