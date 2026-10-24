@@ -24,7 +24,7 @@ const items: Item[] = [
   { label: "Onboarding", path: "/onboarding", icon: ListChecks, built: false },
   { label: "Rules", path: "/rules", icon: BookOpen, built: false },
   { label: "Workbook", path: "/workbook", icon: Table2, built: false },
-  { label: "Audit", path: "/audit", icon: ScrollText, built: false },
+  { label: "Audit", path: "/audit", icon: ScrollText, built: true },
   ...(demoOn
     ? [{ label: "Demo", path: "/demo", icon: FlaskConical, built: false }]
     : []),

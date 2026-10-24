@@ -92,3 +92,24 @@ export type FixtureWorker = {
   displayName: string;
   role: "field" | "manager" | "owner" | "office";
 };
+
+// Mirrors AuditEvent in docs/plans/00-shared-context.md section 6. B's audit.list replaces the fixture.
+// Summaries never carry pay amounts: pay lives in data.effectPayCents and is shown to the owner only.
+export type AuditData = {
+  source?: string;
+  simulated?: boolean;
+  ownerOnly?: boolean;
+  effectPayCents?: number;
+};
+
+export type AuditEvent = {
+  id: string;
+  companyId: string;
+  cycleId: string | null;
+  at: string;
+  actor: FlagEvent["actor"];
+  type: string;
+  summary: string;
+  refs: Record<string, string>;
+  data: AuditData | null;
+};
