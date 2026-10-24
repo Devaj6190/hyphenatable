@@ -8,6 +8,7 @@
 
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { type ConfigB, generateB } from "./lib/company-b";
 import { must } from "./lib/must";
 import { JOBBER_EXPENSE_TITLES, STREETS, VENDORS, WORK } from "./lib/names";
 import { buildAnswerKey, plantCurrent } from "./lib/plant";
@@ -1346,6 +1347,13 @@ export function generate(cfg: Config): Record<string, unknown> {
   };
 }
 
+/** Company A (and anything without `generator`) uses generate(); Company B's HVAC model is seed/lib/company-b.ts. */
+export function generateAny(cfg: Config | ConfigB): Record<string, unknown> {
+  return (cfg as ConfigB).generator === "hvac-weekly"
+    ? generateB(cfg as ConfigB)
+    : generate(cfg as Config);
+}
+
 export function loadConfig(company: string): Config {
   return JSON.parse(
     readFileSync(join(import.meta.dir, "companies", `${company}.json`), "utf8"),
@@ -1379,7 +1387,7 @@ if (import.meta.main) {
   const out =
     arg("out") ?? join(import.meta.dir, "..", "data", "fixtures", company);
   mkdirSync(out, { recursive: true });
-  const files = serialize(generate(loadConfig(company)));
+  const files = serialize(generateAny(loadConfig(company)));
   for (const [f, text] of Object.entries(files))
     writeFileSync(join(out, f), text);
   console.log(`wrote ${Object.keys(files).length} files to ${out}`);

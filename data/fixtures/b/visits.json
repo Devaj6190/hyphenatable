@@ -1,0 +1,5726 @@
+[
+  {
+    "id": "b-v0001",
+    "companyId": "b",
+    "jobId": "b-j001",
+    "sourceId": "b-v0001",
+    "startAt": "2026-09-21T14:00:00.000Z",
+    "endAt": "2026-09-21T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w05",
+      "b-w06",
+      "b-w07",
+      "b-w08"
+    ]
+  },
+  {
+    "id": "b-v0002",
+    "companyId": "b",
+    "jobId": "b-j003",
+    "sourceId": "b-v0002",
+    "startAt": "2026-09-21T14:00:00.000Z",
+    "endAt": "2026-09-21T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w09",
+      "b-w10",
+      "b-w11",
+      "b-w12"
+    ]
+  },
+  {
+    "id": "b-v0003",
+    "companyId": "b",
+    "jobId": "b-j005",
+    "sourceId": "b-v0003",
+    "startAt": "2026-09-21T14:00:00.000Z",
+    "endAt": "2026-09-21T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w13",
+      "b-w14",
+      "b-w15",
+      "b-w16"
+    ]
+  },
+  {
+    "id": "b-v0004",
+    "companyId": "b",
+    "jobId": "b-j007",
+    "sourceId": "b-v0004",
+    "startAt": "2026-09-21T15:00:00.000Z",
+    "endAt": "2026-09-21T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w17",
+      "b-w24"
+    ]
+  },
+  {
+    "id": "b-v0005",
+    "companyId": "b",
+    "jobId": "b-j009",
+    "sourceId": "b-v0005",
+    "startAt": "2026-09-21T15:00:00.000Z",
+    "endAt": "2026-09-21T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w18",
+      "b-w25"
+    ]
+  },
+  {
+    "id": "b-v0006",
+    "companyId": "b",
+    "jobId": "b-j011",
+    "sourceId": "b-v0006",
+    "startAt": "2026-09-21T15:00:00.000Z",
+    "endAt": "2026-09-21T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w19",
+      "b-w26"
+    ]
+  },
+  {
+    "id": "b-v0007",
+    "companyId": "b",
+    "jobId": "b-j013",
+    "sourceId": "b-v0007",
+    "startAt": "2026-09-21T15:00:00.000Z",
+    "endAt": "2026-09-21T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w20",
+      "b-w27"
+    ]
+  },
+  {
+    "id": "b-v0008",
+    "companyId": "b",
+    "jobId": "b-j015",
+    "sourceId": "b-v0008",
+    "startAt": "2026-09-21T15:00:00.000Z",
+    "endAt": "2026-09-21T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w21",
+      "b-w28"
+    ]
+  },
+  {
+    "id": "b-v0009",
+    "companyId": "b",
+    "jobId": "b-j017",
+    "sourceId": "b-v0009",
+    "startAt": "2026-09-21T15:00:00.000Z",
+    "endAt": "2026-09-21T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w22"
+    ]
+  },
+  {
+    "id": "b-v0010",
+    "companyId": "b",
+    "jobId": "b-j019",
+    "sourceId": "b-v0010",
+    "startAt": "2026-09-21T15:00:00.000Z",
+    "endAt": "2026-09-21T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w23"
+    ]
+  },
+  {
+    "id": "b-v0011",
+    "companyId": "b",
+    "jobId": "b-j008",
+    "sourceId": "b-v0011",
+    "startAt": "2026-09-21T19:30:00.000Z",
+    "endAt": "2026-09-22T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w17",
+      "b-w24"
+    ]
+  },
+  {
+    "id": "b-v0012",
+    "companyId": "b",
+    "jobId": "b-j010",
+    "sourceId": "b-v0012",
+    "startAt": "2026-09-21T19:30:00.000Z",
+    "endAt": "2026-09-22T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w18",
+      "b-w25"
+    ]
+  },
+  {
+    "id": "b-v0013",
+    "companyId": "b",
+    "jobId": "b-j012",
+    "sourceId": "b-v0013",
+    "startAt": "2026-09-21T19:30:00.000Z",
+    "endAt": "2026-09-22T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w19",
+      "b-w26"
+    ]
+  },
+  {
+    "id": "b-v0014",
+    "companyId": "b",
+    "jobId": "b-j014",
+    "sourceId": "b-v0014",
+    "startAt": "2026-09-21T19:30:00.000Z",
+    "endAt": "2026-09-22T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w20",
+      "b-w27"
+    ]
+  },
+  {
+    "id": "b-v0015",
+    "companyId": "b",
+    "jobId": "b-j016",
+    "sourceId": "b-v0015",
+    "startAt": "2026-09-21T19:30:00.000Z",
+    "endAt": "2026-09-22T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w21",
+      "b-w28"
+    ]
+  },
+  {
+    "id": "b-v0016",
+    "companyId": "b",
+    "jobId": "b-j018",
+    "sourceId": "b-v0016",
+    "startAt": "2026-09-21T19:30:00.000Z",
+    "endAt": "2026-09-22T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w22"
+    ]
+  },
+  {
+    "id": "b-v0017",
+    "companyId": "b",
+    "jobId": "b-j020",
+    "sourceId": "b-v0017",
+    "startAt": "2026-09-21T19:30:00.000Z",
+    "endAt": "2026-09-22T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w23"
+    ]
+  },
+  {
+    "id": "b-v0018",
+    "companyId": "b",
+    "jobId": "b-j001",
+    "sourceId": "b-v0018",
+    "startAt": "2026-09-22T14:00:00.000Z",
+    "endAt": "2026-09-22T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w05",
+      "b-w06",
+      "b-w07",
+      "b-w08"
+    ]
+  },
+  {
+    "id": "b-v0019",
+    "companyId": "b",
+    "jobId": "b-j003",
+    "sourceId": "b-v0019",
+    "startAt": "2026-09-22T14:00:00.000Z",
+    "endAt": "2026-09-22T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w09",
+      "b-w10",
+      "b-w11",
+      "b-w12"
+    ]
+  },
+  {
+    "id": "b-v0020",
+    "companyId": "b",
+    "jobId": "b-j005",
+    "sourceId": "b-v0020",
+    "startAt": "2026-09-22T14:00:00.000Z",
+    "endAt": "2026-09-22T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w13",
+      "b-w14",
+      "b-w15",
+      "b-w16"
+    ]
+  },
+  {
+    "id": "b-v0021",
+    "companyId": "b",
+    "jobId": "b-j010",
+    "sourceId": "b-v0021",
+    "startAt": "2026-09-22T15:00:00.000Z",
+    "endAt": "2026-09-22T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w17",
+      "b-w24"
+    ]
+  },
+  {
+    "id": "b-v0022",
+    "companyId": "b",
+    "jobId": "b-j012",
+    "sourceId": "b-v0022",
+    "startAt": "2026-09-22T15:00:00.000Z",
+    "endAt": "2026-09-22T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w18",
+      "b-w25"
+    ]
+  },
+  {
+    "id": "b-v0023",
+    "companyId": "b",
+    "jobId": "b-j014",
+    "sourceId": "b-v0023",
+    "startAt": "2026-09-22T15:00:00.000Z",
+    "endAt": "2026-09-22T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w19",
+      "b-w26"
+    ]
+  },
+  {
+    "id": "b-v0024",
+    "companyId": "b",
+    "jobId": "b-j016",
+    "sourceId": "b-v0024",
+    "startAt": "2026-09-22T15:00:00.000Z",
+    "endAt": "2026-09-22T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w20",
+      "b-w27"
+    ]
+  },
+  {
+    "id": "b-v0025",
+    "companyId": "b",
+    "jobId": "b-j018",
+    "sourceId": "b-v0025",
+    "startAt": "2026-09-22T15:00:00.000Z",
+    "endAt": "2026-09-22T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w21",
+      "b-w28"
+    ]
+  },
+  {
+    "id": "b-v0026",
+    "companyId": "b",
+    "jobId": "b-j020",
+    "sourceId": "b-v0026",
+    "startAt": "2026-09-22T15:00:00.000Z",
+    "endAt": "2026-09-22T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w22"
+    ]
+  },
+  {
+    "id": "b-v0027",
+    "companyId": "b",
+    "jobId": "b-j008",
+    "sourceId": "b-v0027",
+    "startAt": "2026-09-22T15:00:00.000Z",
+    "endAt": "2026-09-22T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w23"
+    ]
+  },
+  {
+    "id": "b-v0028",
+    "companyId": "b",
+    "jobId": "b-j011",
+    "sourceId": "b-v0028",
+    "startAt": "2026-09-22T19:30:00.000Z",
+    "endAt": "2026-09-23T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w17",
+      "b-w24"
+    ]
+  },
+  {
+    "id": "b-v0029",
+    "companyId": "b",
+    "jobId": "b-j013",
+    "sourceId": "b-v0029",
+    "startAt": "2026-09-22T19:30:00.000Z",
+    "endAt": "2026-09-23T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w18",
+      "b-w25"
+    ]
+  },
+  {
+    "id": "b-v0030",
+    "companyId": "b",
+    "jobId": "b-j015",
+    "sourceId": "b-v0030",
+    "startAt": "2026-09-22T19:30:00.000Z",
+    "endAt": "2026-09-23T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w19",
+      "b-w26"
+    ]
+  },
+  {
+    "id": "b-v0031",
+    "companyId": "b",
+    "jobId": "b-j017",
+    "sourceId": "b-v0031",
+    "startAt": "2026-09-22T19:30:00.000Z",
+    "endAt": "2026-09-23T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w20",
+      "b-w27"
+    ]
+  },
+  {
+    "id": "b-v0032",
+    "companyId": "b",
+    "jobId": "b-j019",
+    "sourceId": "b-v0032",
+    "startAt": "2026-09-22T19:30:00.000Z",
+    "endAt": "2026-09-23T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w21",
+      "b-w28"
+    ]
+  },
+  {
+    "id": "b-v0033",
+    "companyId": "b",
+    "jobId": "b-j007",
+    "sourceId": "b-v0033",
+    "startAt": "2026-09-22T19:30:00.000Z",
+    "endAt": "2026-09-23T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w22"
+    ]
+  },
+  {
+    "id": "b-v0034",
+    "companyId": "b",
+    "jobId": "b-j009",
+    "sourceId": "b-v0034",
+    "startAt": "2026-09-22T19:30:00.000Z",
+    "endAt": "2026-09-23T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w23"
+    ]
+  },
+  {
+    "id": "b-v0035",
+    "companyId": "b",
+    "jobId": "b-j001",
+    "sourceId": "b-v0035",
+    "startAt": "2026-09-23T14:00:00.000Z",
+    "endAt": "2026-09-23T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w05",
+      "b-w06",
+      "b-w07",
+      "b-w08"
+    ]
+  },
+  {
+    "id": "b-v0036",
+    "companyId": "b",
+    "jobId": "b-j003",
+    "sourceId": "b-v0036",
+    "startAt": "2026-09-23T14:00:00.000Z",
+    "endAt": "2026-09-23T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w09",
+      "b-w10",
+      "b-w11",
+      "b-w12"
+    ]
+  },
+  {
+    "id": "b-v0037",
+    "companyId": "b",
+    "jobId": "b-j006",
+    "sourceId": "b-v0037",
+    "startAt": "2026-09-23T14:00:00.000Z",
+    "endAt": "2026-09-23T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w13",
+      "b-w14",
+      "b-w15",
+      "b-w16"
+    ]
+  },
+  {
+    "id": "b-v0038",
+    "companyId": "b",
+    "jobId": "b-j013",
+    "sourceId": "b-v0038",
+    "startAt": "2026-09-23T15:00:00.000Z",
+    "endAt": "2026-09-23T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w17",
+      "b-w24"
+    ]
+  },
+  {
+    "id": "b-v0039",
+    "companyId": "b",
+    "jobId": "b-j015",
+    "sourceId": "b-v0039",
+    "startAt": "2026-09-23T15:00:00.000Z",
+    "endAt": "2026-09-23T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w18",
+      "b-w25"
+    ]
+  },
+  {
+    "id": "b-v0040",
+    "companyId": "b",
+    "jobId": "b-j017",
+    "sourceId": "b-v0040",
+    "startAt": "2026-09-23T15:00:00.000Z",
+    "endAt": "2026-09-23T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w19",
+      "b-w26"
+    ]
+  },
+  {
+    "id": "b-v0041",
+    "companyId": "b",
+    "jobId": "b-j019",
+    "sourceId": "b-v0041",
+    "startAt": "2026-09-23T15:00:00.000Z",
+    "endAt": "2026-09-23T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w20",
+      "b-w27"
+    ]
+  },
+  {
+    "id": "b-v0042",
+    "companyId": "b",
+    "jobId": "b-j007",
+    "sourceId": "b-v0042",
+    "startAt": "2026-09-23T15:00:00.000Z",
+    "endAt": "2026-09-23T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w21",
+      "b-w28"
+    ]
+  },
+  {
+    "id": "b-v0043",
+    "companyId": "b",
+    "jobId": "b-j009",
+    "sourceId": "b-v0043",
+    "startAt": "2026-09-23T15:00:00.000Z",
+    "endAt": "2026-09-23T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w22"
+    ]
+  },
+  {
+    "id": "b-v0044",
+    "companyId": "b",
+    "jobId": "b-j011",
+    "sourceId": "b-v0044",
+    "startAt": "2026-09-23T15:00:00.000Z",
+    "endAt": "2026-09-23T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w23"
+    ]
+  },
+  {
+    "id": "b-v0045",
+    "companyId": "b",
+    "jobId": "b-j014",
+    "sourceId": "b-v0045",
+    "startAt": "2026-09-23T19:30:00.000Z",
+    "endAt": "2026-09-24T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w17",
+      "b-w24"
+    ]
+  },
+  {
+    "id": "b-v0046",
+    "companyId": "b",
+    "jobId": "b-j016",
+    "sourceId": "b-v0046",
+    "startAt": "2026-09-23T19:30:00.000Z",
+    "endAt": "2026-09-24T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w18",
+      "b-w25"
+    ]
+  },
+  {
+    "id": "b-v0047",
+    "companyId": "b",
+    "jobId": "b-j018",
+    "sourceId": "b-v0047",
+    "startAt": "2026-09-23T19:30:00.000Z",
+    "endAt": "2026-09-24T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w19",
+      "b-w26"
+    ]
+  },
+  {
+    "id": "b-v0048",
+    "companyId": "b",
+    "jobId": "b-j020",
+    "sourceId": "b-v0048",
+    "startAt": "2026-09-23T19:30:00.000Z",
+    "endAt": "2026-09-24T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w20",
+      "b-w27"
+    ]
+  },
+  {
+    "id": "b-v0049",
+    "companyId": "b",
+    "jobId": "b-j008",
+    "sourceId": "b-v0049",
+    "startAt": "2026-09-23T19:30:00.000Z",
+    "endAt": "2026-09-24T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w21",
+      "b-w28"
+    ]
+  },
+  {
+    "id": "b-v0050",
+    "companyId": "b",
+    "jobId": "b-j010",
+    "sourceId": "b-v0050",
+    "startAt": "2026-09-23T19:30:00.000Z",
+    "endAt": "2026-09-24T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w22"
+    ]
+  },
+  {
+    "id": "b-v0051",
+    "companyId": "b",
+    "jobId": "b-j012",
+    "sourceId": "b-v0051",
+    "startAt": "2026-09-23T19:30:00.000Z",
+    "endAt": "2026-09-24T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w23"
+    ]
+  },
+  {
+    "id": "b-v0052",
+    "companyId": "b",
+    "jobId": "b-j002",
+    "sourceId": "b-v0052",
+    "startAt": "2026-09-24T14:00:00.000Z",
+    "endAt": "2026-09-24T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w05",
+      "b-w06",
+      "b-w07",
+      "b-w08"
+    ]
+  },
+  {
+    "id": "b-v0053",
+    "companyId": "b",
+    "jobId": "b-j004",
+    "sourceId": "b-v0053",
+    "startAt": "2026-09-24T14:00:00.000Z",
+    "endAt": "2026-09-24T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w09",
+      "b-w10",
+      "b-w11",
+      "b-w12"
+    ]
+  },
+  {
+    "id": "b-v0054",
+    "companyId": "b",
+    "jobId": "b-j006",
+    "sourceId": "b-v0054",
+    "startAt": "2026-09-24T14:00:00.000Z",
+    "endAt": "2026-09-24T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w13",
+      "b-w14",
+      "b-w15",
+      "b-w16"
+    ]
+  },
+  {
+    "id": "b-v0055",
+    "companyId": "b",
+    "jobId": "b-j016",
+    "sourceId": "b-v0055",
+    "startAt": "2026-09-24T15:00:00.000Z",
+    "endAt": "2026-09-24T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w17",
+      "b-w24"
+    ]
+  },
+  {
+    "id": "b-v0056",
+    "companyId": "b",
+    "jobId": "b-j018",
+    "sourceId": "b-v0056",
+    "startAt": "2026-09-24T15:00:00.000Z",
+    "endAt": "2026-09-24T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w18",
+      "b-w25"
+    ]
+  },
+  {
+    "id": "b-v0057",
+    "companyId": "b",
+    "jobId": "b-j020",
+    "sourceId": "b-v0057",
+    "startAt": "2026-09-24T15:00:00.000Z",
+    "endAt": "2026-09-24T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w19",
+      "b-w26"
+    ]
+  },
+  {
+    "id": "b-v0058",
+    "companyId": "b",
+    "jobId": "b-j008",
+    "sourceId": "b-v0058",
+    "startAt": "2026-09-24T15:00:00.000Z",
+    "endAt": "2026-09-24T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w20",
+      "b-w27"
+    ]
+  },
+  {
+    "id": "b-v0059",
+    "companyId": "b",
+    "jobId": "b-j010",
+    "sourceId": "b-v0059",
+    "startAt": "2026-09-24T15:00:00.000Z",
+    "endAt": "2026-09-24T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w21",
+      "b-w28"
+    ]
+  },
+  {
+    "id": "b-v0060",
+    "companyId": "b",
+    "jobId": "b-j012",
+    "sourceId": "b-v0060",
+    "startAt": "2026-09-24T15:00:00.000Z",
+    "endAt": "2026-09-24T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w22"
+    ]
+  },
+  {
+    "id": "b-v0061",
+    "companyId": "b",
+    "jobId": "b-j014",
+    "sourceId": "b-v0061",
+    "startAt": "2026-09-24T15:00:00.000Z",
+    "endAt": "2026-09-24T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w23"
+    ]
+  },
+  {
+    "id": "b-v0062",
+    "companyId": "b",
+    "jobId": "b-j017",
+    "sourceId": "b-v0062",
+    "startAt": "2026-09-24T19:30:00.000Z",
+    "endAt": "2026-09-25T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w17",
+      "b-w24"
+    ]
+  },
+  {
+    "id": "b-v0063",
+    "companyId": "b",
+    "jobId": "b-j019",
+    "sourceId": "b-v0063",
+    "startAt": "2026-09-24T19:30:00.000Z",
+    "endAt": "2026-09-25T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w18",
+      "b-w25"
+    ]
+  },
+  {
+    "id": "b-v0064",
+    "companyId": "b",
+    "jobId": "b-j007",
+    "sourceId": "b-v0064",
+    "startAt": "2026-09-24T19:30:00.000Z",
+    "endAt": "2026-09-25T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w19",
+      "b-w26"
+    ]
+  },
+  {
+    "id": "b-v0065",
+    "companyId": "b",
+    "jobId": "b-j009",
+    "sourceId": "b-v0065",
+    "startAt": "2026-09-24T19:30:00.000Z",
+    "endAt": "2026-09-25T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w20",
+      "b-w27"
+    ]
+  },
+  {
+    "id": "b-v0066",
+    "companyId": "b",
+    "jobId": "b-j011",
+    "sourceId": "b-v0066",
+    "startAt": "2026-09-24T19:30:00.000Z",
+    "endAt": "2026-09-25T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w21",
+      "b-w28"
+    ]
+  },
+  {
+    "id": "b-v0067",
+    "companyId": "b",
+    "jobId": "b-j013",
+    "sourceId": "b-v0067",
+    "startAt": "2026-09-24T19:30:00.000Z",
+    "endAt": "2026-09-25T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w22"
+    ]
+  },
+  {
+    "id": "b-v0068",
+    "companyId": "b",
+    "jobId": "b-j015",
+    "sourceId": "b-v0068",
+    "startAt": "2026-09-24T19:30:00.000Z",
+    "endAt": "2026-09-25T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w23"
+    ]
+  },
+  {
+    "id": "b-v0069",
+    "companyId": "b",
+    "jobId": "b-j002",
+    "sourceId": "b-v0069",
+    "startAt": "2026-09-25T14:00:00.000Z",
+    "endAt": "2026-09-25T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w05",
+      "b-w06",
+      "b-w07",
+      "b-w08"
+    ]
+  },
+  {
+    "id": "b-v0070",
+    "companyId": "b",
+    "jobId": "b-j004",
+    "sourceId": "b-v0070",
+    "startAt": "2026-09-25T14:00:00.000Z",
+    "endAt": "2026-09-25T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w09",
+      "b-w10",
+      "b-w11",
+      "b-w12"
+    ]
+  },
+  {
+    "id": "b-v0071",
+    "companyId": "b",
+    "jobId": "b-j006",
+    "sourceId": "b-v0071",
+    "startAt": "2026-09-25T14:00:00.000Z",
+    "endAt": "2026-09-25T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w13",
+      "b-w14",
+      "b-w15",
+      "b-w16"
+    ]
+  },
+  {
+    "id": "b-v0072",
+    "companyId": "b",
+    "jobId": "b-j019",
+    "sourceId": "b-v0072",
+    "startAt": "2026-09-25T15:00:00.000Z",
+    "endAt": "2026-09-25T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w17",
+      "b-w24"
+    ]
+  },
+  {
+    "id": "b-v0073",
+    "companyId": "b",
+    "jobId": "b-j007",
+    "sourceId": "b-v0073",
+    "startAt": "2026-09-25T15:00:00.000Z",
+    "endAt": "2026-09-25T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w18",
+      "b-w25"
+    ]
+  },
+  {
+    "id": "b-v0074",
+    "companyId": "b",
+    "jobId": "b-j009",
+    "sourceId": "b-v0074",
+    "startAt": "2026-09-25T15:00:00.000Z",
+    "endAt": "2026-09-25T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w19",
+      "b-w26"
+    ]
+  },
+  {
+    "id": "b-v0075",
+    "companyId": "b",
+    "jobId": "b-j011",
+    "sourceId": "b-v0075",
+    "startAt": "2026-09-25T15:00:00.000Z",
+    "endAt": "2026-09-25T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w20",
+      "b-w27"
+    ]
+  },
+  {
+    "id": "b-v0076",
+    "companyId": "b",
+    "jobId": "b-j013",
+    "sourceId": "b-v0076",
+    "startAt": "2026-09-25T15:00:00.000Z",
+    "endAt": "2026-09-25T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w21",
+      "b-w28"
+    ]
+  },
+  {
+    "id": "b-v0077",
+    "companyId": "b",
+    "jobId": "b-j015",
+    "sourceId": "b-v0077",
+    "startAt": "2026-09-25T15:00:00.000Z",
+    "endAt": "2026-09-25T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w22"
+    ]
+  },
+  {
+    "id": "b-v0078",
+    "companyId": "b",
+    "jobId": "b-j017",
+    "sourceId": "b-v0078",
+    "startAt": "2026-09-25T15:00:00.000Z",
+    "endAt": "2026-09-25T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w23"
+    ]
+  },
+  {
+    "id": "b-v0079",
+    "companyId": "b",
+    "jobId": "b-j020",
+    "sourceId": "b-v0079",
+    "startAt": "2026-09-25T19:30:00.000Z",
+    "endAt": "2026-09-26T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w17",
+      "b-w24"
+    ]
+  },
+  {
+    "id": "b-v0080",
+    "companyId": "b",
+    "jobId": "b-j008",
+    "sourceId": "b-v0080",
+    "startAt": "2026-09-25T19:30:00.000Z",
+    "endAt": "2026-09-26T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w18",
+      "b-w25"
+    ]
+  },
+  {
+    "id": "b-v0081",
+    "companyId": "b",
+    "jobId": "b-j010",
+    "sourceId": "b-v0081",
+    "startAt": "2026-09-25T19:30:00.000Z",
+    "endAt": "2026-09-26T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w19",
+      "b-w26"
+    ]
+  },
+  {
+    "id": "b-v0082",
+    "companyId": "b",
+    "jobId": "b-j012",
+    "sourceId": "b-v0082",
+    "startAt": "2026-09-25T19:30:00.000Z",
+    "endAt": "2026-09-26T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w20",
+      "b-w27"
+    ]
+  },
+  {
+    "id": "b-v0083",
+    "companyId": "b",
+    "jobId": "b-j014",
+    "sourceId": "b-v0083",
+    "startAt": "2026-09-25T19:30:00.000Z",
+    "endAt": "2026-09-26T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w21",
+      "b-w28"
+    ]
+  },
+  {
+    "id": "b-v0084",
+    "companyId": "b",
+    "jobId": "b-j016",
+    "sourceId": "b-v0084",
+    "startAt": "2026-09-25T19:30:00.000Z",
+    "endAt": "2026-09-26T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w22"
+    ]
+  },
+  {
+    "id": "b-v0085",
+    "companyId": "b",
+    "jobId": "b-j018",
+    "sourceId": "b-v0085",
+    "startAt": "2026-09-25T19:30:00.000Z",
+    "endAt": "2026-09-26T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w23"
+    ]
+  },
+  {
+    "id": "b-v0086",
+    "companyId": "b",
+    "jobId": "b-j004",
+    "sourceId": "b-v0086",
+    "startAt": "2026-09-26T14:00:00.000Z",
+    "endAt": "2026-09-26T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w09",
+      "b-w10",
+      "b-w11",
+      "b-w12"
+    ]
+  },
+  {
+    "id": "b-v0087",
+    "companyId": "b",
+    "jobId": "b-j007",
+    "sourceId": "b-v0087",
+    "startAt": "2026-09-26T16:00:00.000Z",
+    "endAt": "2026-09-26T20:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w18"
+    ]
+  },
+  {
+    "id": "b-v0088",
+    "companyId": "b",
+    "jobId": "b-j021",
+    "sourceId": "b-v0088",
+    "startAt": "2026-09-28T14:00:00.000Z",
+    "endAt": "2026-09-28T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w05",
+      "b-w06",
+      "b-w07",
+      "b-w08"
+    ]
+  },
+  {
+    "id": "b-v0089",
+    "companyId": "b",
+    "jobId": "b-j023",
+    "sourceId": "b-v0089",
+    "startAt": "2026-09-28T14:00:00.000Z",
+    "endAt": "2026-09-28T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w09",
+      "b-w10",
+      "b-w11",
+      "b-w12"
+    ]
+  },
+  {
+    "id": "b-v0090",
+    "companyId": "b",
+    "jobId": "b-j025",
+    "sourceId": "b-v0090",
+    "startAt": "2026-09-28T14:00:00.000Z",
+    "endAt": "2026-09-28T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w13",
+      "b-w14",
+      "b-w15",
+      "b-w16"
+    ]
+  },
+  {
+    "id": "b-v0091",
+    "companyId": "b",
+    "jobId": "b-j027",
+    "sourceId": "b-v0091",
+    "startAt": "2026-09-28T15:00:00.000Z",
+    "endAt": "2026-09-28T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w17",
+      "b-w24"
+    ]
+  },
+  {
+    "id": "b-v0092",
+    "companyId": "b",
+    "jobId": "b-j029",
+    "sourceId": "b-v0092",
+    "startAt": "2026-09-28T15:00:00.000Z",
+    "endAt": "2026-09-28T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w18",
+      "b-w25"
+    ]
+  },
+  {
+    "id": "b-v0093",
+    "companyId": "b",
+    "jobId": "b-j031",
+    "sourceId": "b-v0093",
+    "startAt": "2026-09-28T15:00:00.000Z",
+    "endAt": "2026-09-28T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w19",
+      "b-w26"
+    ]
+  },
+  {
+    "id": "b-v0094",
+    "companyId": "b",
+    "jobId": "b-j033",
+    "sourceId": "b-v0094",
+    "startAt": "2026-09-28T15:00:00.000Z",
+    "endAt": "2026-09-28T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w20",
+      "b-w27"
+    ]
+  },
+  {
+    "id": "b-v0095",
+    "companyId": "b",
+    "jobId": "b-j035",
+    "sourceId": "b-v0095",
+    "startAt": "2026-09-28T15:00:00.000Z",
+    "endAt": "2026-09-28T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w21",
+      "b-w28"
+    ]
+  },
+  {
+    "id": "b-v0096",
+    "companyId": "b",
+    "jobId": "b-j037",
+    "sourceId": "b-v0096",
+    "startAt": "2026-09-28T15:00:00.000Z",
+    "endAt": "2026-09-28T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w22"
+    ]
+  },
+  {
+    "id": "b-v0097",
+    "companyId": "b",
+    "jobId": "b-j039",
+    "sourceId": "b-v0097",
+    "startAt": "2026-09-28T15:00:00.000Z",
+    "endAt": "2026-09-28T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w23"
+    ]
+  },
+  {
+    "id": "b-v0098",
+    "companyId": "b",
+    "jobId": "b-j028",
+    "sourceId": "b-v0098",
+    "startAt": "2026-09-28T19:30:00.000Z",
+    "endAt": "2026-09-29T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w17",
+      "b-w24"
+    ]
+  },
+  {
+    "id": "b-v0099",
+    "companyId": "b",
+    "jobId": "b-j030",
+    "sourceId": "b-v0099",
+    "startAt": "2026-09-28T19:30:00.000Z",
+    "endAt": "2026-09-29T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w18",
+      "b-w25"
+    ]
+  },
+  {
+    "id": "b-v0100",
+    "companyId": "b",
+    "jobId": "b-j032",
+    "sourceId": "b-v0100",
+    "startAt": "2026-09-28T19:30:00.000Z",
+    "endAt": "2026-09-29T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w19",
+      "b-w26"
+    ]
+  },
+  {
+    "id": "b-v0101",
+    "companyId": "b",
+    "jobId": "b-j034",
+    "sourceId": "b-v0101",
+    "startAt": "2026-09-28T19:30:00.000Z",
+    "endAt": "2026-09-29T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w20",
+      "b-w27"
+    ]
+  },
+  {
+    "id": "b-v0102",
+    "companyId": "b",
+    "jobId": "b-j036",
+    "sourceId": "b-v0102",
+    "startAt": "2026-09-28T19:30:00.000Z",
+    "endAt": "2026-09-29T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w21",
+      "b-w28"
+    ]
+  },
+  {
+    "id": "b-v0103",
+    "companyId": "b",
+    "jobId": "b-j038",
+    "sourceId": "b-v0103",
+    "startAt": "2026-09-28T19:30:00.000Z",
+    "endAt": "2026-09-29T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w22"
+    ]
+  },
+  {
+    "id": "b-v0104",
+    "companyId": "b",
+    "jobId": "b-j040",
+    "sourceId": "b-v0104",
+    "startAt": "2026-09-28T19:30:00.000Z",
+    "endAt": "2026-09-29T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w23"
+    ]
+  },
+  {
+    "id": "b-v0105",
+    "companyId": "b",
+    "jobId": "b-j021",
+    "sourceId": "b-v0105",
+    "startAt": "2026-09-29T14:00:00.000Z",
+    "endAt": "2026-09-29T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w05",
+      "b-w06",
+      "b-w07",
+      "b-w08"
+    ]
+  },
+  {
+    "id": "b-v0106",
+    "companyId": "b",
+    "jobId": "b-j023",
+    "sourceId": "b-v0106",
+    "startAt": "2026-09-29T14:00:00.000Z",
+    "endAt": "2026-09-29T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w09",
+      "b-w10",
+      "b-w11",
+      "b-w12"
+    ]
+  },
+  {
+    "id": "b-v0107",
+    "companyId": "b",
+    "jobId": "b-j025",
+    "sourceId": "b-v0107",
+    "startAt": "2026-09-29T14:00:00.000Z",
+    "endAt": "2026-09-29T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w13",
+      "b-w14",
+      "b-w15",
+      "b-w16"
+    ]
+  },
+  {
+    "id": "b-v0108",
+    "companyId": "b",
+    "jobId": "b-j030",
+    "sourceId": "b-v0108",
+    "startAt": "2026-09-29T15:00:00.000Z",
+    "endAt": "2026-09-29T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w17",
+      "b-w24"
+    ]
+  },
+  {
+    "id": "b-v0109",
+    "companyId": "b",
+    "jobId": "b-j032",
+    "sourceId": "b-v0109",
+    "startAt": "2026-09-29T15:00:00.000Z",
+    "endAt": "2026-09-29T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w18",
+      "b-w25"
+    ]
+  },
+  {
+    "id": "b-v0110",
+    "companyId": "b",
+    "jobId": "b-j034",
+    "sourceId": "b-v0110",
+    "startAt": "2026-09-29T15:00:00.000Z",
+    "endAt": "2026-09-29T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w19",
+      "b-w26"
+    ]
+  },
+  {
+    "id": "b-v0111",
+    "companyId": "b",
+    "jobId": "b-j036",
+    "sourceId": "b-v0111",
+    "startAt": "2026-09-29T15:00:00.000Z",
+    "endAt": "2026-09-29T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w20",
+      "b-w27"
+    ]
+  },
+  {
+    "id": "b-v0112",
+    "companyId": "b",
+    "jobId": "b-j038",
+    "sourceId": "b-v0112",
+    "startAt": "2026-09-29T15:00:00.000Z",
+    "endAt": "2026-09-29T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w21",
+      "b-w28"
+    ]
+  },
+  {
+    "id": "b-v0113",
+    "companyId": "b",
+    "jobId": "b-j040",
+    "sourceId": "b-v0113",
+    "startAt": "2026-09-29T15:00:00.000Z",
+    "endAt": "2026-09-29T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w22"
+    ]
+  },
+  {
+    "id": "b-v0114",
+    "companyId": "b",
+    "jobId": "b-j028",
+    "sourceId": "b-v0114",
+    "startAt": "2026-09-29T15:00:00.000Z",
+    "endAt": "2026-09-29T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w23"
+    ]
+  },
+  {
+    "id": "b-v0115",
+    "companyId": "b",
+    "jobId": "b-j031",
+    "sourceId": "b-v0115",
+    "startAt": "2026-09-29T19:30:00.000Z",
+    "endAt": "2026-09-30T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w17",
+      "b-w24"
+    ]
+  },
+  {
+    "id": "b-v0116",
+    "companyId": "b",
+    "jobId": "b-j033",
+    "sourceId": "b-v0116",
+    "startAt": "2026-09-29T19:30:00.000Z",
+    "endAt": "2026-09-30T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w18",
+      "b-w25"
+    ]
+  },
+  {
+    "id": "b-v0117",
+    "companyId": "b",
+    "jobId": "b-j035",
+    "sourceId": "b-v0117",
+    "startAt": "2026-09-29T19:30:00.000Z",
+    "endAt": "2026-09-30T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w19",
+      "b-w26"
+    ]
+  },
+  {
+    "id": "b-v0118",
+    "companyId": "b",
+    "jobId": "b-j037",
+    "sourceId": "b-v0118",
+    "startAt": "2026-09-29T19:30:00.000Z",
+    "endAt": "2026-09-30T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w20",
+      "b-w27"
+    ]
+  },
+  {
+    "id": "b-v0119",
+    "companyId": "b",
+    "jobId": "b-j039",
+    "sourceId": "b-v0119",
+    "startAt": "2026-09-29T19:30:00.000Z",
+    "endAt": "2026-09-30T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w21",
+      "b-w28"
+    ]
+  },
+  {
+    "id": "b-v0120",
+    "companyId": "b",
+    "jobId": "b-j027",
+    "sourceId": "b-v0120",
+    "startAt": "2026-09-29T19:30:00.000Z",
+    "endAt": "2026-09-30T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w22"
+    ]
+  },
+  {
+    "id": "b-v0121",
+    "companyId": "b",
+    "jobId": "b-j029",
+    "sourceId": "b-v0121",
+    "startAt": "2026-09-29T19:30:00.000Z",
+    "endAt": "2026-09-30T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w23"
+    ]
+  },
+  {
+    "id": "b-v0122",
+    "companyId": "b",
+    "jobId": "b-j022",
+    "sourceId": "b-v0122",
+    "startAt": "2026-09-30T14:00:00.000Z",
+    "endAt": "2026-09-30T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w05",
+      "b-w06",
+      "b-w07",
+      "b-w08"
+    ]
+  },
+  {
+    "id": "b-v0123",
+    "companyId": "b",
+    "jobId": "b-j024",
+    "sourceId": "b-v0123",
+    "startAt": "2026-09-30T14:00:00.000Z",
+    "endAt": "2026-09-30T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w09",
+      "b-w10",
+      "b-w11",
+      "b-w12"
+    ]
+  },
+  {
+    "id": "b-v0124",
+    "companyId": "b",
+    "jobId": "b-j025",
+    "sourceId": "b-v0124",
+    "startAt": "2026-09-30T14:00:00.000Z",
+    "endAt": "2026-09-30T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w13",
+      "b-w14",
+      "b-w15",
+      "b-w16"
+    ]
+  },
+  {
+    "id": "b-v0125",
+    "companyId": "b",
+    "jobId": "b-j033",
+    "sourceId": "b-v0125",
+    "startAt": "2026-09-30T15:00:00.000Z",
+    "endAt": "2026-09-30T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w17",
+      "b-w24"
+    ]
+  },
+  {
+    "id": "b-v0126",
+    "companyId": "b",
+    "jobId": "b-j035",
+    "sourceId": "b-v0126",
+    "startAt": "2026-09-30T15:00:00.000Z",
+    "endAt": "2026-09-30T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w18",
+      "b-w25"
+    ]
+  },
+  {
+    "id": "b-v0127",
+    "companyId": "b",
+    "jobId": "b-j037",
+    "sourceId": "b-v0127",
+    "startAt": "2026-09-30T15:00:00.000Z",
+    "endAt": "2026-09-30T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w19",
+      "b-w26"
+    ]
+  },
+  {
+    "id": "b-v0128",
+    "companyId": "b",
+    "jobId": "b-j039",
+    "sourceId": "b-v0128",
+    "startAt": "2026-09-30T15:00:00.000Z",
+    "endAt": "2026-09-30T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w20",
+      "b-w27"
+    ]
+  },
+  {
+    "id": "b-v0129",
+    "companyId": "b",
+    "jobId": "b-j027",
+    "sourceId": "b-v0129",
+    "startAt": "2026-09-30T15:00:00.000Z",
+    "endAt": "2026-09-30T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w21",
+      "b-w28"
+    ]
+  },
+  {
+    "id": "b-v0130",
+    "companyId": "b",
+    "jobId": "b-j029",
+    "sourceId": "b-v0130",
+    "startAt": "2026-09-30T15:00:00.000Z",
+    "endAt": "2026-09-30T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w22"
+    ]
+  },
+  {
+    "id": "b-v0131",
+    "companyId": "b",
+    "jobId": "b-j031",
+    "sourceId": "b-v0131",
+    "startAt": "2026-09-30T15:00:00.000Z",
+    "endAt": "2026-09-30T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w23"
+    ]
+  },
+  {
+    "id": "b-v0132",
+    "companyId": "b",
+    "jobId": "b-j034",
+    "sourceId": "b-v0132",
+    "startAt": "2026-09-30T19:30:00.000Z",
+    "endAt": "2026-10-01T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w17",
+      "b-w24"
+    ]
+  },
+  {
+    "id": "b-v0133",
+    "companyId": "b",
+    "jobId": "b-j036",
+    "sourceId": "b-v0133",
+    "startAt": "2026-09-30T19:30:00.000Z",
+    "endAt": "2026-10-01T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w18",
+      "b-w25"
+    ]
+  },
+  {
+    "id": "b-v0134",
+    "companyId": "b",
+    "jobId": "b-j038",
+    "sourceId": "b-v0134",
+    "startAt": "2026-09-30T19:30:00.000Z",
+    "endAt": "2026-10-01T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w19",
+      "b-w26"
+    ]
+  },
+  {
+    "id": "b-v0135",
+    "companyId": "b",
+    "jobId": "b-j040",
+    "sourceId": "b-v0135",
+    "startAt": "2026-09-30T19:30:00.000Z",
+    "endAt": "2026-10-01T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w20",
+      "b-w27"
+    ]
+  },
+  {
+    "id": "b-v0136",
+    "companyId": "b",
+    "jobId": "b-j028",
+    "sourceId": "b-v0136",
+    "startAt": "2026-09-30T19:30:00.000Z",
+    "endAt": "2026-10-01T04:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w21",
+      "b-w27",
+      "b-w28"
+    ]
+  },
+  {
+    "id": "b-v0137",
+    "companyId": "b",
+    "jobId": "b-j030",
+    "sourceId": "b-v0137",
+    "startAt": "2026-09-30T19:30:00.000Z",
+    "endAt": "2026-10-01T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w22"
+    ]
+  },
+  {
+    "id": "b-v0138",
+    "companyId": "b",
+    "jobId": "b-j032",
+    "sourceId": "b-v0138",
+    "startAt": "2026-09-30T19:30:00.000Z",
+    "endAt": "2026-10-01T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w23"
+    ]
+  },
+  {
+    "id": "b-v0139",
+    "companyId": "b",
+    "jobId": "b-j022",
+    "sourceId": "b-v0139",
+    "startAt": "2026-10-01T14:00:00.000Z",
+    "endAt": "2026-10-01T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w05",
+      "b-w06",
+      "b-w07",
+      "b-w08"
+    ]
+  },
+  {
+    "id": "b-v0140",
+    "companyId": "b",
+    "jobId": "b-j024",
+    "sourceId": "b-v0140",
+    "startAt": "2026-10-01T14:00:00.000Z",
+    "endAt": "2026-10-01T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w09",
+      "b-w10",
+      "b-w11",
+      "b-w12"
+    ]
+  },
+  {
+    "id": "b-v0141",
+    "companyId": "b",
+    "jobId": "b-j026",
+    "sourceId": "b-v0141",
+    "startAt": "2026-10-01T14:00:00.000Z",
+    "endAt": "2026-10-01T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w13",
+      "b-w14",
+      "b-w15",
+      "b-w16"
+    ]
+  },
+  {
+    "id": "b-v0142",
+    "companyId": "b",
+    "jobId": "b-j036",
+    "sourceId": "b-v0142",
+    "startAt": "2026-10-01T15:00:00.000Z",
+    "endAt": "2026-10-01T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w17",
+      "b-w24"
+    ]
+  },
+  {
+    "id": "b-v0143",
+    "companyId": "b",
+    "jobId": "b-j038",
+    "sourceId": "b-v0143",
+    "startAt": "2026-10-01T15:00:00.000Z",
+    "endAt": "2026-10-01T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w18",
+      "b-w25"
+    ]
+  },
+  {
+    "id": "b-v0144",
+    "companyId": "b",
+    "jobId": "b-j040",
+    "sourceId": "b-v0144",
+    "startAt": "2026-10-01T15:00:00.000Z",
+    "endAt": "2026-10-01T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w19",
+      "b-w26"
+    ]
+  },
+  {
+    "id": "b-v0145",
+    "companyId": "b",
+    "jobId": "b-j028",
+    "sourceId": "b-v0145",
+    "startAt": "2026-10-01T15:00:00.000Z",
+    "endAt": "2026-10-01T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w20",
+      "b-w27"
+    ]
+  },
+  {
+    "id": "b-v0146",
+    "companyId": "b",
+    "jobId": "b-j030",
+    "sourceId": "b-v0146",
+    "startAt": "2026-10-01T15:00:00.000Z",
+    "endAt": "2026-10-01T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w21",
+      "b-w28"
+    ]
+  },
+  {
+    "id": "b-v0147",
+    "companyId": "b",
+    "jobId": "b-j032",
+    "sourceId": "b-v0147",
+    "startAt": "2026-10-01T15:00:00.000Z",
+    "endAt": "2026-10-01T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w22"
+    ]
+  },
+  {
+    "id": "b-v0148",
+    "companyId": "b",
+    "jobId": "b-j034",
+    "sourceId": "b-v0148",
+    "startAt": "2026-10-01T15:00:00.000Z",
+    "endAt": "2026-10-01T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w23"
+    ]
+  },
+  {
+    "id": "b-v0149",
+    "companyId": "b",
+    "jobId": "b-j037",
+    "sourceId": "b-v0149",
+    "startAt": "2026-10-01T19:30:00.000Z",
+    "endAt": "2026-10-02T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w17",
+      "b-w24"
+    ]
+  },
+  {
+    "id": "b-v0150",
+    "companyId": "b",
+    "jobId": "b-j039",
+    "sourceId": "b-v0150",
+    "startAt": "2026-10-01T19:30:00.000Z",
+    "endAt": "2026-10-02T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w18",
+      "b-w25"
+    ]
+  },
+  {
+    "id": "b-v0151",
+    "companyId": "b",
+    "jobId": "b-j027",
+    "sourceId": "b-v0151",
+    "startAt": "2026-10-01T19:30:00.000Z",
+    "endAt": "2026-10-02T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w19",
+      "b-w26"
+    ]
+  },
+  {
+    "id": "b-v0152",
+    "companyId": "b",
+    "jobId": "b-j029",
+    "sourceId": "b-v0152",
+    "startAt": "2026-10-01T19:30:00.000Z",
+    "endAt": "2026-10-02T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w20",
+      "b-w27"
+    ]
+  },
+  {
+    "id": "b-v0153",
+    "companyId": "b",
+    "jobId": "b-j031",
+    "sourceId": "b-v0153",
+    "startAt": "2026-10-01T19:30:00.000Z",
+    "endAt": "2026-10-02T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w21",
+      "b-w28"
+    ]
+  },
+  {
+    "id": "b-v0154",
+    "companyId": "b",
+    "jobId": "b-j033",
+    "sourceId": "b-v0154",
+    "startAt": "2026-10-01T19:30:00.000Z",
+    "endAt": "2026-10-02T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w22"
+    ]
+  },
+  {
+    "id": "b-v0155",
+    "companyId": "b",
+    "jobId": "b-j035",
+    "sourceId": "b-v0155",
+    "startAt": "2026-10-01T19:30:00.000Z",
+    "endAt": "2026-10-02T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w23"
+    ]
+  },
+  {
+    "id": "b-v0156",
+    "companyId": "b",
+    "jobId": "b-j022",
+    "sourceId": "b-v0156",
+    "startAt": "2026-10-02T14:00:00.000Z",
+    "endAt": "2026-10-02T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w05",
+      "b-w06",
+      "b-w07",
+      "b-w08"
+    ]
+  },
+  {
+    "id": "b-v0157",
+    "companyId": "b",
+    "jobId": "b-j024",
+    "sourceId": "b-v0157",
+    "startAt": "2026-10-02T14:00:00.000Z",
+    "endAt": "2026-10-02T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w09",
+      "b-w10",
+      "b-w11",
+      "b-w12"
+    ]
+  },
+  {
+    "id": "b-v0158",
+    "companyId": "b",
+    "jobId": "b-j026",
+    "sourceId": "b-v0158",
+    "startAt": "2026-10-02T14:00:00.000Z",
+    "endAt": "2026-10-02T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w13",
+      "b-w14",
+      "b-w15",
+      "b-w16"
+    ]
+  },
+  {
+    "id": "b-v0159",
+    "companyId": "b",
+    "jobId": "b-j039",
+    "sourceId": "b-v0159",
+    "startAt": "2026-10-02T15:00:00.000Z",
+    "endAt": "2026-10-02T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w17",
+      "b-w24"
+    ]
+  },
+  {
+    "id": "b-v0160",
+    "companyId": "b",
+    "jobId": "b-j027",
+    "sourceId": "b-v0160",
+    "startAt": "2026-10-02T15:00:00.000Z",
+    "endAt": "2026-10-02T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w18",
+      "b-w25"
+    ]
+  },
+  {
+    "id": "b-v0161",
+    "companyId": "b",
+    "jobId": "b-j029",
+    "sourceId": "b-v0161",
+    "startAt": "2026-10-02T15:00:00.000Z",
+    "endAt": "2026-10-02T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w19",
+      "b-w26"
+    ]
+  },
+  {
+    "id": "b-v0162",
+    "companyId": "b",
+    "jobId": "b-j031",
+    "sourceId": "b-v0162",
+    "startAt": "2026-10-02T15:00:00.000Z",
+    "endAt": "2026-10-02T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w20",
+      "b-w27"
+    ]
+  },
+  {
+    "id": "b-v0163",
+    "companyId": "b",
+    "jobId": "b-j033",
+    "sourceId": "b-v0163",
+    "startAt": "2026-10-02T15:00:00.000Z",
+    "endAt": "2026-10-02T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w21",
+      "b-w28"
+    ]
+  },
+  {
+    "id": "b-v0164",
+    "companyId": "b",
+    "jobId": "b-j035",
+    "sourceId": "b-v0164",
+    "startAt": "2026-10-02T15:00:00.000Z",
+    "endAt": "2026-10-02T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w22"
+    ]
+  },
+  {
+    "id": "b-v0165",
+    "companyId": "b",
+    "jobId": "b-j037",
+    "sourceId": "b-v0165",
+    "startAt": "2026-10-02T15:00:00.000Z",
+    "endAt": "2026-10-02T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w23"
+    ]
+  },
+  {
+    "id": "b-v0166",
+    "companyId": "b",
+    "jobId": "b-j040",
+    "sourceId": "b-v0166",
+    "startAt": "2026-10-02T19:30:00.000Z",
+    "endAt": "2026-10-03T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w17",
+      "b-w24"
+    ]
+  },
+  {
+    "id": "b-v0167",
+    "companyId": "b",
+    "jobId": "b-j028",
+    "sourceId": "b-v0167",
+    "startAt": "2026-10-02T19:30:00.000Z",
+    "endAt": "2026-10-03T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w18",
+      "b-w25"
+    ]
+  },
+  {
+    "id": "b-v0168",
+    "companyId": "b",
+    "jobId": "b-j030",
+    "sourceId": "b-v0168",
+    "startAt": "2026-10-02T19:30:00.000Z",
+    "endAt": "2026-10-03T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w19",
+      "b-w26"
+    ]
+  },
+  {
+    "id": "b-v0169",
+    "companyId": "b",
+    "jobId": "b-j032",
+    "sourceId": "b-v0169",
+    "startAt": "2026-10-02T19:30:00.000Z",
+    "endAt": "2026-10-03T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w20",
+      "b-w27"
+    ]
+  },
+  {
+    "id": "b-v0170",
+    "companyId": "b",
+    "jobId": "b-j034",
+    "sourceId": "b-v0170",
+    "startAt": "2026-10-02T19:30:00.000Z",
+    "endAt": "2026-10-03T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w21",
+      "b-w28"
+    ]
+  },
+  {
+    "id": "b-v0171",
+    "companyId": "b",
+    "jobId": "b-j036",
+    "sourceId": "b-v0171",
+    "startAt": "2026-10-02T19:30:00.000Z",
+    "endAt": "2026-10-03T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w22"
+    ]
+  },
+  {
+    "id": "b-v0172",
+    "companyId": "b",
+    "jobId": "b-j038",
+    "sourceId": "b-v0172",
+    "startAt": "2026-10-02T19:30:00.000Z",
+    "endAt": "2026-10-03T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w23"
+    ]
+  },
+  {
+    "id": "b-v0173",
+    "companyId": "b",
+    "jobId": "b-j026",
+    "sourceId": "b-v0173",
+    "startAt": "2026-10-03T14:00:00.000Z",
+    "endAt": "2026-10-03T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w13",
+      "b-w14",
+      "b-w15",
+      "b-w16"
+    ]
+  },
+  {
+    "id": "b-v0174",
+    "companyId": "b",
+    "jobId": "b-j027",
+    "sourceId": "b-v0174",
+    "startAt": "2026-10-03T16:00:00.000Z",
+    "endAt": "2026-10-03T20:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w19"
+    ]
+  },
+  {
+    "id": "b-v0175",
+    "companyId": "b",
+    "jobId": "b-j041",
+    "sourceId": "b-v0175",
+    "startAt": "2026-10-05T14:00:00.000Z",
+    "endAt": "2026-10-05T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w05",
+      "b-w06",
+      "b-w07",
+      "b-w08"
+    ]
+  },
+  {
+    "id": "b-v0176",
+    "companyId": "b",
+    "jobId": "b-j043",
+    "sourceId": "b-v0176",
+    "startAt": "2026-10-05T14:00:00.000Z",
+    "endAt": "2026-10-05T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w09",
+      "b-w10",
+      "b-w11",
+      "b-w12"
+    ]
+  },
+  {
+    "id": "b-v0177",
+    "companyId": "b",
+    "jobId": "b-j045",
+    "sourceId": "b-v0177",
+    "startAt": "2026-10-05T14:00:00.000Z",
+    "endAt": "2026-10-05T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w13",
+      "b-w14",
+      "b-w15",
+      "b-w16"
+    ]
+  },
+  {
+    "id": "b-v0178",
+    "companyId": "b",
+    "jobId": "b-j047",
+    "sourceId": "b-v0178",
+    "startAt": "2026-10-05T15:00:00.000Z",
+    "endAt": "2026-10-05T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w17",
+      "b-w24"
+    ]
+  },
+  {
+    "id": "b-v0179",
+    "companyId": "b",
+    "jobId": "b-j049",
+    "sourceId": "b-v0179",
+    "startAt": "2026-10-05T15:00:00.000Z",
+    "endAt": "2026-10-05T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w18",
+      "b-w25"
+    ]
+  },
+  {
+    "id": "b-v0180",
+    "companyId": "b",
+    "jobId": "b-j051",
+    "sourceId": "b-v0180",
+    "startAt": "2026-10-05T15:00:00.000Z",
+    "endAt": "2026-10-05T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w19",
+      "b-w26"
+    ]
+  },
+  {
+    "id": "b-v0181",
+    "companyId": "b",
+    "jobId": "b-j053",
+    "sourceId": "b-v0181",
+    "startAt": "2026-10-05T15:00:00.000Z",
+    "endAt": "2026-10-05T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w20",
+      "b-w27"
+    ]
+  },
+  {
+    "id": "b-v0182",
+    "companyId": "b",
+    "jobId": "b-j055",
+    "sourceId": "b-v0182",
+    "startAt": "2026-10-05T15:00:00.000Z",
+    "endAt": "2026-10-05T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w21",
+      "b-w28"
+    ]
+  },
+  {
+    "id": "b-v0183",
+    "companyId": "b",
+    "jobId": "b-j057",
+    "sourceId": "b-v0183",
+    "startAt": "2026-10-05T15:00:00.000Z",
+    "endAt": "2026-10-05T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w22"
+    ]
+  },
+  {
+    "id": "b-v0184",
+    "companyId": "b",
+    "jobId": "b-j059",
+    "sourceId": "b-v0184",
+    "startAt": "2026-10-05T15:00:00.000Z",
+    "endAt": "2026-10-05T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w23"
+    ]
+  },
+  {
+    "id": "b-v0185",
+    "companyId": "b",
+    "jobId": "b-j048",
+    "sourceId": "b-v0185",
+    "startAt": "2026-10-05T19:30:00.000Z",
+    "endAt": "2026-10-06T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w17",
+      "b-w24"
+    ]
+  },
+  {
+    "id": "b-v0186",
+    "companyId": "b",
+    "jobId": "b-j050",
+    "sourceId": "b-v0186",
+    "startAt": "2026-10-05T19:30:00.000Z",
+    "endAt": "2026-10-06T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w18",
+      "b-w25"
+    ]
+  },
+  {
+    "id": "b-v0187",
+    "companyId": "b",
+    "jobId": "b-j052",
+    "sourceId": "b-v0187",
+    "startAt": "2026-10-05T19:30:00.000Z",
+    "endAt": "2026-10-06T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w19",
+      "b-w26"
+    ]
+  },
+  {
+    "id": "b-v0188",
+    "companyId": "b",
+    "jobId": "b-j054",
+    "sourceId": "b-v0188",
+    "startAt": "2026-10-05T19:30:00.000Z",
+    "endAt": "2026-10-06T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w20",
+      "b-w27"
+    ]
+  },
+  {
+    "id": "b-v0189",
+    "companyId": "b",
+    "jobId": "b-j056",
+    "sourceId": "b-v0189",
+    "startAt": "2026-10-05T19:30:00.000Z",
+    "endAt": "2026-10-06T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w21",
+      "b-w28"
+    ]
+  },
+  {
+    "id": "b-v0190",
+    "companyId": "b",
+    "jobId": "b-j058",
+    "sourceId": "b-v0190",
+    "startAt": "2026-10-05T19:30:00.000Z",
+    "endAt": "2026-10-06T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w22"
+    ]
+  },
+  {
+    "id": "b-v0191",
+    "companyId": "b",
+    "jobId": "b-j060",
+    "sourceId": "b-v0191",
+    "startAt": "2026-10-05T19:30:00.000Z",
+    "endAt": "2026-10-06T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w23"
+    ]
+  },
+  {
+    "id": "b-v0192",
+    "companyId": "b",
+    "jobId": "b-j041",
+    "sourceId": "b-v0192",
+    "startAt": "2026-10-06T14:00:00.000Z",
+    "endAt": "2026-10-06T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w05",
+      "b-w06",
+      "b-w07",
+      "b-w08"
+    ]
+  },
+  {
+    "id": "b-v0193",
+    "companyId": "b",
+    "jobId": "b-j043",
+    "sourceId": "b-v0193",
+    "startAt": "2026-10-06T14:00:00.000Z",
+    "endAt": "2026-10-06T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w09",
+      "b-w10",
+      "b-w11",
+      "b-w12"
+    ]
+  },
+  {
+    "id": "b-v0194",
+    "companyId": "b",
+    "jobId": "b-j045",
+    "sourceId": "b-v0194",
+    "startAt": "2026-10-06T14:00:00.000Z",
+    "endAt": "2026-10-06T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w13",
+      "b-w14",
+      "b-w15",
+      "b-w16"
+    ]
+  },
+  {
+    "id": "b-v0195",
+    "companyId": "b",
+    "jobId": "b-j050",
+    "sourceId": "b-v0195",
+    "startAt": "2026-10-06T15:00:00.000Z",
+    "endAt": "2026-10-06T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w17",
+      "b-w24"
+    ]
+  },
+  {
+    "id": "b-v0196",
+    "companyId": "b",
+    "jobId": "b-j052",
+    "sourceId": "b-v0196",
+    "startAt": "2026-10-06T15:00:00.000Z",
+    "endAt": "2026-10-06T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w18",
+      "b-w25"
+    ]
+  },
+  {
+    "id": "b-v0197",
+    "companyId": "b",
+    "jobId": "b-j054",
+    "sourceId": "b-v0197",
+    "startAt": "2026-10-06T15:00:00.000Z",
+    "endAt": "2026-10-06T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w19",
+      "b-w26"
+    ]
+  },
+  {
+    "id": "b-v0198",
+    "companyId": "b",
+    "jobId": "b-j056",
+    "sourceId": "b-v0198",
+    "startAt": "2026-10-06T15:00:00.000Z",
+    "endAt": "2026-10-06T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w20",
+      "b-w27"
+    ]
+  },
+  {
+    "id": "b-v0199",
+    "companyId": "b",
+    "jobId": "b-j058",
+    "sourceId": "b-v0199",
+    "startAt": "2026-10-06T15:00:00.000Z",
+    "endAt": "2026-10-06T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w21",
+      "b-w28"
+    ]
+  },
+  {
+    "id": "b-v0200",
+    "companyId": "b",
+    "jobId": "b-j060",
+    "sourceId": "b-v0200",
+    "startAt": "2026-10-06T15:00:00.000Z",
+    "endAt": "2026-10-06T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w22"
+    ]
+  },
+  {
+    "id": "b-v0201",
+    "companyId": "b",
+    "jobId": "b-j048",
+    "sourceId": "b-v0201",
+    "startAt": "2026-10-06T15:00:00.000Z",
+    "endAt": "2026-10-06T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w23"
+    ]
+  },
+  {
+    "id": "b-v0202",
+    "companyId": "b",
+    "jobId": "b-j051",
+    "sourceId": "b-v0202",
+    "startAt": "2026-10-06T19:30:00.000Z",
+    "endAt": "2026-10-07T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w17",
+      "b-w24"
+    ]
+  },
+  {
+    "id": "b-v0203",
+    "companyId": "b",
+    "jobId": "b-j053",
+    "sourceId": "b-v0203",
+    "startAt": "2026-10-06T19:30:00.000Z",
+    "endAt": "2026-10-07T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w18",
+      "b-w25"
+    ]
+  },
+  {
+    "id": "b-v0204",
+    "companyId": "b",
+    "jobId": "b-j055",
+    "sourceId": "b-v0204",
+    "startAt": "2026-10-06T19:30:00.000Z",
+    "endAt": "2026-10-07T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w19",
+      "b-w26"
+    ]
+  },
+  {
+    "id": "b-v0205",
+    "companyId": "b",
+    "jobId": "b-j057",
+    "sourceId": "b-v0205",
+    "startAt": "2026-10-06T19:30:00.000Z",
+    "endAt": "2026-10-07T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w20",
+      "b-w27"
+    ]
+  },
+  {
+    "id": "b-v0206",
+    "companyId": "b",
+    "jobId": "b-j059",
+    "sourceId": "b-v0206",
+    "startAt": "2026-10-06T19:30:00.000Z",
+    "endAt": "2026-10-07T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w21",
+      "b-w28"
+    ]
+  },
+  {
+    "id": "b-v0207",
+    "companyId": "b",
+    "jobId": "b-j047",
+    "sourceId": "b-v0207",
+    "startAt": "2026-10-06T19:30:00.000Z",
+    "endAt": "2026-10-07T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w22"
+    ]
+  },
+  {
+    "id": "b-v0208",
+    "companyId": "b",
+    "jobId": "b-j049",
+    "sourceId": "b-v0208",
+    "startAt": "2026-10-06T19:30:00.000Z",
+    "endAt": "2026-10-07T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w23"
+    ]
+  },
+  {
+    "id": "b-v0209",
+    "companyId": "b",
+    "jobId": "b-j041",
+    "sourceId": "b-v0209",
+    "startAt": "2026-10-07T14:00:00.000Z",
+    "endAt": "2026-10-07T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w05",
+      "b-w06",
+      "b-w07",
+      "b-w08"
+    ]
+  },
+  {
+    "id": "b-v0210",
+    "companyId": "b",
+    "jobId": "b-j044",
+    "sourceId": "b-v0210",
+    "startAt": "2026-10-07T14:00:00.000Z",
+    "endAt": "2026-10-07T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w09",
+      "b-w10",
+      "b-w11",
+      "b-w12"
+    ]
+  },
+  {
+    "id": "b-v0211",
+    "companyId": "b",
+    "jobId": "b-j045",
+    "sourceId": "b-v0211",
+    "startAt": "2026-10-07T14:00:00.000Z",
+    "endAt": "2026-10-07T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w13",
+      "b-w14",
+      "b-w15",
+      "b-w16"
+    ]
+  },
+  {
+    "id": "b-v0212",
+    "companyId": "b",
+    "jobId": "b-j053",
+    "sourceId": "b-v0212",
+    "startAt": "2026-10-07T15:00:00.000Z",
+    "endAt": "2026-10-07T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w17",
+      "b-w24"
+    ]
+  },
+  {
+    "id": "b-v0213",
+    "companyId": "b",
+    "jobId": "b-j055",
+    "sourceId": "b-v0213",
+    "startAt": "2026-10-07T15:00:00.000Z",
+    "endAt": "2026-10-07T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w18",
+      "b-w25"
+    ]
+  },
+  {
+    "id": "b-v0214",
+    "companyId": "b",
+    "jobId": "b-j057",
+    "sourceId": "b-v0214",
+    "startAt": "2026-10-07T15:00:00.000Z",
+    "endAt": "2026-10-07T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w19",
+      "b-w26"
+    ]
+  },
+  {
+    "id": "b-v0215",
+    "companyId": "b",
+    "jobId": "b-j059",
+    "sourceId": "b-v0215",
+    "startAt": "2026-10-07T15:00:00.000Z",
+    "endAt": "2026-10-07T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w20",
+      "b-w27"
+    ]
+  },
+  {
+    "id": "b-v0216",
+    "companyId": "b",
+    "jobId": "b-j047",
+    "sourceId": "b-v0216",
+    "startAt": "2026-10-07T15:00:00.000Z",
+    "endAt": "2026-10-07T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w21",
+      "b-w28"
+    ]
+  },
+  {
+    "id": "b-v0217",
+    "companyId": "b",
+    "jobId": "b-j049",
+    "sourceId": "b-v0217",
+    "startAt": "2026-10-07T15:00:00.000Z",
+    "endAt": "2026-10-07T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w22"
+    ]
+  },
+  {
+    "id": "b-v0218",
+    "companyId": "b",
+    "jobId": "b-j051",
+    "sourceId": "b-v0218",
+    "startAt": "2026-10-07T15:00:00.000Z",
+    "endAt": "2026-10-07T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w23"
+    ]
+  },
+  {
+    "id": "b-v0219",
+    "companyId": "b",
+    "jobId": "b-j054",
+    "sourceId": "b-v0219",
+    "startAt": "2026-10-07T19:30:00.000Z",
+    "endAt": "2026-10-08T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w17",
+      "b-w24"
+    ]
+  },
+  {
+    "id": "b-v0220",
+    "companyId": "b",
+    "jobId": "b-j056",
+    "sourceId": "b-v0220",
+    "startAt": "2026-10-07T19:30:00.000Z",
+    "endAt": "2026-10-08T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w18",
+      "b-w25"
+    ]
+  },
+  {
+    "id": "b-v0221",
+    "companyId": "b",
+    "jobId": "b-j058",
+    "sourceId": "b-v0221",
+    "startAt": "2026-10-07T19:30:00.000Z",
+    "endAt": "2026-10-08T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w19",
+      "b-w26"
+    ]
+  },
+  {
+    "id": "b-v0222",
+    "companyId": "b",
+    "jobId": "b-j060",
+    "sourceId": "b-v0222",
+    "startAt": "2026-10-07T19:30:00.000Z",
+    "endAt": "2026-10-08T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w20",
+      "b-w27"
+    ]
+  },
+  {
+    "id": "b-v0223",
+    "companyId": "b",
+    "jobId": "b-j048",
+    "sourceId": "b-v0223",
+    "startAt": "2026-10-07T19:30:00.000Z",
+    "endAt": "2026-10-08T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w21",
+      "b-w28"
+    ]
+  },
+  {
+    "id": "b-v0224",
+    "companyId": "b",
+    "jobId": "b-j050",
+    "sourceId": "b-v0224",
+    "startAt": "2026-10-07T19:30:00.000Z",
+    "endAt": "2026-10-08T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w22"
+    ]
+  },
+  {
+    "id": "b-v0225",
+    "companyId": "b",
+    "jobId": "b-j052",
+    "sourceId": "b-v0225",
+    "startAt": "2026-10-07T19:30:00.000Z",
+    "endAt": "2026-10-08T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w23"
+    ]
+  },
+  {
+    "id": "b-v0226",
+    "companyId": "b",
+    "jobId": "b-j042",
+    "sourceId": "b-v0226",
+    "startAt": "2026-10-08T14:00:00.000Z",
+    "endAt": "2026-10-08T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w05",
+      "b-w06",
+      "b-w07",
+      "b-w08"
+    ]
+  },
+  {
+    "id": "b-v0227",
+    "companyId": "b",
+    "jobId": "b-j044",
+    "sourceId": "b-v0227",
+    "startAt": "2026-10-08T14:00:00.000Z",
+    "endAt": "2026-10-08T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w09",
+      "b-w10",
+      "b-w11",
+      "b-w12"
+    ]
+  },
+  {
+    "id": "b-v0228",
+    "companyId": "b",
+    "jobId": "b-j046",
+    "sourceId": "b-v0228",
+    "startAt": "2026-10-08T14:00:00.000Z",
+    "endAt": "2026-10-08T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w13",
+      "b-w14",
+      "b-w15",
+      "b-w16"
+    ]
+  },
+  {
+    "id": "b-v0229",
+    "companyId": "b",
+    "jobId": "b-j056",
+    "sourceId": "b-v0229",
+    "startAt": "2026-10-08T15:00:00.000Z",
+    "endAt": "2026-10-08T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w17",
+      "b-w24"
+    ]
+  },
+  {
+    "id": "b-v0230",
+    "companyId": "b",
+    "jobId": "b-j058",
+    "sourceId": "b-v0230",
+    "startAt": "2026-10-08T15:00:00.000Z",
+    "endAt": "2026-10-08T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w18",
+      "b-w25"
+    ]
+  },
+  {
+    "id": "b-v0231",
+    "companyId": "b",
+    "jobId": "b-j060",
+    "sourceId": "b-v0231",
+    "startAt": "2026-10-08T15:00:00.000Z",
+    "endAt": "2026-10-08T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w19",
+      "b-w26"
+    ]
+  },
+  {
+    "id": "b-v0232",
+    "companyId": "b",
+    "jobId": "b-j048",
+    "sourceId": "b-v0232",
+    "startAt": "2026-10-08T15:00:00.000Z",
+    "endAt": "2026-10-08T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w20",
+      "b-w27"
+    ]
+  },
+  {
+    "id": "b-v0233",
+    "companyId": "b",
+    "jobId": "b-j050",
+    "sourceId": "b-v0233",
+    "startAt": "2026-10-08T15:00:00.000Z",
+    "endAt": "2026-10-08T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w21",
+      "b-w28"
+    ]
+  },
+  {
+    "id": "b-v0234",
+    "companyId": "b",
+    "jobId": "b-j052",
+    "sourceId": "b-v0234",
+    "startAt": "2026-10-08T15:00:00.000Z",
+    "endAt": "2026-10-08T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w22"
+    ]
+  },
+  {
+    "id": "b-v0235",
+    "companyId": "b",
+    "jobId": "b-j054",
+    "sourceId": "b-v0235",
+    "startAt": "2026-10-08T15:00:00.000Z",
+    "endAt": "2026-10-08T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w23"
+    ]
+  },
+  {
+    "id": "b-v0236",
+    "companyId": "b",
+    "jobId": "b-j057",
+    "sourceId": "b-v0236",
+    "startAt": "2026-10-08T19:30:00.000Z",
+    "endAt": "2026-10-09T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w17",
+      "b-w24"
+    ]
+  },
+  {
+    "id": "b-v0237",
+    "companyId": "b",
+    "jobId": "b-j059",
+    "sourceId": "b-v0237",
+    "startAt": "2026-10-08T19:30:00.000Z",
+    "endAt": "2026-10-09T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w18",
+      "b-w25"
+    ]
+  },
+  {
+    "id": "b-v0238",
+    "companyId": "b",
+    "jobId": "b-j047",
+    "sourceId": "b-v0238",
+    "startAt": "2026-10-08T19:30:00.000Z",
+    "endAt": "2026-10-09T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w19",
+      "b-w26"
+    ]
+  },
+  {
+    "id": "b-v0239",
+    "companyId": "b",
+    "jobId": "b-j049",
+    "sourceId": "b-v0239",
+    "startAt": "2026-10-08T19:30:00.000Z",
+    "endAt": "2026-10-09T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w20",
+      "b-w27"
+    ]
+  },
+  {
+    "id": "b-v0240",
+    "companyId": "b",
+    "jobId": "b-j051",
+    "sourceId": "b-v0240",
+    "startAt": "2026-10-08T19:30:00.000Z",
+    "endAt": "2026-10-09T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w21",
+      "b-w28"
+    ]
+  },
+  {
+    "id": "b-v0241",
+    "companyId": "b",
+    "jobId": "b-j053",
+    "sourceId": "b-v0241",
+    "startAt": "2026-10-08T19:30:00.000Z",
+    "endAt": "2026-10-09T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w22"
+    ]
+  },
+  {
+    "id": "b-v0242",
+    "companyId": "b",
+    "jobId": "b-j055",
+    "sourceId": "b-v0242",
+    "startAt": "2026-10-08T19:30:00.000Z",
+    "endAt": "2026-10-09T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w23"
+    ]
+  },
+  {
+    "id": "b-v0243",
+    "companyId": "b",
+    "jobId": "b-j042",
+    "sourceId": "b-v0243",
+    "startAt": "2026-10-09T14:00:00.000Z",
+    "endAt": "2026-10-09T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w05",
+      "b-w06",
+      "b-w07",
+      "b-w08"
+    ]
+  },
+  {
+    "id": "b-v0244",
+    "companyId": "b",
+    "jobId": "b-j044",
+    "sourceId": "b-v0244",
+    "startAt": "2026-10-09T14:00:00.000Z",
+    "endAt": "2026-10-09T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w09",
+      "b-w10",
+      "b-w11",
+      "b-w12"
+    ]
+  },
+  {
+    "id": "b-v0245",
+    "companyId": "b",
+    "jobId": "b-j046",
+    "sourceId": "b-v0245",
+    "startAt": "2026-10-09T14:00:00.000Z",
+    "endAt": "2026-10-09T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w13",
+      "b-w14",
+      "b-w15",
+      "b-w16"
+    ]
+  },
+  {
+    "id": "b-v0246",
+    "companyId": "b",
+    "jobId": "b-j059",
+    "sourceId": "b-v0246",
+    "startAt": "2026-10-09T15:00:00.000Z",
+    "endAt": "2026-10-09T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w17",
+      "b-w24"
+    ]
+  },
+  {
+    "id": "b-v0247",
+    "companyId": "b",
+    "jobId": "b-j047",
+    "sourceId": "b-v0247",
+    "startAt": "2026-10-09T15:00:00.000Z",
+    "endAt": "2026-10-09T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w18",
+      "b-w25"
+    ]
+  },
+  {
+    "id": "b-v0248",
+    "companyId": "b",
+    "jobId": "b-j049",
+    "sourceId": "b-v0248",
+    "startAt": "2026-10-09T15:00:00.000Z",
+    "endAt": "2026-10-09T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w19",
+      "b-w26"
+    ]
+  },
+  {
+    "id": "b-v0249",
+    "companyId": "b",
+    "jobId": "b-j051",
+    "sourceId": "b-v0249",
+    "startAt": "2026-10-09T15:00:00.000Z",
+    "endAt": "2026-10-09T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w20",
+      "b-w27"
+    ]
+  },
+  {
+    "id": "b-v0250",
+    "companyId": "b",
+    "jobId": "b-j053",
+    "sourceId": "b-v0250",
+    "startAt": "2026-10-09T15:00:00.000Z",
+    "endAt": "2026-10-09T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w21",
+      "b-w28"
+    ]
+  },
+  {
+    "id": "b-v0251",
+    "companyId": "b",
+    "jobId": "b-j055",
+    "sourceId": "b-v0251",
+    "startAt": "2026-10-09T15:00:00.000Z",
+    "endAt": "2026-10-09T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w22"
+    ]
+  },
+  {
+    "id": "b-v0252",
+    "companyId": "b",
+    "jobId": "b-j057",
+    "sourceId": "b-v0252",
+    "startAt": "2026-10-09T15:00:00.000Z",
+    "endAt": "2026-10-09T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w23"
+    ]
+  },
+  {
+    "id": "b-v0253",
+    "companyId": "b",
+    "jobId": "b-j060",
+    "sourceId": "b-v0253",
+    "startAt": "2026-10-09T19:30:00.000Z",
+    "endAt": "2026-10-10T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w17",
+      "b-w24"
+    ]
+  },
+  {
+    "id": "b-v0254",
+    "companyId": "b",
+    "jobId": "b-j048",
+    "sourceId": "b-v0254",
+    "startAt": "2026-10-09T19:30:00.000Z",
+    "endAt": "2026-10-10T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w18",
+      "b-w25"
+    ]
+  },
+  {
+    "id": "b-v0255",
+    "companyId": "b",
+    "jobId": "b-j050",
+    "sourceId": "b-v0255",
+    "startAt": "2026-10-09T19:30:00.000Z",
+    "endAt": "2026-10-10T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w19",
+      "b-w26"
+    ]
+  },
+  {
+    "id": "b-v0256",
+    "companyId": "b",
+    "jobId": "b-j052",
+    "sourceId": "b-v0256",
+    "startAt": "2026-10-09T19:30:00.000Z",
+    "endAt": "2026-10-10T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w20",
+      "b-w27"
+    ]
+  },
+  {
+    "id": "b-v0257",
+    "companyId": "b",
+    "jobId": "b-j054",
+    "sourceId": "b-v0257",
+    "startAt": "2026-10-09T19:30:00.000Z",
+    "endAt": "2026-10-10T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w21",
+      "b-w28"
+    ]
+  },
+  {
+    "id": "b-v0258",
+    "companyId": "b",
+    "jobId": "b-j056",
+    "sourceId": "b-v0258",
+    "startAt": "2026-10-09T19:30:00.000Z",
+    "endAt": "2026-10-10T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w22"
+    ]
+  },
+  {
+    "id": "b-v0259",
+    "companyId": "b",
+    "jobId": "b-j058",
+    "sourceId": "b-v0259",
+    "startAt": "2026-10-09T19:30:00.000Z",
+    "endAt": "2026-10-10T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w23"
+    ]
+  },
+  {
+    "id": "b-v0260",
+    "companyId": "b",
+    "jobId": "b-j042",
+    "sourceId": "b-v0260",
+    "startAt": "2026-10-10T14:00:00.000Z",
+    "endAt": "2026-10-10T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w05",
+      "b-w06",
+      "b-w07",
+      "b-w08"
+    ]
+  },
+  {
+    "id": "b-v0261",
+    "companyId": "b",
+    "jobId": "b-j047",
+    "sourceId": "b-v0261",
+    "startAt": "2026-10-10T16:00:00.000Z",
+    "endAt": "2026-10-10T20:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w20"
+    ]
+  },
+  {
+    "id": "b-v0262",
+    "companyId": "b",
+    "jobId": "b-j061",
+    "sourceId": "b-v0262",
+    "startAt": "2026-10-12T14:00:00.000Z",
+    "endAt": "2026-10-12T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w05",
+      "b-w06",
+      "b-w07",
+      "b-w08"
+    ]
+  },
+  {
+    "id": "b-v0263",
+    "companyId": "b",
+    "jobId": "b-j063",
+    "sourceId": "b-v0263",
+    "startAt": "2026-10-12T14:00:00.000Z",
+    "endAt": "2026-10-12T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w09",
+      "b-w10",
+      "b-w11",
+      "b-w12"
+    ]
+  },
+  {
+    "id": "b-v0264",
+    "companyId": "b",
+    "jobId": "b-j065",
+    "sourceId": "b-v0264",
+    "startAt": "2026-10-12T14:00:00.000Z",
+    "endAt": "2026-10-12T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w13",
+      "b-w14",
+      "b-w15",
+      "b-w16"
+    ]
+  },
+  {
+    "id": "b-v0265",
+    "companyId": "b",
+    "jobId": "b-j067",
+    "sourceId": "b-v0265",
+    "startAt": "2026-10-12T15:00:00.000Z",
+    "endAt": "2026-10-12T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w17",
+      "b-w24"
+    ]
+  },
+  {
+    "id": "b-v0266",
+    "companyId": "b",
+    "jobId": "b-j069",
+    "sourceId": "b-v0266",
+    "startAt": "2026-10-12T15:00:00.000Z",
+    "endAt": "2026-10-12T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w18",
+      "b-w25"
+    ]
+  },
+  {
+    "id": "b-v0267",
+    "companyId": "b",
+    "jobId": "b-j071",
+    "sourceId": "b-v0267",
+    "startAt": "2026-10-12T15:00:00.000Z",
+    "endAt": "2026-10-12T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w19",
+      "b-w26"
+    ]
+  },
+  {
+    "id": "b-v0268",
+    "companyId": "b",
+    "jobId": "b-j073",
+    "sourceId": "b-v0268",
+    "startAt": "2026-10-12T15:00:00.000Z",
+    "endAt": "2026-10-12T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w20",
+      "b-w27"
+    ]
+  },
+  {
+    "id": "b-v0269",
+    "companyId": "b",
+    "jobId": "b-j075",
+    "sourceId": "b-v0269",
+    "startAt": "2026-10-12T15:00:00.000Z",
+    "endAt": "2026-10-12T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w21",
+      "b-w28"
+    ]
+  },
+  {
+    "id": "b-v0270",
+    "companyId": "b",
+    "jobId": "b-j077",
+    "sourceId": "b-v0270",
+    "startAt": "2026-10-12T15:00:00.000Z",
+    "endAt": "2026-10-12T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w22"
+    ]
+  },
+  {
+    "id": "b-v0271",
+    "companyId": "b",
+    "jobId": "b-j079",
+    "sourceId": "b-v0271",
+    "startAt": "2026-10-12T15:00:00.000Z",
+    "endAt": "2026-10-12T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w23"
+    ]
+  },
+  {
+    "id": "b-v0272",
+    "companyId": "b",
+    "jobId": "b-j068",
+    "sourceId": "b-v0272",
+    "startAt": "2026-10-12T19:30:00.000Z",
+    "endAt": "2026-10-13T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w17",
+      "b-w24"
+    ]
+  },
+  {
+    "id": "b-v0273",
+    "companyId": "b",
+    "jobId": "b-j070",
+    "sourceId": "b-v0273",
+    "startAt": "2026-10-12T19:30:00.000Z",
+    "endAt": "2026-10-13T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w18",
+      "b-w25"
+    ]
+  },
+  {
+    "id": "b-v0274",
+    "companyId": "b",
+    "jobId": "b-j072",
+    "sourceId": "b-v0274",
+    "startAt": "2026-10-12T19:30:00.000Z",
+    "endAt": "2026-10-13T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w19",
+      "b-w26"
+    ]
+  },
+  {
+    "id": "b-v0275",
+    "companyId": "b",
+    "jobId": "b-j074",
+    "sourceId": "b-v0275",
+    "startAt": "2026-10-12T19:30:00.000Z",
+    "endAt": "2026-10-13T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w20",
+      "b-w27"
+    ]
+  },
+  {
+    "id": "b-v0276",
+    "companyId": "b",
+    "jobId": "b-j076",
+    "sourceId": "b-v0276",
+    "startAt": "2026-10-12T19:30:00.000Z",
+    "endAt": "2026-10-13T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w21",
+      "b-w28"
+    ]
+  },
+  {
+    "id": "b-v0277",
+    "companyId": "b",
+    "jobId": "b-j078",
+    "sourceId": "b-v0277",
+    "startAt": "2026-10-12T19:30:00.000Z",
+    "endAt": "2026-10-13T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w22"
+    ]
+  },
+  {
+    "id": "b-v0278",
+    "companyId": "b",
+    "jobId": "b-j080",
+    "sourceId": "b-v0278",
+    "startAt": "2026-10-12T19:30:00.000Z",
+    "endAt": "2026-10-13T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w23"
+    ]
+  },
+  {
+    "id": "b-v0279",
+    "companyId": "b",
+    "jobId": "b-j061",
+    "sourceId": "b-v0279",
+    "startAt": "2026-10-13T14:00:00.000Z",
+    "endAt": "2026-10-13T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w05",
+      "b-w06",
+      "b-w07",
+      "b-w08"
+    ]
+  },
+  {
+    "id": "b-v0280",
+    "companyId": "b",
+    "jobId": "b-j063",
+    "sourceId": "b-v0280",
+    "startAt": "2026-10-13T14:00:00.000Z",
+    "endAt": "2026-10-13T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w09",
+      "b-w10",
+      "b-w11",
+      "b-w12"
+    ]
+  },
+  {
+    "id": "b-v0281",
+    "companyId": "b",
+    "jobId": "b-j065",
+    "sourceId": "b-v0281",
+    "startAt": "2026-10-13T14:00:00.000Z",
+    "endAt": "2026-10-13T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w13",
+      "b-w14",
+      "b-w15",
+      "b-w16"
+    ]
+  },
+  {
+    "id": "b-v0282",
+    "companyId": "b",
+    "jobId": "b-j070",
+    "sourceId": "b-v0282",
+    "startAt": "2026-10-13T15:00:00.000Z",
+    "endAt": "2026-10-13T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w17",
+      "b-w24"
+    ]
+  },
+  {
+    "id": "b-v0283",
+    "companyId": "b",
+    "jobId": "b-j072",
+    "sourceId": "b-v0283",
+    "startAt": "2026-10-13T15:00:00.000Z",
+    "endAt": "2026-10-13T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w18",
+      "b-w25"
+    ]
+  },
+  {
+    "id": "b-v0284",
+    "companyId": "b",
+    "jobId": "b-j074",
+    "sourceId": "b-v0284",
+    "startAt": "2026-10-13T15:00:00.000Z",
+    "endAt": "2026-10-13T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w19",
+      "b-w26"
+    ]
+  },
+  {
+    "id": "b-v0285",
+    "companyId": "b",
+    "jobId": "b-j076",
+    "sourceId": "b-v0285",
+    "startAt": "2026-10-13T15:00:00.000Z",
+    "endAt": "2026-10-13T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w20",
+      "b-w27"
+    ]
+  },
+  {
+    "id": "b-v0286",
+    "companyId": "b",
+    "jobId": "b-j078",
+    "sourceId": "b-v0286",
+    "startAt": "2026-10-13T15:00:00.000Z",
+    "endAt": "2026-10-13T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w21",
+      "b-w28"
+    ]
+  },
+  {
+    "id": "b-v0287",
+    "companyId": "b",
+    "jobId": "b-j080",
+    "sourceId": "b-v0287",
+    "startAt": "2026-10-13T15:00:00.000Z",
+    "endAt": "2026-10-13T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w22"
+    ]
+  },
+  {
+    "id": "b-v0288",
+    "companyId": "b",
+    "jobId": "b-j068",
+    "sourceId": "b-v0288",
+    "startAt": "2026-10-13T15:00:00.000Z",
+    "endAt": "2026-10-13T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w23"
+    ]
+  },
+  {
+    "id": "b-v0289",
+    "companyId": "b",
+    "jobId": "b-j071",
+    "sourceId": "b-v0289",
+    "startAt": "2026-10-13T19:30:00.000Z",
+    "endAt": "2026-10-14T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w17",
+      "b-w24"
+    ]
+  },
+  {
+    "id": "b-v0290",
+    "companyId": "b",
+    "jobId": "b-j073",
+    "sourceId": "b-v0290",
+    "startAt": "2026-10-13T19:30:00.000Z",
+    "endAt": "2026-10-14T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w18",
+      "b-w25"
+    ]
+  },
+  {
+    "id": "b-v0291",
+    "companyId": "b",
+    "jobId": "b-j075",
+    "sourceId": "b-v0291",
+    "startAt": "2026-10-13T19:30:00.000Z",
+    "endAt": "2026-10-14T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w19",
+      "b-w26"
+    ]
+  },
+  {
+    "id": "b-v0292",
+    "companyId": "b",
+    "jobId": "b-j077",
+    "sourceId": "b-v0292",
+    "startAt": "2026-10-13T19:30:00.000Z",
+    "endAt": "2026-10-14T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w20",
+      "b-w27"
+    ]
+  },
+  {
+    "id": "b-v0293",
+    "companyId": "b",
+    "jobId": "b-j079",
+    "sourceId": "b-v0293",
+    "startAt": "2026-10-13T19:30:00.000Z",
+    "endAt": "2026-10-14T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w21",
+      "b-w28"
+    ]
+  },
+  {
+    "id": "b-v0294",
+    "companyId": "b",
+    "jobId": "b-j067",
+    "sourceId": "b-v0294",
+    "startAt": "2026-10-13T19:30:00.000Z",
+    "endAt": "2026-10-14T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w22"
+    ]
+  },
+  {
+    "id": "b-v0295",
+    "companyId": "b",
+    "jobId": "b-j069",
+    "sourceId": "b-v0295",
+    "startAt": "2026-10-13T19:30:00.000Z",
+    "endAt": "2026-10-14T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w23"
+    ]
+  },
+  {
+    "id": "b-v0296",
+    "companyId": "b",
+    "jobId": "b-j061",
+    "sourceId": "b-v0296",
+    "startAt": "2026-10-14T14:00:00.000Z",
+    "endAt": "2026-10-14T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w05",
+      "b-w06",
+      "b-w07",
+      "b-w08"
+    ]
+  },
+  {
+    "id": "b-v0297",
+    "companyId": "b",
+    "jobId": "b-j063",
+    "sourceId": "b-v0297",
+    "startAt": "2026-10-14T14:00:00.000Z",
+    "endAt": "2026-10-14T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w09",
+      "b-w10",
+      "b-w11",
+      "b-w12"
+    ]
+  },
+  {
+    "id": "b-v0298",
+    "companyId": "b",
+    "jobId": "b-j066",
+    "sourceId": "b-v0298",
+    "startAt": "2026-10-14T14:00:00.000Z",
+    "endAt": "2026-10-14T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w13",
+      "b-w14",
+      "b-w15",
+      "b-w16"
+    ]
+  },
+  {
+    "id": "b-v0299",
+    "companyId": "b",
+    "jobId": "b-j073",
+    "sourceId": "b-v0299",
+    "startAt": "2026-10-14T15:00:00.000Z",
+    "endAt": "2026-10-14T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w17",
+      "b-w24"
+    ]
+  },
+  {
+    "id": "b-v0300",
+    "companyId": "b",
+    "jobId": "b-j075",
+    "sourceId": "b-v0300",
+    "startAt": "2026-10-14T15:00:00.000Z",
+    "endAt": "2026-10-14T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w18",
+      "b-w25"
+    ]
+  },
+  {
+    "id": "b-v0301",
+    "companyId": "b",
+    "jobId": "b-j077",
+    "sourceId": "b-v0301",
+    "startAt": "2026-10-14T15:00:00.000Z",
+    "endAt": "2026-10-14T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w19",
+      "b-w26"
+    ]
+  },
+  {
+    "id": "b-v0302",
+    "companyId": "b",
+    "jobId": "b-j079",
+    "sourceId": "b-v0302",
+    "startAt": "2026-10-14T15:00:00.000Z",
+    "endAt": "2026-10-14T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w20",
+      "b-w27"
+    ]
+  },
+  {
+    "id": "b-v0303",
+    "companyId": "b",
+    "jobId": "b-j067",
+    "sourceId": "b-v0303",
+    "startAt": "2026-10-14T15:00:00.000Z",
+    "endAt": "2026-10-14T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w21",
+      "b-w28"
+    ]
+  },
+  {
+    "id": "b-v0304",
+    "companyId": "b",
+    "jobId": "b-j069",
+    "sourceId": "b-v0304",
+    "startAt": "2026-10-14T15:00:00.000Z",
+    "endAt": "2026-10-14T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w22"
+    ]
+  },
+  {
+    "id": "b-v0305",
+    "companyId": "b",
+    "jobId": "b-j071",
+    "sourceId": "b-v0305",
+    "startAt": "2026-10-14T15:00:00.000Z",
+    "endAt": "2026-10-14T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w23"
+    ]
+  },
+  {
+    "id": "b-v0306",
+    "companyId": "b",
+    "jobId": "b-j074",
+    "sourceId": "b-v0306",
+    "startAt": "2026-10-14T19:30:00.000Z",
+    "endAt": "2026-10-15T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w17",
+      "b-w24"
+    ]
+  },
+  {
+    "id": "b-v0307",
+    "companyId": "b",
+    "jobId": "b-j076",
+    "sourceId": "b-v0307",
+    "startAt": "2026-10-14T19:30:00.000Z",
+    "endAt": "2026-10-15T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w18",
+      "b-w25"
+    ]
+  },
+  {
+    "id": "b-v0308",
+    "companyId": "b",
+    "jobId": "b-j078",
+    "sourceId": "b-v0308",
+    "startAt": "2026-10-14T19:30:00.000Z",
+    "endAt": "2026-10-15T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w19",
+      "b-w26"
+    ]
+  },
+  {
+    "id": "b-v0309",
+    "companyId": "b",
+    "jobId": "b-j080",
+    "sourceId": "b-v0309",
+    "startAt": "2026-10-14T19:30:00.000Z",
+    "endAt": "2026-10-15T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w20",
+      "b-w27"
+    ]
+  },
+  {
+    "id": "b-v0310",
+    "companyId": "b",
+    "jobId": "b-j068",
+    "sourceId": "b-v0310",
+    "startAt": "2026-10-14T19:30:00.000Z",
+    "endAt": "2026-10-15T04:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w21",
+      "b-w25",
+      "b-w28"
+    ]
+  },
+  {
+    "id": "b-v0311",
+    "companyId": "b",
+    "jobId": "b-j070",
+    "sourceId": "b-v0311",
+    "startAt": "2026-10-14T19:30:00.000Z",
+    "endAt": "2026-10-15T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w22"
+    ]
+  },
+  {
+    "id": "b-v0312",
+    "companyId": "b",
+    "jobId": "b-j072",
+    "sourceId": "b-v0312",
+    "startAt": "2026-10-14T19:30:00.000Z",
+    "endAt": "2026-10-15T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w23"
+    ]
+  },
+  {
+    "id": "b-v0313",
+    "companyId": "b",
+    "jobId": "b-j062",
+    "sourceId": "b-v0313",
+    "startAt": "2026-10-15T14:00:00.000Z",
+    "endAt": "2026-10-15T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w05",
+      "b-w06",
+      "b-w07",
+      "b-w08"
+    ]
+  },
+  {
+    "id": "b-v0314",
+    "companyId": "b",
+    "jobId": "b-j064",
+    "sourceId": "b-v0314",
+    "startAt": "2026-10-15T14:00:00.000Z",
+    "endAt": "2026-10-15T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w09",
+      "b-w10",
+      "b-w11",
+      "b-w12"
+    ]
+  },
+  {
+    "id": "b-v0315",
+    "companyId": "b",
+    "jobId": "b-j066",
+    "sourceId": "b-v0315",
+    "startAt": "2026-10-15T14:00:00.000Z",
+    "endAt": "2026-10-15T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w13",
+      "b-w14",
+      "b-w15",
+      "b-w16"
+    ]
+  },
+  {
+    "id": "b-v0316",
+    "companyId": "b",
+    "jobId": "b-j076",
+    "sourceId": "b-v0316",
+    "startAt": "2026-10-15T15:00:00.000Z",
+    "endAt": "2026-10-15T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w17",
+      "b-w24"
+    ]
+  },
+  {
+    "id": "b-v0317",
+    "companyId": "b",
+    "jobId": "b-j078",
+    "sourceId": "b-v0317",
+    "startAt": "2026-10-15T15:00:00.000Z",
+    "endAt": "2026-10-15T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w18",
+      "b-w25"
+    ]
+  },
+  {
+    "id": "b-v0318",
+    "companyId": "b",
+    "jobId": "b-j080",
+    "sourceId": "b-v0318",
+    "startAt": "2026-10-15T15:00:00.000Z",
+    "endAt": "2026-10-15T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w19",
+      "b-w26"
+    ]
+  },
+  {
+    "id": "b-v0319",
+    "companyId": "b",
+    "jobId": "b-j068",
+    "sourceId": "b-v0319",
+    "startAt": "2026-10-15T15:00:00.000Z",
+    "endAt": "2026-10-15T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w20",
+      "b-w27"
+    ]
+  },
+  {
+    "id": "b-v0320",
+    "companyId": "b",
+    "jobId": "b-j070",
+    "sourceId": "b-v0320",
+    "startAt": "2026-10-15T15:00:00.000Z",
+    "endAt": "2026-10-15T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w21",
+      "b-w28"
+    ]
+  },
+  {
+    "id": "b-v0321",
+    "companyId": "b",
+    "jobId": "b-j072",
+    "sourceId": "b-v0321",
+    "startAt": "2026-10-15T15:00:00.000Z",
+    "endAt": "2026-10-15T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w22"
+    ]
+  },
+  {
+    "id": "b-v0322",
+    "companyId": "b",
+    "jobId": "b-j074",
+    "sourceId": "b-v0322",
+    "startAt": "2026-10-15T15:00:00.000Z",
+    "endAt": "2026-10-15T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w23"
+    ]
+  },
+  {
+    "id": "b-v0323",
+    "companyId": "b",
+    "jobId": "b-j077",
+    "sourceId": "b-v0323",
+    "startAt": "2026-10-15T19:30:00.000Z",
+    "endAt": "2026-10-16T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w17",
+      "b-w24"
+    ]
+  },
+  {
+    "id": "b-v0324",
+    "companyId": "b",
+    "jobId": "b-j079",
+    "sourceId": "b-v0324",
+    "startAt": "2026-10-15T19:30:00.000Z",
+    "endAt": "2026-10-16T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w18",
+      "b-w25"
+    ]
+  },
+  {
+    "id": "b-v0325",
+    "companyId": "b",
+    "jobId": "b-j067",
+    "sourceId": "b-v0325",
+    "startAt": "2026-10-15T19:30:00.000Z",
+    "endAt": "2026-10-16T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w19",
+      "b-w26"
+    ]
+  },
+  {
+    "id": "b-v0326",
+    "companyId": "b",
+    "jobId": "b-j069",
+    "sourceId": "b-v0326",
+    "startAt": "2026-10-15T19:30:00.000Z",
+    "endAt": "2026-10-16T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w20",
+      "b-w27"
+    ]
+  },
+  {
+    "id": "b-v0327",
+    "companyId": "b",
+    "jobId": "b-j071",
+    "sourceId": "b-v0327",
+    "startAt": "2026-10-15T19:30:00.000Z",
+    "endAt": "2026-10-16T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w21",
+      "b-w28"
+    ]
+  },
+  {
+    "id": "b-v0328",
+    "companyId": "b",
+    "jobId": "b-j073",
+    "sourceId": "b-v0328",
+    "startAt": "2026-10-15T19:30:00.000Z",
+    "endAt": "2026-10-16T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w22"
+    ]
+  },
+  {
+    "id": "b-v0329",
+    "companyId": "b",
+    "jobId": "b-j075",
+    "sourceId": "b-v0329",
+    "startAt": "2026-10-15T19:30:00.000Z",
+    "endAt": "2026-10-16T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w23"
+    ]
+  },
+  {
+    "id": "b-v0330",
+    "companyId": "b",
+    "jobId": "b-j062",
+    "sourceId": "b-v0330",
+    "startAt": "2026-10-16T14:00:00.000Z",
+    "endAt": "2026-10-16T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w05",
+      "b-w06",
+      "b-w07",
+      "b-w08"
+    ]
+  },
+  {
+    "id": "b-v0331",
+    "companyId": "b",
+    "jobId": "b-j064",
+    "sourceId": "b-v0331",
+    "startAt": "2026-10-16T14:00:00.000Z",
+    "endAt": "2026-10-16T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w09",
+      "b-w10",
+      "b-w11",
+      "b-w12"
+    ]
+  },
+  {
+    "id": "b-v0332",
+    "companyId": "b",
+    "jobId": "b-j066",
+    "sourceId": "b-v0332",
+    "startAt": "2026-10-16T14:00:00.000Z",
+    "endAt": "2026-10-16T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w13",
+      "b-w14",
+      "b-w15",
+      "b-w16"
+    ]
+  },
+  {
+    "id": "b-v0333",
+    "companyId": "b",
+    "jobId": "b-j079",
+    "sourceId": "b-v0333",
+    "startAt": "2026-10-16T15:00:00.000Z",
+    "endAt": "2026-10-16T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w17",
+      "b-w24"
+    ]
+  },
+  {
+    "id": "b-v0334",
+    "companyId": "b",
+    "jobId": "b-j067",
+    "sourceId": "b-v0334",
+    "startAt": "2026-10-16T15:00:00.000Z",
+    "endAt": "2026-10-16T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w18",
+      "b-w25"
+    ]
+  },
+  {
+    "id": "b-v0335",
+    "companyId": "b",
+    "jobId": "b-j069",
+    "sourceId": "b-v0335",
+    "startAt": "2026-10-16T15:00:00.000Z",
+    "endAt": "2026-10-16T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w19",
+      "b-w26"
+    ]
+  },
+  {
+    "id": "b-v0336",
+    "companyId": "b",
+    "jobId": "b-j071",
+    "sourceId": "b-v0336",
+    "startAt": "2026-10-16T15:00:00.000Z",
+    "endAt": "2026-10-16T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w20",
+      "b-w27"
+    ]
+  },
+  {
+    "id": "b-v0337",
+    "companyId": "b",
+    "jobId": "b-j073",
+    "sourceId": "b-v0337",
+    "startAt": "2026-10-16T15:00:00.000Z",
+    "endAt": "2026-10-16T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w21",
+      "b-w28"
+    ]
+  },
+  {
+    "id": "b-v0338",
+    "companyId": "b",
+    "jobId": "b-j075",
+    "sourceId": "b-v0338",
+    "startAt": "2026-10-16T15:00:00.000Z",
+    "endAt": "2026-10-16T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w22"
+    ]
+  },
+  {
+    "id": "b-v0339",
+    "companyId": "b",
+    "jobId": "b-j077",
+    "sourceId": "b-v0339",
+    "startAt": "2026-10-16T15:00:00.000Z",
+    "endAt": "2026-10-16T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w23"
+    ]
+  },
+  {
+    "id": "b-v0340",
+    "companyId": "b",
+    "jobId": "b-j080",
+    "sourceId": "b-v0340",
+    "startAt": "2026-10-16T19:30:00.000Z",
+    "endAt": "2026-10-17T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w17",
+      "b-w24"
+    ]
+  },
+  {
+    "id": "b-v0341",
+    "companyId": "b",
+    "jobId": "b-j068",
+    "sourceId": "b-v0341",
+    "startAt": "2026-10-16T19:30:00.000Z",
+    "endAt": "2026-10-17T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w18",
+      "b-w25"
+    ]
+  },
+  {
+    "id": "b-v0342",
+    "companyId": "b",
+    "jobId": "b-j070",
+    "sourceId": "b-v0342",
+    "startAt": "2026-10-16T19:30:00.000Z",
+    "endAt": "2026-10-17T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w19",
+      "b-w26"
+    ]
+  },
+  {
+    "id": "b-v0343",
+    "companyId": "b",
+    "jobId": "b-j072",
+    "sourceId": "b-v0343",
+    "startAt": "2026-10-16T19:30:00.000Z",
+    "endAt": "2026-10-17T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w20",
+      "b-w27"
+    ]
+  },
+  {
+    "id": "b-v0344",
+    "companyId": "b",
+    "jobId": "b-j074",
+    "sourceId": "b-v0344",
+    "startAt": "2026-10-16T19:30:00.000Z",
+    "endAt": "2026-10-17T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w21",
+      "b-w28"
+    ]
+  },
+  {
+    "id": "b-v0345",
+    "companyId": "b",
+    "jobId": "b-j076",
+    "sourceId": "b-v0345",
+    "startAt": "2026-10-16T19:30:00.000Z",
+    "endAt": "2026-10-17T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w22"
+    ]
+  },
+  {
+    "id": "b-v0346",
+    "companyId": "b",
+    "jobId": "b-j078",
+    "sourceId": "b-v0346",
+    "startAt": "2026-10-16T19:30:00.000Z",
+    "endAt": "2026-10-17T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w23"
+    ]
+  },
+  {
+    "id": "b-v0347",
+    "companyId": "b",
+    "jobId": "b-j064",
+    "sourceId": "b-v0347",
+    "startAt": "2026-10-17T14:00:00.000Z",
+    "endAt": "2026-10-17T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w09",
+      "b-w10",
+      "b-w11",
+      "b-w12"
+    ]
+  },
+  {
+    "id": "b-v0348",
+    "companyId": "b",
+    "jobId": "b-j067",
+    "sourceId": "b-v0348",
+    "startAt": "2026-10-17T16:00:00.000Z",
+    "endAt": "2026-10-17T20:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w21"
+    ]
+  },
+  {
+    "id": "b-v0349",
+    "companyId": "b",
+    "jobId": "b-j081",
+    "sourceId": "b-v0349",
+    "startAt": "2026-10-19T14:00:00.000Z",
+    "endAt": "2026-10-19T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w05",
+      "b-w06",
+      "b-w07",
+      "b-w08"
+    ]
+  },
+  {
+    "id": "b-v0350",
+    "companyId": "b",
+    "jobId": "b-j083",
+    "sourceId": "b-v0350",
+    "startAt": "2026-10-19T14:00:00.000Z",
+    "endAt": "2026-10-20T00:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w09",
+      "b-w10",
+      "b-w11",
+      "b-w12"
+    ]
+  },
+  {
+    "id": "b-v0351",
+    "companyId": "b",
+    "jobId": "b-j085",
+    "sourceId": "b-v0351",
+    "startAt": "2026-10-19T14:00:00.000Z",
+    "endAt": "2026-10-19T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w13",
+      "b-w14",
+      "b-w15",
+      "b-w16"
+    ]
+  },
+  {
+    "id": "b-v0352",
+    "companyId": "b",
+    "jobId": "b-j087",
+    "sourceId": "b-v0352",
+    "startAt": "2026-10-19T15:00:00.000Z",
+    "endAt": "2026-10-19T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w17",
+      "b-w24"
+    ]
+  },
+  {
+    "id": "b-v0353",
+    "companyId": "b",
+    "jobId": "b-j089",
+    "sourceId": "b-v0353",
+    "startAt": "2026-10-19T15:00:00.000Z",
+    "endAt": "2026-10-19T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w18",
+      "b-w25"
+    ]
+  },
+  {
+    "id": "b-v0354",
+    "companyId": "b",
+    "jobId": "b-j091",
+    "sourceId": "b-v0354",
+    "startAt": "2026-10-19T15:00:00.000Z",
+    "endAt": "2026-10-19T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w19",
+      "b-w26"
+    ]
+  },
+  {
+    "id": "b-v0355",
+    "companyId": "b",
+    "jobId": "b-j093",
+    "sourceId": "b-v0355",
+    "startAt": "2026-10-19T15:00:00.000Z",
+    "endAt": "2026-10-19T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w20",
+      "b-w27"
+    ]
+  },
+  {
+    "id": "b-v0356",
+    "companyId": "b",
+    "jobId": "b-j095",
+    "sourceId": "b-v0356",
+    "startAt": "2026-10-19T15:00:00.000Z",
+    "endAt": "2026-10-19T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w21",
+      "b-w28"
+    ]
+  },
+  {
+    "id": "b-v0357",
+    "companyId": "b",
+    "jobId": "b-j097",
+    "sourceId": "b-v0357",
+    "startAt": "2026-10-19T15:00:00.000Z",
+    "endAt": "2026-10-19T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w22"
+    ]
+  },
+  {
+    "id": "b-v0358",
+    "companyId": "b",
+    "jobId": "b-j099",
+    "sourceId": "b-v0358",
+    "startAt": "2026-10-19T15:00:00.000Z",
+    "endAt": "2026-10-19T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w23"
+    ]
+  },
+  {
+    "id": "b-v0359",
+    "companyId": "b",
+    "jobId": "b-j088",
+    "sourceId": "b-v0359",
+    "startAt": "2026-10-19T19:30:00.000Z",
+    "endAt": "2026-10-20T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w17",
+      "b-w24"
+    ]
+  },
+  {
+    "id": "b-v0360",
+    "companyId": "b",
+    "jobId": "b-j090",
+    "sourceId": "b-v0360",
+    "startAt": "2026-10-19T19:30:00.000Z",
+    "endAt": "2026-10-20T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w18",
+      "b-w25"
+    ]
+  },
+  {
+    "id": "b-v0361",
+    "companyId": "b",
+    "jobId": "b-j092",
+    "sourceId": "b-v0361",
+    "startAt": "2026-10-19T19:30:00.000Z",
+    "endAt": "2026-10-20T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w19",
+      "b-w26"
+    ]
+  },
+  {
+    "id": "b-v0362",
+    "companyId": "b",
+    "jobId": "b-j094",
+    "sourceId": "b-v0362",
+    "startAt": "2026-10-19T19:30:00.000Z",
+    "endAt": "2026-10-20T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w20",
+      "b-w27"
+    ]
+  },
+  {
+    "id": "b-v0363",
+    "companyId": "b",
+    "jobId": "b-j096",
+    "sourceId": "b-v0363",
+    "startAt": "2026-10-19T19:30:00.000Z",
+    "endAt": "2026-10-20T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w21",
+      "b-w28"
+    ]
+  },
+  {
+    "id": "b-v0364",
+    "companyId": "b",
+    "jobId": "b-j098",
+    "sourceId": "b-v0364",
+    "startAt": "2026-10-19T19:30:00.000Z",
+    "endAt": "2026-10-20T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w22"
+    ]
+  },
+  {
+    "id": "b-v0365",
+    "companyId": "b",
+    "jobId": "b-j100",
+    "sourceId": "b-v0365",
+    "startAt": "2026-10-19T19:30:00.000Z",
+    "endAt": "2026-10-20T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w23"
+    ]
+  },
+  {
+    "id": "b-v0366",
+    "companyId": "b",
+    "jobId": "b-j081",
+    "sourceId": "b-v0366",
+    "startAt": "2026-10-20T14:00:00.000Z",
+    "endAt": "2026-10-20T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w05",
+      "b-w06",
+      "b-w07",
+      "b-w08"
+    ]
+  },
+  {
+    "id": "b-v0367",
+    "companyId": "b",
+    "jobId": "b-j083",
+    "sourceId": "b-v0367",
+    "startAt": "2026-10-20T14:00:00.000Z",
+    "endAt": "2026-10-21T00:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w09",
+      "b-w10",
+      "b-w11",
+      "b-w12"
+    ]
+  },
+  {
+    "id": "b-v0368",
+    "companyId": "b",
+    "jobId": "b-j085",
+    "sourceId": "b-v0368",
+    "startAt": "2026-10-20T14:00:00.000Z",
+    "endAt": "2026-10-20T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w13",
+      "b-w14",
+      "b-w15",
+      "b-w16"
+    ]
+  },
+  {
+    "id": "b-v0369",
+    "companyId": "b",
+    "jobId": "b-j090",
+    "sourceId": "b-v0369",
+    "startAt": "2026-10-20T15:00:00.000Z",
+    "endAt": "2026-10-20T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w17",
+      "b-w24"
+    ]
+  },
+  {
+    "id": "b-v0370",
+    "companyId": "b",
+    "jobId": "b-j092",
+    "sourceId": "b-v0370",
+    "startAt": "2026-10-20T15:00:00.000Z",
+    "endAt": "2026-10-20T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w18",
+      "b-w25"
+    ]
+  },
+  {
+    "id": "b-v0371",
+    "companyId": "b",
+    "jobId": "b-j094",
+    "sourceId": "b-v0371",
+    "startAt": "2026-10-20T15:00:00.000Z",
+    "endAt": "2026-10-20T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w19",
+      "b-w26"
+    ]
+  },
+  {
+    "id": "b-v0372",
+    "companyId": "b",
+    "jobId": "b-j096",
+    "sourceId": "b-v0372",
+    "startAt": "2026-10-20T15:00:00.000Z",
+    "endAt": "2026-10-20T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w20",
+      "b-w27"
+    ]
+  },
+  {
+    "id": "b-v0373",
+    "companyId": "b",
+    "jobId": "b-j098",
+    "sourceId": "b-v0373",
+    "startAt": "2026-10-20T15:00:00.000Z",
+    "endAt": "2026-10-20T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w21",
+      "b-w28"
+    ]
+  },
+  {
+    "id": "b-v0374",
+    "companyId": "b",
+    "jobId": "b-j100",
+    "sourceId": "b-v0374",
+    "startAt": "2026-10-20T15:00:00.000Z",
+    "endAt": "2026-10-20T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w22"
+    ]
+  },
+  {
+    "id": "b-v0375",
+    "companyId": "b",
+    "jobId": "b-j088",
+    "sourceId": "b-v0375",
+    "startAt": "2026-10-20T15:00:00.000Z",
+    "endAt": "2026-10-20T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w23"
+    ]
+  },
+  {
+    "id": "b-v0376",
+    "companyId": "b",
+    "jobId": "b-j091",
+    "sourceId": "b-v0376",
+    "startAt": "2026-10-20T19:30:00.000Z",
+    "endAt": "2026-10-21T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w17",
+      "b-w24"
+    ]
+  },
+  {
+    "id": "b-v0377",
+    "companyId": "b",
+    "jobId": "b-j093",
+    "sourceId": "b-v0377",
+    "startAt": "2026-10-20T19:30:00.000Z",
+    "endAt": "2026-10-21T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w18",
+      "b-w25"
+    ]
+  },
+  {
+    "id": "b-v0378",
+    "companyId": "b",
+    "jobId": "b-j095",
+    "sourceId": "b-v0378",
+    "startAt": "2026-10-20T19:30:00.000Z",
+    "endAt": "2026-10-21T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w19",
+      "b-w26"
+    ]
+  },
+  {
+    "id": "b-v0379",
+    "companyId": "b",
+    "jobId": "b-j097",
+    "sourceId": "b-v0379",
+    "startAt": "2026-10-20T19:30:00.000Z",
+    "endAt": "2026-10-21T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w20",
+      "b-w27"
+    ]
+  },
+  {
+    "id": "b-v0380",
+    "companyId": "b",
+    "jobId": "b-j099",
+    "sourceId": "b-v0380",
+    "startAt": "2026-10-20T19:30:00.000Z",
+    "endAt": "2026-10-21T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w21",
+      "b-w28"
+    ]
+  },
+  {
+    "id": "b-v0381",
+    "companyId": "b",
+    "jobId": "b-j087",
+    "sourceId": "b-v0381",
+    "startAt": "2026-10-20T19:30:00.000Z",
+    "endAt": "2026-10-21T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w22"
+    ]
+  },
+  {
+    "id": "b-v0382",
+    "companyId": "b",
+    "jobId": "b-j089",
+    "sourceId": "b-v0382",
+    "startAt": "2026-10-20T19:30:00.000Z",
+    "endAt": "2026-10-21T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w23"
+    ]
+  },
+  {
+    "id": "b-v0383",
+    "companyId": "b",
+    "jobId": "b-j082",
+    "sourceId": "b-v0383",
+    "startAt": "2026-10-21T13:00:00.000Z",
+    "endAt": "2026-10-22T02:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w05",
+      "b-w06",
+      "b-w07",
+      "b-w08"
+    ]
+  },
+  {
+    "id": "b-v0384",
+    "companyId": "b",
+    "jobId": "b-j083",
+    "sourceId": "b-v0384",
+    "startAt": "2026-10-21T14:00:00.000Z",
+    "endAt": "2026-10-22T00:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w09",
+      "b-w10",
+      "b-w11",
+      "b-w12"
+    ]
+  },
+  {
+    "id": "b-v0385",
+    "companyId": "b",
+    "jobId": "b-j086",
+    "sourceId": "b-v0385",
+    "startAt": "2026-10-21T14:00:00.000Z",
+    "endAt": "2026-10-21T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w13",
+      "b-w14",
+      "b-w15",
+      "b-w16"
+    ]
+  },
+  {
+    "id": "b-v0386",
+    "companyId": "b",
+    "jobId": "b-j093",
+    "sourceId": "b-v0386",
+    "startAt": "2026-10-21T15:00:00.000Z",
+    "endAt": "2026-10-21T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w17",
+      "b-w24"
+    ]
+  },
+  {
+    "id": "b-v0387",
+    "companyId": "b",
+    "jobId": "b-j095",
+    "sourceId": "b-v0387",
+    "startAt": "2026-10-21T15:00:00.000Z",
+    "endAt": "2026-10-21T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w18",
+      "b-w25"
+    ]
+  },
+  {
+    "id": "b-v0388",
+    "companyId": "b",
+    "jobId": "b-j097",
+    "sourceId": "b-v0388",
+    "startAt": "2026-10-21T15:00:00.000Z",
+    "endAt": "2026-10-21T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w19",
+      "b-w26"
+    ]
+  },
+  {
+    "id": "b-v0389",
+    "companyId": "b",
+    "jobId": "b-j099",
+    "sourceId": "b-v0389",
+    "startAt": "2026-10-21T15:00:00.000Z",
+    "endAt": "2026-10-21T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w20",
+      "b-w27"
+    ]
+  },
+  {
+    "id": "b-v0390",
+    "companyId": "b",
+    "jobId": "b-j087",
+    "sourceId": "b-v0390",
+    "startAt": "2026-10-21T15:00:00.000Z",
+    "endAt": "2026-10-21T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w21",
+      "b-w28"
+    ]
+  },
+  {
+    "id": "b-v0391",
+    "companyId": "b",
+    "jobId": "b-j089",
+    "sourceId": "b-v0391",
+    "startAt": "2026-10-21T15:00:00.000Z",
+    "endAt": "2026-10-21T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w22"
+    ]
+  },
+  {
+    "id": "b-v0392",
+    "companyId": "b",
+    "jobId": "b-j091",
+    "sourceId": "b-v0392",
+    "startAt": "2026-10-21T15:00:00.000Z",
+    "endAt": "2026-10-21T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w23"
+    ]
+  },
+  {
+    "id": "b-v0393",
+    "companyId": "b",
+    "jobId": "b-j094",
+    "sourceId": "b-v0393",
+    "startAt": "2026-10-21T19:30:00.000Z",
+    "endAt": "2026-10-22T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w17",
+      "b-w24"
+    ]
+  },
+  {
+    "id": "b-v0394",
+    "companyId": "b",
+    "jobId": "b-j096",
+    "sourceId": "b-v0394",
+    "startAt": "2026-10-21T19:30:00.000Z",
+    "endAt": "2026-10-22T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w18",
+      "b-w25"
+    ]
+  },
+  {
+    "id": "b-v0395",
+    "companyId": "b",
+    "jobId": "b-j098",
+    "sourceId": "b-v0395",
+    "startAt": "2026-10-21T19:30:00.000Z",
+    "endAt": "2026-10-22T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w19",
+      "b-w26"
+    ]
+  },
+  {
+    "id": "b-v0396",
+    "companyId": "b",
+    "jobId": "b-j100",
+    "sourceId": "b-v0396",
+    "startAt": "2026-10-21T19:30:00.000Z",
+    "endAt": "2026-10-22T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w20",
+      "b-w27"
+    ]
+  },
+  {
+    "id": "b-v0397",
+    "companyId": "b",
+    "jobId": "b-j088",
+    "sourceId": "b-v0397",
+    "startAt": "2026-10-21T19:30:00.000Z",
+    "endAt": "2026-10-22T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w21",
+      "b-w28"
+    ]
+  },
+  {
+    "id": "b-v0398",
+    "companyId": "b",
+    "jobId": "b-j090",
+    "sourceId": "b-v0398",
+    "startAt": "2026-10-21T19:30:00.000Z",
+    "endAt": "2026-10-22T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w22"
+    ]
+  },
+  {
+    "id": "b-v0399",
+    "companyId": "b",
+    "jobId": "b-j092",
+    "sourceId": "b-v0399",
+    "startAt": "2026-10-21T19:30:00.000Z",
+    "endAt": "2026-10-22T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w23"
+    ]
+  },
+  {
+    "id": "b-v0400",
+    "companyId": "b",
+    "jobId": "b-j082",
+    "sourceId": "b-v0400",
+    "startAt": "2026-10-22T14:00:00.000Z",
+    "endAt": "2026-10-22T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w05",
+      "b-w06",
+      "b-w07",
+      "b-w08"
+    ]
+  },
+  {
+    "id": "b-v0401",
+    "companyId": "b",
+    "jobId": "b-j084",
+    "sourceId": "b-v0401",
+    "startAt": "2026-10-22T14:00:00.000Z",
+    "endAt": "2026-10-23T00:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w09",
+      "b-w10",
+      "b-w11",
+      "b-w12"
+    ]
+  },
+  {
+    "id": "b-v0402",
+    "companyId": "b",
+    "jobId": "b-j086",
+    "sourceId": "b-v0402",
+    "startAt": "2026-10-22T14:00:00.000Z",
+    "endAt": "2026-10-22T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w13",
+      "b-w14",
+      "b-w15",
+      "b-w16"
+    ]
+  },
+  {
+    "id": "b-v0403",
+    "companyId": "b",
+    "jobId": "b-j096",
+    "sourceId": "b-v0403",
+    "startAt": "2026-10-22T15:00:00.000Z",
+    "endAt": "2026-10-22T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w17",
+      "b-w24"
+    ]
+  },
+  {
+    "id": "b-v0404",
+    "companyId": "b",
+    "jobId": "b-j098",
+    "sourceId": "b-v0404",
+    "startAt": "2026-10-22T15:00:00.000Z",
+    "endAt": "2026-10-22T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w18",
+      "b-w25"
+    ]
+  },
+  {
+    "id": "b-v0405",
+    "companyId": "b",
+    "jobId": "b-j100",
+    "sourceId": "b-v0405",
+    "startAt": "2026-10-22T15:00:00.000Z",
+    "endAt": "2026-10-22T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w19",
+      "b-w26"
+    ]
+  },
+  {
+    "id": "b-v0406",
+    "companyId": "b",
+    "jobId": "b-j088",
+    "sourceId": "b-v0406",
+    "startAt": "2026-10-22T15:00:00.000Z",
+    "endAt": "2026-10-22T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w20",
+      "b-w27"
+    ]
+  },
+  {
+    "id": "b-v0407",
+    "companyId": "b",
+    "jobId": "b-j090",
+    "sourceId": "b-v0407",
+    "startAt": "2026-10-22T15:00:00.000Z",
+    "endAt": "2026-10-22T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w21",
+      "b-w28"
+    ]
+  },
+  {
+    "id": "b-v0408",
+    "companyId": "b",
+    "jobId": "b-j092",
+    "sourceId": "b-v0408",
+    "startAt": "2026-10-22T15:00:00.000Z",
+    "endAt": "2026-10-22T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w22"
+    ]
+  },
+  {
+    "id": "b-v0409",
+    "companyId": "b",
+    "jobId": "b-j094",
+    "sourceId": "b-v0409",
+    "startAt": "2026-10-22T15:00:00.000Z",
+    "endAt": "2026-10-22T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w23"
+    ]
+  },
+  {
+    "id": "b-v0410",
+    "companyId": "b",
+    "jobId": "b-j091",
+    "sourceId": "b-v0410",
+    "startAt": "2026-10-22T18:30:00.000Z",
+    "endAt": "2026-10-23T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w21",
+      "b-w28"
+    ]
+  },
+  {
+    "id": "b-v0411",
+    "companyId": "b",
+    "jobId": "b-j097",
+    "sourceId": "b-v0411",
+    "startAt": "2026-10-22T19:30:00.000Z",
+    "endAt": "2026-10-23T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w17",
+      "b-w24"
+    ]
+  },
+  {
+    "id": "b-v0412",
+    "companyId": "b",
+    "jobId": "b-j099",
+    "sourceId": "b-v0412",
+    "startAt": "2026-10-22T19:30:00.000Z",
+    "endAt": "2026-10-23T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w18",
+      "b-w25"
+    ]
+  },
+  {
+    "id": "b-v0413",
+    "companyId": "b",
+    "jobId": "b-j087",
+    "sourceId": "b-v0413",
+    "startAt": "2026-10-22T19:30:00.000Z",
+    "endAt": "2026-10-23T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w19",
+      "b-w26"
+    ]
+  },
+  {
+    "id": "b-v0414",
+    "companyId": "b",
+    "jobId": "b-j089",
+    "sourceId": "b-v0414",
+    "startAt": "2026-10-22T19:30:00.000Z",
+    "endAt": "2026-10-23T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w20",
+      "b-w27"
+    ]
+  },
+  {
+    "id": "b-v0415",
+    "companyId": "b",
+    "jobId": "b-j093",
+    "sourceId": "b-v0415",
+    "startAt": "2026-10-22T19:30:00.000Z",
+    "endAt": "2026-10-23T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w22"
+    ]
+  },
+  {
+    "id": "b-v0416",
+    "companyId": "b",
+    "jobId": "b-j095",
+    "sourceId": "b-v0416",
+    "startAt": "2026-10-22T19:30:00.000Z",
+    "endAt": "2026-10-23T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w23"
+    ]
+  },
+  {
+    "id": "b-v0417",
+    "companyId": "b",
+    "jobId": "b-j082",
+    "sourceId": "b-v0417",
+    "startAt": "2026-10-23T14:00:00.000Z",
+    "endAt": "2026-10-23T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w05",
+      "b-w06",
+      "b-w07",
+      "b-w08"
+    ]
+  },
+  {
+    "id": "b-v0418",
+    "companyId": "b",
+    "jobId": "b-j084",
+    "sourceId": "b-v0418",
+    "startAt": "2026-10-23T14:00:00.000Z",
+    "endAt": "2026-10-24T00:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w09",
+      "b-w10",
+      "b-w11",
+      "b-w12"
+    ]
+  },
+  {
+    "id": "b-v0419",
+    "companyId": "b",
+    "jobId": "b-j086",
+    "sourceId": "b-v0419",
+    "startAt": "2026-10-23T14:00:00.000Z",
+    "endAt": "2026-10-23T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w13",
+      "b-w14",
+      "b-w15",
+      "b-w16"
+    ]
+  },
+  {
+    "id": "b-v0420",
+    "companyId": "b",
+    "jobId": "b-j099",
+    "sourceId": "b-v0420",
+    "startAt": "2026-10-23T15:00:00.000Z",
+    "endAt": "2026-10-23T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w17",
+      "b-w24"
+    ]
+  },
+  {
+    "id": "b-v0421",
+    "companyId": "b",
+    "jobId": "b-j087",
+    "sourceId": "b-v0421",
+    "startAt": "2026-10-23T15:00:00.000Z",
+    "endAt": "2026-10-23T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w18",
+      "b-w25"
+    ]
+  },
+  {
+    "id": "b-v0422",
+    "companyId": "b",
+    "jobId": "b-j089",
+    "sourceId": "b-v0422",
+    "startAt": "2026-10-23T15:00:00.000Z",
+    "endAt": "2026-10-23T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w19",
+      "b-w26"
+    ]
+  },
+  {
+    "id": "b-v0423",
+    "companyId": "b",
+    "jobId": "b-j091",
+    "sourceId": "b-v0423",
+    "startAt": "2026-10-23T15:00:00.000Z",
+    "endAt": "2026-10-23T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w20",
+      "b-w27"
+    ]
+  },
+  {
+    "id": "b-v0424",
+    "companyId": "b",
+    "jobId": "b-j093",
+    "sourceId": "b-v0424",
+    "startAt": "2026-10-23T15:00:00.000Z",
+    "endAt": "2026-10-23T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w21",
+      "b-w28"
+    ]
+  },
+  {
+    "id": "b-v0425",
+    "companyId": "b",
+    "jobId": "b-j095",
+    "sourceId": "b-v0425",
+    "startAt": "2026-10-23T15:00:00.000Z",
+    "endAt": "2026-10-23T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w22"
+    ]
+  },
+  {
+    "id": "b-v0426",
+    "companyId": "b",
+    "jobId": "b-j097",
+    "sourceId": "b-v0426",
+    "startAt": "2026-10-23T15:00:00.000Z",
+    "endAt": "2026-10-23T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w23"
+    ]
+  },
+  {
+    "id": "b-v0427",
+    "companyId": "b",
+    "jobId": "b-j100",
+    "sourceId": "b-v0427",
+    "startAt": "2026-10-23T19:30:00.000Z",
+    "endAt": "2026-10-24T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w17",
+      "b-w24"
+    ]
+  },
+  {
+    "id": "b-v0428",
+    "companyId": "b",
+    "jobId": "b-j088",
+    "sourceId": "b-v0428",
+    "startAt": "2026-10-23T19:30:00.000Z",
+    "endAt": "2026-10-24T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w18",
+      "b-w25"
+    ]
+  },
+  {
+    "id": "b-v0429",
+    "companyId": "b",
+    "jobId": "b-j090",
+    "sourceId": "b-v0429",
+    "startAt": "2026-10-23T19:30:00.000Z",
+    "endAt": "2026-10-24T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w19",
+      "b-w26"
+    ]
+  },
+  {
+    "id": "b-v0430",
+    "companyId": "b",
+    "jobId": "b-j092",
+    "sourceId": "b-v0430",
+    "startAt": "2026-10-23T19:30:00.000Z",
+    "endAt": "2026-10-24T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w20",
+      "b-w27"
+    ]
+  },
+  {
+    "id": "b-v0431",
+    "companyId": "b",
+    "jobId": "b-j094",
+    "sourceId": "b-v0431",
+    "startAt": "2026-10-23T19:30:00.000Z",
+    "endAt": "2026-10-24T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w21",
+      "b-w28"
+    ]
+  },
+  {
+    "id": "b-v0432",
+    "companyId": "b",
+    "jobId": "b-j096",
+    "sourceId": "b-v0432",
+    "startAt": "2026-10-23T19:30:00.000Z",
+    "endAt": "2026-10-24T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w22"
+    ]
+  },
+  {
+    "id": "b-v0433",
+    "companyId": "b",
+    "jobId": "b-j098",
+    "sourceId": "b-v0433",
+    "startAt": "2026-10-23T19:30:00.000Z",
+    "endAt": "2026-10-24T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w23"
+    ]
+  },
+  {
+    "id": "b-v0434",
+    "companyId": "b",
+    "jobId": "b-j084",
+    "sourceId": "b-v0434",
+    "startAt": "2026-10-24T14:00:00.000Z",
+    "endAt": "2026-10-25T00:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w12"
+    ]
+  },
+  {
+    "id": "b-v0435",
+    "companyId": "b",
+    "jobId": "b-j086",
+    "sourceId": "b-v0435",
+    "startAt": "2026-10-24T14:00:00.000Z",
+    "endAt": "2026-10-24T19:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w13",
+      "b-w14",
+      "b-w15",
+      "b-w16"
+    ]
+  },
+  {
+    "id": "b-v0436",
+    "companyId": "b",
+    "jobId": "b-j087",
+    "sourceId": "b-v0436",
+    "startAt": "2026-10-24T16:00:00.000Z",
+    "endAt": "2026-10-24T20:00:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "b-w22"
+    ]
+  }
+]
