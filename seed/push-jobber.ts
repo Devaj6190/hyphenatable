@@ -27,6 +27,7 @@ import {
   partitionSupported,
   QUERIES,
   resolveRefs,
+  retitlePlan,
   type Step,
 } from "./lib/jobber-mutations";
 import {
@@ -422,6 +423,47 @@ async function live(company: string, opts: { one: boolean }) {
  * checklist) by user, job and start time, and writes their Jobber ids into the id map (`entries` and
  * `adopted`). Never creates or edits anything in Jobber.
  */
+/**
+ * --live --retitle: renames mapped jobs and Jobber expenses whose title differs from the fixtures (the
+ * "undefined" street fix). Only titles change; nothing is created. Allowlisted account only.
+ */
+async function retitle(company: string) {
+  const client = new SeedClient(seedAuthFromEnv());
+  const account = await requireAllowedAccount(client);
+  console.log(
+    `account ${account.id} "${account.name}" allowed (JOBBER_SEED_ACCOUNT_ID); retitling`,
+  );
+  const available = await availableMutations(client);
+  for (const m of ["jobEdit", "expenseEdit"])
+    if (!available.has(m))
+      throw new Error(`${m} is not in this token's schema`);
+  const map: IdMap = readJsonOrNull<IdMap>(mapPath(company)) ?? {};
+  const current = new Map<string, string>();
+  for (const n of await paginate(client, QUERIES.jobs, "jobs"))
+    current.set(n.id as string, String(n.title));
+  for (const n of await paginate(client, QUERIES.expenses, "expenses"))
+    current.set(n.id as string, String(n.title));
+  const todo = retitlePlan(plan(company, {}).steps, map, current);
+  for (const r of todo) {
+    const doc = r.kind === "jobs" ? MUTATIONS.jobEdit : MUTATIONS.expenseEdit;
+    const vars =
+      r.kind === "jobs"
+        ? { jobId: r.jobberId, input: { title: r.to } }
+        : { expenseId: r.jobberId, input: { title: r.to } };
+    const res = await client.gql(doc, vars);
+    const payload = res.data?.[r.kind === "jobs" ? "jobEdit" : "expenseEdit"] as
+      | { userErrors?: { message: string }[] }
+      | undefined;
+    const errs = [
+      ...res.errors.map((e) => e.message),
+      ...(payload?.userErrors ?? []).map((e) => e.message),
+    ];
+    if (errs.length) throw new Error(`retitle ${r.ourId}: ${errs.join("; ")}`);
+    console.log(`RETITLED ${r.kind} ${r.ourId}: "${r.from}" -> "${r.to}"`);
+  }
+  console.log(`${todo.length} title(s) changed`);
+}
+
 async function adopt(company: string, ids: string[]) {
   const client = new SeedClient(seedAuthFromEnv());
   const account = await requireAllowedAccount(client);
@@ -511,7 +553,8 @@ if (import.meta.main) {
         throw new Error(
           "usage: bun run seed/push-jobber.ts --company <a|b> [--live [--one]] [--verbose]",
         );
-      if (flag("live") && flag("adopt-entries"))
+      if (flag("live") && flag("retitle")) await retitle(company);
+      else if (flag("live") && flag("adopt-entries"))
         await adopt(
           company,
           (val("ids") ?? DEFAULT_ADOPT_IDS.join(",")).split(","),

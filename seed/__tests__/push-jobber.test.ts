@@ -7,6 +7,7 @@ import {
   partitionSupported,
   QUERIES,
   resolveRefs,
+  retitlePlan,
 } from "../lib/jobber-mutations";
 import {
   codeFromRedirect,
@@ -441,5 +442,41 @@ describe("seed client: dropped connections", () => {
     ).rejects.toThrow("may have been applied");
     expect(isMutation("  mutation { a }")).toBe(true);
     expect(isMutation("query { a }")).toBe(false);
+  });
+});
+
+describe("--retitle", () => {
+  test("lists only mapped jobs and expenses whose Jobber title differs from the fixtures", () => {
+    const steps = buildPlan(fx, {}, opts).steps;
+    const map: IdMap = {
+      jobs: { "a-j28": "J28", "a-j01": "J01" },
+      expenses: { "a-ex-4006": "E6" },
+    };
+    const current = new Map([
+      ["J28", "Backyard patio and drainage - undefined [payrollpilot:a-j28]"],
+      ["J01", "Front yard sod install - Larkspur Ln [payrollpilot:a-j01]"],
+      ["E6", "Dump fee - undefined [payrollpilot:a-ex-4006]"],
+    ]);
+    expect(retitlePlan(steps, map, current)).toEqual([
+      {
+        kind: "jobs",
+        ourId: "a-j28",
+        jobberId: "J28",
+        from: "Backyard patio and drainage - undefined [payrollpilot:a-j28]",
+        to: "Backyard patio and drainage - Kingfisher Ln [payrollpilot:a-j28]",
+      },
+      {
+        kind: "expenses",
+        ourId: "a-ex-4006",
+        jobberId: "E6",
+        from: "Dump fee - undefined [payrollpilot:a-ex-4006]",
+        to: "Dump fee - Kingfisher Ln [payrollpilot:a-ex-4006]",
+      },
+    ]);
+  });
+  test("no fixture title contains undefined any more", () => {
+    for (const j of fx.jobs) expect(String(j.title)).not.toContain("undefined");
+    for (const x of fx.expenses)
+      expect(String(x.description)).not.toContain("undefined");
   });
 });

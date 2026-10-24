@@ -28,6 +28,18 @@ export const STREETS = [
   "Mossbank Way",
 ];
 
+// Used in order once STREETS is exhausted by the past cycles (none of these appear in a-c05 or a-c06).
+export const STREETS_OVERFLOW = [
+  "Kingfisher Ln",
+  "Briarwood Ct",
+  "Silverleaf Dr",
+  "Goldenrod Way",
+  "Cattail Rd",
+  "Larchmont Ave",
+  "Bittersweet Ln",
+  "Primrose Ct",
+];
+
 // Kinds of landscaping work for past-cycle jobs. `lighting` jobs are the ones quoted in person.
 export const WORK = [
   { title: "Front yard sod install", kind: "install" },

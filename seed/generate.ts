@@ -11,7 +11,13 @@ import { join } from "node:path";
 import { type ConfigB, generateB } from "./lib/company-b";
 import { type CycleExtConfig, generateCycleA06 } from "./lib/cycle-a06";
 import { must } from "./lib/must";
-import { JOBBER_EXPENSE_TITLES, STREETS, VENDORS, WORK } from "./lib/names";
+import {
+  JOBBER_EXPENSE_TITLES,
+  STREETS,
+  STREETS_OVERFLOW,
+  VENDORS,
+  WORK,
+} from "./lib/names";
 import { buildAnswerKey, plantCurrent } from "./lib/plant";
 import { rng } from "./lib/random";
 import {
@@ -376,8 +382,13 @@ function buildPast(ctx: Ctx, wcfg: Map<string, WorkerCfg>) {
     (s) => !cfg.current.jobs.some((j) => j.title.endsWith(s)),
   );
   const streetOrder = rng(`${cfg.seed}:streets`);
+  // When the shuffled pool runs out, take the overflow streets in order. The overflow used to be missing,
+  // which made 5 a-c04 titles end in "undefined"; the order of the first 16 streets is unchanged.
+  const overflow = [...STREETS_OVERFLOW];
   const takeStreet = () =>
-    streetPool.splice(streetOrder.int(0, streetPool.length - 1), 1)[0];
+    streetPool.length
+      ? streetPool.splice(streetOrder.int(0, streetPool.length - 1), 1)[0]
+      : must(overflow.shift(), "a street (extend STREETS_OVERFLOW)");
   const jobberRate = (w: string, c: string) =>
     rateAt(must(wcfg.get(w), `worker ${w}`).jobberRates, c) ??
     must(wcfg.get(w), `worker ${w}`).jobberRate ??
