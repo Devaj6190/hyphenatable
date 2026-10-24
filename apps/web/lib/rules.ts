@@ -1,5 +1,3 @@
-import type { MissedQuestion } from "@/lib/onboardingQuestions";
-
 // Mirrors Rule in docs/plans/00-shared-context.md section 6. B's rules.list replaces the fixture.
 export type RuleType =
   | "overtime_policy"
@@ -57,47 +55,8 @@ export type SyncRun = {
   complete: boolean;
 };
 
-export type EvidenceItem = {
-  id: string;
-  kind: "cycle" | "payroll" | "other";
-  label: string;
-  incomplete: SyncRun[];
-};
-
-/**
- * A rule as the server hands it to a screen (lib/server/rules.ts). `params` is always empty: the plain
- * words are built on the server, and only the owner's carry pay amounts.
- */
-export type RuleView = Rule & {
-  words: string;
-  evidence: EvidenceItem[] | null;
-  summary: { text: string; seen: number | null; of: number | null } | null;
-};
-
-export type PastQuestion = {
-  id: string;
-  cycleId: string;
-  toRole: string;
-  text: string;
-};
-
-export type RulesViewData = {
-  rules: RuleView[];
-  /** The owner's worker id: the approver for every rule in the demo. */
-  ownerId: string | null;
-  /** Display names for the people rules name as answerer or approver. */
-  names: Record<string, string>;
-  cycles: Cycle[];
-  incompleteSyncs: SyncRun[];
-  pastQuestions: PastQuestion[];
-  missedQuestions: MissedQuestion[];
-};
-
 export const closedOf = (cycles: Cycle[]) =>
   cycles.filter((c) => c.stage === "closed");
-
-export const RULES_SOURCE = "fixture, data/fixtures/a/rules.json";
-export const CYCLES_SOURCE = "fixture, data/fixtures/a/cycles.json";
 
 const day = new Intl.DateTimeFormat("en-US", {
   month: "short",

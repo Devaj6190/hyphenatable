@@ -10,9 +10,10 @@ import { SourceChip } from "@/components/SourceChip";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { blockedApprover, type useRuleStore } from "@/lib/ruleStore";
-import { type RuleView, shortDate, sourceWords, syncWords } from "@/lib/rules";
+import { shortDate, sourceWords, syncWords } from "@/lib/rules";
 import type { ViewerRole } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import type { RuleView } from "@/lib/view-types";
 
 type Store = ReturnType<typeof useRuleStore>;
 
@@ -100,7 +101,7 @@ export function RuleCard({
   highlight = false,
 }: {
   rule: RuleView;
-  /** Display names by worker id, from the server. */
+  /** "Name (role)" by worker id, from the server. */
   names: Record<string, string>;
   store: Store;
   viewer: ViewerRole;
@@ -120,9 +121,11 @@ export function RuleCard({
   const sodBlocked = approverId !== null && blockedApprover(rule, approverId);
   const evidence = rule.summary;
   const { answeredBy, approvedBy, approvedAt } = rule.provenance;
-  const wasApproved = change
-    ? change.label !== "Rejected"
-    : rule.status !== "proposed";
+  // Only a real approval earns the on/off switch. A rule turned off by an edit or a rejection was never approved.
+  const wasApproved =
+    rule.provenance.approvedBy !== null || store.wasApproved(rule.id);
+  // An owner-stated rule has no type until the Analyst restates it, so nothing could enforce it yet.
+  const awaitingRestatement = stated && rule.type === null;
 
   const approve = () =>
     approverId && store.decide(rule, "active", "Approved", approverId);
@@ -237,9 +240,13 @@ export function RuleCard({
           <div className="flex shrink-0 flex-wrap items-center gap-2 lg:justify-end">
             {rule.status === "proposed" && (
               <>
-                <Button size="sm" onClick={approve} disabled={sodBlocked}>
-                  {approveLabel}
-                </Button>
+                {awaitingRestatement ? (
+                  <StatusBadge status="asked" label="Waiting for restatement" />
+                ) : (
+                  <Button size="sm" onClick={approve} disabled={sodBlocked}>
+                    {approveLabel}
+                  </Button>
+                )}
                 <Button
                   size="sm"
                   variant="secondary"
@@ -347,7 +354,7 @@ export function RuleCard({
               />
               <p className="mt-2 text-sm text-muted-foreground">
                 Your version is added as a rule stated by you. This one turns
-                off.
+                off. Undo on this rule removes your version too.
               </p>
             </div>
           )}

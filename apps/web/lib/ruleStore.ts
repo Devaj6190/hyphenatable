@@ -1,7 +1,8 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
-import type { Rule, RuleView } from "@/lib/rules";
+import type { Rule } from "@/lib/rules";
+import type { RuleView } from "@/lib/view-types";
 
 // ponytail: browser-only stand-in for rules.approve / rules.toggle / rules.stateInPlainWords /
 // onboarding answers, which are not in apps/web/convex yet. Decisions live in sessionStorage so
@@ -104,13 +105,22 @@ export function useRuleStore(companyId: string, initial: RuleView[]) {
     });
   };
 
+  /** Undoing "Replaced by your edit" also removes the owner's replacement, so the two never both stand. */
   const undo = (ruleId: string) => {
     const cur = read();
+    const history = cur.changes[ruleId] ?? [];
+    const replaced = history.at(-1)?.label === "Replaced by your edit";
+    const gone = replaced
+      ? cur.stated.filter((r) => r.params.replaces === ruleId).map((r) => r.id)
+      : [];
     write({
       ...cur,
+      stated: cur.stated.filter((r) => !gone.includes(r.id)),
       changes: {
-        ...cur.changes,
-        [ruleId]: (cur.changes[ruleId] ?? []).slice(0, -1),
+        ...Object.fromEntries(
+          Object.entries(cur.changes).filter(([id]) => !gone.includes(id)),
+        ),
+        [ruleId]: history.slice(0, -1),
       },
     });
   };
@@ -157,6 +167,8 @@ export function useRuleStore(companyId: string, initial: RuleView[]) {
   return {
     rules,
     lastChange: (id: string) => s.changes[id]?.at(-1) ?? null,
+    wasApproved: (id: string) =>
+      (s.changes[id] ?? []).some((c) => c.label === "Approved"),
     changedIds: Object.keys(s.changes).filter((id) => s.changes[id].length),
     answers: s.answers,
     decide,

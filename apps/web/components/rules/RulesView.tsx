@@ -9,12 +9,8 @@ import { RuleCard } from "@/components/rules/RuleCard";
 import { PreviewNote, RulesEmpty } from "@/components/rules/RulesBits";
 import { Segmented } from "@/components/Segmented";
 import { useRuleStore } from "@/lib/ruleStore";
-import {
-  groupRules,
-  RULES_SOURCE,
-  type Rule,
-  type RulesViewData,
-} from "@/lib/rules";
+import { groupRules, type Rule } from "@/lib/rules";
+import type { RulesViewData } from "@/lib/view-types";
 
 type Filter = "all" | Rule["status"];
 
@@ -79,11 +75,25 @@ export function RulesView({
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
           <DataLabel kind={dataKind} detail={label} />
           <span className="text-sm text-muted-foreground">
-            Source: {RULES_SOURCE}
+            Source: {data.sources.rules}
           </span>
         </div>
         <PreviewNote />
       </div>
+
+      <section className="flex flex-col gap-2" aria-labelledby="conflicts">
+        <h2 id="conflicts" className="text-xl font-semibold">
+          Conflicts
+        </h2>
+        <div className="rounded-card border border-dashed border-input bg-card p-4">
+          <p className="font-medium">No conflicts.</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            A conflict shows here when a new answer disagrees with an active
+            rule, and you decide which one stands. Source: lessons, none yet
+            (there is no lessons data in the fixture, and lessons are not live).
+          </p>
+        </div>
+      </section>
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <Segmented

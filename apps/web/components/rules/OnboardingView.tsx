@@ -11,17 +11,10 @@ import { SourceChip } from "@/components/SourceChip";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { MISSED_SOURCE, type MissedQuestion } from "@/lib/onboardingQuestions";
 import { useRuleStore } from "@/lib/ruleStore";
-import {
-  closedOf,
-  groupRules,
-  RULES_SOURCE,
-  type RulesViewData,
-  shortDate,
-  syncWords,
-} from "@/lib/rules";
+import { closedOf, groupRules, shortDate, syncWords } from "@/lib/rules";
 import { cn } from "@/lib/utils";
+import type { MissedQuestion, RulesViewData } from "@/lib/view-types";
 
 function Section({
   n,
@@ -194,7 +187,7 @@ export function OnboardingView({
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
           <DataLabel kind={dataKind} detail={`${label}, onboarding`} />
           <span className="text-sm text-muted-foreground">
-            Rules: {RULES_SOURCE}
+            Rules: {data.sources.rules}
           </span>
         </div>
         <p className="max-w-2xl">
@@ -238,43 +231,25 @@ export function OnboardingView({
         title="Rules we found"
         description="The Analyst proposed these. Confirm what’s right and fix what isn’t. We only use rules you confirm, and checks never change pay on their own."
       >
-        {groupRules(learned).map((g) => {
-          const sure = g.rules.filter(
-            (r) => r.status === "proposed" && r.confidence >= 0.85,
-          );
-          return (
-            <div key={g.id} className="flex flex-col gap-3">
-              <div className="flex flex-wrap items-center gap-3">
-                <h3 className="text-sm font-semibold tracking-wide text-muted-foreground uppercase">
-                  {g.title}
-                </h3>
-                {approverId && sure.length > 1 && (
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    onClick={() => {
-                      for (const r of sure)
-                        store.decide(r, "active", "Approved", approverId);
-                    }}
-                  >
-                    Confirm the {sure.length} at 85%+ sure
-                  </Button>
-                )}
-              </div>
-              {g.rules.map((r) => (
-                <RuleCard
-                  key={r.id}
-                  rule={r}
-                  names={data.names}
-                  store={store}
-                  viewer={role}
-                  approverId={approverId}
-                  approveLabel="Confirm"
-                />
-              ))}
-            </div>
-          );
-        })}
+        {/* No bulk confirm: model confidence is not a reason to approve a rule unread. */}
+        {groupRules(learned).map((g) => (
+          <div key={g.id} className="flex flex-col gap-3">
+            <h3 className="text-sm font-semibold tracking-wide text-muted-foreground uppercase">
+              {g.title}
+            </h3>
+            {g.rules.map((r) => (
+              <RuleCard
+                key={r.id}
+                rule={r}
+                names={data.names}
+                store={store}
+                viewer={role}
+                approverId={approverId}
+                approveLabel="Confirm"
+              />
+            ))}
+          </div>
+        ))}
       </Section>
 
       <Section
@@ -283,7 +258,9 @@ export function OnboardingView({
         description="A few things in your past payrolls we couldn’t explain. Your answer helps, and nothing changes until you approve a rule."
       >
         <p className="-mt-2 text-sm text-muted-foreground">
-          Questions: {MISSED_SOURCE}
+          {approverId
+            ? `Questions: ${data.sources.missed}`
+            : "These questions go to the owner."}
         </p>
         {questions.map((q) => (
           <MissedCard

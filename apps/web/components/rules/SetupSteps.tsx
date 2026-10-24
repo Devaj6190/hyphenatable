@@ -1,22 +1,26 @@
 import { Check, CircleDot } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const STEPS = [
-  "Connect Jobber",
-  "Connect QuickBooks",
-  "Connect Gusto",
-  "Check your rules",
-  "Add your job manager",
-];
+import type { RulesViewData } from "@/lib/view-types";
 
-/** Shannin's setup checklist, as an eyebrow above the onboarding title. */
-export function SetupSteps() {
+/** Shannin's setup checklist, as an eyebrow above the onboarding title. Connected = a sync run is on record. */
+export function SetupSteps({
+  connected,
+}: {
+  connected: RulesViewData["connected"];
+}) {
+  const steps = [
+    { label: "Connect Jobber", done: connected.jobber },
+    { label: "Connect QuickBooks", done: connected.qbo },
+    { label: "Connect Gusto", done: connected.gusto },
+    { label: "Check your rules", done: false },
+    { label: "Add your job manager", done: false },
+  ];
+  const nowIndex = steps.findIndex((s) => !s.done);
   return (
     <ol className="mb-3 flex flex-wrap gap-x-4 gap-y-2 text-sm">
-      {STEPS.map((s, i) => {
-        // Company A's syncRuns.json has runs from all three sources.
-        const done = i < 3;
-        const now = i === 3;
+      {steps.map(({ label: s, done }, i) => {
+        const now = i === nowIndex;
         return (
           <li
             key={s}

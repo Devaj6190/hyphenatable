@@ -8,7 +8,8 @@ import { PreviewNote, RulesEmpty } from "@/components/rules/RulesBits";
 import { StatusBadge } from "@/components/StatusBadge";
 import { buttonVariants } from "@/components/ui/button";
 import { useRuleStore } from "@/lib/ruleStore";
-import { CYCLES_SOURCE, closedOf, type RulesViewData } from "@/lib/rules";
+import { closedOf, shortDate } from "@/lib/rules";
+import type { RulesViewData } from "@/lib/view-types";
 
 export function LearnedView({
   companyId,
@@ -32,9 +33,18 @@ export function LearnedView({
   const last = past[past.length - 1];
   const prev = past[past.length - 2];
   const max = Math.max(1, ...past.map((c) => c.questionsAsked));
-  const changed = store.rules.filter(
-    (r) => store.changedIds.includes(r.id) || r.source === "owner_stated",
-  );
+  const approvedBetween = (from: string | undefined, to: string | undefined) =>
+    store.rules.filter(
+      (r) =>
+        r.status === "active" &&
+        r.provenance.approvedAt !== null &&
+        (!from || r.provenance.approvedAt > from) &&
+        (!to || r.provenance.approvedAt <= to),
+    );
+  // Approved after the last closed cycle ended: these apply from the next cycle on.
+  const changed = approvedBetween(last.periodEnd, undefined);
+  // Credit rules for the change in questions only when some were approved between the two cycles.
+  const credited = prev ? approvedBetween(prev.periodEnd, last.periodEnd) : [];
   const proposed = store.rules.filter((r) => r.status === "proposed").length;
   const asked = data.pastQuestions;
   const delta = prev ? last.questionsAsked - prev.questionsAsked : 0;
@@ -69,12 +79,13 @@ export function LearnedView({
                 ? `Down from ${prev.questionsAsked} in cycle ${prev.number}.`
                 : delta > 0
                   ? `Up from ${prev.questionsAsked} in cycle ${prev.number}.`
-                  : `Same as cycle ${prev.number}.`}{" "}
-              Approved rules answer things the next cycle would otherwise ask.
+                  : `Same as cycle ${prev.number}.`}
+              {credited.length > 0 &&
+                ` Rules approved between the two cycles: ${credited.map((r) => r.id).join(", ")}. They answer things the next cycle would otherwise ask.`}
             </p>
           )}
           <p className="mt-auto text-sm text-muted-foreground">
-            Source: Cycle.questionsAsked, {CYCLES_SOURCE}
+            Source: Cycle.questionsAsked, {data.sources.cycles}
           </p>
         </div>
         <figure className="flex flex-col gap-2">
@@ -120,7 +131,10 @@ export function LearnedView({
         <PreviewNote />
         {changed.length === 0 ? (
           <div className="rounded-card border bg-card p-5 shadow-card">
-            <p>No rule changes yet.</p>
+            <p>
+              No rules approved since cycle {last.number} closed on{" "}
+              {shortDate(last.periodEnd)}.
+            </p>
             {proposed > 0 && (
               <p className="mt-1 text-muted-foreground">
                 {proposed} proposed rules wait for your approval.
@@ -195,7 +209,7 @@ export function LearnedView({
             })}
           </ul>
           <p className="text-sm text-muted-foreground">
-            Source: data/fixtures/a/questions.json
+            Source: {data.sources.questions}
           </p>
         </section>
       )}

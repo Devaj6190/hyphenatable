@@ -4,8 +4,7 @@ import { PageHeader } from "@/components/PageHeader";
 import { OnboardingView } from "@/components/rules/OnboardingView";
 import { SetupSteps } from "@/components/rules/SetupSteps";
 import { companies } from "@/lib/companies";
-import { currentViewer } from "@/lib/server/fixtures";
-import { rulesView } from "@/lib/server/rules";
+import { currentViewer, rulesView } from "@/lib/server/fixtures";
 
 // Params are read inside Suspense so the shell stays instant (Next 16).
 export default function OnboardingPage({
@@ -13,7 +12,9 @@ export default function OnboardingPage({
 }: PageProps<"/c/[companyId]/onboarding">) {
   return (
     <>
-      <SetupSteps />
+      <Suspense>
+        <Steps params={params} />
+      </Suspense>
       <PageHeader
         title="Here’s how we think you run payroll"
         description="Rules we found in your past payrolls. Confirm them, answer what we missed, or add your own."
@@ -23,6 +24,14 @@ export default function OnboardingPage({
       </Suspense>
     </>
   );
+}
+
+async function Steps({
+  params,
+}: Pick<PageProps<"/c/[companyId]/onboarding">, "params">) {
+  const { companyId } = await params;
+  const viewer = await currentViewer(companyId);
+  return <SetupSteps connected={rulesView(viewer, companyId).connected} />;
 }
 
 async function Body({

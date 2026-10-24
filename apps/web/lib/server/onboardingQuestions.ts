@@ -1,14 +1,8 @@
+import "server-only";
+import type { MissedQuestion } from "@/lib/view-types";
+
 // Placeholder "What did we miss?" questions until onboarding.questions is live. Each one is written
 // from past payroll lines the fixture rules don't explain; the ids are those Gusto lines.
-export type MissedQuestion = {
-  id: string;
-  companyId: string;
-  text: string;
-  options: string[];
-  evidence: string[];
-  relatedRuleIds: string[];
-};
-
 export const MISSED_SOURCE =
   "placeholder, written from data/fixtures/a/pastPayrolls.json";
 
