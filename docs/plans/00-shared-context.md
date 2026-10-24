@@ -64,7 +64,7 @@ Hard facts: at the venue by **Sun 08:00**, Devpost submission by **Sun 09:00** (
 ### 4.1 Choices (justified in `docs/plan-research.md`)
 | Layer | Choice | Why |
 |---|---|---|
-| Language | TypeScript everywhere, Bun 1.4 as package manager and runtime for scripts | one language for three people; the earlier Photon bridge ran on Bun |
+| Language | TypeScript everywhere, Bun 1.3.13 (pinned in CI) as package manager and runtime for scripts | one language for three people; the earlier Photon bridge ran on Bun |
 | Backend, DB, scheduling, realtime | **Convex** (free tier: 0.5 GB, 1M calls/month, actions up to 10 min, persisted scheduler, crons, HTTP actions, vector search, live queries) | the agent loop cannot live on Vercel functions (300 s cap, daily crons on Hobby); Convex gives scheduling, webhooks, a shared DB and a live dashboard with no glue; it also enters the Convex track |
 | Dashboard | **Next.js 16 (App Router)** on Vercel, project `payrollpilot` (rename later), Tailwind 4, shadcn | documented Convex + Next.js path; Vercel project already exists |
 | Texting | **Photon Spectrum** `spectrum-ts` 12.14 in a Bun worker (`apps/courier`) on a laptop, connected to Convex with the Convex client | the SDK stream needs no tunnel; there is no REST send endpoint; one open question per conversation |
@@ -84,9 +84,13 @@ Plan B if Convex fails its first-hour check (H5): Neon Postgres + Drizzle, one B
 bun init -y >/dev/null 2>&1 || true
 mkdir -p apps packages seed eval data/fixtures data/private docs
 # dashboard + convex
-cd apps && bunx create-next-app@latest web --ts --app --tailwind --eslint=false --src-dir=false --import-alias "@/*" --use-bun --yes && cd web
+# create-next-app 16.4.3 has no --eslint=false / --src-dir=false; this is the form that works:
+cd apps && npx create-next-app@16.4.3 web --ts --app --tailwind --biome --no-src-dir --import-alias "@/*" --use-bun --skip-install --disable-git --yes && cd web
+mv biome.json ../../biome.json   # one Biome config at the root
 bun add convex @anthropic-ai/sdk zod
-bunx convex dev --once   # creates convex/ and a dev deployment; prints NEXT_PUBLIC_CONVEX_URL
+bunx convex login        # once per machine (device flow in the browser)
+bunx convex dev --once   # creates the dev deployment, convex/_generated and .env.local (NEXT_PUBLIC_CONVEX_URL)
+# no login yet? CONVEX_AGENT_MODE=anonymous bunx convex dev runs a local backend (port 3210) for offline work
 cd ../..
 # workspaces
 cat > package.json <<'JSON'
