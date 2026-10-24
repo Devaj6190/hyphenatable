@@ -52,6 +52,42 @@ Both runners print counts only. Everything they read and write stays under `data
 bun run m2-run.ts   # "M2: N of M onboarding rules match the owner's runbook; K differ; J were not learned"
 ```
 
+### M4 setup from the owner's facts: `m4-rules-build.ts`
+
+```bash
+bun run m4-rules-build.ts   # [--private data/private/r] → data/private/r/m4-rules.json; prints counts only
+```
+
+It reads three private inputs:
+
+1. **`owner-facts.json`** (real first names):
+
+   ```
+   { source, timezone, payFrequency,
+     overtime: { workweekStartsOn, weeklyHours, multiplier, dailyOvertime },
+     longShiftReviewHours,
+     venmo: { latestCycle, earlierCycle (full names), movedVenmoToGusto },
+     salaried, commission: { plan, recordedRecipients }, managerProfitShare: { recipients } }
+   ```
+
+2. **`pseudonyms.json`**: ingest-r's map from a real-name key to a pseudonymous display name.
+3. **`out/*.json`**: the anonymized bundles.
+
+How it builds the setup:
+
+- **Name resolution:** a first name resolves when exactly one map key contains it, and a full name needs an exact key. Ambiguous or missing names are counted as unresolved, never guessed. The display name is then joined to the bundle's worker id.
+- **Rates:** each worker's Regular rate comes from regular-section journal rows, using the row's rate, else amount / hours.
+  - One rate: the worker is hourly at that rate.
+  - Several rates: `multiRate: true`. M4 reports these workers separately as "rate depends on job role, not in timesheets".
+  - No rate: the worker is excluded with that reason.
+- **Venmo:** Venmo workers (latest and earlier cycles, minus those who moved to Gusto) are excluded with "paid outside Gusto".
+- **Salaried:** a salaried worker needs one consistent Salary amount per period, which becomes a `Paycheck` rate.
+- **Stage 2:** commission and manager-share recipients are listed only as ids. Their Stage 2 pay types are left out of the Stage 1 comparison.
+- **Rules:** the overtime rule takes the owner's workweek (for example `Monday-Sunday`).
+- **Output:** ids only. A leak check refuses to write the file if any word of a real name appears in it.
+
+Synthetic test inputs: `fixtures/r-build/` (every name invented).
+
 ### M4: the Company R backtest
 
 The backtest takes three inputs:
@@ -62,12 +98,22 @@ The backtest takes three inputs:
 
 For each pay period, it runs `computeStage1` and compares gross per worker with what was paid. Venmo is excluded, because it is not in the Gusto journal. The report gives exact matches, matches within $1, the max difference and the unmatched worker-periods, **before and after corrections**.
 
+**Which periods are compared.** Only pay periods that lie fully inside the timesheet export window are compared.
+
+- **Where the window comes from:** `--from` / `--to`, taken from the export's SyncRun or metadata. Without them it falls back to the earliest and latest entry date.
+  - The fallback is narrower when the export's first or last days have no entries, for example a Saturday off, so pass `--from` / `--to` when you know them.
+- **Periods the window misses:** periods only partly inside it, or not at all, are counted as "not compared (outside the timesheet export window)". The summary gives how many periods were fully covered, partly covered and not covered.
+
+**Per period.** Every compared period gets its own exact, within-$1 and max-difference counts.
+
+**The within-$1 split.** "Within $1" is split out as **rounding** when the difference is at most 0.005 h × the worker's entries in the period × rate × the highest multiplier they earned. That is what Jobber's 2-decimal rounding of each entry can explain.
+
 Explain trails go only to `data/private/r/m4/trails-<time>.json`. The counts go to `data/private/r/m4/summary.json`, which `run.ts` copies into `results.json` as `m4.companyR`. The runner refuses any directory outside `data/private/`.
 
 Export entries without a start time are placed at local noon of their date. An unknown `payable` is counted as worked. Both are listed in `notes`. Hours are never trimmed.
 
 ```bash
-bun run m4-r-run.ts   # [--private data/private/r] [--rules …] [--corrections …]
+bun run m4-r-run.ts   # [--private data/private/r] [--rules …] [--corrections …] [--from YYYY-MM-DD --to YYYY-MM-DD]
 ```
 
 Synthetic sample: `fixtures/r-sample/`. It has 3 workers and one duplicate entry that the register's correction deletes: 2 of 3 exact before the correction, 3 of 3 after.

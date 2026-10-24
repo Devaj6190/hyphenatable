@@ -3,6 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
+  type CompareRow as CompareRowT,
   compareFailed,
   compareGustoEmployees,
   compareIds,
@@ -369,14 +370,28 @@ describe("compareQbo", () => {
       "2026-10-11",
       "2026-10-24",
     );
+    // a seeded company (it has a QBO map): the 2 records without a marker or map entry are the sandbox's own
+    // sample data, counted apart and not extra
     expect(row).toEqual({
       object: "expenses(qbo)",
       fixture: 4,
       pulled: 5,
       matched: 3,
       missing: 1,
-      extra: 2,
+      extra: 0,
+      unmarked: 2,
+      note: "2 unmarked (sample/other data, kept in the pull)",
     });
+    expect(compareFailed([{ ...(row as CompareRowT), missing: 0 }])).toBe(
+      false,
+    );
+    expect(formatCompare([row as CompareRowT])).toContain(
+      "(2 unmarked (sample/other data, kept in the pull))",
+    );
+    // no seed map: the same records are extra, as before
+    const [plain] = compareQbo(expenses, fx, {}, "2026-10-11", "2026-10-24");
+    expect(plain).toMatchObject({ matched: 2, extra: 3 });
+    expect(plain?.unmarked).toBeUndefined();
   });
 });
 

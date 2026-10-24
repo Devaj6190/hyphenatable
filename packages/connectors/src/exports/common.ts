@@ -23,8 +23,10 @@ export function locateHeader<K extends string>(
   rows: Cell[][],
   mapping: Mapping<K>,
   required: K[][],
+  /** rows scanned for the header (title blocks; the Jobber CSV has one line per user above it) */
+  maxRows = 25,
 ): { headerRow: number; cols: Partial<Record<K, number>> } {
-  for (let r = 0; r < Math.min(rows.length, 25); r++) {
+  for (let r = 0; r < Math.min(rows.length, maxRows); r++) {
     const cells = (rows[r] ?? []).map((c) => norm(String(c ?? "")));
     const cols: Partial<Record<K, number>> = {};
     for (const key of Object.keys(mapping) as K[]) {
@@ -165,6 +167,8 @@ export function exportSyncRun(
   pulled: number,
   expected: number,
   problems: string[],
+  /** observations that do not make the run incomplete (printed after the problems, prefixed "note:") */
+  notes: string[] = [],
 ): SyncRun {
   return {
     id: `${companyId}:export:${object}:${startedAt}`,
@@ -178,6 +182,9 @@ export function exportSyncRun(
     expected,
     complete: problems.length === 0,
     method,
-    error: problems.length ? problems.join("; ") : null,
+    error:
+      problems.length || notes.length
+        ? [...problems, ...notes.map((n) => `note: ${n}`)].join("; ")
+        : null,
   };
 }

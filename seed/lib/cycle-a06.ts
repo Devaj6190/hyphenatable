@@ -5,6 +5,8 @@
 // Each a-c06 answer-key row says whether a rule learned from cycle 1's answers resolves it without a
 // question (`resolvableByRuleType`, the RuleType, or null when it must still be asked).
 
+import { withPayrollSourceId, withReimbursement } from "./contract";
+import { flagsFromAnswerKey } from "./flags";
 import { must } from "./must";
 import {
   addDays,
@@ -544,11 +546,29 @@ export function generateCycleA06(
     "quotes.json": quotes,
     "invoices.json": invoices,
     "payments.json": payments,
-    "expenses.json": [...expenses].sort((a, b) =>
-      String(a.id).localeCompare(String(b.id)),
+    "expenses.json": withReimbursement(
+      [...expenses].sort((a, b) => String(a.id).localeCompare(String(b.id))),
     ),
-    "pastPayrolls.json": pastPayrolls,
+    "pastPayrolls.json": withPayrollSourceId(pastPayrolls),
     "answer-key.json": answerKey,
+    "flags.json": flagsFromAnswerKey(answerKey, {
+      companyId: C,
+      cycleId: ext.cycle.id,
+      idPrefix: `${C}-fl-6`,
+      settings: company.settings as Rec,
+      entries,
+      expenses,
+      jobs,
+      workers,
+      rules: base["rules.json"] as Rec[],
+      payments,
+      invoices,
+      quotes,
+      syncRuns,
+      lowMarginPct: (company.settings as Rec).lowMarginPct as number,
+      priorFlags: base["flags.json"] as Rec[],
+      priorCutoffDate: "2026-10-23",
+    }),
   };
 }
 

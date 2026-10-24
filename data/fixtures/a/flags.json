@@ -1,0 +1,1169 @@
+[
+  {
+    "id": "a-fl-01",
+    "companyId": "a",
+    "cycleId": "a-c05",
+    "checkId": "CHK-01",
+    "status": "open",
+    "subject": {
+      "workerId": "a-w05",
+      "jobId": null,
+      "entryIds": [
+        "a-te-0121"
+      ],
+      "expenseIds": []
+    },
+    "seen": "Entry a-te-0121 for a-w05 (4 h) has no job and no visit.",
+    "where": [
+      {
+        "system": "jobber",
+        "recordId": "a-te-0121",
+        "url": null
+      }
+    ],
+    "confidence": "certain",
+    "precedent": {
+      "ruleId": null,
+      "flagId": null,
+      "note": "no precedent"
+    },
+    "routeTo": "manager",
+    "affects": {
+      "workerId": "a-w05",
+      "jobId": null,
+      "dollarsCents": null
+    },
+    "questionId": null,
+    "correctionId": null
+  },
+  {
+    "id": "a-fl-02",
+    "companyId": "a",
+    "cycleId": "a-c05",
+    "checkId": "CHK-02",
+    "status": "open",
+    "subject": {
+      "workerId": "a-w05",
+      "jobId": "a-j02",
+      "entryIds": [
+        "a-te-0140"
+      ],
+      "expenseIds": []
+    },
+    "seen": "Entry a-te-0140 for a-w05 was still running at cutoff.",
+    "where": [
+      {
+        "system": "jobber",
+        "recordId": "a-te-0140",
+        "url": null
+      },
+      {
+        "system": "jobber",
+        "recordId": "a-j02",
+        "url": null
+      }
+    ],
+    "confidence": "certain",
+    "precedent": {
+      "ruleId": null,
+      "flagId": null,
+      "note": "no precedent"
+    },
+    "routeTo": "manager",
+    "affects": {
+      "workerId": "a-w05",
+      "jobId": "a-j02",
+      "dollarsCents": null
+    },
+    "questionId": null,
+    "correctionId": null
+  },
+  {
+    "id": "a-fl-03",
+    "companyId": "a",
+    "cycleId": "a-c05",
+    "checkId": "CHK-03",
+    "status": "open",
+    "subject": {
+      "workerId": "a-w07",
+      "jobId": "a-j05",
+      "entryIds": [
+        "a-te-0130"
+      ],
+      "expenseIds": []
+    },
+    "seen": "Entry a-te-0130 for a-w07 is 13 h, over the 11 h long-shift threshold.",
+    "where": [
+      {
+        "system": "jobber",
+        "recordId": "a-te-0130",
+        "url": null
+      },
+      {
+        "system": "jobber",
+        "recordId": "a-j05",
+        "url": null
+      }
+    ],
+    "confidence": "certain",
+    "precedent": {
+      "ruleId": "a-rule-02",
+      "flagId": null,
+      "note": "rule: long_shift_threshold {\"hours\":11}"
+    },
+    "routeTo": "manager",
+    "affects": {
+      "workerId": "a-w07",
+      "jobId": "a-j05",
+      "dollarsCents": null
+    },
+    "questionId": null,
+    "correctionId": null
+  },
+  {
+    "id": "a-fl-04",
+    "companyId": "a",
+    "cycleId": "a-c05",
+    "checkId": "CHK-04",
+    "status": "open",
+    "subject": {
+      "workerId": "a-w03",
+      "jobId": null,
+      "entryIds": [
+        "a-te-0111",
+        "a-te-0113"
+      ],
+      "expenseIds": []
+    },
+    "seen": "Entries a-te-0111 and a-te-0113 for a-w03 overlap.",
+    "where": [
+      {
+        "system": "jobber",
+        "recordId": "a-te-0111",
+        "url": null
+      },
+      {
+        "system": "jobber",
+        "recordId": "a-te-0113",
+        "url": null
+      }
+    ],
+    "confidence": "certain",
+    "precedent": {
+      "ruleId": null,
+      "flagId": null,
+      "note": "no precedent"
+    },
+    "routeTo": "manager",
+    "affects": {
+      "workerId": "a-w03",
+      "jobId": null,
+      "dollarsCents": null
+    },
+    "questionId": null,
+    "correctionId": null
+  },
+  {
+    "id": "a-fl-05",
+    "companyId": "a",
+    "cycleId": "a-c05",
+    "checkId": "CHK-05",
+    "status": "open",
+    "subject": {
+      "workerId": "a-w04",
+      "jobId": null,
+      "entryIds": [
+        "a-te-0137"
+      ],
+      "expenseIds": []
+    },
+    "seen": "Entry a-te-0137 for a-w04 has zero duration.",
+    "where": [
+      {
+        "system": "jobber",
+        "recordId": "a-te-0137",
+        "url": null
+      }
+    ],
+    "confidence": "certain",
+    "precedent": {
+      "ruleId": null,
+      "flagId": null,
+      "note": "no precedent"
+    },
+    "routeTo": "manager",
+    "affects": {
+      "workerId": "a-w04",
+      "jobId": null,
+      "dollarsCents": null
+    },
+    "questionId": null,
+    "correctionId": null
+  },
+  {
+    "id": "a-fl-06",
+    "companyId": "a",
+    "cycleId": "a-c05",
+    "checkId": "CHK-10",
+    "status": "open",
+    "subject": {
+      "workerId": "a-w02",
+      "jobId": null,
+      "entryIds": [],
+      "expenseIds": []
+    },
+    "seen": "Worker a-w02 has a Jobber labour rate of $26.00/h and a Gusto rate of $25.00/h.",
+    "where": [
+      {
+        "system": "jobber",
+        "recordId": "a-w02",
+        "url": null
+      },
+      {
+        "system": "gusto",
+        "recordId": "a-w02",
+        "url": null
+      }
+    ],
+    "confidence": "certain",
+    "precedent": {
+      "ruleId": "a-rule-17",
+      "flagId": null,
+      "note": "rule: pay_rate {\"workerId\":\"a-w02\",\"rateCents\":2600,\"paymentUnit\":\"Hour\",\"costRateCentsPerHour\":2600}"
+    },
+    "routeTo": "owner",
+    "affects": {
+      "workerId": "a-w02",
+      "jobId": null,
+      "dollarsCents": null
+    },
+    "questionId": null,
+    "correctionId": null
+  },
+  {
+    "id": "a-fl-07",
+    "companyId": "a",
+    "cycleId": "a-c05",
+    "checkId": "CHK-11",
+    "status": "open",
+    "subject": {
+      "workerId": "a-w10",
+      "jobId": null,
+      "entryIds": [],
+      "expenseIds": []
+    },
+    "seen": "Venmo contractor a-w10 has hours but no rate on file.",
+    "where": [
+      {
+        "system": "payrollpilot",
+        "recordId": "a-w10",
+        "url": null
+      }
+    ],
+    "confidence": "certain",
+    "precedent": {
+      "ruleId": null,
+      "flagId": null,
+      "note": "no precedent"
+    },
+    "routeTo": "owner",
+    "affects": {
+      "workerId": "a-w10",
+      "jobId": null,
+      "dollarsCents": null
+    },
+    "questionId": null,
+    "correctionId": null
+  },
+  {
+    "id": "a-fl-08",
+    "companyId": "a",
+    "cycleId": "a-c05",
+    "checkId": "CHK-14",
+    "status": "open",
+    "subject": {
+      "workerId": null,
+      "jobId": null,
+      "entryIds": [],
+      "expenseIds": [
+        "a-ex-0003"
+      ]
+    },
+    "seen": "Job-cost expense a-ex-0003 ($214.37) has no job.",
+    "where": [
+      {
+        "system": "qbo",
+        "recordId": "a-ex-0003",
+        "url": null
+      }
+    ],
+    "confidence": 0.6,
+    "precedent": {
+      "ruleId": null,
+      "flagId": null,
+      "note": "no precedent"
+    },
+    "routeTo": "manager",
+    "affects": {
+      "workerId": null,
+      "jobId": null,
+      "dollarsCents": 21437
+    },
+    "questionId": null,
+    "correctionId": null
+  },
+  {
+    "id": "a-fl-09",
+    "companyId": "a",
+    "cycleId": "a-c05",
+    "checkId": "CHK-05",
+    "status": "open",
+    "subject": {
+      "workerId": "a-w02",
+      "jobId": null,
+      "entryIds": [
+        "a-te-0106",
+        "a-te-0146"
+      ],
+      "expenseIds": []
+    },
+    "seen": "Entries a-te-0106 and a-te-0146 for a-w02 are exact duplicates.",
+    "where": [
+      {
+        "system": "jobber",
+        "recordId": "a-te-0106",
+        "url": null
+      },
+      {
+        "system": "jobber",
+        "recordId": "a-te-0146",
+        "url": null
+      }
+    ],
+    "confidence": "certain",
+    "precedent": {
+      "ruleId": null,
+      "flagId": null,
+      "note": "no precedent"
+    },
+    "routeTo": "manager",
+    "affects": {
+      "workerId": "a-w02",
+      "jobId": null,
+      "dollarsCents": null
+    },
+    "questionId": null,
+    "correctionId": null
+  },
+  {
+    "id": "a-fl-10",
+    "companyId": "a",
+    "cycleId": "a-c05",
+    "checkId": "CHK-06",
+    "status": "open",
+    "subject": {
+      "workerId": "a-w01",
+      "jobId": null,
+      "entryIds": [
+        "a-te-0183"
+      ],
+      "expenseIds": []
+    },
+    "seen": "Entry a-te-0183 for a-w01 was not approved at cutoff.",
+    "where": [
+      {
+        "system": "jobber",
+        "recordId": "a-te-0183",
+        "url": null
+      }
+    ],
+    "confidence": "certain",
+    "precedent": {
+      "ruleId": null,
+      "flagId": null,
+      "note": "no precedent"
+    },
+    "routeTo": "owner",
+    "affects": {
+      "workerId": "a-w01",
+      "jobId": null,
+      "dollarsCents": null
+    },
+    "questionId": null,
+    "correctionId": null
+  },
+  {
+    "id": "a-fl-11",
+    "companyId": "a",
+    "cycleId": "a-c05",
+    "checkId": "CHK-06",
+    "status": "open",
+    "subject": {
+      "workerId": "a-w03",
+      "jobId": null,
+      "entryIds": [
+        "a-te-0184"
+      ],
+      "expenseIds": []
+    },
+    "seen": "Entry a-te-0184 for a-w03 was not approved at cutoff.",
+    "where": [
+      {
+        "system": "jobber",
+        "recordId": "a-te-0184",
+        "url": null
+      }
+    ],
+    "confidence": "certain",
+    "precedent": {
+      "ruleId": null,
+      "flagId": null,
+      "note": "no precedent"
+    },
+    "routeTo": "owner",
+    "affects": {
+      "workerId": "a-w03",
+      "jobId": null,
+      "dollarsCents": null
+    },
+    "questionId": null,
+    "correctionId": null
+  },
+  {
+    "id": "a-fl-12",
+    "companyId": "a",
+    "cycleId": "a-c05",
+    "checkId": "CHK-06",
+    "status": "open",
+    "subject": {
+      "workerId": "a-w04",
+      "jobId": null,
+      "entryIds": [
+        "a-te-0185"
+      ],
+      "expenseIds": []
+    },
+    "seen": "Entry a-te-0185 for a-w04 was not approved at cutoff.",
+    "where": [
+      {
+        "system": "jobber",
+        "recordId": "a-te-0185",
+        "url": null
+      }
+    ],
+    "confidence": "certain",
+    "precedent": {
+      "ruleId": null,
+      "flagId": null,
+      "note": "no precedent"
+    },
+    "routeTo": "owner",
+    "affects": {
+      "workerId": "a-w04",
+      "jobId": null,
+      "dollarsCents": null
+    },
+    "questionId": null,
+    "correctionId": null
+  },
+  {
+    "id": "a-fl-13",
+    "companyId": "a",
+    "cycleId": "a-c05",
+    "checkId": "CHK-06",
+    "status": "open",
+    "subject": {
+      "workerId": "a-w05",
+      "jobId": null,
+      "entryIds": [
+        "a-te-0140"
+      ],
+      "expenseIds": []
+    },
+    "seen": "Entry a-te-0140 for a-w05 was not approved at cutoff.",
+    "where": [
+      {
+        "system": "jobber",
+        "recordId": "a-te-0140",
+        "url": null
+      }
+    ],
+    "confidence": "certain",
+    "precedent": {
+      "ruleId": null,
+      "flagId": null,
+      "note": "no precedent"
+    },
+    "routeTo": "owner",
+    "affects": {
+      "workerId": "a-w05",
+      "jobId": null,
+      "dollarsCents": null
+    },
+    "questionId": null,
+    "correctionId": null
+  },
+  {
+    "id": "a-fl-14",
+    "companyId": "a",
+    "cycleId": "a-c05",
+    "checkId": "CHK-07",
+    "status": "open",
+    "subject": {
+      "workerId": "a-w06",
+      "jobId": null,
+      "entryIds": [],
+      "expenseIds": []
+    },
+    "seen": "Active hourly worker a-w06 has no time entries this cycle.",
+    "where": [
+      {
+        "system": "jobber",
+        "recordId": "a-w06",
+        "url": null
+      }
+    ],
+    "confidence": "certain",
+    "precedent": {
+      "ruleId": null,
+      "flagId": null,
+      "note": "no precedent"
+    },
+    "routeTo": "manager",
+    "affects": {
+      "workerId": "a-w06",
+      "jobId": null,
+      "dollarsCents": null
+    },
+    "questionId": null,
+    "correctionId": null
+  },
+  {
+    "id": "a-fl-15",
+    "companyId": "a",
+    "cycleId": "a-c05",
+    "checkId": "CHK-08",
+    "status": "open",
+    "subject": {
+      "workerId": "a-w13",
+      "jobId": null,
+      "entryIds": [
+        "a-te-0144",
+        "a-te-0151"
+      ],
+      "expenseIds": []
+    },
+    "seen": "Inactive worker a-w13 has 2 time entries this cycle.",
+    "where": [
+      {
+        "system": "jobber",
+        "recordId": "a-te-0144",
+        "url": null
+      },
+      {
+        "system": "jobber",
+        "recordId": "a-te-0151",
+        "url": null
+      },
+      {
+        "system": "jobber",
+        "recordId": "a-w13",
+        "url": null
+      },
+      {
+        "system": "gusto",
+        "recordId": "a-w13",
+        "url": null
+      }
+    ],
+    "confidence": "certain",
+    "precedent": {
+      "ruleId": null,
+      "flagId": null,
+      "note": "no precedent"
+    },
+    "routeTo": "owner",
+    "affects": {
+      "workerId": "a-w13",
+      "jobId": null,
+      "dollarsCents": null
+    },
+    "questionId": null,
+    "correctionId": null
+  },
+  {
+    "id": "a-fl-16",
+    "companyId": "a",
+    "cycleId": "a-c05",
+    "checkId": "CHK-09",
+    "status": "open",
+    "subject": {
+      "workerId": "a-w14",
+      "jobId": null,
+      "entryIds": [],
+      "expenseIds": []
+    },
+    "seen": "Worker a-w14 has hours but has not finished Gusto onboarding.",
+    "where": [
+      {
+        "system": "gusto",
+        "recordId": "a-w14",
+        "url": null
+      }
+    ],
+    "confidence": "certain",
+    "precedent": {
+      "ruleId": null,
+      "flagId": null,
+      "note": "no precedent"
+    },
+    "routeTo": "owner",
+    "affects": {
+      "workerId": "a-w14",
+      "jobId": null,
+      "dollarsCents": null
+    },
+    "questionId": null,
+    "correctionId": null
+  },
+  {
+    "id": "a-fl-17",
+    "companyId": "a",
+    "cycleId": "a-c05",
+    "checkId": "CHK-12",
+    "status": "open",
+    "subject": {
+      "workerId": "a-w08",
+      "jobId": null,
+      "entryIds": [],
+      "expenseIds": []
+    },
+    "seen": "Worker a-w08 (salary) has hours; paid outside the Jobber-to-Gusto sync.",
+    "where": [
+      {
+        "system": "jobber",
+        "recordId": "a-w08",
+        "url": null
+      }
+    ],
+    "confidence": "certain",
+    "precedent": {
+      "ruleId": null,
+      "flagId": null,
+      "note": "no precedent"
+    },
+    "routeTo": "none",
+    "affects": {
+      "workerId": "a-w08",
+      "jobId": null,
+      "dollarsCents": null
+    },
+    "questionId": null,
+    "correctionId": null
+  },
+  {
+    "id": "a-fl-18",
+    "companyId": "a",
+    "cycleId": "a-c05",
+    "checkId": "CHK-12",
+    "status": "open",
+    "subject": {
+      "workerId": "a-w09",
+      "jobId": null,
+      "entryIds": [],
+      "expenseIds": []
+    },
+    "seen": "Worker a-w09 (contractor_venmo) has hours; paid outside the Jobber-to-Gusto sync.",
+    "where": [
+      {
+        "system": "jobber",
+        "recordId": "a-w09",
+        "url": null
+      }
+    ],
+    "confidence": "certain",
+    "precedent": {
+      "ruleId": null,
+      "flagId": null,
+      "note": "no precedent"
+    },
+    "routeTo": "none",
+    "affects": {
+      "workerId": "a-w09",
+      "jobId": null,
+      "dollarsCents": null
+    },
+    "questionId": null,
+    "correctionId": null
+  },
+  {
+    "id": "a-fl-19",
+    "companyId": "a",
+    "cycleId": "a-c05",
+    "checkId": "CHK-12",
+    "status": "open",
+    "subject": {
+      "workerId": "a-w10",
+      "jobId": null,
+      "entryIds": [],
+      "expenseIds": []
+    },
+    "seen": "Worker a-w10 (contractor_venmo) has hours; paid outside the Jobber-to-Gusto sync.",
+    "where": [
+      {
+        "system": "jobber",
+        "recordId": "a-w10",
+        "url": null
+      }
+    ],
+    "confidence": "certain",
+    "precedent": {
+      "ruleId": null,
+      "flagId": null,
+      "note": "no precedent"
+    },
+    "routeTo": "none",
+    "affects": {
+      "workerId": "a-w10",
+      "jobId": null,
+      "dollarsCents": null
+    },
+    "questionId": null,
+    "correctionId": null
+  },
+  {
+    "id": "a-fl-20",
+    "companyId": "a",
+    "cycleId": "a-c05",
+    "checkId": "CHK-13",
+    "status": "open",
+    "subject": {
+      "workerId": null,
+      "jobId": "a-j07",
+      "entryIds": [
+        "a-te-0126",
+        "a-te-0170"
+      ],
+      "expenseIds": []
+    },
+    "seen": "Job a-j07 has a completed visit but no time entries.",
+    "where": [
+      {
+        "system": "jobber",
+        "recordId": "a-te-0126",
+        "url": null
+      },
+      {
+        "system": "jobber",
+        "recordId": "a-te-0170",
+        "url": null
+      },
+      {
+        "system": "jobber",
+        "recordId": "a-j07",
+        "url": null
+      }
+    ],
+    "confidence": "certain",
+    "precedent": {
+      "ruleId": null,
+      "flagId": null,
+      "note": "no precedent"
+    },
+    "routeTo": "manager",
+    "affects": {
+      "workerId": null,
+      "jobId": "a-j07",
+      "dollarsCents": null
+    },
+    "questionId": null,
+    "correctionId": null
+  },
+  {
+    "id": "a-fl-21",
+    "companyId": "a",
+    "cycleId": "a-c05",
+    "checkId": "CHK-15",
+    "status": "open",
+    "subject": {
+      "workerId": null,
+      "jobId": "a-j05",
+      "entryIds": [],
+      "expenseIds": [
+        "a-ex-0003",
+        "a-ex-0009"
+      ]
+    },
+    "seen": "Expenses a-ex-0003 and a-ex-0009 look like the same $214.37 purchase.",
+    "where": [
+      {
+        "system": "qbo",
+        "recordId": "a-ex-0003",
+        "url": null
+      },
+      {
+        "system": "jobber",
+        "recordId": "a-ex-0009",
+        "url": null
+      },
+      {
+        "system": "jobber",
+        "recordId": "a-j05",
+        "url": null
+      }
+    ],
+    "confidence": 0.9,
+    "precedent": {
+      "ruleId": null,
+      "flagId": null,
+      "note": "no precedent"
+    },
+    "routeTo": "owner",
+    "affects": {
+      "workerId": null,
+      "jobId": "a-j05",
+      "dollarsCents": 21437
+    },
+    "questionId": null,
+    "correctionId": null
+  },
+  {
+    "id": "a-fl-22",
+    "companyId": "a",
+    "cycleId": "a-c05",
+    "checkId": "CHK-16",
+    "status": "open",
+    "subject": {
+      "workerId": null,
+      "jobId": "a-j08",
+      "entryIds": [],
+      "expenseIds": [
+        "a-ex-0010"
+      ]
+    },
+    "seen": "Job a-j08 is a disposal run with no parent job.",
+    "where": [
+      {
+        "system": "jobber",
+        "recordId": "a-ex-0010",
+        "url": null
+      },
+      {
+        "system": "jobber",
+        "recordId": "a-j08",
+        "url": null
+      }
+    ],
+    "confidence": "certain",
+    "precedent": {
+      "ruleId": "a-rule-14",
+      "flagId": null,
+      "note": "rule: disposal_parent_link {\"titlePrefix\":\"Disposal run - \",\"linkBy\":\"same street suffix in the parent job title\"}"
+    },
+    "routeTo": "manager",
+    "affects": {
+      "workerId": null,
+      "jobId": "a-j08",
+      "dollarsCents": 14250
+    },
+    "questionId": null,
+    "correctionId": null
+  },
+  {
+    "id": "a-fl-23",
+    "companyId": "a",
+    "cycleId": "a-c05",
+    "checkId": "CHK-17",
+    "status": "open",
+    "subject": {
+      "workerId": null,
+      "jobId": null,
+      "entryIds": [],
+      "expenseIds": [
+        "a-ex-0011"
+      ]
+    },
+    "seen": "Expense a-ex-0011 is on account Fuel, which has no job-cost/overhead rule.",
+    "where": [
+      {
+        "system": "qbo",
+        "recordId": "a-ex-0011",
+        "url": null
+      }
+    ],
+    "confidence": "certain",
+    "precedent": {
+      "ruleId": null,
+      "flagId": null,
+      "note": "no precedent"
+    },
+    "routeTo": "owner",
+    "affects": {
+      "workerId": null,
+      "jobId": null,
+      "dollarsCents": 8640
+    },
+    "questionId": null,
+    "correctionId": null
+  },
+  {
+    "id": "a-fl-24",
+    "companyId": "a",
+    "cycleId": "a-c05",
+    "checkId": "CHK-18",
+    "status": "open",
+    "subject": {
+      "workerId": "a-w08",
+      "jobId": null,
+      "entryIds": [],
+      "expenseIds": []
+    },
+    "seen": "Labour for a-w08 is costed at a Jobber rate that differs from the current pay rate.",
+    "where": [
+      {
+        "system": "jobber",
+        "recordId": "a-w08",
+        "url": null
+      }
+    ],
+    "confidence": "certain",
+    "precedent": {
+      "ruleId": "a-rule-23",
+      "flagId": null,
+      "note": "rule: pay_rate {\"workerId\":\"a-w08\",\"rateCents\":6760000,\"paymentUnit\":\"Year\",\"costRateCentsPerHour\":3250}"
+    },
+    "routeTo": "owner",
+    "affects": {
+      "workerId": "a-w08",
+      "jobId": null,
+      "dollarsCents": null
+    },
+    "questionId": null,
+    "correctionId": null
+  },
+  {
+    "id": "a-fl-25",
+    "companyId": "a",
+    "cycleId": "a-c05",
+    "checkId": "CHK-19",
+    "status": "open",
+    "subject": {
+      "workerId": null,
+      "jobId": "a-j09",
+      "entryIds": [],
+      "expenseIds": []
+    },
+    "seen": "Payment a-pay03 on job a-j09 is a quote deposit recorded as invoice a-in04's final payment.",
+    "where": [
+      {
+        "system": "jobber",
+        "recordId": "a-j09",
+        "url": null
+      },
+      {
+        "system": "jobber",
+        "recordId": "a-pay03",
+        "url": null
+      },
+      {
+        "system": "jobber",
+        "recordId": "a-in04",
+        "url": null
+      }
+    ],
+    "confidence": "certain",
+    "precedent": {
+      "ruleId": "a-rule-13",
+      "flagId": null,
+      "note": "rule: deposit_vs_final {\"quotePayment\":\"deposit\",\"invoicePayment\":\"final\"}"
+    },
+    "routeTo": "owner",
+    "affects": {
+      "workerId": null,
+      "jobId": "a-j09",
+      "dollarsCents": 280000
+    },
+    "questionId": null,
+    "correctionId": null
+  },
+  {
+    "id": "a-fl-26",
+    "companyId": "a",
+    "cycleId": "a-c05",
+    "checkId": "CHK-20",
+    "status": "open",
+    "subject": {
+      "workerId": "a-w12",
+      "jobId": "a-j10",
+      "entryIds": [],
+      "expenseIds": []
+    },
+    "seen": "Quote a-q05 on job a-j10 lists a-w12 as salesperson; the in-person quoter rule names another worker.",
+    "where": [
+      {
+        "system": "jobber",
+        "recordId": "a-j10",
+        "url": null
+      },
+      {
+        "system": "jobber",
+        "recordId": "a-q05",
+        "url": null
+      }
+    ],
+    "confidence": 0.75,
+    "precedent": {
+      "ruleId": "a-rule-15",
+      "flagId": null,
+      "note": "rule: in_person_quoter {\"titleKeyword\":\"Landscape lighting\",\"workerId\":\"a-w05\"}"
+    },
+    "routeTo": "owner",
+    "affects": {
+      "workerId": "a-w12",
+      "jobId": "a-j10",
+      "dollarsCents": null
+    },
+    "questionId": null,
+    "correctionId": null
+  },
+  {
+    "id": "a-fl-27",
+    "companyId": "a",
+    "cycleId": "a-c05",
+    "checkId": "CHK-21",
+    "status": "open",
+    "subject": {
+      "workerId": null,
+      "jobId": "a-j05",
+      "entryIds": [],
+      "expenseIds": []
+    },
+    "seen": "Job a-j05's margin is below the 20% threshold.",
+    "where": [
+      {
+        "system": "jobber",
+        "recordId": "a-j05",
+        "url": null
+      }
+    ],
+    "confidence": "certain",
+    "precedent": {
+      "ruleId": null,
+      "flagId": null,
+      "note": "no precedent"
+    },
+    "routeTo": "owner",
+    "affects": {
+      "workerId": null,
+      "jobId": "a-j05",
+      "dollarsCents": null
+    },
+    "questionId": null,
+    "correctionId": null
+  },
+  {
+    "id": "a-fl-28",
+    "companyId": "a",
+    "cycleId": "a-c05",
+    "checkId": "CHK-22",
+    "status": "open",
+    "subject": {
+      "workerId": "a-w04",
+      "jobId": null,
+      "entryIds": [],
+      "expenseIds": []
+    },
+    "seen": "Worker a-w04's gross differs by more than 25% from the mean of the last 3 cycles.",
+    "where": [
+      {
+        "system": "gusto",
+        "recordId": "a-w04",
+        "url": null
+      }
+    ],
+    "confidence": "certain",
+    "precedent": {
+      "ruleId": null,
+      "flagId": null,
+      "note": "no precedent"
+    },
+    "routeTo": "owner",
+    "affects": {
+      "workerId": "a-w04",
+      "jobId": null,
+      "dollarsCents": null
+    },
+    "questionId": null,
+    "correctionId": null
+  },
+  {
+    "id": "a-fl-29",
+    "companyId": "a",
+    "cycleId": "a-c05",
+    "checkId": "CHK-22",
+    "status": "open",
+    "subject": {
+      "workerId": "a-w06",
+      "jobId": null,
+      "entryIds": [],
+      "expenseIds": []
+    },
+    "seen": "Worker a-w06's gross differs by more than 25% from the mean of the last 3 cycles.",
+    "where": [
+      {
+        "system": "gusto",
+        "recordId": "a-w06",
+        "url": null
+      }
+    ],
+    "confidence": "certain",
+    "precedent": {
+      "ruleId": null,
+      "flagId": null,
+      "note": "no precedent"
+    },
+    "routeTo": "owner",
+    "affects": {
+      "workerId": "a-w06",
+      "jobId": null,
+      "dollarsCents": null
+    },
+    "questionId": null,
+    "correctionId": null
+  },
+  {
+    "id": "a-fl-30",
+    "companyId": "a",
+    "cycleId": "a-c04",
+    "checkId": "CHK-23",
+    "status": "open",
+    "subject": {
+      "workerId": null,
+      "jobId": null,
+      "entryIds": [],
+      "expenseIds": []
+    },
+    "seen": "Sync run a-sr-04 pulled 75 of 76 timeSheetEntries from jobber.",
+    "where": [
+      {
+        "system": "jobber",
+        "recordId": "a-sr-04",
+        "url": null
+      }
+    ],
+    "confidence": "certain",
+    "precedent": {
+      "ruleId": null,
+      "flagId": null,
+      "note": "no precedent"
+    },
+    "routeTo": "owner",
+    "affects": {
+      "workerId": null,
+      "jobId": null,
+      "dollarsCents": null
+    },
+    "questionId": null,
+    "correctionId": null
+  }
+]

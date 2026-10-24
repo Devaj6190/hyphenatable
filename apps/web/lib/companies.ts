@@ -12,6 +12,7 @@ type CompanyInfo = {
 };
 
 // Fake names only. Replaced by company rows and cycles.get once B's functions are live.
+// timezone matches each company's data/fixtures/<id>/company.json (Company A is Pennsylvania, per docs/STATUS.md).
 export const companies: Record<string, CompanyInfo> = {
   a: {
     name: "Greenline Landscaping",
@@ -39,7 +40,9 @@ export const companies: Record<string, CompanyInfo> = {
     name: "Company R",
     label: "Company R",
     kind: "real, anonymized",
-    timezone: "America/Los_Angeles",
+    // No fixture file and no documented zone (the ingest takes it as a parameter). UTC is named on every time,
+    // so it is never silently wrong. Replace with the company row's timezone once live.
+    timezone: "UTC",
     cycle: null,
   },
 };
