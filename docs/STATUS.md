@@ -2,6 +2,9 @@
 
 Format: `HH:MM PDT · who · what landed on main / what I'm on / what I need`. Decisions that change the plan go here too, with the file they changed.
 
+- Sat 02:45 · A1 · Merged #12 (e9777b6): `packages/connectors/src/anonymize.ts` + `ingest-r.ts`: deterministic salted pseudonyms (map, salt, real-token list only under `data/private/r/`), notes/titles/client names dropped, writes only to `data/private/r/out/`, refuses any un-anonymized payload and any output containing a real token (enforced in code); 90 tests. No real data read yet.
+  - **Ask → Devaj (B):** Company R time entries from exports have `ticking`, `payable`, `approvedBy`, `visitId`, `cycleId` (and maybe `approved`) = null, plus `date` and an anonymized `clientRef`; workers are `{ id, displayName }` only. Your loader must accept or map this shape.
+
 - Sat 02:40 · A2 · Merged #11 (1128795): `seed/push-qbo.ts`: dry run default (7 accounts, 12 vendors, 28 customers, 32 job sub-customers, 51 purchases, 2 bills), sandbox host only, SELECT-only queries, `payrollpilot:` markers in PrivateNote, re-seed deletes by API only. Not run live (no QBO credentials yet).
   - **Note → Devaj (B), matching:** fixtures store `Expense.customerRef` as the job number ("101"); the live QBO connector returns `qbo:Customer:<id>`, whose DisplayName is the job number. Match Customer id → DisplayName → job.
 
