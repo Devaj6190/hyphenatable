@@ -1,0 +1,132 @@
+[
+  {
+    "id": "a-qn-01",
+    "companyId": "a",
+    "cycleId": "a-c01",
+    "flagIds": [],
+    "toWorkerId": "a-w11",
+    "toRole": "manager",
+    "text": "Manager, on Aug 20 an 8.5h entry has no job. Which job was it? 1 #72 2 #73 3 something else",
+    "options": [
+      "#72",
+      "#73",
+      "something else"
+    ],
+    "kind": "text",
+    "status": "answered",
+    "approvedBy": "a-w12",
+    "approvedAt": "2026-08-20T23:00:00.000Z",
+    "sentAt": "2026-08-20T23:01:00.000Z",
+    "remindAt": null,
+    "expiresAt": null,
+    "interpretationId": null
+  },
+  {
+    "id": "a-qn-02",
+    "companyId": "a",
+    "cycleId": "a-c02",
+    "flagIds": [],
+    "toWorkerId": "a-w11",
+    "toRole": "manager",
+    "text": "Manager, a Materials purchase on Sep 2 has no job. Which job was it? 1 #77 2 #78 3 something else",
+    "options": [
+      "#77",
+      "#78",
+      "something else"
+    ],
+    "kind": "text",
+    "status": "answered",
+    "approvedBy": "a-w12",
+    "approvedAt": "2026-09-02T23:00:00.000Z",
+    "sentAt": "2026-09-02T23:01:00.000Z",
+    "remindAt": null,
+    "expiresAt": null,
+    "interpretationId": null
+  },
+  {
+    "id": "a-qn-03",
+    "companyId": "a",
+    "cycleId": "a-c02",
+    "flagIds": [],
+    "toWorkerId": "a-w12",
+    "toRole": "owner",
+    "text": "Owner, a payment came in on the quote for job #78. Is it a deposit? Reply 1 yes, 2 no",
+    "options": [
+      "yes",
+      "no"
+    ],
+    "kind": "text",
+    "status": "answered",
+    "approvedBy": "a-w12",
+    "approvedAt": "2026-09-08T23:00:00.000Z",
+    "sentAt": "2026-09-08T23:01:00.000Z",
+    "remindAt": null,
+    "expiresAt": null,
+    "interpretationId": null
+  },
+  {
+    "id": "a-qn-04",
+    "companyId": "a",
+    "cycleId": "a-c03",
+    "flagIds": [],
+    "toWorkerId": "a-w11",
+    "toRole": "manager",
+    "text": "Manager, job #84 has a disposal run with no parent job. Which job does it belong to? 1 #84 2 #85 3 something else",
+    "options": [
+      "#84",
+      "#85",
+      "something else"
+    ],
+    "kind": "text",
+    "status": "answered",
+    "approvedBy": "a-w12",
+    "approvedAt": "2026-09-18T23:00:00.000Z",
+    "sentAt": "2026-09-18T23:01:00.000Z",
+    "remindAt": null,
+    "expiresAt": null,
+    "interpretationId": null
+  },
+  {
+    "id": "a-qn-05",
+    "companyId": "a",
+    "cycleId": "a-c03",
+    "flagIds": [],
+    "toWorkerId": "a-w12",
+    "toRole": "owner",
+    "text": "Owner, who quoted job #85 in person? 1 the crew lead on site 2 you 3 someone else",
+    "options": [
+      "the crew lead on site",
+      "you",
+      "someone else"
+    ],
+    "kind": "text",
+    "status": "answered",
+    "approvedBy": "a-w12",
+    "approvedAt": "2026-09-22T23:00:00.000Z",
+    "sentAt": "2026-09-22T23:01:00.000Z",
+    "remindAt": null,
+    "expiresAt": null,
+    "interpretationId": null
+  },
+  {
+    "id": "a-qn-06",
+    "companyId": "a",
+    "cycleId": "a-c04",
+    "flagIds": [],
+    "toWorkerId": "a-w12",
+    "toRole": "owner",
+    "text": "Owner, a Fuel purchase on Oct 1: job cost or overhead? 1 job cost 2 overhead",
+    "options": [
+      "job cost",
+      "overhead"
+    ],
+    "kind": "text",
+    "status": "answered",
+    "approvedBy": "a-w12",
+    "approvedAt": "2026-10-01T23:00:00.000Z",
+    "sentAt": "2026-10-01T23:01:00.000Z",
+    "remindAt": null,
+    "expiresAt": null,
+    "interpretationId": null
+  }
+]

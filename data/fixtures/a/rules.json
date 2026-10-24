@@ -336,5 +336,257 @@
     },
     "backtest": null,
     "confidence": 0.85
+  },
+  {
+    "id": "a-rule-14",
+    "companyId": "a",
+    "type": "disposal_parent_link",
+    "params": {
+      "titlePrefix": "Disposal run - ",
+      "linkBy": "same street suffix in the parent job title"
+    },
+    "status": "proposed",
+    "source": "history",
+    "provenance": {
+      "lessonId": null,
+      "flagId": null,
+      "answeredBy": null,
+      "approvedBy": null,
+      "approvedAt": null,
+      "evidence": [
+        "a-c01",
+        "a-c02",
+        "a-c03",
+        "a-c04"
+      ]
+    },
+    "backtest": null,
+    "confidence": 0.8
+  },
+  {
+    "id": "a-rule-15",
+    "companyId": "a",
+    "type": "in_person_quoter",
+    "params": {
+      "titleKeyword": "Landscape lighting",
+      "workerId": "a-w05"
+    },
+    "status": "proposed",
+    "source": "history",
+    "provenance": {
+      "lessonId": null,
+      "flagId": null,
+      "answeredBy": null,
+      "approvedBy": null,
+      "approvedAt": null,
+      "evidence": [
+        "a-c01",
+        "a-c02",
+        "a-c03",
+        "a-c04"
+      ]
+    },
+    "backtest": null,
+    "confidence": 0.75
+  },
+  {
+    "id": "a-rule-16",
+    "companyId": "a",
+    "type": "pay_rate",
+    "params": {
+      "workerId": "a-w01",
+      "rateCents": 2800,
+      "paymentUnit": "Hour",
+      "costRateCentsPerHour": 2800
+    },
+    "status": "proposed",
+    "source": "history",
+    "provenance": {
+      "lessonId": null,
+      "flagId": null,
+      "answeredBy": null,
+      "approvedBy": null,
+      "approvedAt": null,
+      "evidence": [
+        "a-pp-401"
+      ]
+    },
+    "backtest": null,
+    "confidence": 0.95
+  },
+  {
+    "id": "a-rule-17",
+    "companyId": "a",
+    "type": "pay_rate",
+    "params": {
+      "workerId": "a-w02",
+      "rateCents": 2600,
+      "paymentUnit": "Hour",
+      "costRateCentsPerHour": 2600
+    },
+    "status": "proposed",
+    "source": "history",
+    "provenance": {
+      "lessonId": null,
+      "flagId": null,
+      "answeredBy": null,
+      "approvedBy": null,
+      "approvedAt": null,
+      "evidence": [
+        "a-pp-402"
+      ]
+    },
+    "backtest": null,
+    "confidence": 0.95
+  },
+  {
+    "id": "a-rule-18",
+    "companyId": "a",
+    "type": "pay_rate",
+    "params": {
+      "workerId": "a-w03",
+      "rateCents": 2400,
+      "paymentUnit": "Hour",
+      "costRateCentsPerHour": 2400
+    },
+    "status": "proposed",
+    "source": "history",
+    "provenance": {
+      "lessonId": null,
+      "flagId": null,
+      "answeredBy": null,
+      "approvedBy": null,
+      "approvedAt": null,
+      "evidence": [
+        "a-pp-403"
+      ]
+    },
+    "backtest": null,
+    "confidence": 0.95
+  },
+  {
+    "id": "a-rule-19",
+    "companyId": "a",
+    "type": "pay_rate",
+    "params": {
+      "workerId": "a-w04",
+      "rateCents": 2400,
+      "paymentUnit": "Hour",
+      "costRateCentsPerHour": 2400
+    },
+    "status": "proposed",
+    "source": "history",
+    "provenance": {
+      "lessonId": null,
+      "flagId": null,
+      "answeredBy": null,
+      "approvedBy": null,
+      "approvedAt": null,
+      "evidence": [
+        "a-pp-404"
+      ]
+    },
+    "backtest": null,
+    "confidence": 0.95
+  },
+  {
+    "id": "a-rule-20",
+    "companyId": "a",
+    "type": "pay_rate",
+    "params": {
+      "workerId": "a-w05",
+      "rateCents": 2200,
+      "paymentUnit": "Hour",
+      "costRateCentsPerHour": 2200
+    },
+    "status": "proposed",
+    "source": "history",
+    "provenance": {
+      "lessonId": null,
+      "flagId": null,
+      "answeredBy": null,
+      "approvedBy": null,
+      "approvedAt": null,
+      "evidence": [
+        "a-pp-405"
+      ]
+    },
+    "backtest": null,
+    "confidence": 0.95
+  },
+  {
+    "id": "a-rule-21",
+    "companyId": "a",
+    "type": "pay_rate",
+    "params": {
+      "workerId": "a-w06",
+      "rateCents": 2200,
+      "paymentUnit": "Hour",
+      "costRateCentsPerHour": 2200
+    },
+    "status": "proposed",
+    "source": "history",
+    "provenance": {
+      "lessonId": null,
+      "flagId": null,
+      "answeredBy": null,
+      "approvedBy": null,
+      "approvedAt": null,
+      "evidence": [
+        "a-pp-406"
+      ]
+    },
+    "backtest": null,
+    "confidence": 0.95
+  },
+  {
+    "id": "a-rule-22",
+    "companyId": "a",
+    "type": "pay_rate",
+    "params": {
+      "workerId": "a-w07",
+      "rateCents": 2000,
+      "paymentUnit": "Hour",
+      "costRateCentsPerHour": 2000
+    },
+    "status": "proposed",
+    "source": "history",
+    "provenance": {
+      "lessonId": null,
+      "flagId": null,
+      "answeredBy": null,
+      "approvedBy": null,
+      "approvedAt": null,
+      "evidence": [
+        "a-pp-407"
+      ]
+    },
+    "backtest": null,
+    "confidence": 0.95
+  },
+  {
+    "id": "a-rule-23",
+    "companyId": "a",
+    "type": "pay_rate",
+    "params": {
+      "workerId": "a-w08",
+      "rateCents": 6760000,
+      "paymentUnit": "Year",
+      "costRateCentsPerHour": 3250
+    },
+    "status": "proposed",
+    "source": "history",
+    "provenance": {
+      "lessonId": null,
+      "flagId": null,
+      "answeredBy": null,
+      "approvedBy": null,
+      "approvedAt": null,
+      "evidence": [
+        "a-pp-408"
+      ]
+    },
+    "backtest": null,
+    "confidence": 0.95
   }
 ]
