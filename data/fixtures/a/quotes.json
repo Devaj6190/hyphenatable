@@ -1,0 +1,252 @@
+[
+  {
+    "id": "a-q01",
+    "companyId": "a",
+    "sourceId": "a-q01",
+    "jobId": "a-j01",
+    "salespersonWorkerId": "a-w12",
+    "sentAt": "2026-09-29T17:00:00.000Z",
+    "status": "converted",
+    "amountCents": 814000
+  },
+  {
+    "id": "a-q02",
+    "companyId": "a",
+    "sourceId": "a-q02",
+    "jobId": "a-j02",
+    "salespersonWorkerId": "a-w11",
+    "sentAt": "2026-10-01T21:30:00.000Z",
+    "status": "converted",
+    "amountCents": 524000
+  },
+  {
+    "id": "a-q03",
+    "companyId": "a",
+    "sourceId": "a-q03",
+    "jobId": null,
+    "salespersonWorkerId": "a-w12",
+    "sentAt": "2026-10-20T23:00:00.000Z",
+    "status": "awaiting_response",
+    "amountCents": 128000
+  },
+  {
+    "id": "a-q04",
+    "companyId": "a",
+    "sourceId": "a-q04",
+    "jobId": "a-j09",
+    "salespersonWorkerId": "a-w11",
+    "sentAt": "2026-09-24T16:00:00.000Z",
+    "status": "converted",
+    "amountCents": 400000
+  },
+  {
+    "id": "a-q05",
+    "companyId": "a",
+    "sourceId": "a-q05",
+    "jobId": "a-j10",
+    "salespersonWorkerId": "a-w12",
+    "sentAt": "2026-10-20T00:00:00.000Z",
+    "status": "converted",
+    "amountCents": 315000
+  },
+  {
+    "id": "a-q11",
+    "companyId": "a",
+    "sourceId": "a-q11",
+    "jobId": "a-j11",
+    "salespersonWorkerId": "a-w12",
+    "sentAt": "2026-08-03T17:00:00.000Z",
+    "status": "converted",
+    "amountCents": 744000
+  },
+  {
+    "id": "a-q12",
+    "companyId": "a",
+    "sourceId": "a-q12",
+    "jobId": "a-j12",
+    "salespersonWorkerId": "a-w12",
+    "sentAt": "2026-08-05T17:00:00.000Z",
+    "status": "converted",
+    "amountCents": 604000
+  },
+  {
+    "id": "a-q13",
+    "companyId": "a",
+    "sourceId": "a-q13",
+    "jobId": "a-j13",
+    "salespersonWorkerId": "a-w05",
+    "sentAt": "2026-08-07T17:00:00.000Z",
+    "status": "converted",
+    "amountCents": 774000
+  },
+  {
+    "id": "a-q14",
+    "companyId": "a",
+    "sourceId": "a-q14",
+    "jobId": "a-j14",
+    "salespersonWorkerId": "a-w12",
+    "sentAt": "2026-08-11T17:00:00.000Z",
+    "status": "converted",
+    "amountCents": 662000
+  },
+  {
+    "id": "a-q15",
+    "companyId": "a",
+    "sourceId": "a-q15",
+    "jobId": "a-j15",
+    "salespersonWorkerId": "a-w12",
+    "sentAt": "2026-08-13T17:00:00.000Z",
+    "status": "converted",
+    "amountCents": 586000
+  },
+  {
+    "id": "a-q16",
+    "companyId": "a",
+    "sourceId": "a-q16",
+    "jobId": "a-j16",
+    "salespersonWorkerId": "a-w12",
+    "sentAt": "2026-08-17T17:00:00.000Z",
+    "status": "converted",
+    "amountCents": 775000
+  },
+  {
+    "id": "a-q17",
+    "companyId": "a",
+    "sourceId": "a-q17",
+    "jobId": "a-j17",
+    "salespersonWorkerId": "a-w11",
+    "sentAt": "2026-08-19T17:00:00.000Z",
+    "status": "converted",
+    "amountCents": 706000
+  },
+  {
+    "id": "a-q18",
+    "companyId": "a",
+    "sourceId": "a-q18",
+    "jobId": "a-j18",
+    "salespersonWorkerId": "a-w12",
+    "sentAt": "2026-08-21T17:00:00.000Z",
+    "status": "converted",
+    "amountCents": 682000
+  },
+  {
+    "id": "a-q19",
+    "companyId": "a",
+    "sourceId": "a-q19",
+    "jobId": "a-j19",
+    "salespersonWorkerId": "a-w12",
+    "sentAt": "2026-08-26T17:00:00.000Z",
+    "status": "converted",
+    "amountCents": 838000
+  },
+  {
+    "id": "a-q20",
+    "companyId": "a",
+    "sourceId": "a-q20",
+    "jobId": "a-j21",
+    "salespersonWorkerId": "a-w11",
+    "sentAt": "2026-08-28T17:00:00.000Z",
+    "status": "converted",
+    "amountCents": 424000
+  },
+  {
+    "id": "a-q21",
+    "companyId": "a",
+    "sourceId": "a-q21",
+    "jobId": "a-j22",
+    "salespersonWorkerId": "a-w12",
+    "sentAt": "2026-08-31T17:00:00.000Z",
+    "status": "converted",
+    "amountCents": 719000
+  },
+  {
+    "id": "a-q22",
+    "companyId": "a",
+    "sourceId": "a-q22",
+    "jobId": "a-j23",
+    "salespersonWorkerId": "a-w05",
+    "sentAt": "2026-09-02T17:00:00.000Z",
+    "status": "converted",
+    "amountCents": 604000
+  },
+  {
+    "id": "a-q23",
+    "companyId": "a",
+    "sourceId": "a-q23",
+    "jobId": "a-j24",
+    "salespersonWorkerId": "a-w12",
+    "sentAt": "2026-09-04T17:00:00.000Z",
+    "status": "converted",
+    "amountCents": 679000
+  },
+  {
+    "id": "a-q24",
+    "companyId": "a",
+    "sourceId": "a-q24",
+    "jobId": "a-j25",
+    "salespersonWorkerId": "a-w12",
+    "sentAt": "2026-09-08T17:00:00.000Z",
+    "status": "converted",
+    "amountCents": 701000
+  },
+  {
+    "id": "a-q25",
+    "companyId": "a",
+    "sourceId": "a-q25",
+    "jobId": "a-j26",
+    "salespersonWorkerId": "a-w12",
+    "sentAt": "2026-09-10T17:00:00.000Z",
+    "status": "converted",
+    "amountCents": 628000
+  },
+  {
+    "id": "a-q26",
+    "companyId": "a",
+    "sourceId": "a-q26",
+    "jobId": "a-j27",
+    "salespersonWorkerId": "a-w11",
+    "sentAt": "2026-09-14T17:00:00.000Z",
+    "status": "converted",
+    "amountCents": 718000
+  },
+  {
+    "id": "a-q27",
+    "companyId": "a",
+    "sourceId": "a-q27",
+    "jobId": "a-j28",
+    "salespersonWorkerId": "a-w12",
+    "sentAt": "2026-09-16T17:00:00.000Z",
+    "status": "converted",
+    "amountCents": 871000
+  },
+  {
+    "id": "a-q28",
+    "companyId": "a",
+    "sourceId": "a-q28",
+    "jobId": "a-j30",
+    "salespersonWorkerId": "a-w12",
+    "sentAt": "2026-09-18T17:00:00.000Z",
+    "status": "converted",
+    "amountCents": 528000
+  },
+  {
+    "id": "a-q29",
+    "companyId": "a",
+    "sourceId": "a-q29",
+    "jobId": "a-j31",
+    "salespersonWorkerId": "a-w11",
+    "sentAt": "2026-09-22T17:00:00.000Z",
+    "status": "converted",
+    "amountCents": 676000
+  },
+  {
+    "id": "a-q30",
+    "companyId": "a",
+    "sourceId": "a-q30",
+    "jobId": "a-j32",
+    "salespersonWorkerId": "a-w11",
+    "sentAt": "2026-09-24T17:00:00.000Z",
+    "status": "converted",
+    "amountCents": 666000
+  }
+]

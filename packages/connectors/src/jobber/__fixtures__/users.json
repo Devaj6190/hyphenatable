@@ -1,0 +1,33 @@
+{
+  "_comment": "Hand-built from the 2026-09-25 introspected schema. Fake ids, fake names. Responses keyed by users(status).",
+  "ACTIVATED": {
+    "data": {
+      "users": {
+        "totalCount": 3,
+        "pageInfo": { "hasNextPage": false, "endCursor": "Mw" },
+        "nodes": [
+          { "id": "Z2lkOi8vSm9iYmVyL1VzZXIvMTAwMQ==", "name": { "full": "Morgan Lee" }, "status": "ACTIVATED", "isAccountOwner": true, "isAccountAdmin": true, "labourRate": null },
+          { "id": "Z2lkOi8vSm9iYmVyL1VzZXIvMTAwMg==", "name": { "full": "Avery Reed" }, "status": "ACTIVATED", "isAccountOwner": false, "isAccountAdmin": false, "labourRate": 28.5 },
+          { "id": "Z2lkOi8vSm9iYmVyL1VzZXIvMTAwMw==", "name": { "full": "Jordan Ellis" }, "status": "ACTIVATED", "isAccountOwner": false, "isAccountAdmin": false, "labourRate": 31.15 }
+        ]
+      }
+    },
+    "extensions": { "cost": { "requestedQueryCost": 350, "actualQueryCost": 22, "throttleStatus": { "maximumAvailable": 10000, "currentlyAvailable": 9978, "restoreRate": 500 } } }
+  },
+  "DEACTIVATED": {
+    "data": {
+      "users": {
+        "totalCount": 1,
+        "pageInfo": { "hasNextPage": false, "endCursor": "MQ" },
+        "nodes": [
+          { "id": "Z2lkOi8vSm9iYmVyL1VzZXIvMTAwNA==", "name": { "full": "Sam Okafor" }, "status": "DEACTIVATED", "isAccountOwner": false, "isAccountAdmin": false, "labourRate": 26 }
+        ]
+      }
+    },
+    "extensions": { "cost": { "requestedQueryCost": 350, "actualQueryCost": 8, "throttleStatus": { "maximumAvailable": 10000, "currentlyAvailable": 9970, "restoreRate": 500 } } }
+  },
+  "COUNT": {
+    "data": { "users": { "totalCount": 4 } },
+    "extensions": { "cost": { "requestedQueryCost": 2, "actualQueryCost": 2, "throttleStatus": { "maximumAvailable": 10000, "currentlyAvailable": 9968, "restoreRate": 500 } } }
+  }
+}

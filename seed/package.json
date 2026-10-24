@@ -1,5 +1,11 @@
 {
   "name": "@payrollpilot/seed",
   "private": true,
-  "type": "module"
+  "type": "module",
+  "scripts": {
+    "validate": "bun run validate.ts ../data/fixtures/a"
+  },
+  "dependencies": {
+    "zod": "^4.1.12"
+  }
 }
