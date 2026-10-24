@@ -12,6 +12,13 @@ import { createServer } from "node:http";
 import { dirname, resolve, sep } from "node:path";
 import { createInterface } from "node:readline";
 import { parseArgs } from "node:util";
+import {
+  compareJobber,
+  formatCompare,
+  loadFixtures,
+  loadIdMap,
+} from "../compare.ts";
+import { resolvePeriod } from "../time.ts";
 import { privatePath } from "../tokens.ts";
 import {
   authFromEnv,
@@ -37,6 +44,7 @@ const { positionals, values } = parseArgs({
     tz: { type: "string" },
     cycle: { type: "string" },
     out: { type: "string" },
+    compare: { type: "string" },
     "redirect-uri": { type: "string" },
     account: { type: "string" },
     paste: { type: "boolean" },
@@ -225,6 +233,16 @@ async function pull() {
       throw new Error("--out must be under data/private/");
     await writeFile(out, JSON.stringify(result, null, 2));
     console.log(`wrote ${out}`);
+  }
+  if (values.compare) {
+    const rows = compareJobber(
+      result.records,
+      await loadFixtures(values.compare),
+      await loadIdMap(company, "jobber"),
+      resolvePeriod(from, to, values.tz ?? "UTC"),
+    );
+    console.log(`\n${formatCompare(rows)}`);
+    if (rows.some((r) => r.missing || r.extra)) process.exitCode = 1;
   }
   if (result.syncRuns.some((r) => !r.complete)) process.exitCode = 1;
 }
