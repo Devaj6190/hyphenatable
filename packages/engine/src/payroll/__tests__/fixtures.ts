@@ -5,6 +5,10 @@ import type {
   Company,
   Cycle,
   Expense,
+  Invoice,
+  Job,
+  Payment,
+  Quote,
   Rule,
   TimeEntry,
   Worker,
@@ -36,5 +40,9 @@ export function fixtures(company: "a" | "b") {
       (r): Rule => ({ ...r, status: "active" }),
     ),
     pastPayrolls: load<PastPayroll[]>(company, "pastPayrolls"),
+    jobs: load<Job[]>(company, "jobs"),
+    quotes: load<Quote[]>(company, "quotes"),
+    invoices: load<Invoice[]>(company, "invoices"),
+    payments: load<Payment[]>(company, "payments"),
   };
 }
