@@ -1,0 +1,161 @@
+{
+  "note": "Pinned from marginHistory on data/fixtures/a (a-c01..a-c04, costing rates as Jobber held them then) and data/fixtures/b (b-c01..b-c04). Re-pin with PIN_GOLDEN=1 and review the diff.",
+  "a": {
+    "cycles": [
+      {
+        "cycleId": "a-c01",
+        "revenueCents": 3370000,
+        "laborCents": 1585850,
+        "jobCostCents": 429175,
+        "profitCents": 1354975,
+        "marginPct": 40.21,
+        "complete": true,
+        "incompleteReasons": [],
+        "jobs": 5
+      },
+      {
+        "cycleId": "a-c02",
+        "revenueCents": 3425000,
+        "laborCents": 1562050,
+        "jobCostCents": 670672,
+        "profitCents": 1192278,
+        "marginPct": 34.81,
+        "complete": true,
+        "incompleteReasons": [],
+        "jobs": 5
+      },
+      {
+        "cycleId": "a-c03",
+        "revenueCents": 3331000,
+        "laborCents": 1585850,
+        "jobCostCents": 495255,
+        "profitCents": 1249895,
+        "marginPct": 37.52,
+        "complete": true,
+        "incompleteReasons": [],
+        "jobs": 5
+      },
+      {
+        "cycleId": "a-c04",
+        "revenueCents": 3459000,
+        "laborCents": 1593500,
+        "jobCostCents": 539309,
+        "profitCents": 1326191,
+        "marginPct": 38.34,
+        "complete": true,
+        "incompleteReasons": [],
+        "jobs": 5
+      }
+    ],
+    "cycleStats": {
+      "n": 4,
+      "meanPct": 37.72,
+      "sdPct": 1.94,
+      "minPct": 34.81,
+      "maxPct": 40.21,
+      "minId": "a-c02"
+    },
+    "jobStats": {
+      "n": 20,
+      "meanPct": 37.74,
+      "sdPct": 3.47,
+      "minPct": 29.99,
+      "maxPct": 43.03,
+      "minId": "a-j24"
+    },
+    "suggestion": {
+      "status": "proposed",
+      "lowMarginPct": 29,
+      "method": "lowest_clean_job",
+      "why": "20 job margins over 4 complete cycles (mean 37.74%, sd 3.47, lowest 29.99% on a-j24); mean − 2 sd (30%) would have flagged a clean past job, so the lowest clean job, rounded down, is used",
+      "evidence": {
+        "cycleIds": ["a-c01", "a-c02", "a-c03", "a-c04"],
+        "jobs": 20,
+        "meanPct": 37.74,
+        "sdPct": 3.47,
+        "minPct": 29.99,
+        "minJobId": "a-j24"
+      }
+    },
+    "note": null
+  },
+  "b": {
+    "cycles": [
+      {
+        "cycleId": "b-c01",
+        "revenueCents": 10562000,
+        "laborCents": 3176100,
+        "jobCostCents": 3326192,
+        "profitCents": 4059708,
+        "marginPct": 38.44,
+        "complete": true,
+        "incompleteReasons": [],
+        "jobs": 20
+      },
+      {
+        "cycleId": "b-c02",
+        "revenueCents": 11250500,
+        "laborCents": 3186500,
+        "jobCostCents": 3602638,
+        "profitCents": 4461362,
+        "marginPct": 39.65,
+        "complete": true,
+        "incompleteReasons": [],
+        "jobs": 20
+      },
+      {
+        "cycleId": "b-c03",
+        "revenueCents": 11584000,
+        "laborCents": 3176300,
+        "jobCostCents": 3821300,
+        "profitCents": 4586400,
+        "marginPct": 39.59,
+        "complete": true,
+        "incompleteReasons": [],
+        "jobs": 20
+      },
+      {
+        "cycleId": "b-c04",
+        "revenueCents": 10577500,
+        "laborCents": 3186500,
+        "jobCostCents": 3341773,
+        "profitCents": 4049227,
+        "marginPct": 38.28,
+        "complete": true,
+        "incompleteReasons": [],
+        "jobs": 20
+      }
+    ],
+    "cycleStats": {
+      "n": 4,
+      "meanPct": 38.99,
+      "sdPct": 0.63,
+      "minPct": 38.28,
+      "maxPct": 39.65,
+      "minId": "b-c04"
+    },
+    "jobStats": {
+      "n": 80,
+      "meanPct": 43.64,
+      "sdPct": 7,
+      "minPct": 30.02,
+      "maxPct": 55.38,
+      "minId": "b-j002"
+    },
+    "suggestion": {
+      "status": "proposed",
+      "lowMarginPct": 29,
+      "method": "mean_minus_2sd",
+      "why": "80 job margins over 4 complete cycles (mean 43.64%, sd 7, lowest 30.02% on b-j002); a job more than 2 sd below the mean is unusual for this company, and that is below every clean past job",
+      "evidence": {
+        "cycleIds": ["b-c01", "b-c02", "b-c03", "b-c04"],
+        "jobs": 80,
+        "meanPct": 43.64,
+        "sdPct": 7,
+        "minPct": 30.02,
+        "minJobId": "b-j002"
+      }
+    },
+    "note": null
+  }
+}
