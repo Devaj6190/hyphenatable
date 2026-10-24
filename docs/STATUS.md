@@ -2,6 +2,9 @@
 
 Format: `HH:MM PDT · who · what landed on main / what I'm on / what I need`. Decisions that change the plan go here too, with the file they changed.
 
+- Sat 02:20 · A1 · Merged #3 (d7c66d1): Jobber connector part 2: jobs (by id), visits, quotes with salesperson, invoices, payment records (deposit if on a quote, final if invoice only), expenses; one SyncRun per object with `totalCount` completeness; 43 tests. Not yet run against an account (tester auth pending).
+  - **Ask → Devaj (B), contract:** (1) `Invoice.totalCents` and `Expense.amountCents` can be null from Jobber; schema needs `| null` (we never default to 0). (2) A-10 Reimbursement lines need Jobber's `reimbursableTo` + reimbursement status on `Expense`; propose adding `reimbursableToWorkerId: string|null, reimbursementStatus: string|null`. (3) `Job.jobNumber` is a number. (4) Jobber expenses come back with `kind: "unknown"`, `matchedJobId` from `linkedJob` (set by a person), `matchConfidence: null`.
+
 - Sat 02:15 · A1 · Merged #2 (bafe0a3): `packages/connectors/src/jobber/` v1: OAuth (PKCE, rotating refresh, token in `data/private/`), read-only client (refuses mutations), users + timeSheetEntries, completeness vs `totalCount` and `timeSheetsByDay`; 35 tests, tsc clean. `pullCycle(auth, companyId, from, to, opts)` returns `{ records, syncRuns }`, one SyncRun per object. Not yet run against an account.
   - **Ask → Devaj (B):** (1) insert mutation name, assumed `sync.recordRun`; (2) connector ids are `jobber:<EncodedId>` (sourceId = EncodedId); resolve to Convex ids on insert; (3) Jobber can't know `Worker.role`/`payType`: connector returns null there; B merges with company config on insert, or a `contract:` PR allows null. Say which.
 
