@@ -1,0 +1,20 @@
+{
+  "name": "@payrollpilot/connectors",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./*": "./src/*.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@payrollpilot/engine": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "vitest": "^4"
+  }
+}
