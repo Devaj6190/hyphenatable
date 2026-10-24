@@ -1,0 +1,21 @@
+[
+  {
+    "id": "a-m-01",
+    "questionId": "a-q-02",
+    "workerId": "a-w08",
+    "direction": "out",
+    "text": "Rowan, on Oct 8 your 6.5h entry has no job. Which job was it? 1 a-j01 2 a-j02 3 something else",
+    "at": "2026-10-24T08:31:00.000Z",
+    "kind": "text"
+  },
+  {
+    "id": "a-m-02",
+    "questionId": "a-q-02",
+    "workerId": "a-w08",
+    "direction": "in",
+    "text": "1",
+    "at": "2026-10-24T08:40:00.000Z",
+    "kind": "text",
+    "interpretation": "Read as option 1, job a-j01."
+  }
+]

@@ -20,7 +20,7 @@ type Item = { label: string; path: string; icon: LucideIcon; built: boolean };
 
 const items: Item[] = [
   { label: "Home", path: "", icon: Gauge, built: true },
-  { label: "Manager", path: "/manager", icon: Users, built: false },
+  { label: "Manager", path: "/manager", icon: Users, built: true },
   { label: "Onboarding", path: "/onboarding", icon: ListChecks, built: false },
   { label: "Rules", path: "/rules", icon: BookOpen, built: false },
   { label: "Workbook", path: "/workbook", icon: Table2, built: false },

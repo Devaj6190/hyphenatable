@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { DataLabel } from "@/components/DataLabel";
 import { Nav } from "@/components/Nav";
+import { RoleNotice, RoleSwitch } from "@/components/RoleSwitch";
 import { companies, SEATS_LINE } from "@/lib/companies";
 
 // Known companies are prerendered; cacheComponents requires params to be known or inside Suspense.
@@ -28,7 +29,8 @@ export default async function CompanyLayout({
               {company?.name ?? "Unknown company"}
             </span>
             {company && <DataLabel kind={company.kind} />}
-            <div className="ml-auto flex gap-3 text-sm">
+            <div className="ml-auto flex items-center gap-4 text-sm">
+              <RoleSwitch />
               {Object.keys(companies).map((id) => (
                 <Link
                   key={id}
@@ -47,6 +49,7 @@ export default async function CompanyLayout({
           <p className="mx-auto mt-1 max-w-6xl text-sm text-muted-foreground">
             {SEATS_LINE}
           </p>
+          <RoleNotice />
         </header>
         <main className="mx-auto max-w-6xl px-4 py-6 lg:px-8">
           <Suspense

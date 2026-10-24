@@ -73,3 +73,22 @@ export type FlagEvent = {
   type: string;
   summary: string;
 };
+
+// One line in a per-worker text thread. Phone numbers never appear here; the courier owns them.
+export type ThreadMessage = {
+  id: string;
+  questionId: string;
+  workerId: string;
+  direction: "out" | "in";
+  text: string;
+  at: string;
+  kind: "text" | "poll" | "poll_vote" | "reaction";
+  simulated?: boolean;
+  interpretation?: string;
+};
+
+export type FixtureWorker = {
+  id: string;
+  displayName: string;
+  role: "field" | "manager" | "owner" | "office";
+};
