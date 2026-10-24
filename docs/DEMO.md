@@ -16,7 +16,7 @@ Owner: Varnika (C). v0, Sat Oct 24. Sources: `docs/plans/C-product-messaging-dem
 
 **Checks.** The catalogue has **23 checks** (CHK-01 to CHK-23, shared context section 9). Cycle 1 plants **29 errors** covering CHK-01 to CHK-22, with an answer key. Cycle 2 plants 31, and 9 of them can be settled by rules learned in cycle 1, which is where "fewer questions" comes from.
 
-**What's real, what's synthetic (say it exactly this way).** The people, jobs and hours are synthetic. Company A's clients, jobs, quotes, invoices and expenses live in a real Jobber trial account and are read through the Jobber API. Its hours are loaded from fixtures, because the Jobber API cannot create time entries. Its payroll lives in the real Gusto demo environment. QuickBooks: **[TODO: H3 still open]**. The texts are real iMessage/SMS through Photon: **[TODO: H4 not yet proven]**. Anything the simulated-manager persona writes carries a red **Simulated** chip.
+**What's real, what's synthetic (say it exactly this way).** The people, jobs and hours are synthetic. Company A's users, clients, properties, jobs, visits, quotes, invoices and expenses live in a real Jobber trial account and are read through the Jobber API. Its time entries and payment records are loaded from fixtures, because the Jobber API cannot create them. Its employees, compensations and current unprocessed payroll live in the real Gusto demo environment; its past payrolls come from fixtures. (Same as `docs/PROOF.md` section 1.) QuickBooks: **[TODO: H3 still open]**. The texts are real iMessage/SMS through Photon: **[TODO: H4 not yet proven]**. Anything the simulated-manager persona writes carries a red **Simulated** chip.
 
 ## 2. The opening moment (video 0:00 to 0:20)
 

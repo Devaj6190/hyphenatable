@@ -42,8 +42,8 @@ The moment: Sam Okafor (a fake worker) has two overlapping entries on the same d
 - An append-only audit log that traces every number to the record, rule or person behind it.
 
 ## What's real, what's simulated, and how we know
-- **Real:** the Jobber trial account (clients, jobs, quotes, invoices, expenses read through the API), the Gusto demo environment, the texts **[TODO: once H4 passes]**, and a real company's past cycles, anonymized at ingest, for the backtest.
-- **Synthetic:** Company A (a 13-person landscaping crew) and Company B, their people, jobs and hours. Hours load from fixtures because the Jobber API can't create time entries. Any reply produced by the simulated-manager persona is labelled Simulated.
+- **Real:** the Jobber trial account (users, clients, properties, jobs, visits, quotes, invoices and expenses, read through the API), the Gusto demo environment (employees, compensations, the current unprocessed payroll), the texts **[TODO: once H4 passes]**, and a real company's past cycles, anonymized at ingest, for the backtest.
+- **Synthetic:** Company A (a 13-person landscaping crew) and Company B, their people, jobs and hours. Time entries and payment records load from fixtures because the Jobber API can't create them; Company A's past payrolls come from fixtures too. Any reply produced by the simulated-manager persona is labelled Simulated. Must match `docs/PROOF.md` section 1.
 - **How we know:** 29 planted errors with an answer key in cycle 1 (covering 22 of the 23 checks): precision **[measured at G3]**, recall **[measured at G3]**. Learned rules graded against the owner's runbook, which the system never saw: **[measured at G3]** (aggregate only). The real company's past cycle matched to the cent: **[measured at G3]**. Full statement in `docs/PROOF.md` **[TODO: link once it exists]**.
 
 ## Challenges we ran into
