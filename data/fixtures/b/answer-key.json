@@ -1,0 +1,174 @@
+[
+  {
+    "id": "b-ak-01",
+    "checkId": "CHK-01",
+    "subject": {
+      "workerId": "b-w18",
+      "jobId": null,
+      "entryIds": [
+        "b-te-5112"
+      ],
+      "expenseIds": []
+    },
+    "truth": "entry b-te-5112 was a parts run for job b-j096; the job was not picked on the timer",
+    "correctAnswer": {
+      "kind": "change",
+      "values": {
+        "jobId": "b-j096"
+      }
+    },
+    "registerCategory": "hours with no job"
+  },
+  {
+    "id": "b-ak-02",
+    "checkId": "CHK-03",
+    "subject": {
+      "workerId": "b-w07",
+      "jobId": "b-j082",
+      "entryIds": [
+        "b-te-5075"
+      ],
+      "expenseIds": []
+    },
+    "truth": "the 13 h day b-te-5075 is real (rooftop unit swap); pay 8 h regular, 4 h at 1.5x, 1 h at 2x",
+    "correctAnswer": {
+      "kind": "confirm",
+      "values": {}
+    },
+    "registerCategory": "long or open shifts"
+  },
+  {
+    "id": "b-ak-03",
+    "checkId": "CHK-04",
+    "subject": {
+      "workerId": "b-w21",
+      "jobId": null,
+      "entryIds": [
+        "b-te-5130",
+        "b-te-5138"
+      ],
+      "expenseIds": []
+    },
+    "truth": "b-w21 started the afternoon call at 12:30 local, not 11:30; b-te-5138 starts at 12:30",
+    "correctAnswer": {
+      "kind": "change",
+      "values": {
+        "b-te-5138.startAt": "2026-10-22T19:30:00.000Z"
+      }
+    },
+    "registerCategory": "overlapping hours"
+  },
+  {
+    "id": "b-ak-04",
+    "checkId": "CHK-10",
+    "subject": {
+      "workerId": "b-w20",
+      "jobId": null,
+      "entryIds": [],
+      "expenseIds": []
+    },
+    "truth": "b-w20 is paid $32.00/h (Gusto, and every past payroll); Jobber's $34.00/h labour rate is a typo",
+    "correctAnswer": {
+      "kind": "change",
+      "values": {
+        "jobber.labourRateCents": 3200
+      }
+    },
+    "registerCategory": "stale rates"
+  },
+  {
+    "id": "b-ak-05",
+    "checkId": "CHK-14",
+    "subject": {
+      "workerId": null,
+      "jobId": null,
+      "entryIds": [],
+      "expenseIds": [
+        "b-ex-5035"
+      ]
+    },
+    "truth": "purchase b-ex-5035 (R-410A, $386.40) was for the service job b-w17 worked Tuesday morning",
+    "correctAnswer": {
+      "kind": "change",
+      "values": {
+        "matchedJobId": "b-j090"
+      }
+    },
+    "registerCategory": "unmatched material purchases"
+  },
+  {
+    "id": "b-ak-06",
+    "checkId": "CHK-15",
+    "subject": {
+      "workerId": null,
+      "jobId": "b-j081",
+      "entryIds": [],
+      "expenseIds": [
+        "b-ex-5002",
+        "b-ex-5036"
+      ]
+    },
+    "truth": "b-ex-5036 (Jobber) and b-ex-5002 (QuickBooks) are the same ductwork purchase; count it once",
+    "correctAnswer": {
+      "kind": "change",
+      "values": {
+        "keep": "b-ex-5002",
+        "drop": "b-ex-5036"
+      }
+    },
+    "registerCategory": "costs counted twice"
+  },
+  {
+    "id": "b-ak-07",
+    "checkId": "CHK-19",
+    "subject": {
+      "workerId": null,
+      "jobId": "b-j081",
+      "entryIds": [],
+      "expenseIds": []
+    },
+    "truth": "b-pay105 is the 50% deposit taken on the quote, not the final payment; the rest of b-in081 is still owed",
+    "correctAnswer": {
+      "kind": "change",
+      "values": {
+        "b-pay105.kind": "deposit",
+        "b-in081.status": "awaiting_payment"
+      }
+    },
+    "registerCategory": "a deposit mistaken for a final payment"
+  },
+  {
+    "id": "b-ak-08",
+    "checkId": "CHK-22",
+    "subject": {
+      "workerId": "b-w12",
+      "jobId": null,
+      "entryIds": [],
+      "expenseIds": []
+    },
+    "truth": "b-w12 worked 10.5 h days and a full Saturday to finish an install; the higher gross is right",
+    "correctAnswer": {
+      "kind": "confirm",
+      "values": {}
+    },
+    "registerCategory": "gross change over 25%"
+  },
+  {
+    "id": "b-ak-09",
+    "checkId": "CHK-18",
+    "subject": {
+      "workerId": "b-w20",
+      "jobId": null,
+      "entryIds": [],
+      "expenseIds": []
+    },
+    "truth": "b-w20's jobs are costed at Jobber's $34.00/h; the pay rate is $32.00/h (same typo as CHK-10)",
+    "correctAnswer": {
+      "kind": "change",
+      "values": {
+        "jobber.labourRateCents": 3200
+      }
+    },
+    "registerCategory": "stale rates inflating job profit"
+  }
+]

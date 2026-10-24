@@ -1,0 +1,1002 @@
+[
+  {
+    "id": "b-in001",
+    "companyId": "b",
+    "sourceId": "b-in001",
+    "jobId": "b-j001",
+    "issuedDate": "2026-09-24",
+    "dueDate": "2026-10-09",
+    "status": "paid",
+    "totalCents": 1322000
+  },
+  {
+    "id": "b-in002",
+    "companyId": "b",
+    "sourceId": "b-in002",
+    "jobId": "b-j002",
+    "issuedDate": "2026-09-26",
+    "dueDate": "2026-10-11",
+    "status": "paid",
+    "totalCents": 1234000
+  },
+  {
+    "id": "b-in003",
+    "companyId": "b",
+    "sourceId": "b-in003",
+    "jobId": "b-j003",
+    "issuedDate": "2026-09-24",
+    "dueDate": "2026-10-09",
+    "status": "paid",
+    "totalCents": 1087000
+  },
+  {
+    "id": "b-in004",
+    "companyId": "b",
+    "sourceId": "b-in004",
+    "jobId": "b-j004",
+    "issuedDate": "2026-09-27",
+    "dueDate": "2026-10-12",
+    "status": "paid",
+    "totalCents": 1563000
+  },
+  {
+    "id": "b-in005",
+    "companyId": "b",
+    "sourceId": "b-in005",
+    "jobId": "b-j005",
+    "issuedDate": "2026-09-23",
+    "dueDate": "2026-10-08",
+    "status": "paid",
+    "totalCents": 947000
+  },
+  {
+    "id": "b-in006",
+    "companyId": "b",
+    "sourceId": "b-in006",
+    "jobId": "b-j006",
+    "issuedDate": "2026-09-26",
+    "dueDate": "2026-10-11",
+    "status": "paid",
+    "totalCents": 1166000
+  },
+  {
+    "id": "b-in007",
+    "companyId": "b",
+    "sourceId": "b-in007",
+    "jobId": "b-j007",
+    "issuedDate": "2026-09-27",
+    "dueDate": "2026-10-12",
+    "status": "paid",
+    "totalCents": 217000
+  },
+  {
+    "id": "b-in008",
+    "companyId": "b",
+    "sourceId": "b-in008",
+    "jobId": "b-j008",
+    "issuedDate": "2026-09-26",
+    "dueDate": "2026-10-11",
+    "status": "paid",
+    "totalCents": 294000
+  },
+  {
+    "id": "b-in009",
+    "companyId": "b",
+    "sourceId": "b-in009",
+    "jobId": "b-j009",
+    "issuedDate": "2026-09-26",
+    "dueDate": "2026-10-11",
+    "status": "paid",
+    "totalCents": 247500
+  },
+  {
+    "id": "b-in010",
+    "companyId": "b",
+    "sourceId": "b-in010",
+    "jobId": "b-j010",
+    "issuedDate": "2026-09-26",
+    "dueDate": "2026-10-11",
+    "status": "paid",
+    "totalCents": 255000
+  },
+  {
+    "id": "b-in011",
+    "companyId": "b",
+    "sourceId": "b-in011",
+    "jobId": "b-j011",
+    "issuedDate": "2026-09-26",
+    "dueDate": "2026-10-11",
+    "status": "paid",
+    "totalCents": 212000
+  },
+  {
+    "id": "b-in012",
+    "companyId": "b",
+    "sourceId": "b-in012",
+    "jobId": "b-j012",
+    "issuedDate": "2026-09-26",
+    "dueDate": "2026-10-11",
+    "status": "paid",
+    "totalCents": 225500
+  },
+  {
+    "id": "b-in013",
+    "companyId": "b",
+    "sourceId": "b-in013",
+    "jobId": "b-j013",
+    "issuedDate": "2026-09-26",
+    "dueDate": "2026-10-11",
+    "status": "paid",
+    "totalCents": 221500
+  },
+  {
+    "id": "b-in014",
+    "companyId": "b",
+    "sourceId": "b-in014",
+    "jobId": "b-j014",
+    "issuedDate": "2026-09-26",
+    "dueDate": "2026-10-11",
+    "status": "paid",
+    "totalCents": 231500
+  },
+  {
+    "id": "b-in015",
+    "companyId": "b",
+    "sourceId": "b-in015",
+    "jobId": "b-j015",
+    "issuedDate": "2026-09-26",
+    "dueDate": "2026-10-11",
+    "status": "paid",
+    "totalCents": 189000
+  },
+  {
+    "id": "b-in016",
+    "companyId": "b",
+    "sourceId": "b-in016",
+    "jobId": "b-j016",
+    "issuedDate": "2026-09-26",
+    "dueDate": "2026-10-11",
+    "status": "paid",
+    "totalCents": 273000
+  },
+  {
+    "id": "b-in017",
+    "companyId": "b",
+    "sourceId": "b-in017",
+    "jobId": "b-j017",
+    "issuedDate": "2026-09-26",
+    "dueDate": "2026-10-11",
+    "status": "paid",
+    "totalCents": 219500
+  },
+  {
+    "id": "b-in018",
+    "companyId": "b",
+    "sourceId": "b-in018",
+    "jobId": "b-j018",
+    "issuedDate": "2026-09-26",
+    "dueDate": "2026-10-11",
+    "status": "paid",
+    "totalCents": 218500
+  },
+  {
+    "id": "b-in019",
+    "companyId": "b",
+    "sourceId": "b-in019",
+    "jobId": "b-j019",
+    "issuedDate": "2026-09-26",
+    "dueDate": "2026-10-11",
+    "status": "paid",
+    "totalCents": 212000
+  },
+  {
+    "id": "b-in020",
+    "companyId": "b",
+    "sourceId": "b-in020",
+    "jobId": "b-j020",
+    "issuedDate": "2026-09-26",
+    "dueDate": "2026-10-11",
+    "status": "paid",
+    "totalCents": 227000
+  },
+  {
+    "id": "b-in021",
+    "companyId": "b",
+    "sourceId": "b-in021",
+    "jobId": "b-j021",
+    "issuedDate": "2026-09-30",
+    "dueDate": "2026-10-15",
+    "status": "paid",
+    "totalCents": 1233000
+  },
+  {
+    "id": "b-in022",
+    "companyId": "b",
+    "sourceId": "b-in022",
+    "jobId": "b-j022",
+    "issuedDate": "2026-10-03",
+    "dueDate": "2026-10-18",
+    "status": "paid",
+    "totalCents": 1342000
+  },
+  {
+    "id": "b-in023",
+    "companyId": "b",
+    "sourceId": "b-in023",
+    "jobId": "b-j023",
+    "issuedDate": "2026-09-30",
+    "dueDate": "2026-10-15",
+    "status": "paid",
+    "totalCents": 1229000
+  },
+  {
+    "id": "b-in024",
+    "companyId": "b",
+    "sourceId": "b-in024",
+    "jobId": "b-j024",
+    "issuedDate": "2026-10-03",
+    "dueDate": "2026-10-18",
+    "status": "paid",
+    "totalCents": 1581000
+  },
+  {
+    "id": "b-in025",
+    "companyId": "b",
+    "sourceId": "b-in025",
+    "jobId": "b-j025",
+    "issuedDate": "2026-10-01",
+    "dueDate": "2026-10-16",
+    "status": "paid",
+    "totalCents": 1294000
+  },
+  {
+    "id": "b-in026",
+    "companyId": "b",
+    "sourceId": "b-in026",
+    "jobId": "b-j026",
+    "issuedDate": "2026-10-04",
+    "dueDate": "2026-10-19",
+    "status": "paid",
+    "totalCents": 1209000
+  },
+  {
+    "id": "b-in027",
+    "companyId": "b",
+    "sourceId": "b-in027",
+    "jobId": "b-j027",
+    "issuedDate": "2026-10-04",
+    "dueDate": "2026-10-19",
+    "status": "paid",
+    "totalCents": 287500
+  },
+  {
+    "id": "b-in028",
+    "companyId": "b",
+    "sourceId": "b-in028",
+    "jobId": "b-j028",
+    "issuedDate": "2026-10-03",
+    "dueDate": "2026-10-18",
+    "status": "paid",
+    "totalCents": 291000
+  },
+  {
+    "id": "b-in029",
+    "companyId": "b",
+    "sourceId": "b-in029",
+    "jobId": "b-j029",
+    "issuedDate": "2026-10-03",
+    "dueDate": "2026-10-18",
+    "status": "paid",
+    "totalCents": 211500
+  },
+  {
+    "id": "b-in030",
+    "companyId": "b",
+    "sourceId": "b-in030",
+    "jobId": "b-j030",
+    "issuedDate": "2026-10-03",
+    "dueDate": "2026-10-18",
+    "status": "paid",
+    "totalCents": 260500
+  },
+  {
+    "id": "b-in031",
+    "companyId": "b",
+    "sourceId": "b-in031",
+    "jobId": "b-j031",
+    "issuedDate": "2026-10-03",
+    "dueDate": "2026-10-18",
+    "status": "paid",
+    "totalCents": 267000
+  },
+  {
+    "id": "b-in032",
+    "companyId": "b",
+    "sourceId": "b-in032",
+    "jobId": "b-j032",
+    "issuedDate": "2026-10-03",
+    "dueDate": "2026-10-18",
+    "status": "paid",
+    "totalCents": 200500
+  },
+  {
+    "id": "b-in033",
+    "companyId": "b",
+    "sourceId": "b-in033",
+    "jobId": "b-j033",
+    "issuedDate": "2026-10-03",
+    "dueDate": "2026-10-18",
+    "status": "paid",
+    "totalCents": 196500
+  },
+  {
+    "id": "b-in034",
+    "companyId": "b",
+    "sourceId": "b-in034",
+    "jobId": "b-j034",
+    "issuedDate": "2026-10-03",
+    "dueDate": "2026-10-18",
+    "status": "paid",
+    "totalCents": 309500
+  },
+  {
+    "id": "b-in035",
+    "companyId": "b",
+    "sourceId": "b-in035",
+    "jobId": "b-j035",
+    "issuedDate": "2026-10-03",
+    "dueDate": "2026-10-18",
+    "status": "paid",
+    "totalCents": 179500
+  },
+  {
+    "id": "b-in036",
+    "companyId": "b",
+    "sourceId": "b-in036",
+    "jobId": "b-j036",
+    "issuedDate": "2026-10-03",
+    "dueDate": "2026-10-18",
+    "status": "paid",
+    "totalCents": 268000
+  },
+  {
+    "id": "b-in037",
+    "companyId": "b",
+    "sourceId": "b-in037",
+    "jobId": "b-j037",
+    "issuedDate": "2026-10-03",
+    "dueDate": "2026-10-18",
+    "status": "paid",
+    "totalCents": 220000
+  },
+  {
+    "id": "b-in038",
+    "companyId": "b",
+    "sourceId": "b-in038",
+    "jobId": "b-j038",
+    "issuedDate": "2026-10-03",
+    "dueDate": "2026-10-18",
+    "status": "paid",
+    "totalCents": 207500
+  },
+  {
+    "id": "b-in039",
+    "companyId": "b",
+    "sourceId": "b-in039",
+    "jobId": "b-j039",
+    "issuedDate": "2026-10-03",
+    "dueDate": "2026-10-18",
+    "status": "paid",
+    "totalCents": 224000
+  },
+  {
+    "id": "b-in040",
+    "companyId": "b",
+    "sourceId": "b-in040",
+    "jobId": "b-j040",
+    "issuedDate": "2026-10-03",
+    "dueDate": "2026-10-18",
+    "status": "paid",
+    "totalCents": 239500
+  },
+  {
+    "id": "b-in041",
+    "companyId": "b",
+    "sourceId": "b-in041",
+    "jobId": "b-j041",
+    "issuedDate": "2026-10-08",
+    "dueDate": "2026-10-23",
+    "status": "paid",
+    "totalCents": 1125000
+  },
+  {
+    "id": "b-in042",
+    "companyId": "b",
+    "sourceId": "b-in042",
+    "jobId": "b-j042",
+    "issuedDate": "2026-10-11",
+    "dueDate": "2026-10-26",
+    "status": "paid",
+    "totalCents": 1564000
+  },
+  {
+    "id": "b-in043",
+    "companyId": "b",
+    "sourceId": "b-in043",
+    "jobId": "b-j043",
+    "issuedDate": "2026-10-07",
+    "dueDate": "2026-10-22",
+    "status": "paid",
+    "totalCents": 1233000
+  },
+  {
+    "id": "b-in044",
+    "companyId": "b",
+    "sourceId": "b-in044",
+    "jobId": "b-j044",
+    "issuedDate": "2026-10-10",
+    "dueDate": "2026-10-25",
+    "status": "paid",
+    "totalCents": 1649000
+  },
+  {
+    "id": "b-in045",
+    "companyId": "b",
+    "sourceId": "b-in045",
+    "jobId": "b-j045",
+    "issuedDate": "2026-10-08",
+    "dueDate": "2026-10-23",
+    "status": "paid",
+    "totalCents": 1311000
+  },
+  {
+    "id": "b-in046",
+    "companyId": "b",
+    "sourceId": "b-in046",
+    "jobId": "b-j046",
+    "issuedDate": "2026-10-10",
+    "dueDate": "2026-10-25",
+    "status": "paid",
+    "totalCents": 1508000
+  },
+  {
+    "id": "b-in047",
+    "companyId": "b",
+    "sourceId": "b-in047",
+    "jobId": "b-j047",
+    "issuedDate": "2026-10-11",
+    "dueDate": "2026-10-26",
+    "status": "paid",
+    "totalCents": 234500
+  },
+  {
+    "id": "b-in048",
+    "companyId": "b",
+    "sourceId": "b-in048",
+    "jobId": "b-j048",
+    "issuedDate": "2026-10-10",
+    "dueDate": "2026-10-25",
+    "status": "paid",
+    "totalCents": 234500
+  },
+  {
+    "id": "b-in049",
+    "companyId": "b",
+    "sourceId": "b-in049",
+    "jobId": "b-j049",
+    "issuedDate": "2026-10-10",
+    "dueDate": "2026-10-25",
+    "status": "paid",
+    "totalCents": 198000
+  },
+  {
+    "id": "b-in050",
+    "companyId": "b",
+    "sourceId": "b-in050",
+    "jobId": "b-j050",
+    "issuedDate": "2026-10-10",
+    "dueDate": "2026-10-25",
+    "status": "paid",
+    "totalCents": 266000
+  },
+  {
+    "id": "b-in051",
+    "companyId": "b",
+    "sourceId": "b-in051",
+    "jobId": "b-j051",
+    "issuedDate": "2026-10-10",
+    "dueDate": "2026-10-25",
+    "status": "paid",
+    "totalCents": 226500
+  },
+  {
+    "id": "b-in052",
+    "companyId": "b",
+    "sourceId": "b-in052",
+    "jobId": "b-j052",
+    "issuedDate": "2026-10-10",
+    "dueDate": "2026-10-25",
+    "status": "paid",
+    "totalCents": 230500
+  },
+  {
+    "id": "b-in053",
+    "companyId": "b",
+    "sourceId": "b-in053",
+    "jobId": "b-j053",
+    "issuedDate": "2026-10-10",
+    "dueDate": "2026-10-25",
+    "status": "paid",
+    "totalCents": 216500
+  },
+  {
+    "id": "b-in054",
+    "companyId": "b",
+    "sourceId": "b-in054",
+    "jobId": "b-j054",
+    "issuedDate": "2026-10-10",
+    "dueDate": "2026-10-25",
+    "status": "paid",
+    "totalCents": 272000
+  },
+  {
+    "id": "b-in055",
+    "companyId": "b",
+    "sourceId": "b-in055",
+    "jobId": "b-j055",
+    "issuedDate": "2026-10-10",
+    "dueDate": "2026-10-25",
+    "status": "paid",
+    "totalCents": 222000
+  },
+  {
+    "id": "b-in056",
+    "companyId": "b",
+    "sourceId": "b-in056",
+    "jobId": "b-j056",
+    "issuedDate": "2026-10-10",
+    "dueDate": "2026-10-25",
+    "status": "paid",
+    "totalCents": 205000
+  },
+  {
+    "id": "b-in057",
+    "companyId": "b",
+    "sourceId": "b-in057",
+    "jobId": "b-j057",
+    "issuedDate": "2026-10-10",
+    "dueDate": "2026-10-25",
+    "status": "paid",
+    "totalCents": 190000
+  },
+  {
+    "id": "b-in058",
+    "companyId": "b",
+    "sourceId": "b-in058",
+    "jobId": "b-j058",
+    "issuedDate": "2026-10-10",
+    "dueDate": "2026-10-25",
+    "status": "paid",
+    "totalCents": 238500
+  },
+  {
+    "id": "b-in059",
+    "companyId": "b",
+    "sourceId": "b-in059",
+    "jobId": "b-j059",
+    "issuedDate": "2026-10-10",
+    "dueDate": "2026-10-25",
+    "status": "paid",
+    "totalCents": 264000
+  },
+  {
+    "id": "b-in060",
+    "companyId": "b",
+    "sourceId": "b-in060",
+    "jobId": "b-j060",
+    "issuedDate": "2026-10-10",
+    "dueDate": "2026-10-25",
+    "status": "paid",
+    "totalCents": 196000
+  },
+  {
+    "id": "b-in061",
+    "companyId": "b",
+    "sourceId": "b-in061",
+    "jobId": "b-j061",
+    "issuedDate": "2026-10-15",
+    "dueDate": "2026-10-30",
+    "status": "paid",
+    "totalCents": 992000
+  },
+  {
+    "id": "b-in062",
+    "companyId": "b",
+    "sourceId": "b-in062",
+    "jobId": "b-j062",
+    "issuedDate": "2026-10-17",
+    "dueDate": "2026-11-01",
+    "status": "paid",
+    "totalCents": 1333000
+  },
+  {
+    "id": "b-in063",
+    "companyId": "b",
+    "sourceId": "b-in063",
+    "jobId": "b-j063",
+    "issuedDate": "2026-10-15",
+    "dueDate": "2026-10-30",
+    "status": "paid",
+    "totalCents": 1373000
+  },
+  {
+    "id": "b-in064",
+    "companyId": "b",
+    "sourceId": "b-in064",
+    "jobId": "b-j064",
+    "issuedDate": "2026-10-18",
+    "dueDate": "2026-11-02",
+    "status": "paid",
+    "totalCents": 1093000
+  },
+  {
+    "id": "b-in065",
+    "companyId": "b",
+    "sourceId": "b-in065",
+    "jobId": "b-j065",
+    "issuedDate": "2026-10-14",
+    "dueDate": "2026-10-29",
+    "status": "paid",
+    "totalCents": 1111000
+  },
+  {
+    "id": "b-in066",
+    "companyId": "b",
+    "sourceId": "b-in066",
+    "jobId": "b-j066",
+    "issuedDate": "2026-10-17",
+    "dueDate": "2026-11-01",
+    "status": "paid",
+    "totalCents": 1386000
+  },
+  {
+    "id": "b-in067",
+    "companyId": "b",
+    "sourceId": "b-in067",
+    "jobId": "b-j067",
+    "issuedDate": "2026-10-18",
+    "dueDate": "2026-11-02",
+    "status": "paid",
+    "totalCents": 284500
+  },
+  {
+    "id": "b-in068",
+    "companyId": "b",
+    "sourceId": "b-in068",
+    "jobId": "b-j068",
+    "issuedDate": "2026-10-17",
+    "dueDate": "2026-11-01",
+    "status": "paid",
+    "totalCents": 218000
+  },
+  {
+    "id": "b-in069",
+    "companyId": "b",
+    "sourceId": "b-in069",
+    "jobId": "b-j069",
+    "issuedDate": "2026-10-17",
+    "dueDate": "2026-11-01",
+    "status": "paid",
+    "totalCents": 202000
+  },
+  {
+    "id": "b-in070",
+    "companyId": "b",
+    "sourceId": "b-in070",
+    "jobId": "b-j070",
+    "issuedDate": "2026-10-17",
+    "dueDate": "2026-11-01",
+    "status": "paid",
+    "totalCents": 231500
+  },
+  {
+    "id": "b-in071",
+    "companyId": "b",
+    "sourceId": "b-in071",
+    "jobId": "b-j071",
+    "issuedDate": "2026-10-17",
+    "dueDate": "2026-11-01",
+    "status": "paid",
+    "totalCents": 281500
+  },
+  {
+    "id": "b-in072",
+    "companyId": "b",
+    "sourceId": "b-in072",
+    "jobId": "b-j072",
+    "issuedDate": "2026-10-17",
+    "dueDate": "2026-11-01",
+    "status": "paid",
+    "totalCents": 230500
+  },
+  {
+    "id": "b-in073",
+    "companyId": "b",
+    "sourceId": "b-in073",
+    "jobId": "b-j073",
+    "issuedDate": "2026-10-17",
+    "dueDate": "2026-11-01",
+    "status": "paid",
+    "totalCents": 203500
+  },
+  {
+    "id": "b-in074",
+    "companyId": "b",
+    "sourceId": "b-in074",
+    "jobId": "b-j074",
+    "issuedDate": "2026-10-17",
+    "dueDate": "2026-11-01",
+    "status": "paid",
+    "totalCents": 284500
+  },
+  {
+    "id": "b-in075",
+    "companyId": "b",
+    "sourceId": "b-in075",
+    "jobId": "b-j075",
+    "issuedDate": "2026-10-17",
+    "dueDate": "2026-11-01",
+    "status": "paid",
+    "totalCents": 200000
+  },
+  {
+    "id": "b-in076",
+    "companyId": "b",
+    "sourceId": "b-in076",
+    "jobId": "b-j076",
+    "issuedDate": "2026-10-17",
+    "dueDate": "2026-11-01",
+    "status": "paid",
+    "totalCents": 298500
+  },
+  {
+    "id": "b-in077",
+    "companyId": "b",
+    "sourceId": "b-in077",
+    "jobId": "b-j077",
+    "issuedDate": "2026-10-17",
+    "dueDate": "2026-11-01",
+    "status": "paid",
+    "totalCents": 216000
+  },
+  {
+    "id": "b-in078",
+    "companyId": "b",
+    "sourceId": "b-in078",
+    "jobId": "b-j078",
+    "issuedDate": "2026-10-17",
+    "dueDate": "2026-11-01",
+    "status": "paid",
+    "totalCents": 193500
+  },
+  {
+    "id": "b-in079",
+    "companyId": "b",
+    "sourceId": "b-in079",
+    "jobId": "b-j079",
+    "issuedDate": "2026-10-17",
+    "dueDate": "2026-11-01",
+    "status": "paid",
+    "totalCents": 259500
+  },
+  {
+    "id": "b-in080",
+    "companyId": "b",
+    "sourceId": "b-in080",
+    "jobId": "b-j080",
+    "issuedDate": "2026-10-17",
+    "dueDate": "2026-11-01",
+    "status": "paid",
+    "totalCents": 186000
+  },
+  {
+    "id": "b-in081",
+    "companyId": "b",
+    "sourceId": "b-in081",
+    "jobId": "b-j081",
+    "issuedDate": "2026-10-21",
+    "dueDate": "2026-11-05",
+    "status": "paid",
+    "totalCents": 1639000
+  },
+  {
+    "id": "b-in082",
+    "companyId": "b",
+    "sourceId": "b-in082",
+    "jobId": "b-j082",
+    "issuedDate": "2026-10-24",
+    "dueDate": "2026-11-08",
+    "status": "awaiting_payment",
+    "totalCents": 1250000
+  },
+  {
+    "id": "b-in083",
+    "companyId": "b",
+    "sourceId": "b-in083",
+    "jobId": "b-j083",
+    "issuedDate": "2026-10-22",
+    "dueDate": "2026-11-06",
+    "status": "awaiting_payment",
+    "totalCents": 1450000
+  },
+  {
+    "id": "b-in084",
+    "companyId": "b",
+    "sourceId": "b-in084",
+    "jobId": "b-j084",
+    "issuedDate": "2026-10-25",
+    "dueDate": "2026-11-09",
+    "status": "awaiting_payment",
+    "totalCents": 1235000
+  },
+  {
+    "id": "b-in085",
+    "companyId": "b",
+    "sourceId": "b-in085",
+    "jobId": "b-j085",
+    "issuedDate": "2026-10-21",
+    "dueDate": "2026-11-05",
+    "status": "paid",
+    "totalCents": 1220000
+  },
+  {
+    "id": "b-in086",
+    "companyId": "b",
+    "sourceId": "b-in086",
+    "jobId": "b-j086",
+    "issuedDate": "2026-10-25",
+    "dueDate": "2026-11-09",
+    "status": "awaiting_payment",
+    "totalCents": 1814000
+  },
+  {
+    "id": "b-in087",
+    "companyId": "b",
+    "sourceId": "b-in087",
+    "jobId": "b-j087",
+    "issuedDate": "2026-10-25",
+    "dueDate": "2026-11-09",
+    "status": "awaiting_payment",
+    "totalCents": 305000
+  },
+  {
+    "id": "b-in088",
+    "companyId": "b",
+    "sourceId": "b-in088",
+    "jobId": "b-j088",
+    "issuedDate": "2026-10-24",
+    "dueDate": "2026-11-08",
+    "status": "awaiting_payment",
+    "totalCents": 239000
+  },
+  {
+    "id": "b-in089",
+    "companyId": "b",
+    "sourceId": "b-in089",
+    "jobId": "b-j089",
+    "issuedDate": "2026-10-24",
+    "dueDate": "2026-11-08",
+    "status": "awaiting_payment",
+    "totalCents": 245000
+  },
+  {
+    "id": "b-in090",
+    "companyId": "b",
+    "sourceId": "b-in090",
+    "jobId": "b-j090",
+    "issuedDate": "2026-10-24",
+    "dueDate": "2026-11-08",
+    "status": "awaiting_payment",
+    "totalCents": 210000
+  },
+  {
+    "id": "b-in091",
+    "companyId": "b",
+    "sourceId": "b-in091",
+    "jobId": "b-j091",
+    "issuedDate": "2026-10-24",
+    "dueDate": "2026-11-08",
+    "status": "awaiting_payment",
+    "totalCents": 242500
+  },
+  {
+    "id": "b-in092",
+    "companyId": "b",
+    "sourceId": "b-in092",
+    "jobId": "b-j092",
+    "issuedDate": "2026-10-24",
+    "dueDate": "2026-11-08",
+    "status": "awaiting_payment",
+    "totalCents": 267500
+  },
+  {
+    "id": "b-in093",
+    "companyId": "b",
+    "sourceId": "b-in093",
+    "jobId": "b-j093",
+    "issuedDate": "2026-10-24",
+    "dueDate": "2026-11-08",
+    "status": "awaiting_payment",
+    "totalCents": 237000
+  },
+  {
+    "id": "b-in094",
+    "companyId": "b",
+    "sourceId": "b-in094",
+    "jobId": "b-j094",
+    "issuedDate": "2026-10-24",
+    "dueDate": "2026-11-08",
+    "status": "awaiting_payment",
+    "totalCents": 266000
+  },
+  {
+    "id": "b-in095",
+    "companyId": "b",
+    "sourceId": "b-in095",
+    "jobId": "b-j095",
+    "issuedDate": "2026-10-24",
+    "dueDate": "2026-11-08",
+    "status": "awaiting_payment",
+    "totalCents": 173000
+  },
+  {
+    "id": "b-in096",
+    "companyId": "b",
+    "sourceId": "b-in096",
+    "jobId": "b-j096",
+    "issuedDate": "2026-10-24",
+    "dueDate": "2026-11-08",
+    "status": "awaiting_payment",
+    "totalCents": 208500
+  },
+  {
+    "id": "b-in097",
+    "companyId": "b",
+    "sourceId": "b-in097",
+    "jobId": "b-j097",
+    "issuedDate": "2026-10-24",
+    "dueDate": "2026-11-08",
+    "status": "awaiting_payment",
+    "totalCents": 177000
+  },
+  {
+    "id": "b-in098",
+    "companyId": "b",
+    "sourceId": "b-in098",
+    "jobId": "b-j098",
+    "issuedDate": "2026-10-24",
+    "dueDate": "2026-11-08",
+    "status": "awaiting_payment",
+    "totalCents": 192000
+  },
+  {
+    "id": "b-in099",
+    "companyId": "b",
+    "sourceId": "b-in099",
+    "jobId": "b-j099",
+    "issuedDate": "2026-10-24",
+    "dueDate": "2026-11-08",
+    "status": "awaiting_payment",
+    "totalCents": 255000
+  },
+  {
+    "id": "b-in100",
+    "companyId": "b",
+    "sourceId": "b-in100",
+    "jobId": "b-j100",
+    "issuedDate": "2026-10-24",
+    "dueDate": "2026-11-08",
+    "status": "awaiting_payment",
+    "totalCents": 234500
+  }
+]
