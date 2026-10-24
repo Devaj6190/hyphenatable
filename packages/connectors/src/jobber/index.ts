@@ -1,10 +1,18 @@
 // Jobber connector entry point. Plain async functions; no Convex import.
 // B's convex/sync/ calls pullCycle from a "use node" action and writes records + syncRuns.
 
-import { resolvePeriod } from "../time.ts";
+import { resolvePeriod, weekWindows } from "../time.ts";
 import type { SyncRun, TimeEntry, Worker } from "../types.ts";
-import { type JobberAuth, JobberClient, JOBBER_GRAPHQL_VERSION } from "./client.ts";
-import { type CompletenessResult, connectionCompleteness, timeEntryCompleteness } from "./completeness.ts";
+import {
+  JOBBER_GRAPHQL_VERSION,
+  type JobberAuth,
+  JobberClient,
+} from "./client.ts";
+import {
+  type CompletenessResult,
+  connectionCompleteness,
+  timeEntryCompleteness,
+} from "./completeness.ts";
 import { normalizeTimeSheetEntry, normalizeUser } from "./normalize.ts";
 import { type ObjectRecords, pullObjects } from "./objects.ts";
 import {
@@ -15,11 +23,18 @@ import {
   type RawUser,
   TIME_SHEET_ENTRIES_QUERY,
   USER_TIME_SHEETS_BY_DAY_QUERY,
-  USERS_COUNT_QUERY,
   USERS_QUERY,
+  USERS_QUERY_NO_RATE,
+  visibleFields,
 } from "./queries.ts";
 
-export { authFromEnv, fileTokenStore, JobberClient, type JobberAuth, type TokenStore } from "./client.ts";
+export {
+  authFromEnv,
+  fileTokenStore,
+  type JobberAuth,
+  JobberClient,
+  type TokenStore,
+} from "./client.ts";
 
 export interface PullOptions {
   /** Convex cycle id, if known; otherwise null and the caller sets it on insert. */
@@ -59,7 +74,12 @@ export async function pullCycle(
   const period = resolvePeriod(periodStart, periodEnd, opts.timezone ?? "UTC");
   const syncRuns: SyncRun[] = [];
 
-  const run = (object: string, method: string, startedAt: string, r: CompletenessResult): SyncRun => ({
+  const run = (
+    object: string,
+    method: string,
+    startedAt: string,
+    r: CompletenessResult,
+  ): SyncRun => ({
     id: `${companyId}:jobber:${object}:${startedAt}`,
     companyId,
     cycleId,
@@ -80,31 +100,48 @@ export async function pullCycle(
     error: e instanceof Error ? e.message : String(e),
   });
 
-  // ---- users (ACTIVATED + DEACTIVATED) ----
+  // ---- users: every status (ACTIVATED, NOT_INVITED, invites, DEACTIVATED), unfiltered ----
+  // Workers added in Manage Team without a login invite are NOT_INVITED but still log hours.
   let rawUsers: RawUser[] | null = null;
   {
     const startedAt = now().toISOString();
-    const method = `${METHOD} users(status: ACTIVATED|DEACTIVATED) first:50`;
+    let method = `${METHOD} users(all statuses) first:50`;
     try {
       type D = { users: Connection<RawUser> };
-      const active = await paginate<RawUser, D>(client, USERS_QUERY, { status: "ACTIVATED" }, (d) => d.users);
-      const inactive = await paginate<RawUser, D>(client, USERS_QUERY, { status: "DEACTIVATED" }, (d) => d.users);
-      const all = await client.query<{ users: { totalCount: number } }>(USERS_COUNT_QUERY);
-      rawUsers = [...active.nodes, ...inactive.nodes];
-      const a = connectionCompleteness("users(ACTIVATED)", active.nodes.length, active.totalCount, active.totalCountDrift);
-      const i = connectionCompleteness("users(DEACTIVATED)", inactive.nodes.length, inactive.totalCount, inactive.totalCountDrift);
-      const errors = [a.error, i.error].filter(Boolean);
-      const other = all.users.totalCount - (active.totalCount + inactive.totalCount);
-      // Users in other statuses (NOT_INVITED, invites) are not pulled; if any of them has hours,
-      // the time-entry per-user check marks that run incomplete. Here it is a note only.
-      if (other !== 0) errors.push(`note: ${other} users in other statuses (not ACTIVATED/DEACTIVATED) not pulled`);
+      const withRate = (await visibleFields(client, "User")).has("labourRate");
+      if (!withRate)
+        method +=
+          "; User.labourRate hidden from this app (scope), labourRateCents null";
+      const page = await paginate<RawUser, D>(
+        client,
+        withRate ? USERS_QUERY : USERS_QUERY_NO_RATE,
+        {},
+        (d) => d.users,
+      );
+      const unique = new Map(page.nodes.map((u) => [u.id, u]));
+      rawUsers = [...unique.values()];
+      const r = connectionCompleteness(
+        "users",
+        page.nodes.length,
+        page.totalCount,
+        page.totalCountDrift,
+      );
+      const dup = page.nodes.length - unique.size;
       syncRuns.push(
-        run("users", method, startedAt, {
-          pulled: rawUsers.length,
-          expected: active.totalCount + inactive.totalCount,
-          complete: a.complete && i.complete,
-          error: errors.length ? errors.join("; ") : null,
-        }),
+        run(
+          "users",
+          method,
+          startedAt,
+          dup
+            ? {
+                ...r,
+                complete: false,
+                error: [r.error, `users: ${dup} duplicate ids across pages`]
+                  .filter(Boolean)
+                  .join("; "),
+              }
+            : r,
+        ),
       );
     } catch (e) {
       syncRuns.push(run("users", method, startedAt, failed(e)));
@@ -117,24 +154,40 @@ export async function pullCycle(
     const startedAt = now().toISOString();
     const method = `${METHOD} timeSheetEntries(startAt ${period.startUtc}..${period.endUtc}, START_AT ASC) first:50 + User.timeSheetsByDay(${period.startDate}..${period.endDate})`;
     try {
-      const entries = await paginate<RawTimeSheetEntry, { timeSheetEntries: Connection<RawTimeSheetEntry> }>(
+      const entries = await paginate<
+        RawTimeSheetEntry,
+        { timeSheetEntries: Connection<RawTimeSheetEntry> }
+      >(
         client,
         TIME_SHEET_ENTRIES_QUERY,
         { startAfter: period.startUtc, startBefore: period.endUtc },
         (d) => d.timeSheetEntries,
       );
       rawEntries = entries.nodes;
-      if (rawUsers === null) throw new Error("timeSheetEntries pulled but users failed, so timeSheetsByDay totals are unavailable");
+      if (rawUsers === null)
+        throw new Error(
+          "timeSheetEntries pulled but users failed, so timeSheetsByDay totals are unavailable",
+        );
       const byDay = new Map<string, number>();
       for (const u of rawUsers) {
-        type D = { user: { id: string; timeSheetsByDay: Connection<RawTimeSheetUserDay> } | null };
-        const days = await paginate<RawTimeSheetUserDay, D>(
-          client,
-          USER_TIME_SHEETS_BY_DAY_QUERY,
-          { userId: u.id, startDate: period.startDate, endDate: period.endDate },
-          (d) => d.user?.timeSheetsByDay,
-        );
-        byDay.set(u.id, days.nodes.reduce((s, n) => s + n.entries.totalCount, 0));
+        type D = {
+          user: {
+            id: string;
+            timeSheetsByDay: Connection<RawTimeSheetUserDay>;
+          } | null;
+        };
+        let count = 0;
+        // Jobber rejects timeSheetsByDay ranges over 7 days (live, 2026-10-24): walk the period in 7-day windows.
+        for (const w of weekWindows(period.startDate, period.endDate)) {
+          const days = await paginate<RawTimeSheetUserDay, D>(
+            client,
+            USER_TIME_SHEETS_BY_DAY_QUERY,
+            { userId: u.id, startDate: w.start, endDate: w.end },
+            (d) => d.user?.timeSheetsByDay,
+          );
+          count += days.nodes.reduce((s, n) => s + n.entries.totalCount, 0);
+        }
+        byDay.set(u.id, count);
       }
       const result = timeEntryCompleteness({
         entryUserIds: rawEntries.map((e) => e.user?.id ?? null),
@@ -145,21 +198,55 @@ export async function pullCycle(
       syncRuns.push(run("timeSheetEntries", method, startedAt, result));
     } catch (e) {
       const r = failed(e);
-      syncRuns.push(run("timeSheetEntries", method, startedAt, { ...r, pulled: rawEntries.length }));
+      syncRuns.push(
+        run("timeSheetEntries", method, startedAt, {
+          ...r,
+          pulled: rawEntries.length,
+        }),
+      );
     }
   }
 
-  const timeEntries = rawEntries.map((e) => normalizeTimeSheetEntry(e, companyId, cycleId));
-  let objects: ObjectRecords = { jobs: [], visits: [], quotes: [], invoices: [], payments: [], expenses: [] };
+  const timeEntries = rawEntries.map((e) =>
+    normalizeTimeSheetEntry(e, companyId, cycleId),
+  );
+  let objects: ObjectRecords = {
+    jobs: [],
+    visits: [],
+    quotes: [],
+    invoices: [],
+    payments: [],
+    expenses: [],
+  };
   if (opts.objects !== false) {
-    const entryJobIds = timeEntries.flatMap((e) => (e.jobId ? [e.jobId.slice("jobber:".length)] : []));
-    const pulled = await pullObjects(client, companyId, period, entryJobIds, now);
+    const entryJobIds = timeEntries.flatMap((e) =>
+      e.jobId ? [e.jobId.slice("jobber:".length)] : [],
+    );
+    const pulled = await pullObjects(
+      client,
+      companyId,
+      period,
+      entryJobIds,
+      now,
+    );
     objects = pulled.records;
-    for (const r of pulled.runs) syncRuns.push(run(r.object, `${METHOD} ${r.method.replace(/^jobber-graphql /, "")}`, r.startedAt, r.result));
+    for (const r of pulled.runs)
+      syncRuns.push(
+        run(
+          r.object,
+          `${METHOD} ${r.method.replace(/^jobber-graphql /, "")}`,
+          r.startedAt,
+          r.result,
+        ),
+      );
   }
 
   return {
-    records: { workers: (rawUsers ?? []).map((u) => normalizeUser(u, companyId)), timeEntries, ...objects },
+    records: {
+      workers: (rawUsers ?? []).map((u) => normalizeUser(u, companyId)),
+      timeEntries,
+      ...objects,
+    },
     syncRuns,
   };
 }

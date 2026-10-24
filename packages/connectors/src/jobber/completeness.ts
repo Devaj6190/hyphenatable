@@ -11,11 +11,25 @@ export interface CompletenessResult {
 const signed = (n: number) => (n > 0 ? `+${n}` : `${n}`);
 
 /** nodes.length vs the connection's totalCount (and totalCount stable across pages). */
-export function connectionCompleteness(object: string, pulled: number, totalCount: number, totalCountDrift = false): CompletenessResult {
+export function connectionCompleteness(
+  object: string,
+  pulled: number,
+  totalCount: number,
+  totalCountDrift = false,
+): CompletenessResult {
   const problems: string[] = [];
-  if (pulled !== totalCount) problems.push(`${object}: pulled ${pulled}, totalCount ${totalCount} (diff ${signed(pulled - totalCount)})`);
-  if (totalCountDrift) problems.push(`${object}: totalCount changed between pages`);
-  return { pulled, expected: totalCount, complete: problems.length === 0, error: problems.length ? problems.join("; ") : null };
+  if (pulled !== totalCount)
+    problems.push(
+      `${object}: pulled ${pulled}, totalCount ${totalCount} (diff ${signed(pulled - totalCount)})`,
+    );
+  if (totalCountDrift)
+    problems.push(`${object}: totalCount changed between pages`);
+  return {
+    pulled,
+    expected: totalCount,
+    complete: problems.length === 0,
+    error: problems.length ? problems.join("; ") : null,
+  };
 }
 
 export interface TimeEntryCompletenessInput {
@@ -32,9 +46,16 @@ export interface TimeEntryCompletenessInput {
  * User.timeSheetsByDay totals. Either mismatch makes the run incomplete. Entries without a user
  * cannot appear in a per-user total, so they are compared against totalCount only and reported.
  */
-export function timeEntryCompleteness(input: TimeEntryCompletenessInput): CompletenessResult {
+export function timeEntryCompleteness(
+  input: TimeEntryCompletenessInput,
+): CompletenessResult {
   const pulled = input.entryUserIds.length;
-  const base = connectionCompleteness("timeSheetEntries", pulled, input.totalCount, input.totalCountDrift);
+  const base = connectionCompleteness(
+    "timeSheetEntries",
+    pulled,
+    input.totalCount,
+    input.totalCountDrift,
+  );
   const problems = base.error ? [base.error] : [];
 
   const pulledPerUser = new Map<string, number>();
@@ -47,14 +68,22 @@ export function timeEntryCompleteness(input: TimeEntryCompletenessInput): Comple
   for (const n of input.byDayCountPerUser.values()) byDaySum += n;
   const withUser = pulled - noUser;
   if (withUser !== byDaySum) {
-    problems.push(`timeSheetEntries: pulled ${withUser} with a user, timeSheetsByDay sum ${byDaySum} (diff ${signed(withUser - byDaySum)})`);
+    problems.push(
+      `timeSheetEntries: pulled ${withUser} with a user, timeSheetsByDay sum ${byDaySum} (diff ${signed(withUser - byDaySum)})`,
+    );
   }
-  const users = new Set([...pulledPerUser.keys(), ...input.byDayCountPerUser.keys()]);
+  const users = new Set([
+    ...pulledPerUser.keys(),
+    ...input.byDayCountPerUser.keys(),
+  ]);
   const perUser: string[] = [];
   for (const u of [...users].sort()) {
     const p = pulledPerUser.get(u) ?? 0;
     const d = input.byDayCountPerUser.get(u);
-    if (d === undefined) perUser.push(`${u} pulled ${p}, no timeSheetsByDay total (user not in users pull)`);
+    if (d === undefined)
+      perUser.push(
+        `${u} pulled ${p}, no timeSheetsByDay total (user not in users pull)`,
+      );
     else if (p !== d) perUser.push(`${u} pulled ${p} vs timeSheetsByDay ${d}`);
   }
   if (perUser.length) problems.push(`per user: ${perUser.join(", ")}`);

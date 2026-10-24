@@ -2,13 +2,19 @@
 // READ-ONLY by construction: `query()` refuses any document that contains a mutation.
 // Never logs token values.
 
-import { fileTokenStore as fileStore, privatePath, type StoredTokens, type TokenStore } from "../tokens.ts";
+import {
+  fileTokenStore as fileStore,
+  privatePath,
+  type StoredTokens,
+  type TokenStore,
+} from "../tokens.ts";
 
 export type { StoredTokens, TokenStore };
 
 export const JOBBER_GRAPHQL_URL = "https://api.getjobber.com/api/graphql";
 export const JOBBER_TOKEN_URL = "https://api.getjobber.com/api/oauth/token";
-export const JOBBER_AUTHORIZE_URL = "https://api.getjobber.com/api/oauth/authorize";
+export const JOBBER_AUTHORIZE_URL =
+  "https://api.getjobber.com/api/oauth/authorize";
 export const JOBBER_GRAPHQL_VERSION = "2026-09-25";
 
 /** Throttle policy (plan A-03 step 1): below this many points, sleep (2000 - available) / 500 s. */
@@ -19,12 +25,14 @@ const EXPIRY_SKEW_MS = 60_000;
 /** Default token file. data/private/ is gitignored; it is the only runtime write outside the package. */
 export const DEFAULT_TOKEN_PATH = privatePath("jobber-token.json");
 
-export const fileTokenStore = (path: string = DEFAULT_TOKEN_PATH): TokenStore => fileStore(path);
+export const fileTokenStore = (path: string = DEFAULT_TOKEN_PATH): TokenStore =>
+  fileStore(path);
 
 /** Company R's real account keeps its own token file; it never shares the trial/tester token. */
 export const R_ACCOUNT_TOKEN_PATH = privatePath("r/jobber-token.json");
 export type JobberAccount = "trial" | "r";
-export const jobberTokenPath = (account: JobberAccount): string => (account === "r" ? R_ACCOUNT_TOKEN_PATH : DEFAULT_TOKEN_PATH);
+export const jobberTokenPath = (account: JobberAccount): string =>
+  account === "r" ? R_ACCOUNT_TOKEN_PATH : DEFAULT_TOKEN_PATH;
 
 export interface JobberAuth {
   clientId: string;
@@ -37,10 +45,13 @@ export interface JobberAuth {
 }
 
 /** Reads JOBBER_CLIENT_ID / JOBBER_CLIENT_SECRET (shared-context section 16). */
-export function authFromEnv(env: Record<string, string | undefined> = process.env): JobberAuth {
+export function authFromEnv(
+  env: Record<string, string | undefined> = process.env,
+): JobberAuth {
   const clientId = env.JOBBER_CLIENT_ID;
   const clientSecret = env.JOBBER_CLIENT_SECRET;
-  if (!clientId || !clientSecret) throw new Error("JOBBER_CLIENT_ID and JOBBER_CLIENT_SECRET must be set");
+  if (!clientId || !clientSecret)
+    throw new Error("JOBBER_CLIENT_ID and JOBBER_CLIENT_SECRET must be set");
   return { clientId, clientSecret };
 }
 
@@ -73,11 +84,14 @@ export function throttleDelaySec(currentlyAvailable: number): number {
   return (2000 - currentlyAvailable) / 500;
 }
 
-const defaultSleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
+const defaultSleep = (ms: number) =>
+  new Promise<void>((r) => setTimeout(r, ms));
 
 /** True when the document's first operation is (or any operation is) a mutation or subscription. */
 export function isWriteDocument(doc: string): boolean {
-  const stripped = doc.replace(/#[^\n]*/g, "").replace(/"(?:[^"\\]|\\.)*"/g, '""');
+  const stripped = doc
+    .replace(/#[^\n]*/g, "")
+    .replace(/"(?:[^"\\]|\\.)*"/g, '""');
   return /(^|[\s}])(mutation|subscription)\b/.test(stripped);
 }
 
@@ -103,7 +117,11 @@ export class JobberClient {
   private async currentTokens(): Promise<StoredTokens> {
     if (!this.tokens) this.tokens = await this.store.load();
     if (!this.tokens) {
-      throw new JobberError("No Jobber refresh token stored. Run `cli.ts auth` once (needs a browser).", "NO_TOKEN", null);
+      throw new JobberError(
+        "No Jobber refresh token stored. Run `cli.ts auth` once (needs a browser).",
+        "NO_TOKEN",
+        null,
+      );
     }
     return this.tokens;
   }
@@ -128,14 +146,30 @@ export class JobberClient {
     });
     const res = await this.fetchImpl(JOBBER_TOKEN_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded", Accept: "application/json" },
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        Accept: "application/json",
+      },
       body,
     });
     if (!res.ok) {
-      throw new JobberError(`Jobber token refresh failed: HTTP ${res.status}`, "REFRESH_FAILED", res.status);
+      throw new JobberError(
+        `Jobber token refresh failed: HTTP ${res.status}`,
+        "REFRESH_FAILED",
+        res.status,
+      );
     }
-    const json = (await res.json()) as { access_token?: string; refresh_token?: string; expires_in?: number };
-    if (!json.access_token) throw new JobberError("Jobber token refresh returned no access_token", "REFRESH_FAILED", res.status);
+    const json = (await res.json()) as {
+      access_token?: string;
+      refresh_token?: string;
+      expires_in?: number;
+    };
+    if (!json.access_token)
+      throw new JobberError(
+        "Jobber token refresh returned no access_token",
+        "REFRESH_FAILED",
+        res.status,
+      );
     const next: StoredTokens = {
       accessToken: json.access_token,
       accessTokenExpiresAt: Date.now() + (json.expires_in ?? 3600) * 1000,
@@ -152,7 +186,11 @@ export class JobberClient {
 
   private async accessToken(): Promise<string> {
     const t = await this.currentTokens();
-    if (t.accessToken && t.accessTokenExpiresAt && t.accessTokenExpiresAt - EXPIRY_SKEW_MS > Date.now()) {
+    if (
+      t.accessToken &&
+      t.accessTokenExpiresAt &&
+      t.accessTokenExpiresAt - EXPIRY_SKEW_MS > Date.now()
+    ) {
       return t.accessToken;
     }
     const fresh = await this.refresh();
@@ -160,8 +198,17 @@ export class JobberClient {
   }
 
   /** Run a read-only GraphQL document. Retries on THROTTLED (HTTP 200), 401 (one refresh), 429 and 5xx. */
-  async query<T>(document: string, variables: Record<string, unknown> = {}, operationName?: string): Promise<T> {
-    if (isWriteDocument(document)) throw new JobberError("Refusing a mutation: the Jobber connector is read-only", "READ_ONLY", null);
+  async query<T>(
+    document: string,
+    variables: Record<string, unknown> = {},
+    operationName?: string,
+  ): Promise<T> {
+    if (isWriteDocument(document))
+      throw new JobberError(
+        "Refusing a mutation: the Jobber connector is read-only",
+        "READ_ONLY",
+        null,
+      );
     let refreshedFor401 = false;
     for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
       const token = await this.accessToken();
@@ -174,7 +221,11 @@ export class JobberClient {
           "Content-Type": "application/json",
           Accept: "application/json",
         },
-        body: JSON.stringify({ query: document, variables, ...(operationName ? { operationName } : {}) }),
+        body: JSON.stringify({
+          query: document,
+          variables,
+          ...(operationName ? { operationName } : {}),
+        }),
       });
 
       if (res.status === 401 && !refreshedFor401) {
@@ -188,33 +239,50 @@ export class JobberClient {
         await this.sleep(wait * 1000);
         continue;
       }
-      if (!res.ok) throw new JobberError(`Jobber HTTP ${res.status}`, "HTTP", res.status);
+      if (!res.ok)
+        throw new JobberError(`Jobber HTTP ${res.status}`, "HTTP", res.status);
 
       const json = (await res.json()) as GraphQLResponse<T>;
       const throttle = json.extensions?.cost?.throttleStatus ?? null;
       if (throttle) this.lastThrottle = throttle;
 
-      const throttled = json.errors?.some((e) => e.extensions?.code === "THROTTLED");
+      const throttled = json.errors?.some(
+        (e) => e.extensions?.code === "THROTTLED",
+      );
       if (throttled) {
-        const wait = Math.max(throttleDelaySec(throttle?.currentlyAvailable ?? 0), 1);
+        const wait = Math.max(
+          throttleDelaySec(throttle?.currentlyAvailable ?? 0),
+          1,
+        );
         this.log(`jobber: THROTTLED, sleeping ${wait}s`);
         await this.sleep(wait * 1000);
         continue;
       }
       if (json.errors?.length) {
         const code = json.errors[0]?.extensions?.code ?? null;
-        throw new JobberError(`Jobber GraphQL error: ${json.errors.map((e) => e.message).join("; ")}`, code, res.status);
+        throw new JobberError(
+          `Jobber GraphQL error: ${json.errors.map((e) => e.message).join("; ")}`,
+          code,
+          res.status,
+        );
       }
       if (throttle) {
         const wait = throttleDelaySec(throttle.currentlyAvailable);
         if (wait > 0) {
-          this.log(`jobber: ${throttle.currentlyAvailable} points left, sleeping ${wait}s`);
+          this.log(
+            `jobber: ${throttle.currentlyAvailable} points left, sleeping ${wait}s`,
+          );
           await this.sleep(wait * 1000);
         }
       }
-      if (json.data === undefined || json.data === null) throw new JobberError("Jobber returned no data", null, res.status);
+      if (json.data === undefined || json.data === null)
+        throw new JobberError("Jobber returned no data", null, res.status);
       return json.data;
     }
-    throw new JobberError(`Jobber request failed after ${MAX_ATTEMPTS} attempts`, "RETRIES_EXHAUSTED", null);
+    throw new JobberError(
+      `Jobber request failed after ${MAX_ATTEMPTS} attempts`,
+      "RETRIES_EXHAUSTED",
+      null,
+    );
   }
 }

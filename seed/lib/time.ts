@@ -13,7 +13,9 @@ export function local(date: string, hhmm: string): string {
 }
 
 export function addDays(date: string, n: number): string {
-  return new Date(Date.parse(`${date}T12:00:00Z`) + n * DAY_MS).toISOString().slice(0, 10);
+  return new Date(Date.parse(`${date}T12:00:00Z`) + n * DAY_MS)
+    .toISOString()
+    .slice(0, 10);
 }
 
 export function weekday(date: string): number {
@@ -21,7 +23,11 @@ export function weekday(date: string): number {
 }
 
 /** Mon-Fri dates in [start, end], skipping holidays. */
-export function workdays(start: string, end: string, holidays: string[]): string[] {
+export function workdays(
+  start: string,
+  end: string,
+  holidays: string[],
+): string[] {
   const out: string[] = [];
   for (let d = start; d <= end; d = addDays(d, 1)) {
     const wd = weekday(d);
@@ -30,7 +36,20 @@ export function workdays(start: string, end: string, holidays: string[]): string
   return out;
 }
 
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const MONTHS = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
 export function shortDate(date: string): string {
   return `${MONTHS[Number(date.slice(5, 7)) - 1]} ${Number(date.slice(8, 10))}`;
 }

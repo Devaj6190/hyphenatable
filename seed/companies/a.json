@@ -8,7 +8,12 @@
     "payFrequency": "biweekly",
     "timezone": "America/Los_Angeles",
     "utcOffset": "-07:00",
-    "settings": { "longShiftHours": 11, "otWeeklyHours": 40, "grossChangePct": 25, "employeesMayBeTexted": true }
+    "settings": {
+      "longShiftHours": 11,
+      "otWeeklyHours": 40,
+      "grossChangePct": 25,
+      "employeesMayBeTexted": true
+    }
   },
   "lowMarginPct": 20,
   "holidays": ["2026-09-07"],
@@ -17,27 +22,160 @@
     { "id": "a-c02", "number": 2, "start": "2026-08-30", "end": "2026-09-12" },
     { "id": "a-c03", "number": 3, "start": "2026-09-13", "end": "2026-09-26" },
     { "id": "a-c04", "number": 4, "start": "2026-09-27", "end": "2026-10-10" },
-    { "id": "a-c05", "number": 5, "start": "2026-10-11", "end": "2026-10-24", "current": true }
+    {
+      "id": "a-c05",
+      "number": 5,
+      "start": "2026-10-11",
+      "end": "2026-10-24",
+      "current": true
+    }
   ],
   "workers": [
-    { "n": 1, "name": "Avery Reed", "role": "field", "payType": "hourly", "jobberRate": 2800, "gustoRate": 2800, "rates": { "a-c01": 2800 } },
-    { "n": 2, "name": "Jordan Ellis", "role": "field", "payType": "hourly", "jobberRate": 2600, "gustoRate": 2500, "rates": { "a-c01": 2500, "a-c04": 2600 }, "jobberRates": { "a-c01": 2500, "a-c04": 2600 } },
-    { "n": 3, "name": "Sam Okafor", "role": "field", "payType": "hourly", "jobberRate": 2400, "gustoRate": 2400, "rates": { "a-c01": 2400 } },
-    { "n": 4, "name": "Riley Moreno", "role": "field", "payType": "hourly", "jobberRate": 2400, "gustoRate": 2400, "rates": { "a-c01": 2400 } },
-    { "n": 5, "name": "Casey Lindqvist", "role": "field", "payType": "hourly", "jobberRate": 2200, "gustoRate": 2200, "rates": { "a-c01": 2200 } },
-    { "n": 6, "name": "Morgan Achebe", "role": "field", "payType": "hourly", "jobberRate": 2200, "gustoRate": 2200, "rates": { "a-c01": 2200 } },
-    { "n": 7, "name": "Quinn Takahashi", "role": "field", "payType": "hourly", "jobberRate": 2000, "gustoRate": 2000, "rates": { "a-c01": 2000 } },
-    { "n": 8, "name": "Rowan Castillo", "role": "field", "payType": "salary", "jobberRate": 3000, "gustoRate": 6760000, "rates": { "a-c01": 6240000, "a-c04": 6760000 } },
-    { "n": 9, "name": "Emerson Vale", "role": "field", "payType": "contractor_venmo", "jobberRate": 2500, "venmoRate": 2500, "rates": { "a-c01": 2500 } },
-    { "n": 10, "name": "Harper Nakamura", "role": "field", "payType": "contractor_venmo", "jobberRate": 2200, "venmoRate": null, "firstCycle": "a-c05" },
-    { "n": 11, "name": "Dakota Brennan", "role": "manager", "payType": "salary", "jobberRate": null, "gustoRate": 7280000, "rates": { "a-c01": 7280000 } },
-    { "n": 12, "name": "Skyler Ashford", "role": "owner", "payType": "salary", "jobberRate": null, "gustoRate": 9100000, "rates": { "a-c01": 9100000 } },
-    { "n": 13, "name": "Parker Whitfield", "role": "field", "payType": "hourly", "status": "inactive", "jobberStatus": "DEACTIVATED", "jobberRate": 2200, "gustoRate": 2200, "rates": { "a-c01": 2200 } },
-    { "n": 14, "name": "Reese Calloway", "role": "field", "payType": "hourly", "jobberRate": 2000, "gustoRate": 2000, "onboarded": false, "firstCycle": "a-c05" }
+    {
+      "n": 1,
+      "name": "Avery Reed",
+      "role": "field",
+      "payType": "hourly",
+      "jobberRate": 2800,
+      "gustoRate": 2800,
+      "rates": { "a-c01": 2800 }
+    },
+    {
+      "n": 2,
+      "name": "Jordan Ellis",
+      "role": "field",
+      "payType": "hourly",
+      "jobberRate": 2600,
+      "gustoRate": 2500,
+      "rates": { "a-c01": 2500, "a-c04": 2600 },
+      "jobberRates": { "a-c01": 2500, "a-c04": 2600 }
+    },
+    {
+      "n": 3,
+      "name": "Sam Okafor",
+      "role": "field",
+      "payType": "hourly",
+      "jobberRate": 2400,
+      "gustoRate": 2400,
+      "rates": { "a-c01": 2400 }
+    },
+    {
+      "n": 4,
+      "name": "Riley Moreno",
+      "role": "field",
+      "payType": "hourly",
+      "jobberRate": 2400,
+      "gustoRate": 2400,
+      "rates": { "a-c01": 2400 }
+    },
+    {
+      "n": 5,
+      "name": "Casey Lindqvist",
+      "role": "field",
+      "payType": "hourly",
+      "jobberRate": 2200,
+      "gustoRate": 2200,
+      "rates": { "a-c01": 2200 }
+    },
+    {
+      "n": 6,
+      "name": "Morgan Achebe",
+      "role": "field",
+      "payType": "hourly",
+      "jobberRate": 2200,
+      "gustoRate": 2200,
+      "rates": { "a-c01": 2200 }
+    },
+    {
+      "n": 7,
+      "name": "Quinn Takahashi",
+      "role": "field",
+      "payType": "hourly",
+      "jobberRate": 2000,
+      "gustoRate": 2000,
+      "rates": { "a-c01": 2000 }
+    },
+    {
+      "n": 8,
+      "name": "Rowan Castillo",
+      "role": "field",
+      "payType": "salary",
+      "jobberRate": 3000,
+      "gustoRate": 6760000,
+      "rates": { "a-c01": 6240000, "a-c04": 6760000 }
+    },
+    {
+      "n": 9,
+      "name": "Emerson Vale",
+      "role": "field",
+      "payType": "contractor_venmo",
+      "jobberRate": 2500,
+      "venmoRate": 2500,
+      "rates": { "a-c01": 2500 }
+    },
+    {
+      "n": 10,
+      "name": "Harper Nakamura",
+      "role": "field",
+      "payType": "contractor_venmo",
+      "jobberRate": 2200,
+      "venmoRate": null,
+      "firstCycle": "a-c05"
+    },
+    {
+      "n": 11,
+      "name": "Dakota Brennan",
+      "role": "manager",
+      "payType": "salary",
+      "jobberRate": null,
+      "gustoRate": 7280000,
+      "rates": { "a-c01": 7280000 }
+    },
+    {
+      "n": 12,
+      "name": "Skyler Ashford",
+      "role": "owner",
+      "payType": "salary",
+      "jobberRate": null,
+      "gustoRate": 9100000,
+      "rates": { "a-c01": 9100000 }
+    },
+    {
+      "n": 13,
+      "name": "Parker Whitfield",
+      "role": "field",
+      "payType": "hourly",
+      "status": "inactive",
+      "jobberStatus": "DEACTIVATED",
+      "jobberRate": 2200,
+      "gustoRate": 2200,
+      "rates": { "a-c01": 2200 }
+    },
+    {
+      "n": 14,
+      "name": "Reese Calloway",
+      "role": "field",
+      "payType": "hourly",
+      "jobberRate": 2000,
+      "gustoRate": 2000,
+      "onboarded": false,
+      "firstCycle": "a-c05"
+    }
   ],
   "shift": { "start": "07:00", "end": "15:30" },
   "past": {
-    "daysPerCycle": { "a-w01": 10, "a-w02": 9, "a-w03": 9, "a-w04": 6, "a-w05": 9, "a-w06": 8, "a-w07": 9, "a-w08": 8, "a-w09": 6, "a-w13": 2 },
+    "daysPerCycle": {
+      "a-w01": 10,
+      "a-w02": 9,
+      "a-w03": 9,
+      "a-w04": 6,
+      "a-w05": 9,
+      "a-w06": 8,
+      "a-w07": 9,
+      "a-w08": 8,
+      "a-w09": 6,
+      "a-w13": 2
+    },
     "shiftEnd": { "a-w04": "16:15" },
     "jobsPerCycle": 5,
     "marginRange": [30, 45],
@@ -45,14 +183,53 @@
     "disposalSubJob": { "a-c02": 3, "a-c04": 1 },
     "tip": { "cycle": "a-c03", "job": 3, "amountCents": 15000 },
     "firstJobNumber": 71,
-    "salespeople": { "default": ["a-w12", "a-w12", "a-w11"], "lighting": "a-w05" },
+    "salespeople": {
+      "default": ["a-w12", "a-w12", "a-w11"],
+      "lighting": "a-w05"
+    },
     "questions": [
-      { "cycle": "a-c01", "to": "a-w11", "day": 3, "text": "Manager, on {date} an 8.5h entry has no job. Which job was it? 1 #{job1} 2 #{job2} 3 something else", "options": ["#{job1}", "#{job2}", "something else"] },
-      { "cycle": "a-c02", "to": "a-w11", "day": 2, "text": "Manager, a Materials purchase on {date} has no job. Which job was it? 1 #{job1} 2 #{job2} 3 something else", "options": ["#{job1}", "#{job2}", "something else"] },
-      { "cycle": "a-c02", "to": "a-w12", "day": 5, "text": "Owner, a payment came in on the quote for job #{job1}. Is it a deposit? Reply 1 yes, 2 no", "options": ["yes", "no"] },
-      { "cycle": "a-c03", "to": "a-w11", "day": 4, "text": "Manager, job #{job1} has a disposal run with no parent job. Which job does it belong to? 1 #{job1} 2 #{job2} 3 something else", "options": ["#{job1}", "#{job2}", "something else"] },
-      { "cycle": "a-c03", "to": "a-w12", "day": 6, "text": "Owner, who quoted job #{job1} in person? 1 the crew lead on site 2 you 3 someone else", "options": ["the crew lead on site", "you", "someone else"] },
-      { "cycle": "a-c04", "to": "a-w12", "day": 3, "text": "Owner, a Fuel purchase on {date}: job cost or overhead? 1 job cost 2 overhead", "options": ["job cost", "overhead"] }
+      {
+        "cycle": "a-c01",
+        "to": "a-w11",
+        "day": 3,
+        "text": "Manager, on {date} an 8.5h entry has no job. Which job was it? 1 #{job1} 2 #{job2} 3 something else",
+        "options": ["#{job1}", "#{job2}", "something else"]
+      },
+      {
+        "cycle": "a-c02",
+        "to": "a-w11",
+        "day": 2,
+        "text": "Manager, a Materials purchase on {date} has no job. Which job was it? 1 #{job1} 2 #{job2} 3 something else",
+        "options": ["#{job1}", "#{job2}", "something else"]
+      },
+      {
+        "cycle": "a-c02",
+        "to": "a-w12",
+        "day": 5,
+        "text": "Owner, a payment came in on the quote for job #{job1}. Is it a deposit? Reply 1 yes, 2 no",
+        "options": ["yes", "no"]
+      },
+      {
+        "cycle": "a-c03",
+        "to": "a-w11",
+        "day": 4,
+        "text": "Manager, job #{job1} has a disposal run with no parent job. Which job does it belong to? 1 #{job1} 2 #{job2} 3 something else",
+        "options": ["#{job1}", "#{job2}", "something else"]
+      },
+      {
+        "cycle": "a-c03",
+        "to": "a-w12",
+        "day": 6,
+        "text": "Owner, who quoted job #{job1} in person? 1 the crew lead on site 2 you 3 someone else",
+        "options": ["the crew lead on site", "you", "someone else"]
+      },
+      {
+        "cycle": "a-c04",
+        "to": "a-w12",
+        "day": 3,
+        "text": "Owner, a Fuel purchase on {date}: job cost or overhead? 1 job cost 2 overhead",
+        "options": ["job cost", "overhead"]
+      }
     ]
   },
   "current": {
@@ -62,7 +239,11 @@
       "a-w01": { "days": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] },
       "a-w02": { "days": [0, 1, 2, 3, 4, 5, 6, 7, 8] },
       "a-w03": { "days": [0, 1, 3, 4, 5, 6, 7, 9] },
-      "a-w04": { "days": [0, 1, 2, 3, 4, 5, 6, 7, 9], "extendedDays": [0, 2, 3, 5, 7, 9], "extendedEnd": "17:00" },
+      "a-w04": {
+        "days": [0, 1, 2, 3, 4, 5, 6, 7, 9],
+        "extendedDays": [0, 2, 3, 5, 7, 9],
+        "extendedEnd": "17:00"
+      },
       "a-w05": { "days": [0, 1, 2, 3, 5, 6, 7, 8] },
       "a-w07": { "days": [0, 1, 2, 3, 4, 5, 6, 8] },
       "a-w08": { "days": [0, 1, 2, 3, 5, 6, 7, 8] },
@@ -71,85 +252,464 @@
       "a-w13": { "days": [0, 1] },
       "a-w14": { "days": [5, 6, 7, 8] }
     },
-    "jobByDay": ["a-j01", "a-j01", "a-j02", "a-j03", "a-j03", "a-j04", "a-j04", "a-j05", "a-j05", "a-j02"],
+    "jobByDay": [
+      "a-j01",
+      "a-j01",
+      "a-j02",
+      "a-j03",
+      "a-j03",
+      "a-j04",
+      "a-j04",
+      "a-j05",
+      "a-j05",
+      "a-j02"
+    ],
     "jobs": [
-      { "id": "a-j01", "number": 101, "title": "Front yard sod install - Larkspur Ln", "client": "a-cl-01", "status": "requires_invoicing", "salesperson": "a-w12", "quote": "a-q01", "start": "2026-10-12", "end": "2026-10-13", "marginPct": 40 },
-      { "id": "a-j02", "number": 102, "title": "Backyard patio and drainage - Birchwood Ave", "client": "a-cl-02", "status": "active", "salesperson": "a-w11", "quote": "a-q02", "start": "2026-10-14", "end": "2026-10-23", "marginPct": 35 },
-      { "id": "a-j03", "number": 103, "title": "Hedge trim and cleanup - Juniper Way", "client": "a-cl-03", "status": "requires_invoicing", "salesperson": null, "quote": null, "start": "2026-10-15", "end": "2026-10-16", "marginPct": 45 },
-      { "id": "a-j04", "number": 104, "title": "Retaining wall rebuild - Foxglove Ct", "client": "a-cl-04", "status": "active", "salesperson": "a-w12", "quote": null, "start": "2026-10-14", "end": "2026-10-27", "marginPct": 32 },
-      { "id": "a-j05", "number": 105, "title": "Irrigation system install - Alder Run", "client": "a-cl-05", "status": "active", "salesperson": "a-w11", "quote": null, "start": "2026-10-21", "end": "2026-10-22", "marginPct": 8 },
-      { "id": "a-j06", "number": 106, "title": "Seasonal mulch refresh - Larkspur Ln", "client": "a-cl-01", "status": "upcoming", "salesperson": null, "quote": null, "start": "2026-11-02", "end": "2026-11-02", "totalCents": 62000 },
-      { "id": "a-j07", "number": 107, "title": "Drip line repair - Sorrel St", "client": "a-cl-06", "status": "requires_invoicing", "salesperson": null, "quote": null, "start": "2026-10-20", "end": "2026-10-20", "totalCents": 48000 },
-      { "id": "a-j08", "number": 108, "title": "Disposal run - Foxglove Ct", "client": "a-cl-04", "status": "requires_invoicing", "salesperson": null, "quote": null, "start": "2026-10-20", "end": "2026-10-20", "totalCents": null },
-      { "id": "a-j09", "number": 109, "title": "Paver walkway - Hawthorn Pl", "client": "a-cl-07", "status": "archived", "salesperson": "a-w11", "quote": "a-q04", "start": "2026-10-12", "end": "2026-10-12", "totalCents": 400000 },
-      { "id": "a-j10", "number": 110, "title": "Landscape lighting install - Quail Hollow Rd", "client": "a-cl-08", "status": "upcoming", "salesperson": "a-w12", "quote": "a-q05", "start": "2026-11-04", "end": "2026-11-05", "totalCents": 315000 }
+      {
+        "id": "a-j01",
+        "number": 101,
+        "title": "Front yard sod install - Larkspur Ln",
+        "client": "a-cl-01",
+        "status": "requires_invoicing",
+        "salesperson": "a-w12",
+        "quote": "a-q01",
+        "start": "2026-10-12",
+        "end": "2026-10-13",
+        "marginPct": 40
+      },
+      {
+        "id": "a-j02",
+        "number": 102,
+        "title": "Backyard patio and drainage - Birchwood Ave",
+        "client": "a-cl-02",
+        "status": "active",
+        "salesperson": "a-w11",
+        "quote": "a-q02",
+        "start": "2026-10-14",
+        "end": "2026-10-23",
+        "marginPct": 35
+      },
+      {
+        "id": "a-j03",
+        "number": 103,
+        "title": "Hedge trim and cleanup - Juniper Way",
+        "client": "a-cl-03",
+        "status": "requires_invoicing",
+        "salesperson": null,
+        "quote": null,
+        "start": "2026-10-15",
+        "end": "2026-10-16",
+        "marginPct": 45
+      },
+      {
+        "id": "a-j04",
+        "number": 104,
+        "title": "Retaining wall rebuild - Foxglove Ct",
+        "client": "a-cl-04",
+        "status": "active",
+        "salesperson": "a-w12",
+        "quote": null,
+        "start": "2026-10-14",
+        "end": "2026-10-27",
+        "marginPct": 32
+      },
+      {
+        "id": "a-j05",
+        "number": 105,
+        "title": "Irrigation system install - Alder Run",
+        "client": "a-cl-05",
+        "status": "active",
+        "salesperson": "a-w11",
+        "quote": null,
+        "start": "2026-10-21",
+        "end": "2026-10-22",
+        "marginPct": 8
+      },
+      {
+        "id": "a-j06",
+        "number": 106,
+        "title": "Seasonal mulch refresh - Larkspur Ln",
+        "client": "a-cl-01",
+        "status": "upcoming",
+        "salesperson": null,
+        "quote": null,
+        "start": "2026-11-02",
+        "end": "2026-11-02",
+        "totalCents": 62000
+      },
+      {
+        "id": "a-j07",
+        "number": 107,
+        "title": "Drip line repair - Sorrel St",
+        "client": "a-cl-06",
+        "status": "requires_invoicing",
+        "salesperson": null,
+        "quote": null,
+        "start": "2026-10-20",
+        "end": "2026-10-20",
+        "totalCents": 48000
+      },
+      {
+        "id": "a-j08",
+        "number": 108,
+        "title": "Disposal run - Foxglove Ct",
+        "client": "a-cl-04",
+        "status": "requires_invoicing",
+        "salesperson": null,
+        "quote": null,
+        "start": "2026-10-20",
+        "end": "2026-10-20",
+        "totalCents": null
+      },
+      {
+        "id": "a-j09",
+        "number": 109,
+        "title": "Paver walkway - Hawthorn Pl",
+        "client": "a-cl-07",
+        "status": "archived",
+        "salesperson": "a-w11",
+        "quote": "a-q04",
+        "start": "2026-10-12",
+        "end": "2026-10-12",
+        "totalCents": 400000
+      },
+      {
+        "id": "a-j10",
+        "number": 110,
+        "title": "Landscape lighting install - Quail Hollow Rd",
+        "client": "a-cl-08",
+        "status": "upcoming",
+        "salesperson": "a-w12",
+        "quote": "a-q05",
+        "start": "2026-11-04",
+        "end": "2026-11-05",
+        "totalCents": 315000
+      }
     ],
     "visits": [
       { "id": "a-v01", "job": "a-j01", "day": 0 },
       { "id": "a-v02", "job": "a-j03", "day": 3 },
       { "id": "a-v03", "job": "a-j04", "day": 5 },
       { "id": "a-v04", "job": "a-j05", "day": 7 },
-      { "id": "a-v05", "job": "a-j07", "day": 6, "assigned": ["a-w02", "a-w03"] }
+      {
+        "id": "a-v05",
+        "job": "a-j07",
+        "day": 6,
+        "assigned": ["a-w02", "a-w03"]
+      }
     ],
     "quotes": [
-      { "id": "a-q01", "job": "a-j01", "salesperson": "a-w12", "sentAt": "2026-09-29T10:00", "status": "converted" },
-      { "id": "a-q02", "job": "a-j02", "salesperson": "a-w11", "sentAt": "2026-10-01T14:30", "status": "converted" },
-      { "id": "a-q03", "job": null, "salesperson": "a-w12", "sentAt": "2026-10-20T16:00", "status": "awaiting_response", "amountCents": 128000 },
-      { "id": "a-q04", "job": "a-j09", "salesperson": "a-w11", "sentAt": "2026-09-24T09:00", "status": "converted" },
-      { "id": "a-q05", "job": "a-j10", "salesperson": "a-w12", "sentAt": "2026-10-19T17:00", "status": "converted" }
+      {
+        "id": "a-q01",
+        "job": "a-j01",
+        "salesperson": "a-w12",
+        "sentAt": "2026-09-29T10:00",
+        "status": "converted"
+      },
+      {
+        "id": "a-q02",
+        "job": "a-j02",
+        "salesperson": "a-w11",
+        "sentAt": "2026-10-01T14:30",
+        "status": "converted"
+      },
+      {
+        "id": "a-q03",
+        "job": null,
+        "salesperson": "a-w12",
+        "sentAt": "2026-10-20T16:00",
+        "status": "awaiting_response",
+        "amountCents": 128000
+      },
+      {
+        "id": "a-q04",
+        "job": "a-j09",
+        "salesperson": "a-w11",
+        "sentAt": "2026-09-24T09:00",
+        "status": "converted"
+      },
+      {
+        "id": "a-q05",
+        "job": "a-j10",
+        "salesperson": "a-w12",
+        "sentAt": "2026-10-19T17:00",
+        "status": "converted"
+      }
     ],
     "invoices": [
-      { "id": "a-in01", "job": "a-j01", "issued": "2026-10-14", "due": "2026-10-28", "status": "paid" },
-      { "id": "a-in02", "job": "a-j03", "issued": "2026-10-17", "due": "2026-10-31", "status": "awaiting_payment" },
-      { "id": "a-in03", "job": "a-j05", "issued": null, "due": null, "status": "draft" },
-      { "id": "a-in04", "job": "a-j09", "issued": "2026-10-13", "due": "2026-10-27", "status": "paid" }
+      {
+        "id": "a-in01",
+        "job": "a-j01",
+        "issued": "2026-10-14",
+        "due": "2026-10-28",
+        "status": "paid"
+      },
+      {
+        "id": "a-in02",
+        "job": "a-j03",
+        "issued": "2026-10-17",
+        "due": "2026-10-31",
+        "status": "awaiting_payment"
+      },
+      {
+        "id": "a-in03",
+        "job": "a-j05",
+        "issued": null,
+        "due": null,
+        "status": "draft"
+      },
+      {
+        "id": "a-in04",
+        "job": "a-j09",
+        "issued": "2026-10-13",
+        "due": "2026-10-27",
+        "status": "paid"
+      }
     ],
     "payments": [
-      { "id": "a-pay01", "invoice": null, "quote": "a-q02", "date": "2026-10-05", "amountCents": 50000, "type": "credit_card", "kind": "deposit" },
-      { "id": "a-pay02", "invoice": "a-in01", "quote": null, "date": "2026-10-20", "amountCents": "invoiceTotal", "type": "check", "kind": "final" }
+      {
+        "id": "a-pay01",
+        "invoice": null,
+        "quote": "a-q02",
+        "date": "2026-10-05",
+        "amountCents": 50000,
+        "type": "credit_card",
+        "kind": "deposit"
+      },
+      {
+        "id": "a-pay02",
+        "invoice": "a-in01",
+        "quote": null,
+        "date": "2026-10-20",
+        "amountCents": "invoiceTotal",
+        "type": "check",
+        "kind": "final"
+      }
     ],
     "expenses": [
-      { "id": "a-ex-0001", "source": "qbo", "date": "2026-10-12", "amountCents": 68250, "vendor": "Valley Turf Farm", "description": "Sod pallets", "account": "Materials", "job": "a-j01", "kind": "job_cost" },
-      { "id": "a-ex-0002", "source": "qbo", "date": "2026-10-14", "amountCents": 41500, "vendor": "Ridgeway Equipment Rental", "description": "Mini excavator day rate", "account": "Equipment Rental", "job": "a-j02", "kind": "job_cost" },
-      { "id": "a-ex-0003", "source": "qbo", "date": "2026-10-21", "amountCents": 21437, "vendor": "Cedar Creek Supply", "description": "PVC fittings and valves", "account": "Materials", "job": null, "kind": "job_cost" },
-      { "id": "a-ex-0004", "source": "qbo", "date": "2026-10-20", "amountCents": 18900, "vendor": "County Green Waste", "description": "Green waste tipping fee", "account": "Disposal", "job": "a-j04", "kind": "job_cost" },
-      { "id": "a-ex-0005", "source": "qbo", "date": "2026-10-15", "amountCents": 4999, "vendor": "FieldRoute Software", "description": "Monthly scheduling subscription", "account": "Software", "job": null, "kind": "overhead" },
-      { "id": "a-ex-0006", "source": "jobber", "date": "2026-10-19", "amountCents": 112640, "description": "Retaining wall block", "job": "a-j04", "kind": "job_cost" },
-      { "id": "a-ex-0007", "source": "jobber", "date": "2026-10-22", "amountCents": 9735, "description": "Drip emitters", "job": "a-j05", "kind": "job_cost" },
-      { "id": "a-ex-0008", "source": "jobber", "date": "2026-10-16", "amountCents": 6420, "description": "Hedge trimmer blades", "job": "a-j03", "kind": "job_cost" }
+      {
+        "id": "a-ex-0001",
+        "source": "qbo",
+        "date": "2026-10-12",
+        "amountCents": 68250,
+        "vendor": "Valley Turf Farm",
+        "description": "Sod pallets",
+        "account": "Materials",
+        "job": "a-j01",
+        "kind": "job_cost"
+      },
+      {
+        "id": "a-ex-0002",
+        "source": "qbo",
+        "date": "2026-10-14",
+        "amountCents": 41500,
+        "vendor": "Ridgeway Equipment Rental",
+        "description": "Mini excavator day rate",
+        "account": "Equipment Rental",
+        "job": "a-j02",
+        "kind": "job_cost"
+      },
+      {
+        "id": "a-ex-0003",
+        "source": "qbo",
+        "date": "2026-10-21",
+        "amountCents": 21437,
+        "vendor": "Cedar Creek Supply",
+        "description": "PVC fittings and valves",
+        "account": "Materials",
+        "job": null,
+        "kind": "job_cost"
+      },
+      {
+        "id": "a-ex-0004",
+        "source": "qbo",
+        "date": "2026-10-20",
+        "amountCents": 18900,
+        "vendor": "County Green Waste",
+        "description": "Green waste tipping fee",
+        "account": "Disposal",
+        "job": "a-j04",
+        "kind": "job_cost"
+      },
+      {
+        "id": "a-ex-0005",
+        "source": "qbo",
+        "date": "2026-10-15",
+        "amountCents": 4999,
+        "vendor": "FieldRoute Software",
+        "description": "Monthly scheduling subscription",
+        "account": "Software",
+        "job": null,
+        "kind": "overhead"
+      },
+      {
+        "id": "a-ex-0006",
+        "source": "jobber",
+        "date": "2026-10-19",
+        "amountCents": 112640,
+        "description": "Retaining wall block",
+        "job": "a-j04",
+        "kind": "job_cost"
+      },
+      {
+        "id": "a-ex-0007",
+        "source": "jobber",
+        "date": "2026-10-22",
+        "amountCents": 9735,
+        "description": "Drip emitters",
+        "job": "a-j05",
+        "kind": "job_cost"
+      },
+      {
+        "id": "a-ex-0008",
+        "source": "jobber",
+        "date": "2026-10-16",
+        "amountCents": 6420,
+        "description": "Hedge trimmer blades",
+        "job": "a-j03",
+        "kind": "job_cost"
+      }
     ],
     "pinnedEntryIds": {
-      "a-w01|2026-10-12T14:00:00.000Z": "a-te-0101", "a-w03|2026-10-12T14:00:00.000Z": "a-te-0102", "a-w05|2026-10-12T14:00:00.000Z": "a-te-0103",
-      "a-w07|2026-10-12T14:00:00.000Z": "a-te-0104", "a-w08|2026-10-12T14:00:00.000Z": "a-te-0105", "a-w02|2026-10-13T14:00:00.000Z": "a-te-0106",
-      "a-w04|2026-10-13T14:00:00.000Z": "a-te-0107", "a-w05|2026-10-13T14:00:00.000Z": "a-te-0108", "a-w10|2026-10-13T14:00:00.000Z": "a-te-0109",
-      "a-w01|2026-10-14T14:00:00.000Z": "a-te-0110", "a-w03|2026-10-14T14:00:00.000Z": "a-te-0111", "a-w08|2026-10-14T14:00:00.000Z": "a-te-0112",
-      "a-w03|2026-10-14T19:00:00.000Z": "a-te-0113", "a-w02|2026-10-15T14:00:00.000Z": "a-te-0114", "a-w05|2026-10-15T14:00:00.000Z": "a-te-0115",
-      "a-w09|2026-10-15T14:00:00.000Z": "a-te-0116", "a-w04|2026-10-16T14:00:00.000Z": "a-te-0117", "a-w07|2026-10-16T14:00:00.000Z": "a-te-0118",
-      "a-w09|2026-10-16T14:00:00.000Z": "a-te-0119", "a-w10|2026-10-16T14:00:00.000Z": "a-te-0120", "a-w05|2026-10-16T15:00:00.000Z": "a-te-0121",
-      "a-w01|2026-10-19T14:00:00.000Z": "a-te-0122", "a-w03|2026-10-19T14:00:00.000Z": "a-te-0123", "a-w05|2026-10-19T14:00:00.000Z": "a-te-0124",
-      "a-w08|2026-10-19T14:00:00.000Z": "a-te-0125", "a-w02|2026-10-20T14:00:00.000Z": "a-te-0126", "a-w04|2026-10-20T14:00:00.000Z": "a-te-0127",
-      "a-w07|2026-10-20T14:00:00.000Z": "a-te-0128", "a-w10|2026-10-20T14:00:00.000Z": "a-te-0129", "a-w07|2026-10-21T13:00:00.000Z": "a-te-0130",
-      "a-w01|2026-10-21T14:00:00.000Z": "a-te-0131", "a-w05|2026-10-21T14:00:00.000Z": "a-te-0132", "a-w08|2026-10-21T14:00:00.000Z": "a-te-0133",
-      "a-w02|2026-10-22T14:00:00.000Z": "a-te-0134", "a-w05|2026-10-22T14:00:00.000Z": "a-te-0135", "a-w09|2026-10-22T14:00:00.000Z": "a-te-0136",
-      "a-w04|2026-10-22T17:15:00.000Z": "a-te-0137", "a-w09|2026-10-23T14:00:00.000Z": "a-te-0138", "a-w10|2026-10-23T14:00:00.000Z": "a-te-0139",
+      "a-w01|2026-10-12T14:00:00.000Z": "a-te-0101",
+      "a-w03|2026-10-12T14:00:00.000Z": "a-te-0102",
+      "a-w05|2026-10-12T14:00:00.000Z": "a-te-0103",
+      "a-w07|2026-10-12T14:00:00.000Z": "a-te-0104",
+      "a-w08|2026-10-12T14:00:00.000Z": "a-te-0105",
+      "a-w02|2026-10-13T14:00:00.000Z": "a-te-0106",
+      "a-w04|2026-10-13T14:00:00.000Z": "a-te-0107",
+      "a-w05|2026-10-13T14:00:00.000Z": "a-te-0108",
+      "a-w10|2026-10-13T14:00:00.000Z": "a-te-0109",
+      "a-w01|2026-10-14T14:00:00.000Z": "a-te-0110",
+      "a-w03|2026-10-14T14:00:00.000Z": "a-te-0111",
+      "a-w08|2026-10-14T14:00:00.000Z": "a-te-0112",
+      "a-w03|2026-10-14T19:00:00.000Z": "a-te-0113",
+      "a-w02|2026-10-15T14:00:00.000Z": "a-te-0114",
+      "a-w05|2026-10-15T14:00:00.000Z": "a-te-0115",
+      "a-w09|2026-10-15T14:00:00.000Z": "a-te-0116",
+      "a-w04|2026-10-16T14:00:00.000Z": "a-te-0117",
+      "a-w07|2026-10-16T14:00:00.000Z": "a-te-0118",
+      "a-w09|2026-10-16T14:00:00.000Z": "a-te-0119",
+      "a-w10|2026-10-16T14:00:00.000Z": "a-te-0120",
+      "a-w05|2026-10-16T15:00:00.000Z": "a-te-0121",
+      "a-w01|2026-10-19T14:00:00.000Z": "a-te-0122",
+      "a-w03|2026-10-19T14:00:00.000Z": "a-te-0123",
+      "a-w05|2026-10-19T14:00:00.000Z": "a-te-0124",
+      "a-w08|2026-10-19T14:00:00.000Z": "a-te-0125",
+      "a-w02|2026-10-20T14:00:00.000Z": "a-te-0126",
+      "a-w04|2026-10-20T14:00:00.000Z": "a-te-0127",
+      "a-w07|2026-10-20T14:00:00.000Z": "a-te-0128",
+      "a-w10|2026-10-20T14:00:00.000Z": "a-te-0129",
+      "a-w07|2026-10-21T13:00:00.000Z": "a-te-0130",
+      "a-w01|2026-10-21T14:00:00.000Z": "a-te-0131",
+      "a-w05|2026-10-21T14:00:00.000Z": "a-te-0132",
+      "a-w08|2026-10-21T14:00:00.000Z": "a-te-0133",
+      "a-w02|2026-10-22T14:00:00.000Z": "a-te-0134",
+      "a-w05|2026-10-22T14:00:00.000Z": "a-te-0135",
+      "a-w09|2026-10-22T14:00:00.000Z": "a-te-0136",
+      "a-w04|2026-10-22T17:15:00.000Z": "a-te-0137",
+      "a-w09|2026-10-23T14:00:00.000Z": "a-te-0138",
+      "a-w10|2026-10-23T14:00:00.000Z": "a-te-0139",
       "a-w05|2026-10-23T20:00:00.000Z": "a-te-0140"
     }
   },
   "rules": [
-    { "id": "a-rule-01", "type": "overtime_policy", "params": { "weeklyHours": 40, "multiplier": 1.5, "dailyHours": null }, "confidence": 0.95 },
-    { "id": "a-rule-02", "type": "long_shift_threshold", "params": { "hours": 11 }, "confidence": 0.9 },
-    { "id": "a-rule-03", "type": "expense_account_kind", "params": { "accountName": "Materials", "kind": "job_cost" }, "confidence": 0.95 },
-    { "id": "a-rule-04", "type": "expense_account_kind", "params": { "accountName": "Equipment Rental", "kind": "job_cost" }, "confidence": 0.9 },
-    { "id": "a-rule-05", "type": "expense_account_kind", "params": { "accountName": "Disposal", "kind": "job_cost" }, "confidence": 0.9 },
-    { "id": "a-rule-06", "type": "expense_account_kind", "params": { "accountName": "Software", "kind": "overhead" }, "confidence": 0.95 },
-    { "id": "a-rule-07", "type": "expense_account_kind", "params": { "accountName": "Insurance", "kind": "overhead" }, "confidence": 0.9 },
-    { "id": "a-rule-08", "type": "venmo_rate", "params": { "workerId": "a-w09", "rateCents": 2500 }, "confidence": 0.95 },
-    { "id": "a-rule-09", "type": "commission_plan", "params": { "pctOfJobTotal": 5, "when": "quote_in_person", "payee": "quote_salesperson" }, "confidence": 0.7 },
-    { "id": "a-rule-10", "type": "tip_policy", "params": { "split": "by_hours_on_job" }, "confidence": 0.7 },
-    { "id": "a-rule-11", "type": "manager_split", "params": { "workerId": "a-w11", "pctOfJobProfit": 10 }, "confidence": 0.7 },
-    { "id": "a-rule-12", "type": "routing", "params": { "jobFacts": "a-w11", "money": "a-w12" }, "confidence": 0.85 },
-    { "id": "a-rule-13", "type": "deposit_vs_final", "params": { "quotePayment": "deposit", "invoicePayment": "final" }, "confidence": 0.85 },
-    { "id": "a-rule-14", "type": "disposal_parent_link", "params": { "titlePrefix": "Disposal run - ", "linkBy": "same street suffix in the parent job title" }, "confidence": 0.8 },
-    { "id": "a-rule-15", "type": "in_person_quoter", "params": { "titleKeyword": "Landscape lighting", "workerId": "a-w05" }, "confidence": 0.75 }
+    {
+      "id": "a-rule-01",
+      "type": "overtime_policy",
+      "params": { "weeklyHours": 40, "multiplier": 1.5, "dailyHours": null },
+      "confidence": 0.95
+    },
+    {
+      "id": "a-rule-02",
+      "type": "long_shift_threshold",
+      "params": { "hours": 11 },
+      "confidence": 0.9
+    },
+    {
+      "id": "a-rule-03",
+      "type": "expense_account_kind",
+      "params": { "accountName": "Materials", "kind": "job_cost" },
+      "confidence": 0.95
+    },
+    {
+      "id": "a-rule-04",
+      "type": "expense_account_kind",
+      "params": { "accountName": "Equipment Rental", "kind": "job_cost" },
+      "confidence": 0.9
+    },
+    {
+      "id": "a-rule-05",
+      "type": "expense_account_kind",
+      "params": { "accountName": "Disposal", "kind": "job_cost" },
+      "confidence": 0.9
+    },
+    {
+      "id": "a-rule-06",
+      "type": "expense_account_kind",
+      "params": { "accountName": "Software", "kind": "overhead" },
+      "confidence": 0.95
+    },
+    {
+      "id": "a-rule-07",
+      "type": "expense_account_kind",
+      "params": { "accountName": "Insurance", "kind": "overhead" },
+      "confidence": 0.9
+    },
+    {
+      "id": "a-rule-08",
+      "type": "venmo_rate",
+      "params": { "workerId": "a-w09", "rateCents": 2500 },
+      "confidence": 0.95
+    },
+    {
+      "id": "a-rule-09",
+      "type": "commission_plan",
+      "params": {
+        "pctOfJobTotal": 5,
+        "when": "quote_in_person",
+        "payee": "quote_salesperson"
+      },
+      "confidence": 0.7
+    },
+    {
+      "id": "a-rule-10",
+      "type": "tip_policy",
+      "params": { "split": "by_hours_on_job" },
+      "confidence": 0.7
+    },
+    {
+      "id": "a-rule-11",
+      "type": "manager_split",
+      "params": { "workerId": "a-w11", "pctOfJobProfit": 10 },
+      "confidence": 0.7
+    },
+    {
+      "id": "a-rule-12",
+      "type": "routing",
+      "params": { "jobFacts": "a-w11", "money": "a-w12" },
+      "confidence": 0.85
+    },
+    {
+      "id": "a-rule-13",
+      "type": "deposit_vs_final",
+      "params": { "quotePayment": "deposit", "invoicePayment": "final" },
+      "confidence": 0.85
+    },
+    {
+      "id": "a-rule-14",
+      "type": "disposal_parent_link",
+      "params": {
+        "titlePrefix": "Disposal run - ",
+        "linkBy": "same street suffix in the parent job title"
+      },
+      "confidence": 0.8
+    },
+    {
+      "id": "a-rule-15",
+      "type": "in_person_quoter",
+      "params": { "titleKeyword": "Landscape lighting", "workerId": "a-w05" },
+      "confidence": 0.75
+    }
   ]
 }

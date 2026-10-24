@@ -6,15 +6,51 @@ import type { JobberClient } from "./client.ts";
 
 export const PAGE_SIZE = 50;
 
-export const USERS_QUERY = /* GraphQL */ `
-  query PayrollPilotUsers($status: UsersStatusFilterEnum!, $first: Int!, $after: String) {
-    users(filter: { status: $status }, first: $first, after: $after) {
+// User.labourRate is in Jobber's public schema but hidden from an app without the matching scope
+// (seen live on the trial account 2026-10-24: "Field 'labourRate' doesn't exist on type 'User'").
+// It is requested only when the live schema shows it; otherwise labourRateCents stays null.
+export const usersQuery = (withLabourRate: boolean) => /* GraphQL */ `
+  query PayrollPilotUsers($first: Int!, $after: String) {
+    users(first: $first, after: $after) {
       totalCount
       pageInfo { hasNextPage endCursor }
-      nodes { id name { full } status isAccountOwner isAccountAdmin labourRate }
+      nodes { id name { full } status isAccountOwner isAccountAdmin${withLabourRate ? " labourRate" : ""} }
     }
   }
 `;
+export const USERS_QUERY = usersQuery(true);
+export const USERS_QUERY_NO_RATE = usersQuery(false);
+
+/** Field names of a type as this app's token sees them (scope-filtered). Read-only introspection. */
+export const TYPE_FIELDS_QUERY = /* GraphQL */ `
+  query PayrollPilotTypeFields($name: String!) {
+    __type(name: $name) { name fields { name } }
+  }
+`;
+
+const probes = new WeakMap<JobberClient, Map<string, Promise<Set<string>>>>();
+/** Cached per client: one introspection per type per pull. */
+export function visibleFields(
+  client: JobberClient,
+  typeName: string,
+): Promise<Set<string>> {
+  let byType = probes.get(client);
+  if (!byType) {
+    byType = new Map();
+    probes.set(client, byType);
+  }
+  let p = byType.get(typeName);
+  if (!p) {
+    p = client
+      .query<{ __type: { fields: { name: string }[] | null } | null }>(
+        TYPE_FIELDS_QUERY,
+        { name: typeName },
+      )
+      .then((d) => new Set((d.__type?.fields ?? []).map((f) => f.name)));
+    byType.set(typeName, p);
+  }
+  return p;
+}
 
 /** Unfiltered count: reveals users in statuses other than ACTIVATED / DEACTIVATED (e.g. NOT_INVITED). */
 export const USERS_COUNT_QUERY = /* GraphQL */ `
@@ -100,15 +136,21 @@ export async function paginate<N, R>(
   let drift = false;
   let pages = 0;
   for (;;) {
-    const data: R = await client.query<R>(document, { ...variables, first: PAGE_SIZE, after });
+    const data: R = await client.query<R>(document, {
+      ...variables,
+      first: PAGE_SIZE,
+      after,
+    });
     const conn = pick(data);
-    if (!conn) throw new Error("Jobber response missing the expected connection");
+    if (!conn)
+      throw new Error("Jobber response missing the expected connection");
     pages++;
     if (totalCount === null) totalCount = conn.totalCount;
     else if (conn.totalCount !== totalCount) drift = true;
     nodes.push(...conn.nodes);
     if (!conn.pageInfo.hasNextPage) break;
-    if (!conn.pageInfo.endCursor) throw new Error("Jobber hasNextPage without endCursor");
+    if (!conn.pageInfo.endCursor)
+      throw new Error("Jobber hasNextPage without endCursor");
     after = conn.pageInfo.endCursor;
   }
   return { nodes, totalCount: totalCount ?? 0, totalCountDrift: drift, pages };
@@ -122,14 +164,19 @@ export interface RawUser {
   status: string;
   isAccountOwner: boolean;
   isAccountAdmin: boolean;
-  labourRate: number | null;
+  /** absent when the field is hidden from this app */
+  labourRate?: number | null;
 }
 
 export interface RawTimeSheetEntry {
   id: string;
   user: { id: string } | null;
   job: { id: string } | null;
-  targetItem: { __typename: string; id?: string; job?: { id: string } | null } | null;
+  targetItem: {
+    __typename: string;
+    id?: string;
+    job?: { id: string } | null;
+  } | null;
   startAt: string;
   endAt: string | null;
   finalDuration: number;

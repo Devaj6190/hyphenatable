@@ -1,16 +1,48 @@
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
-import { type IdMap, OBJECTS, buildPlan, marker, resolveRefs } from "../lib/jobber-mutations";
-import { JOBBER_GRAPHQL_URL, SEED_TOKEN_PATH, seedAuthFromEnv } from "../lib/jobber-seed-client";
-import { closure, loadFixtures, printDryRun, requireAllowedAccount } from "../push-jobber";
+import {
+  buildPlan,
+  type IdMap,
+  marker,
+  OBJECTS,
+  QUERIES,
+  resolveRefs,
+} from "../lib/jobber-mutations";
+import {
+  codeFromRedirect,
+  DEFAULT_REDIRECT_URI,
+  JOBBER_GRAPHQL_URL,
+  SEED_TOKEN_PATH,
+  seedAuthFromEnv,
+} from "../lib/jobber-seed-client";
+import { bucket, must } from "../lib/must";
+import {
+  closure,
+  loadFixtures,
+  missingMutations,
+  pastedAddress,
+  printDryRun,
+  requireAllowedAccount,
+} from "../push-jobber";
 
 const { fx, currentCycleId } = loadFixtures("a");
-const opts = { currentCycleId, companyName: "Company A" };
-const answerKey = (await Bun.file(new URL("../../data/fixtures/a/answer-key.json", import.meta.url)).json()) as { checkId: string; subject: { entryIds: string[] } }[];
+const opts = {
+  currentCycleId,
+  companyName: "Company A",
+  timezone: "America/Los_Angeles",
+};
+const answerKey = (await Bun.file(
+  new URL("../../data/fixtures/a/answer-key.json", import.meta.url),
+).json()) as { checkId: string; subject: { entryIds: string[] } }[];
 
 /** A map as if everything had been created: every ref resolves. */
 function fullMap(): IdMap {
-  const m: IdMap = { users: Object.fromEntries(fx.workers.map((w) => [w.id as string, `U-${w.id}`])) };
-  for (const s of buildPlan(fx, {}, opts).steps) (m[s.object] ??= {})[s.ourId] = `J-${s.object}-${s.ourId}`;
+  const m: IdMap = {
+    users: Object.fromEntries(
+      fx.workers.map((w) => [w.id as string, `U-${w.id}`]),
+    ),
+  };
+  for (const s of buildPlan(fx, {}, opts).steps)
+    bucket(m, s.object)[s.ourId] = `J-${s.object}-${s.ourId}`;
   return m;
 }
 
@@ -43,17 +75,35 @@ describe("push-jobber dry run (default path)", () => {
   });
 
   test("one step per record, ticking entry and tips left out, only Jobber expenses", () => {
-    const count = (o: string) => plan.steps.filter((s) => s.object === o).length;
-    expect(count("entries")).toBe(fx.timeEntries.filter((e) => !e.ticking).length);
-    expect(count("expenses")).toBe(fx.expenses.filter((e) => e.source === "jobber").length);
+    const count = (o: string) =>
+      plan.steps.filter((s) => s.object === o).length;
+    expect(count("entries")).toBe(
+      fx.timeEntries.filter((e) => !e.ticking).length,
+    );
+    expect(count("expenses")).toBe(
+      fx.expenses.filter((e) => e.source === "jobber").length,
+    );
     expect(count("jobs")).toBe(fx.jobs.length);
     expect(count("visits")).toBe(fx.visits.length);
-    expect(count("payments")).toBe(fx.payments.filter((p) => p.paymentType !== "tip").length);
+    expect(count("payments")).toBe(
+      fx.payments.filter((p) => p.paymentType !== "tip").length,
+    );
     expect(plan.skipped.map((s) => s.ourId)).toContain("a-te-0140");
   });
 
   test("every step carries its marker in the payload", () => {
-    for (const s of plan.steps.filter((x) => ["clients", "quotes", "jobs", "visits", "entries", "expenses", "invoices", "payments"].includes(x.object))) {
+    for (const s of plan.steps.filter((x) =>
+      [
+        "clients",
+        "quotes",
+        "jobs",
+        "visits",
+        "entries",
+        "expenses",
+        "invoices",
+        "payments",
+      ].includes(x.object),
+    )) {
       expect(JSON.stringify(s.variables)).toContain(marker(s.ourId));
     }
   });
@@ -64,7 +114,8 @@ describe("push-jobber dry run (default path)", () => {
       expect(!!input.visitId && !!input.jobId).toBe(false);
       expect(input.labourRate).toBeUndefined();
     }
-    const noJob = plan.steps.find((s) => s.ourId === "a-te-0121")!.variables.input as Record<string, unknown>;
+    const noJob = must(plan.steps.find((s) => s.ourId === "a-te-0121"))
+      .variables.input as Record<string, unknown>;
     expect(noJob.jobId ?? noJob.visitId ?? null).toBeNull();
   });
 
@@ -76,7 +127,11 @@ describe("push-jobber dry run (default path)", () => {
       expect(missing).toEqual([]);
     }
     const missing: string[] = [];
-    resolveRefs(plan.steps.find((s) => s.object === "entries")!.variables, {}, missing);
+    resolveRefs(
+      must(plan.steps.find((s) => s.object === "entries")).variables,
+      {},
+      missing,
+    );
     expect(missing.length).toBeGreaterThan(0);
   });
 
@@ -86,8 +141,17 @@ describe("push-jobber dry run (default path)", () => {
 
   test("--one: earliest past entry plus only what it needs, dependencies first", () => {
     const entries = plan.steps.filter((s) => s.object === "entries");
-    const earliest = [...entries].sort((a, b) => String((a.variables.input as Record<string, unknown>).startAt).localeCompare(String((b.variables.input as Record<string, unknown>).startAt)))[0];
-    expect(String((earliest.variables.input as Record<string, unknown>).startAt) < "2026-09-01").toBe(true);
+    const earliest = [...entries].sort((a, b) =>
+      String(
+        (a.variables.input as Record<string, unknown>).startAt,
+      ).localeCompare(
+        String((b.variables.input as Record<string, unknown>).startAt),
+      ),
+    )[0];
+    expect(
+      String((earliest.variables.input as Record<string, unknown>).startAt) <
+        "2026-09-01",
+    ).toBe(true);
     const c = closure(plan.steps, earliest, {});
     expect(c.at(-1)).toBe(earliest);
     expect(c.filter((s) => s.object === "entries")).toHaveLength(1);
@@ -99,8 +163,12 @@ describe("push-jobber dry run (default path)", () => {
   });
 
   test("approval checklist leaves exactly the CHK-06 entries unapproved (ticking one handled as the timer)", () => {
-    const chk06 = answerKey.filter((r) => r.checkId === "CHK-06").flatMap((r) => r.subject.entryIds);
-    const listed = plan.manual.after.filter((l) => l.includes("leave unapproved")).map((l) => /a-te-\d+/.exec(l)![0]);
+    const chk06 = answerKey
+      .filter((r) => r.checkId === "CHK-06")
+      .flatMap((r) => r.subject.entryIds);
+    const listed = plan.manual.after
+      .filter((l) => l.includes("leave unapproved"))
+      .map((l) => must(/a-te-\d+/.exec(l))[0]);
     const ticking = fx.timeEntries.filter((e) => e.ticking).map((e) => e.id);
     expect([...listed, ...ticking].sort()).toEqual([...chk06].sort());
   });
@@ -108,27 +176,170 @@ describe("push-jobber dry run (default path)", () => {
 
 describe("live safety", () => {
   test("needs the seed app's own env vars (not the read app's)", () => {
-    expect(() => seedAuthFromEnv({ JOBBER_CLIENT_ID: "x", JOBBER_CLIENT_SECRET: "y" })).toThrow("JOBBER_SEED_CLIENT_ID");
-    expect(seedAuthFromEnv({ JOBBER_SEED_CLIENT_ID: "a", JOBBER_SEED_CLIENT_SECRET: "b" }).clientId).toBe("a");
+    expect(() =>
+      seedAuthFromEnv({ JOBBER_CLIENT_ID: "x", JOBBER_CLIENT_SECRET: "y" }),
+    ).toThrow("JOBBER_SEED_CLIENT_ID");
+    expect(
+      seedAuthFromEnv({
+        JOBBER_SEED_CLIENT_ID: "a",
+        JOBBER_SEED_CLIENT_SECRET: "b",
+      }).clientId,
+    ).toBe("a");
   });
   test("talks only to api.getjobber.com and keeps its own token file", () => {
-    expect(JOBBER_GRAPHQL_URL.startsWith("https://api.getjobber.com/")).toBe(true);
-    expect(SEED_TOKEN_PATH.endsWith("data/private/jobber-seed-tokens.json")).toBe(true);
+    expect(JOBBER_GRAPHQL_URL.startsWith("https://api.getjobber.com/")).toBe(
+      true,
+    );
+    expect(
+      SEED_TOKEN_PATH.endsWith("data/private/jobber-seed-tokens.json"),
+    ).toBe(true);
   });
-  const acct = (id: string, tester: boolean) => ({ gql: async () => ({ data: { account: { id, name: `Acct ${id}`, tester } }, errors: [] }) });
-  test("refuses a non-allowlisted, non-tester account and prints its id and name", async () => {
-    await expect(requireAllowedAccount(acct("X", false), {})).rejects.toThrow('REFUSED: authorized Jobber account id=X name="Acct X"');
-    await expect(requireAllowedAccount(acct("X", false), { JOBBER_SEED_ACCOUNT_ID: "OTHER" })).rejects.toThrow("REFUSED");
-    await expect(requireAllowedAccount(acct("X", false), { JOBBER_SEED_ACCOUNT_ID: "  " })).rejects.toThrow("REFUSED");
+  // The live Account type has no `tester` field: only the allowlist can admit an account.
+  const acct = (id: string, extra: Record<string, unknown> = {}) => ({
+    gql: async () => ({
+      data: { account: { id, name: `Acct ${id}`, ...extra } },
+      errors: [],
+    }),
   });
-  test("accepts the allowlisted account (a regular trial, tester=false)", async () => {
-    expect((await requireAllowedAccount(acct("TRIAL1", false), { JOBBER_SEED_ACCOUNT_ID: "TRIAL1" })).via).toBe("allowlist");
+  test("refuses a non-allowlisted account and prints its id and name", async () => {
+    await expect(requireAllowedAccount(acct("X"), {})).rejects.toThrow(
+      'REFUSED: authorized Jobber account id=X name="Acct X"',
+    );
+    await expect(
+      requireAllowedAccount(acct("X"), { JOBBER_SEED_ACCOUNT_ID: "OTHER" }),
+    ).rejects.toThrow("REFUSED");
+    await expect(
+      requireAllowedAccount(acct("X"), { JOBBER_SEED_ACCOUNT_ID: "  " }),
+    ).rejects.toThrow("REFUSED");
+    await expect(
+      requireAllowedAccount(acct("X", { tester: true }), {}),
+    ).rejects.toThrow("REFUSED");
   });
-  test("accepts a tester account", async () => {
-    expect((await requireAllowedAccount(acct("T", true), {})).via).toBe("tester");
+  test("accepts the allowlisted account (the free trial)", async () => {
+    expect(
+      (
+        await requireAllowedAccount(acct("TRIAL1"), {
+          JOBBER_SEED_ACCOUNT_ID: "TRIAL1",
+        })
+      ).id,
+    ).toBe("TRIAL1");
+  });
+  test("account query asks only for fields the live schema has", () => {
+    expect(QUERIES.account).not.toContain("tester");
+  });
+  test("preflight lists mutations the live schema lacks (time entries, payment records, invoiceCreateFromJob)", async () => {
+    const live = [
+      "clientCreate",
+      "propertyCreate",
+      "quoteCreate",
+      "jobCreate",
+      "visitCreate",
+      "visitComplete",
+      "expenseCreate",
+      "invoiceMarkAsSent",
+      "invoiceCreate",
+    ];
+    const fake = {
+      gql: async () => ({
+        data: { __type: { fields: live.map((name) => ({ name })) } },
+        errors: [],
+      }),
+    };
+    expect(await missingMutations(fake, buildPlan(fx, {}, opts).steps)).toEqual(
+      [
+        "invoiceCreateFromJob",
+        "invoiceCreatePaymentRecord",
+        "quoteCreatePaymentRecord",
+        "timeSheetEntryCreate",
+      ],
+    );
+  });
+  test("visits use the live schedule shape in the company's time zone; invoiceMarkAsSent takes id", () => {
+    const steps = buildPlan(fx, {}, opts).steps;
+    const v = must(
+      steps.find((s) => s.ourId === "a-v01" && s.object === "visits"),
+    );
+    const sched = (
+      (v.variables.input as Record<string, unknown>).visits as Record<
+        string,
+        unknown
+      >[]
+    )[0].schedule as Record<string, unknown>;
+    expect(sched.startAt).toEqual({
+      date: "2026-10-12",
+      time: "07:00:00",
+      timezone: "America/Los_Angeles",
+    });
+    expect(Array.isArray(sched.teamMemberIdsToAssign)).toBe(true);
+    expect(
+      Object.keys(
+        must(steps.find((s) => s.object === "invoiceSends")).variables,
+      ),
+    ).toEqual(["id"]);
   });
   test("refuses when the account query fails", async () => {
-    const broken = { gql: async () => ({ data: null, errors: [{ message: "UNAUTHENTICATED" }] }) };
-    await expect(requireAllowedAccount(broken, { JOBBER_SEED_ACCOUNT_ID: "TRIAL1" })).rejects.toThrow("account query failed");
+    const broken = {
+      gql: async () => ({
+        data: null,
+        errors: [{ message: "UNAUTHENTICATED" }],
+      }),
+    };
+    await expect(
+      requireAllowedAccount(broken, { JOBBER_SEED_ACCOUNT_ID: "TRIAL1" }),
+    ).rejects.toThrow("account query failed");
+  });
+});
+
+describe("seed auth: paste-the-address code exchange", () => {
+  const pkce = { state: "s123", redirectUri: DEFAULT_REDIRECT_URI };
+  test("default redirect is the saved Vercel callback", () => {
+    expect(DEFAULT_REDIRECT_URI).toBe("https://payrollpilot.vercel.app/auth");
+  });
+  test("takes the code from the full redirected address when state matches", () => {
+    expect(
+      codeFromRedirect(
+        " https://payrollpilot.vercel.app/auth?code=abc&state=s123 \n",
+        pkce,
+      ),
+    ).toBe("abc");
+  });
+  test("refuses wrong state, a bare code, another host or path, a Jobber error, and a missing code", () => {
+    expect(() =>
+      codeFromRedirect(
+        "https://payrollpilot.vercel.app/auth?code=abc&state=other",
+        pkce,
+      ),
+    ).toThrow("state does not match");
+    expect(() => codeFromRedirect("abc", pkce)).toThrow("full address");
+    expect(() =>
+      codeFromRedirect("https://evil.example/auth?code=abc&state=s123", pkce),
+    ).toThrow("not the seed app's redirect");
+    expect(() =>
+      codeFromRedirect(
+        "https://payrollpilot.vercel.app/other?code=abc&state=s123",
+        pkce,
+      ),
+    ).toThrow("not the seed app's redirect");
+    expect(() =>
+      codeFromRedirect(
+        "https://payrollpilot.vercel.app/auth?error=access_denied&state=s123",
+        pkce,
+      ),
+    ).toThrow("error=access_denied");
+    expect(() =>
+      codeFromRedirect("https://payrollpilot.vercel.app/auth?state=s123", pkce),
+    ).toThrow("no code");
+  });
+  test("address comes from the argument, else PASTED_URL, else stdin", async () => {
+    expect(await pastedAddress("A", { PASTED_URL: "B" }, async () => "C")).toBe(
+      "A",
+    );
+    expect(
+      await pastedAddress(undefined, { PASTED_URL: "B" }, async () => "C"),
+    ).toBe("B");
+    expect(await pastedAddress(undefined, {}, async () => "C\n")).toBe("C");
+    await expect(
+      pastedAddress(undefined, {}, async () => "  "),
+    ).rejects.toThrow("no address");
   });
 });
