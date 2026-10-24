@@ -8,7 +8,7 @@ import type { Expense, Invoice, Job, Payment, Quote, Visit } from "../types.ts";
 import type { JobberClient } from "./client.ts";
 import { type CompletenessResult, connectionCompleteness } from "./completeness.ts";
 import { jobberRef, toUtcIso } from "./normalize.ts";
-import { type Connection, PAGE_SIZE, paginate } from "./queries.ts";
+import { type Connection, PAGE_SIZE, paginate, visibleFields } from "./queries.ts";
 
 /** Max nested items fetched per parent (assigned users, quote/invoice jobs). More -> the run is incomplete. */
 export const NESTED_FIRST = 10;
@@ -29,7 +29,11 @@ export const VISITS_QUERY = conn("visits", range("startAt"), `id job { id } star
 export const QUOTES_QUERY = conn("quotes", range("sentAt"), `id quoteStatus salesperson { id } sentAt amounts { total } ${nestedIds("jobs")}`);
 export const INVOICES_QUERY = conn("invoices", range("issuedDate"), `id invoiceStatus issuedDate dueDate amounts { total } ${nestedIds("jobs")}`);
 export const PAYMENT_RECORDS_QUERY = conn("paymentRecords", range("entryDate"), "id amount entryDate paymentType invoice { id } quote { id }");
-export const EXPENSES_QUERY = conn("expenses", range("date"), "id title description date total linkedJob { id } accountingCode { code } reimbursableTo { id }");
+// Expense.accountingCode is hidden from an app without the matching scope (seen live 2026-10-24); requested only when visible.
+export const expensesQuery = (withAccountingCode: boolean) =>
+  conn("expenses", range("date"), `id title description date total linkedJob { id }${withAccountingCode ? " accountingCode { code }" : ""} reimbursableTo { id }`);
+export const EXPENSES_QUERY = expensesQuery(true);
+export const EXPENSES_QUERY_NO_CODE = expensesQuery(false);
 /** Expense has no status field; the status exists only as a filter, so ids are pulled per status. */
 export const EXPENSE_STATUS_QUERY = /* GraphQL */ `
   query PayrollPilot_expenseStatus($after: String, $first: Int!, $from: ISO8601DateTime!, $to: ISO8601DateTime!, $status: ExpensePaymentStatus!) {
@@ -54,7 +58,7 @@ export interface RawVisit { id: string; job: { id: string }; startAt: string | n
 export interface RawQuote { id: string; quoteStatus: string; salesperson: Id; sentAt: string | null; amounts: { total: number }; jobs: Nested }
 export interface RawInvoice { id: string; invoiceStatus: string; issuedDate: string | null; dueDate: string | null; amounts: { total: number } | null; jobs: Nested }
 export interface RawPayment { id: string; amount: number; entryDate: string; paymentType: string | null; invoice: Id; quote: Id }
-export interface RawExpense { id: string; title: string; description: string | null; date: string; total: number | null; linkedJob: Id; accountingCode: { code: string } | null; reimbursableTo: Id }
+export interface RawExpense { id: string; title: string; description: string | null; date: string; total: number | null; linkedJob: Id; accountingCode?: { code: string } | null; reimbursableTo: Id }
 export interface RawJob {
   id: string; jobNumber: number; title: string | null; jobStatus: string; client: { id: string }; salesperson: Id; quote: Id;
   startAt: string | null; endAt: string | null; total: number;
@@ -137,9 +141,9 @@ export async function pullObjects(
   const runs: ObjectRun[] = [];
   const failed = (e: unknown): CompletenessResult => ({ pulled: 0, expected: null, complete: false, error: e instanceof Error ? e.message : String(e) });
 
-  async function one<R>(object: string, doc: string, field: string, nested?: (r: R) => Nested): Promise<R[]> {
+  async function one<R>(object: string, doc: string, field: string, nested?: (r: R) => Nested, note = ""): Promise<R[]> {
     const startedAt = now().toISOString();
-    const method = `jobber-graphql ${object}(${field} ${period.startUtc}..${period.endUtc}) first:${PAGE_SIZE}`;
+    const method = `jobber-graphql ${object}(${field} ${period.startUtc}..${period.endUtc}) first:${PAGE_SIZE}${note}`;
     try {
       const page = await paginate<R, Record<string, Connection<R>>>(client, doc, vars, (d) => d[object]);
       let result = connectionCompleteness(object, page.nodes.length, page.totalCount, page.totalCountDrift);
@@ -156,7 +160,8 @@ export async function pullObjects(
   const quotes = await one<RawQuote>("quotes", QUOTES_QUERY, "sentAt", (r) => r.jobs);
   const invoices = await one<RawInvoice>("invoices", INVOICES_QUERY, "issuedDate", (r) => r.jobs);
   const payments = await one<RawPayment>("paymentRecords", PAYMENT_RECORDS_QUERY, "entryDate");
-  const expenses = await one<RawExpense>("expenses", EXPENSES_QUERY, "date");
+  const withCode = (await visibleFields(client, "Expense").catch(() => new Set<string>())).has("accountingCode");
+  const expenses = await one<RawExpense>("expenses", expensesQuery(withCode), "date", undefined, withCode ? "" : "; Expense.accountingCode hidden from this app (scope), accountName null");
   const reimbursement = new Map<string, ReimbursementStatus>();
   if (expenses.some((x) => x.reimbursableTo?.id)) {
     try {

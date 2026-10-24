@@ -28,7 +28,8 @@ export interface FakeCalls {
   token: URLSearchParams[];
 }
 
-export function fakeJobberFetch(fx: Fixtures, opts: { rotate?: boolean } = {}): { fetch: typeof fetch; calls: FakeCalls } {
+/** `hidden`: Type.field names this fake app cannot see (like a missing scope): introspection omits them and querying them errors as Jobber does. */
+export function fakeJobberFetch(fx: Fixtures, opts: { rotate?: boolean; hidden?: string[] } = {}): { fetch: typeof fetch; calls: FakeCalls } {
   const calls: FakeCalls = { graphql: [], token: [] };
   let n = 0;
   const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json" } });
@@ -46,9 +47,25 @@ export function fakeJobberFetch(fx: Fixtures, opts: { rotate?: boolean } = {}): 
     const operation = /query\s+(\w+)/.exec(body.query)?.[1] ?? "anonymous";
     const v = body.variables;
     calls.graphql.push({ operation, variables: v, auth: headers.get("authorization"), version: headers.get("x-jobber-graphql-version") });
+    // a field the app cannot see is never in a response either
+    const strip = <T,>(value: T, type: string): T => {
+      const drop = (opts.hidden ?? []).filter((h) => h.startsWith(`${type}.`)).map((h) => h.split(".")[1] as string);
+      return drop.length ? (JSON.parse(JSON.stringify(value), (k, val) => (drop.includes(k) ? undefined : val)) as T) : value;
+    };
+    for (const h of opts.hidden ?? []) {
+      const [type, field] = h.split(".") as [string, string];
+      const op = { User: "PayrollPilotUsers", Expense: "PayrollPilot_expenses" }[type];
+      if (operation === op && new RegExp(`\\b${field}\\b`).test(body.query)) return json({ errors: [{ message: `Field '${field}' doesn't exist on type '${type}'` }] });
+    }
     switch (operation) {
+      case "PayrollPilotTypeFields": {
+        const all: Record<string, string[]> = { User: ["id", "name", "status", "labourRate"], Expense: ["id", "title", "total", "accountingCode", "reimbursableTo"] };
+        const fields = (all[String(v.name)] ?? []).filter((f) => !(opts.hidden ?? []).includes(`${v.name}.${f}`));
+        return json({ data: { __type: { name: v.name, fields: fields.map((name) => ({ name })) } } });
+      }
       case "PayrollPilotUsers":
-        return json(fx.users[v.status as "ACTIVATED" | "DEACTIVATED"]);
+        // unfiltered users(): every status in one connection, like the live API
+        return json(strip({ data: { users: { totalCount: fx.users.ACTIVATED.data.users.totalCount + fx.users.DEACTIVATED.data.users.totalCount, pageInfo: { hasNextPage: false, endCursor: null }, nodes: [...fx.users.ACTIVATED.data.users.nodes, ...fx.users.DEACTIVATED.data.users.nodes] } } }, "User"));
       case "PayrollPilotUsersCount":
         return json(fx.users.COUNT);
       case "PayrollPilotTimeSheetEntries": {
@@ -56,7 +73,10 @@ export function fakeJobberFetch(fx: Fixtures, opts: { rotate?: boolean } = {}): 
         return page ? json(page) : json({ errors: [{ message: "bad cursor" }] });
       }
       case "PayrollPilotUserTimeSheetsByDay": {
-        const days = (fx.entries.byDay as Record<string, unknown[]>)[String(v.userId)] ?? [];
+        const from = String(v.startDate);
+        const to = String(v.endDate);
+        if ((Date.parse(to) - Date.parse(from)) / 86400000 > 6) return json({ errors: [{ message: "date range must not exceed 7 days" }] });
+        const days = ((fx.entries.byDay as Record<string, { date: string }[]>)[String(v.userId)] ?? []).filter((d) => d.date >= from && d.date <= to);
         return json({
           data: { user: { id: v.userId, timeSheetsByDay: { totalCount: days.length, pageInfo: { hasNextPage: false, endCursor: null }, nodes: days } } },
           extensions: { cost: { throttleStatus: { maximumAvailable: 10000, currentlyAvailable: 9800, restoreRate: 500 } } },
@@ -69,7 +89,7 @@ export function fakeJobberFetch(fx: Fixtures, opts: { rotate?: boolean } = {}): 
       case "PayrollPilot_expenses":
       case "PayrollPilot_jobs": {
         const object = operation.slice("PayrollPilot_".length) as "visits" | "jobs";
-        let nodes = fx.objects[object] as { id: string }[];
+        let nodes = strip(fx.objects[object], String(object) === "expenses" ? "Expense" : "") as { id: string }[];
         if (object === "jobs") nodes = nodes.filter((n) => (v.ids as string[]).includes(n.id));
         const totalCount = (fx.objects.totalCounts as Record<string, number>)[object] ?? nodes.length;
         return json({ data: { [object]: { totalCount, pageInfo: { hasNextPage: false, endCursor: null }, nodes } } });

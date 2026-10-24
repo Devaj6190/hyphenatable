@@ -65,3 +65,13 @@ export function resolvePeriod(periodStart: string, periodEnd: string, tz = "UTC"
     endDate: DATE_RE.test(periodEnd) ? periodEnd : zonedDate(endMs - 1, tz),
   };
 }
+
+/** Inclusive date windows of at most 7 days covering startDate..endDate (Jobber's timeSheetsByDay limit). */
+export function weekWindows(startDate: string, endDate: string): { start: string; end: string }[] {
+  const out: { start: string; end: string }[] = [];
+  for (let s = startDate; s <= endDate; s = addDays(s, 7)) {
+    const e = addDays(s, 6);
+    out.push({ start: s, end: e < endDate ? e : endDate });
+  }
+  return out;
+}

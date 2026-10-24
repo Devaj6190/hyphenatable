@@ -20,7 +20,8 @@ export function toUtcIso(value: string | null): string | null {
 }
 
 export function normalizeUser(raw: RawUser, companyId: string): Worker {
-  const status = raw.status === "ACTIVATED" ? "active" : "inactive";
+  // Only DEACTIVATED is inactive: NOT_INVITED workers (no login invite) and pending invites still work and log hours.
+  const status = raw.status === "DEACTIVATED" ? "inactive" : "active";
   return {
     id: jobberRef(raw.id),
     companyId,
