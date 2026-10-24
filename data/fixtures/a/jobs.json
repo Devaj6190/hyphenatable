@@ -10,8 +10,8 @@
     "salespersonWorkerId": "a-w12",
     "quoteId": "a-q01",
     "parentJobId": null,
-    "startAt": "2026-10-12T14:00:00.000Z",
-    "endAt": "2026-10-14T00:00:00.000Z",
+    "startAt": "2026-10-12T11:00:00.000Z",
+    "endAt": "2026-10-13T21:00:00.000Z",
     "totalCents": 814000
   },
   {
@@ -25,8 +25,8 @@
     "salespersonWorkerId": "a-w11",
     "quoteId": "a-q02",
     "parentJobId": null,
-    "startAt": "2026-10-14T14:00:00.000Z",
-    "endAt": "2026-10-24T00:00:00.000Z",
+    "startAt": "2026-10-14T11:00:00.000Z",
+    "endAt": "2026-10-23T21:00:00.000Z",
     "totalCents": 524000
   },
   {
@@ -40,8 +40,8 @@
     "salespersonWorkerId": null,
     "quoteId": null,
     "parentJobId": null,
-    "startAt": "2026-10-15T14:00:00.000Z",
-    "endAt": "2026-10-17T00:00:00.000Z",
+    "startAt": "2026-10-15T11:00:00.000Z",
+    "endAt": "2026-10-16T21:00:00.000Z",
     "totalCents": 587000
   },
   {
@@ -55,8 +55,8 @@
     "salespersonWorkerId": "a-w12",
     "quoteId": null,
     "parentJobId": null,
-    "startAt": "2026-10-14T14:00:00.000Z",
-    "endAt": "2026-10-28T00:00:00.000Z",
+    "startAt": "2026-10-14T11:00:00.000Z",
+    "endAt": "2026-10-27T21:00:00.000Z",
     "totalCents": 711000
   },
   {
@@ -70,8 +70,8 @@
     "salespersonWorkerId": "a-w11",
     "quoteId": null,
     "parentJobId": null,
-    "startAt": "2026-10-21T14:00:00.000Z",
-    "endAt": "2026-10-23T00:00:00.000Z",
+    "startAt": "2026-10-21T11:00:00.000Z",
+    "endAt": "2026-10-22T21:00:00.000Z",
     "totalCents": 405000
   },
   {
@@ -85,8 +85,8 @@
     "salespersonWorkerId": null,
     "quoteId": null,
     "parentJobId": null,
-    "startAt": "2026-11-02T15:00:00.000Z",
-    "endAt": "2026-11-03T01:00:00.000Z",
+    "startAt": "2026-11-02T12:00:00.000Z",
+    "endAt": "2026-11-02T22:00:00.000Z",
     "totalCents": 62000
   },
   {
@@ -100,8 +100,8 @@
     "salespersonWorkerId": null,
     "quoteId": null,
     "parentJobId": null,
-    "startAt": "2026-10-20T14:00:00.000Z",
-    "endAt": "2026-10-21T00:00:00.000Z",
+    "startAt": "2026-10-20T11:00:00.000Z",
+    "endAt": "2026-10-20T21:00:00.000Z",
     "totalCents": 48000
   },
   {
@@ -115,8 +115,8 @@
     "salespersonWorkerId": null,
     "quoteId": null,
     "parentJobId": null,
-    "startAt": "2026-10-20T14:00:00.000Z",
-    "endAt": "2026-10-21T00:00:00.000Z",
+    "startAt": "2026-10-20T11:00:00.000Z",
+    "endAt": "2026-10-20T21:00:00.000Z",
     "totalCents": null
   },
   {
@@ -130,8 +130,8 @@
     "salespersonWorkerId": "a-w11",
     "quoteId": "a-q04",
     "parentJobId": null,
-    "startAt": "2026-10-12T14:00:00.000Z",
-    "endAt": "2026-10-13T00:00:00.000Z",
+    "startAt": "2026-10-12T11:00:00.000Z",
+    "endAt": "2026-10-12T21:00:00.000Z",
     "totalCents": 400000
   },
   {
@@ -145,8 +145,8 @@
     "salespersonWorkerId": "a-w12",
     "quoteId": "a-q05",
     "parentJobId": null,
-    "startAt": "2026-11-04T15:00:00.000Z",
-    "endAt": "2026-11-06T01:00:00.000Z",
+    "startAt": "2026-11-04T12:00:00.000Z",
+    "endAt": "2026-11-05T22:00:00.000Z",
     "totalCents": 315000
   },
   {
@@ -160,8 +160,8 @@
     "salespersonWorkerId": "a-w12",
     "quoteId": "a-q11",
     "parentJobId": null,
-    "startAt": "2026-08-17T14:00:00.000Z",
-    "endAt": "2026-08-19T00:00:00.000Z",
+    "startAt": "2026-08-17T11:00:00.000Z",
+    "endAt": "2026-08-18T21:00:00.000Z",
     "totalCents": 744000
   },
   {
@@ -175,8 +175,8 @@
     "salespersonWorkerId": "a-w12",
     "quoteId": "a-q12",
     "parentJobId": null,
-    "startAt": "2026-08-19T14:00:00.000Z",
-    "endAt": "2026-08-21T00:00:00.000Z",
+    "startAt": "2026-08-19T11:00:00.000Z",
+    "endAt": "2026-08-20T21:00:00.000Z",
     "totalCents": 604000
   },
   {
@@ -190,8 +190,8 @@
     "salespersonWorkerId": "a-w05",
     "quoteId": "a-q13",
     "parentJobId": null,
-    "startAt": "2026-08-21T14:00:00.000Z",
-    "endAt": "2026-08-25T00:00:00.000Z",
+    "startAt": "2026-08-21T11:00:00.000Z",
+    "endAt": "2026-08-24T21:00:00.000Z",
     "totalCents": 774000
   },
   {
@@ -205,8 +205,8 @@
     "salespersonWorkerId": "a-w12",
     "quoteId": "a-q14",
     "parentJobId": null,
-    "startAt": "2026-08-25T14:00:00.000Z",
-    "endAt": "2026-08-27T00:00:00.000Z",
+    "startAt": "2026-08-25T11:00:00.000Z",
+    "endAt": "2026-08-26T21:00:00.000Z",
     "totalCents": 662000
   },
   {
@@ -220,8 +220,8 @@
     "salespersonWorkerId": "a-w12",
     "quoteId": "a-q15",
     "parentJobId": null,
-    "startAt": "2026-08-27T14:00:00.000Z",
-    "endAt": "2026-08-29T00:00:00.000Z",
+    "startAt": "2026-08-27T11:00:00.000Z",
+    "endAt": "2026-08-28T21:00:00.000Z",
     "totalCents": 586000
   },
   {
@@ -235,8 +235,8 @@
     "salespersonWorkerId": "a-w12",
     "quoteId": "a-q16",
     "parentJobId": null,
-    "startAt": "2026-08-31T14:00:00.000Z",
-    "endAt": "2026-09-02T00:00:00.000Z",
+    "startAt": "2026-08-31T11:00:00.000Z",
+    "endAt": "2026-09-01T21:00:00.000Z",
     "totalCents": 775000
   },
   {
@@ -250,8 +250,8 @@
     "salespersonWorkerId": "a-w11",
     "quoteId": "a-q17",
     "parentJobId": null,
-    "startAt": "2026-09-02T14:00:00.000Z",
-    "endAt": "2026-09-04T00:00:00.000Z",
+    "startAt": "2026-09-02T11:00:00.000Z",
+    "endAt": "2026-09-03T21:00:00.000Z",
     "totalCents": 706000
   },
   {
@@ -265,8 +265,8 @@
     "salespersonWorkerId": "a-w12",
     "quoteId": "a-q18",
     "parentJobId": null,
-    "startAt": "2026-09-04T14:00:00.000Z",
-    "endAt": "2026-09-09T00:00:00.000Z",
+    "startAt": "2026-09-04T11:00:00.000Z",
+    "endAt": "2026-09-08T21:00:00.000Z",
     "totalCents": 682000
   },
   {
@@ -280,8 +280,8 @@
     "salespersonWorkerId": "a-w12",
     "quoteId": "a-q19",
     "parentJobId": null,
-    "startAt": "2026-09-09T14:00:00.000Z",
-    "endAt": "2026-09-11T00:00:00.000Z",
+    "startAt": "2026-09-09T11:00:00.000Z",
+    "endAt": "2026-09-10T21:00:00.000Z",
     "totalCents": 838000
   },
   {
@@ -295,8 +295,8 @@
     "salespersonWorkerId": null,
     "quoteId": null,
     "parentJobId": "a-j19",
-    "startAt": "2026-09-10T14:00:00.000Z",
-    "endAt": "2026-09-11T00:00:00.000Z",
+    "startAt": "2026-09-10T11:00:00.000Z",
+    "endAt": "2026-09-10T21:00:00.000Z",
     "totalCents": null
   },
   {
@@ -310,8 +310,8 @@
     "salespersonWorkerId": "a-w11",
     "quoteId": "a-q20",
     "parentJobId": null,
-    "startAt": "2026-09-11T14:00:00.000Z",
-    "endAt": "2026-09-12T00:00:00.000Z",
+    "startAt": "2026-09-11T11:00:00.000Z",
+    "endAt": "2026-09-11T21:00:00.000Z",
     "totalCents": 424000
   },
   {
@@ -325,8 +325,8 @@
     "salespersonWorkerId": "a-w12",
     "quoteId": "a-q21",
     "parentJobId": null,
-    "startAt": "2026-09-14T14:00:00.000Z",
-    "endAt": "2026-09-16T00:00:00.000Z",
+    "startAt": "2026-09-14T11:00:00.000Z",
+    "endAt": "2026-09-15T21:00:00.000Z",
     "totalCents": 719000
   },
   {
@@ -340,8 +340,8 @@
     "salespersonWorkerId": "a-w05",
     "quoteId": "a-q22",
     "parentJobId": null,
-    "startAt": "2026-09-16T14:00:00.000Z",
-    "endAt": "2026-09-18T00:00:00.000Z",
+    "startAt": "2026-09-16T11:00:00.000Z",
+    "endAt": "2026-09-17T21:00:00.000Z",
     "totalCents": 604000
   },
   {
@@ -355,8 +355,8 @@
     "salespersonWorkerId": "a-w12",
     "quoteId": "a-q23",
     "parentJobId": null,
-    "startAt": "2026-09-18T14:00:00.000Z",
-    "endAt": "2026-09-22T00:00:00.000Z",
+    "startAt": "2026-09-18T11:00:00.000Z",
+    "endAt": "2026-09-21T21:00:00.000Z",
     "totalCents": 679000
   },
   {
@@ -370,8 +370,8 @@
     "salespersonWorkerId": "a-w12",
     "quoteId": "a-q24",
     "parentJobId": null,
-    "startAt": "2026-09-22T14:00:00.000Z",
-    "endAt": "2026-09-24T00:00:00.000Z",
+    "startAt": "2026-09-22T11:00:00.000Z",
+    "endAt": "2026-09-23T21:00:00.000Z",
     "totalCents": 701000
   },
   {
@@ -385,8 +385,8 @@
     "salespersonWorkerId": "a-w12",
     "quoteId": "a-q25",
     "parentJobId": null,
-    "startAt": "2026-09-24T14:00:00.000Z",
-    "endAt": "2026-09-26T00:00:00.000Z",
+    "startAt": "2026-09-24T11:00:00.000Z",
+    "endAt": "2026-09-25T21:00:00.000Z",
     "totalCents": 628000
   },
   {
@@ -400,8 +400,8 @@
     "salespersonWorkerId": "a-w11",
     "quoteId": "a-q26",
     "parentJobId": null,
-    "startAt": "2026-09-28T14:00:00.000Z",
-    "endAt": "2026-09-30T00:00:00.000Z",
+    "startAt": "2026-09-28T11:00:00.000Z",
+    "endAt": "2026-09-29T21:00:00.000Z",
     "totalCents": 718000
   },
   {
@@ -415,8 +415,8 @@
     "salespersonWorkerId": "a-w12",
     "quoteId": "a-q27",
     "parentJobId": null,
-    "startAt": "2026-09-30T14:00:00.000Z",
-    "endAt": "2026-10-02T00:00:00.000Z",
+    "startAt": "2026-09-30T11:00:00.000Z",
+    "endAt": "2026-10-01T21:00:00.000Z",
     "totalCents": 871000
   },
   {
@@ -430,8 +430,8 @@
     "salespersonWorkerId": null,
     "quoteId": null,
     "parentJobId": "a-j28",
-    "startAt": "2026-10-01T14:00:00.000Z",
-    "endAt": "2026-10-02T00:00:00.000Z",
+    "startAt": "2026-10-01T11:00:00.000Z",
+    "endAt": "2026-10-01T21:00:00.000Z",
     "totalCents": null
   },
   {
@@ -445,8 +445,8 @@
     "salespersonWorkerId": "a-w12",
     "quoteId": "a-q28",
     "parentJobId": null,
-    "startAt": "2026-10-02T14:00:00.000Z",
-    "endAt": "2026-10-06T00:00:00.000Z",
+    "startAt": "2026-10-02T11:00:00.000Z",
+    "endAt": "2026-10-05T21:00:00.000Z",
     "totalCents": 528000
   },
   {
@@ -460,8 +460,8 @@
     "salespersonWorkerId": "a-w11",
     "quoteId": "a-q29",
     "parentJobId": null,
-    "startAt": "2026-10-06T14:00:00.000Z",
-    "endAt": "2026-10-08T00:00:00.000Z",
+    "startAt": "2026-10-06T11:00:00.000Z",
+    "endAt": "2026-10-07T21:00:00.000Z",
     "totalCents": 676000
   },
   {
@@ -475,8 +475,8 @@
     "salespersonWorkerId": "a-w11",
     "quoteId": "a-q30",
     "parentJobId": null,
-    "startAt": "2026-10-08T14:00:00.000Z",
-    "endAt": "2026-10-10T00:00:00.000Z",
+    "startAt": "2026-10-08T11:00:00.000Z",
+    "endAt": "2026-10-09T21:00:00.000Z",
     "totalCents": 666000
   }
 ]

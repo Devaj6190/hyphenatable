@@ -17,9 +17,9 @@ bun run seed/validate.ts data/fixtures/a   # exits 0 only if all 15 files valida
 
 | File | Contents |
 |---|---|
-| `company.json` | one `Company` (biweekly, `America/Los_Angeles`, long shift 11 h, OT after 40 h/week, gross change 25%) |
+| `company.json` | one `Company` (biweekly, `America/New_York`: Pennsylvania, weekly OT only; long shift 11 h, OT after 40 h/week, gross change 25%) |
 | `workers.json` | 14 `Worker`s: a-w01..a-w07 hourly field, a-w08 salaried crew lead, a-w09/a-w10 Venmo contractors (`gusto: null`), a-w11 manager, a-w12 owner, a-w13 deactivated hourly, a-w14 new hire not onboarded in Gusto |
-| `cycles.json` | a-c01..a-c04 (closed) and the current cycle a-c05 (Sun 2026-10-11 to Sat 2026-10-24) |
+| `cycles.json` | a-c01..a-c04 (closed) and the current cycle a-c05 (Sat 2026-10-10 to Fri 2026-10-23), biweekly Sat-Fri to match the Gusto demo pay schedule; earlier cycles step back 14 days |
 | `syncRuns.json` | complete runs for a-c05 (Jobber time entries, expenses, visits; QuickBooks Purchase; Gusto employees) and past cycles; one incomplete Jobber time-entry run for a-c04 (a-sr-04, pulled one fewer than expected) for CHK-23 |
 | `timeEntries.json` | about 300 past entries (a-te-1001...) and 85 in a-c05 (a-te-0101..0140 from v1, a-te-0141+ new) |
 | `jobs.json`, `visits.json` | past jobs a-j11+ (one visit per job day), current jobs a-j01..a-j10, visits a-v01..a-v05 |
@@ -36,13 +36,17 @@ bun run seed/validate.ts data/fixtures/a   # exits 0 only if all 15 files valida
 - `sourceId` equals our id in fixtures (it is the marker the pushers write, e.g. `payrollpilot:a-te-0121`); after a real pull it is the upstream id.
 - Upstream ids that do not exist yet are visibly fake: Jobber `userId` is `jobber-user:a-wNN`; Gusto uuids are `00000000-0000-4000-a000-…` (employee) and `…-b000-…` (job). A-07 replaces them.
 - `contactRef` is an opaque key (`contact:a-wNN`) the courier maps to a phone; never a number.
-- Money is integer cents. Timestamps are ISO 8601 UTC (`…Z`), from local wall time (PDT until 2026-11-01, PST after). Date-only fields (`Expense.date`, `Payment.entryDate`, `Invoice.issuedDate`/`dueDate`) are `YYYY-MM-DD`.
-- Cycle bounds: `periodStart` is local midnight Sunday, `periodEnd` is the last millisecond of Saturday local (inclusive). `cutoffAt` is Friday 18:00 local; the a-c05 sync snapshot is Friday 18:05 local.
+- Money is integer cents. Timestamps are ISO 8601 UTC (`…Z`), from local wall time in the company's zone (Company A: EDT, -04:00, until 2026-11-01, then EST; Company B: PDT/PST). Date-only fields (`Expense.date`, `Payment.entryDate`, `Invoice.issuedDate`/`dueDate`) are `YYYY-MM-DD`.
+- Cycle bounds (Company A): `periodStart` is local midnight Saturday, `periodEnd` is the last millisecond of the second Friday, local and inclusive. The OT workweek is Sat-Fri. `cutoffAt` is that Friday at 18:00 local; the a-c05 sync snapshot is Friday 18:05 local.
 - Ticking entries: `endAt` is `null` and `durationSec` is the elapsed time at the sync snapshot.
 - Expenses: `matchedJobId`/`matchConfidence` show the state **after** matching; QuickBooks `customerRef` is the job-number sub-customer (`"101"`); Jobber expenses have `accountName: null` (Jobber has no chart of accounts) and `matchedJobId` from `linkedJobId`. Fuel purchases have `kind: "unknown"` (no rule).
 - Job totals come from Jobber job costing (hours x Jobber labour rate + job-cost expenses, incl. linked sub-jobs) and a target margin; quotes and invoices carry the job total.
 - `pay_rate` rule params: `{ workerId, rateCents, paymentUnit, costRateCentsPerHour }`; for salaried workers the cost rate is annual / 2080.
 - Unknowns are explicit `null`, never `0` (e.g. `a-w10.venmoRateCents`, the owner's and manager's Jobber `labourRateCents`, the disposal sub-job's `totalCents`).
+
+## Changes in the Pennsylvania move (a/company-a-pa)
+
+Company A moved from America/Los_Angeles to America/New_York, and its cycles from Sun-Sat to Sat-Fri. Every id is unchanged, and so are every amount, hour count, working date and wall-clock time. Only the UTC instants moved: entries, visits, jobs, quotes, sync runs and answer-key time values are 3 h earlier (the same local time in EDT instead of PDT). Cycles start one day earlier (Saturday) and end on Friday; the cutoff is still Friday 18:00 local. The same checks fire as before.
 
 ## Answer key
 

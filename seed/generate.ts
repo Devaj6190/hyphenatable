@@ -16,12 +16,18 @@ import { rng } from "./lib/random";
 import {
   addDays,
   DAY_MS,
-  local,
+  fridayOnOrBefore,
+  localDateOf,
+  local as localIn,
   seconds,
   shortDate,
   weekday,
   workdays,
 } from "./lib/time";
+
+/** The company's zone, set by generate() from cfg.company.timezone before anything is built. */
+let TZ = "America/Los_Angeles";
+const local = (date: string, hhmm: string) => localIn(date, hhmm, TZ);
 
 // ---------------------------------------------------------------- types
 
@@ -248,7 +254,7 @@ function buildCycles(cfg: Config): Rec[] {
     periodEnd: new Date(
       Date.parse(local(addDays(c.end, 1), "00:00")) - 1,
     ).toISOString(),
-    cutoffAt: local(addDays(c.end, -1), "18:00"), // Friday 18:00 local
+    cutoffAt: local(fridayOnOrBefore(c.end), "18:00"), // Friday 18:00 local
     stage: c.current ? "setup" : "closed",
     gustoPayrollId: c.current ? (cfg.current.gustoPayrollId ?? null) : null,
     gustoOffCyclePayrollId: null,
@@ -756,11 +762,7 @@ function weeklySplit(
 ): { regular: number; overtime: number } {
   const weeks = new Map<number, number>();
   for (const e of entries) {
-    const localDate = new Date(
-      Date.parse(e.startAt as string) - 7 * 3600 * 1000,
-    )
-      .toISOString()
-      .slice(0, 10);
+    const localDate = localDateOf(e.startAt as string, TZ);
     const wk = Math.floor(
       (Date.parse(`${localDate}T12:00:00Z`) -
         Date.parse(`${periodStartDate}T12:00:00Z`)) /
@@ -1165,7 +1167,7 @@ function buildSyncRuns(ctx: Ctx) {
   // CHK-23 fixture: the a-c04 time-entry pull missed one entry and was never re-run
   const c04 = must(ctx.cfg.cycles.find((c) => c.id === "a-c04"));
   const n4 = count(ctx.entries, (e) => e.cycleId === "a-c04");
-  const c04end = addDays(c04.end, -1);
+  const c04end = fridayOnOrBefore(c04.end);
   run(
     "a-sr-04",
     "a-c04",
@@ -1191,7 +1193,7 @@ function buildSyncRuns(ctx: Ctx) {
     (x) => !x.current && x.id !== "a-c04",
   )) {
     const n = count(ctx.entries, (e) => e.cycleId === c.id);
-    const end = addDays(c.end, -1);
+    const end = fridayOnOrBefore(c.end);
     run(
       `a-sr-${pad(6 + c.number, 2)}`,
       c.id,
@@ -1280,6 +1282,7 @@ function buildRules(ctx: Ctx): Rec[] {
 // ---------------------------------------------------------------- main
 
 export function generate(cfg: Config): Record<string, unknown> {
+  TZ = cfg.company.timezone;
   const C = cfg.company.id;
   const curCycle = must(cfg.cycles.find((c) => c.current));
   const ctx: Ctx = {

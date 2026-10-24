@@ -18,7 +18,7 @@ bun test seed                               # determinism hash, committed fixtur
 | `lib/plant.ts` | planted errors in a-c05 and the answer-key rows (CHK-01..CHK-22) |
 | `lib/random.ts` | seeded RNG (mulberry32 over an FNV-1a hash of `seed:<cycle>`) |
 | `lib/names.ts` | fake streets, job kinds, vendors |
-| `lib/time.ts` | local wall time to UTC (PDT until 2026-11-01, PST after), working days |
+| `lib/time.ts` | local wall time to UTC per zone (A: America/New_York, EDT until 2026-11-01 then EST; B: America/Los_Angeles), working days, Friday cutoff |
 | `validate.ts` | the validator (replaced by `packages/engine/src/schemas.ts` once B-02 lands) |
 | `__tests__/generate.test.ts` | tests; `EXPECTED_SHA256_A` changes only when the config or generator changes on purpose |
 

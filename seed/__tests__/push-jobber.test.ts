@@ -28,7 +28,7 @@ const { fx, currentCycleId } = loadFixtures("a");
 const opts = {
   currentCycleId,
   companyName: "Company A",
-  timezone: "America/Los_Angeles",
+  timezone: "America/New_York",
 };
 const answerKey = (await Bun.file(
   new URL("../../data/fixtures/a/answer-key.json", import.meta.url),
@@ -268,7 +268,7 @@ describe("live safety", () => {
     expect(sched.startAt).toEqual({
       date: "2026-10-12",
       time: "07:00:00",
-      timezone: "America/Los_Angeles",
+      timezone: "America/New_York",
     });
     expect(Array.isArray(sched.teamMemberIdsToAssign)).toBe(true);
     expect(
