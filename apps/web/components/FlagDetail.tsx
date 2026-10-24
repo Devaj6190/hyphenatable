@@ -39,7 +39,7 @@ export function FlagDetail({
   const back = (
     <Link
       href={`/c/${companyId}`}
-      className="text-sm font-medium text-primary hover:underline"
+      className="text-sm font-medium text-link hover:underline"
     >
       ← Back to what we need from you
     </Link>

@@ -25,13 +25,15 @@ function DialogClose({ ...props }: DialogPrimitive.Close.Props) {
 
 function DialogOverlay({
   className,
+  scrim = "frosted",
   ...props
-}: DialogPrimitive.Backdrop.Props) {
+}: DialogPrimitive.Backdrop.Props & { scrim?: "frosted" | "plain" }) {
   return (
     <DialogPrimitive.Backdrop
       data-slot="dialog-overlay"
       className={cn(
-        "fixed inset-0 isolate z-50 bg-black/10 duration-100 supports-backdrop-filter:backdrop-blur-xs data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0",
+        "fixed inset-0 isolate z-50 transition-opacity duration-(--dur-sheet) ease-out-soft data-ending-style:opacity-0 data-starting-style:opacity-0",
+        scrim === "frosted" ? "frosted-scrim" : "bg-(--scrim)",
         className,
       )}
       {...props}
@@ -43,17 +45,20 @@ function DialogContent({
   className,
   children,
   showCloseButton = true,
+  scrim = "frosted",
   ...props
 }: DialogPrimitive.Popup.Props & {
   showCloseButton?: boolean;
+  /** Surrounding layer: frosted (default) or a plain tinted scrim. The dialog body is always solid. */
+  scrim?: "frosted" | "plain";
 }) {
   return (
     <DialogPortal>
-      <DialogOverlay />
+      <DialogOverlay scrim={scrim} />
       <DialogPrimitive.Popup
         data-slot="dialog-content"
         className={cn(
-          "fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-xl bg-popover p-4 text-sm text-popover-foreground ring-1 ring-foreground/10 duration-100 outline-none sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
+          "fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-overlay border bg-raised p-6 text-popover-foreground shadow-overlay outline-none transition-[opacity,translate,scale] duration-(--dur-sheet) ease-out-soft sm:max-w-lg data-ending-style:translate-y-[calc(-50%+8px)] data-ending-style:opacity-0 data-starting-style:translate-y-[calc(-50%+8px)] data-starting-style:opacity-0",
           className,
         )}
         {...props}
@@ -65,7 +70,7 @@ function DialogContent({
             render={
               <Button
                 variant="ghost"
-                className="absolute top-2 right-2"
+                className="absolute top-4 right-4"
                 size="icon-sm"
               />
             }
@@ -101,7 +106,7 @@ function DialogFooter({
     <div
       data-slot="dialog-footer"
       className={cn(
-        "-mx-4 -mb-4 flex flex-col-reverse gap-2 rounded-b-xl border-t bg-muted/50 p-4 sm:flex-row sm:justify-end",
+        "-mx-6 -mb-6 flex flex-col-reverse gap-2 rounded-b-overlay border-t bg-muted/60 px-6 py-4 sm:flex-row sm:justify-end",
         className,
       )}
       {...props}
@@ -121,7 +126,7 @@ function DialogTitle({ className, ...props }: DialogPrimitive.Title.Props) {
     <DialogPrimitive.Title
       data-slot="dialog-title"
       className={cn(
-        "font-heading text-base leading-none font-medium",
+        "font-heading text-xl leading-tight font-semibold pr-10",
         className,
       )}
       {...props}

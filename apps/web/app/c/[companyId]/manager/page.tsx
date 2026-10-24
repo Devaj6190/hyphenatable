@@ -1,14 +1,13 @@
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import { ManagerInbox } from "@/components/ManagerInbox";
 import { companies } from "@/lib/companies";
 import { managerInbox } from "@/lib/server/fixtures";
 
-export default async function ManagerPage({
+// Params are read inside Suspense so the shell stays instant (Next 16).
+export default function ManagerPage({
   params,
 }: PageProps<"/c/[companyId]/manager">) {
-  const { companyId } = await params;
-  const company = companies[companyId];
-  if (!company) notFound();
   return (
     <div className="flex flex-col gap-4">
       <div>
@@ -17,11 +16,24 @@ export default async function ManagerPage({
           Hours and jobs only. Pay amounts are never shown here.
         </p>
       </div>
-      <ManagerInbox
-        data={managerInbox(companyId)}
-        dataKind={company.kind}
-        timezone={company.timezone}
-      />
+      <Suspense>
+        <Body params={params} />
+      </Suspense>
     </div>
+  );
+}
+
+async function Body({
+  params,
+}: Pick<PageProps<"/c/[companyId]/manager">, "params">) {
+  const { companyId } = await params;
+  const company = companies[companyId];
+  if (!company) notFound();
+  return (
+    <ManagerInbox
+      data={managerInbox(companyId)}
+      dataKind={company.kind}
+      timezone={company.timezone}
+    />
   );
 }

@@ -48,7 +48,7 @@ function Refs({
           <Link
             key={k}
             href={`/c/${event.companyId}/flags/${v}`}
-            className="text-sm text-primary hover:underline"
+            className="text-sm text-link hover:underline"
           >
             flag {v}
           </Link>

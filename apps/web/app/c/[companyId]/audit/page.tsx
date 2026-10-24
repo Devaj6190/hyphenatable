@@ -1,15 +1,13 @@
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import { AuditLog } from "@/components/AuditLog";
 import { companies } from "@/lib/companies";
 import { auditView, currentViewer } from "@/lib/server/fixtures";
 
-export default async function AuditPage({
+// Params are read inside Suspense so the shell stays instant (Next 16).
+export default function AuditPage({
   params,
 }: PageProps<"/c/[companyId]/audit">) {
-  const { companyId } = await params;
-  const company = companies[companyId];
-  if (!company) notFound();
-  const viewer = await currentViewer(companyId);
   return (
     <div className="flex flex-col gap-4">
       <div>
@@ -19,11 +17,25 @@ export default async function AuditPage({
           after the fact.
         </p>
       </div>
-      <AuditLog
-        data={auditView(viewer, companyId)}
-        dataKind={company.kind}
-        timezone={company.timezone}
-      />
+      <Suspense>
+        <Body params={params} />
+      </Suspense>
     </div>
+  );
+}
+
+async function Body({
+  params,
+}: Pick<PageProps<"/c/[companyId]/audit">, "params">) {
+  const { companyId } = await params;
+  const company = companies[companyId];
+  if (!company) notFound();
+  const viewer = await currentViewer(companyId);
+  return (
+    <AuditLog
+      data={auditView(viewer, companyId)}
+      dataKind={company.kind}
+      timezone={company.timezone}
+    />
   );
 }

@@ -1,30 +1,39 @@
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import { FlagsList } from "@/components/FlagsList";
+import { PageHeader } from "@/components/PageHeader";
 import { companies } from "@/lib/companies";
 import { currentViewer, homeFlags } from "@/lib/server/fixtures";
 
-export default async function OwnerHome({
+// Next 16 instant navigation: the page shell must not await params; read them inside a Suspense child.
+export default function OwnerHome({ params }: PageProps<"/c/[companyId]">) {
+  return (
+    <>
+      <PageHeader
+        title="Here’s what we need from you"
+        description="Flags for this pay cycle. Details are one click away."
+      />
+      <Suspense>
+        <HomeFlags params={params} />
+      </Suspense>
+    </>
+  );
+}
+
+async function HomeFlags({
   params,
-}: PageProps<"/c/[companyId]">) {
+}: Pick<PageProps<"/c/[companyId]">, "params">) {
   const { companyId } = await params;
   const company = companies[companyId];
   if (!company) notFound();
   // Fixture mode: the server picks the viewer from the role cookie and strips pay before anything is sent.
   const viewer = await currentViewer(companyId);
   return (
-    <div className="flex flex-col gap-4">
-      <div>
-        <h1 className="text-2xl font-semibold">Here’s what we need from you</h1>
-        <p className="text-sm text-muted-foreground">
-          Flags for this pay cycle. Details are one click away.
-        </p>
-      </div>
-      <FlagsList
-        companyId={companyId}
-        dataKind={company.kind}
-        flags={homeFlags(viewer, companyId)}
-        viewerId={viewer.workerId}
-      />
-    </div>
+    <FlagsList
+      companyId={companyId}
+      dataKind={company.kind}
+      flags={homeFlags(viewer, companyId)}
+      viewerId={viewer.workerId}
+    />
   );
 }
