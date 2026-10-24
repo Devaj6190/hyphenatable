@@ -19,6 +19,7 @@ import {
   MUTATIONS,
   OBJECTS,
   type PlanResult,
+  partitionSupported,
   QUERIES,
   resolveRefs,
   type Step,
@@ -216,11 +217,10 @@ export async function requireAllowedAccount(
   );
 }
 
-/** Mutations the steps need that the live schema does not have. Live mode writes nothing if any are missing. */
-export async function missingMutations(
+/** Mutation names in the token's schema (read-only introspection). */
+export async function availableMutations(
   client: Pick<SeedClient, "gql">,
-  steps: Step[],
-): Promise<string[]> {
+): Promise<Set<string>> {
   const r = await client.gql(QUERIES.mutationNames);
   const fields = (
     (r.data?.__type as { fields?: { name: string }[] } | undefined)?.fields ??
@@ -230,9 +230,28 @@ export async function missingMutations(
     throw new Error(
       `could not read the Mutation type: ${r.errors.map((e) => e.message).join("; ")}`,
     );
-  return [...new Set(steps.map((s) => s.mutation))]
-    .filter((m) => !fields.includes(m))
-    .sort();
+  return new Set(fields);
+}
+
+/** The --one target: the earliest record of the first supported kind (entries, then visits, then jobs). */
+export function oneTarget(steps: Step[]): Step | undefined {
+  const when = (s: Step): string => {
+    const input = s.variables.input as Record<string, unknown> | undefined;
+    if (s.object === "entries") return String(input?.startAt);
+    if (s.object === "visits") {
+      const v = (input?.visits as Record<string, unknown>[])[0]
+        .schedule as Record<string, Record<string, string>>;
+      return `${v.startAt.date}T${v.startAt.time}`;
+    }
+    return s.ourId;
+  };
+  for (const kind of ["entries", "visits", "jobs"]) {
+    const list = steps
+      .filter((s) => s.object === kind)
+      .sort((a, b) => when(a).localeCompare(when(b)));
+    if (list.length) return list[0];
+  }
+  return undefined;
 }
 
 async function live(company: string, opts: { one: boolean }) {
@@ -273,7 +292,23 @@ async function live(company: string, opts: { one: boolean }) {
     process.exit(4);
   }
 
-  // discover markers already in the account (a lost map file never causes duplicates)
+  // what this token can create; the rest is skipped and recorded, never refused silently
+  const available = await availableMutations(client);
+  const first = partitionSupported(plan(company, map).steps, available);
+  const pushing = new Set(first.run.map((s) => s.object as string));
+  map.skipped = {
+    checkedAt: new Date().toISOString(),
+    accountId: account.id,
+    objects: first.skipped,
+  };
+  save();
+  for (const [object, r] of Object.entries(first.skipped)) {
+    console.log(
+      `SKIPPED ${object}: ${r.count} record(s); ${r.reason} (${r.mutations.join(", ")})`,
+    );
+  }
+
+  // discover markers already in the account for what we push (a lost map file never causes duplicates)
   const discover = (
     kind: keyof IdMap,
     nodes: Record<string, unknown>[],
@@ -284,55 +319,58 @@ async function live(company: string, opts: { one: boolean }) {
       if (m) bucket(map, kind)[m[1]] = n.id as string;
     }
   };
-  const starts = fx.timeEntries.map((e) => e.startAt as string).sort();
-  discover(
-    "entries",
-    await paginate(client, QUERIES.entries, "timeSheetEntries", {
-      from: starts[0],
-      to: new Date(Date.parse(must(starts.at(-1))) + 86_400_000).toISOString(),
-    }),
-    "note",
-  );
-  discover("jobs", await paginate(client, QUERIES.jobs, "jobs"), "title");
-  discover(
-    "expenses",
-    await paginate(client, QUERIES.expenses, "expenses"),
-    "title",
-  );
-  discover(
-    "clients",
-    await paginate(client, QUERIES.clients, "clients"),
-    "companyName",
-  );
-  discover("quotes", await paginate(client, QUERIES.quotes, "quotes"), "title");
+  if (pushing.has("entries")) {
+    const starts = fx.timeEntries.map((e) => e.startAt as string).sort();
+    discover(
+      "entries",
+      await paginate(client, QUERIES.entries, "timeSheetEntries", {
+        from: starts[0],
+        to: new Date(
+          Date.parse(must(starts.at(-1))) + 86_400_000,
+        ).toISOString(),
+      }),
+      "note",
+    );
+  }
+  if (pushing.has("jobs"))
+    discover("jobs", await paginate(client, QUERIES.jobs, "jobs"), "title");
+  if (pushing.has("expenses"))
+    discover(
+      "expenses",
+      await paginate(client, QUERIES.expenses, "expenses"),
+      "title",
+    );
+  if (pushing.has("clients"))
+    discover(
+      "clients",
+      await paginate(client, QUERIES.clients, "clients"),
+      "companyName",
+    );
+  if (pushing.has("quotes"))
+    discover(
+      "quotes",
+      await paginate(client, QUERIES.quotes, "quotes"),
+      "title",
+    );
+  if (pushing.has("invoices"))
+    discover(
+      "invoices",
+      await paginate(client, QUERIES.invoices, "invoices"),
+      "subject",
+    );
   save();
 
   const p = plan(company, map);
-  let steps = p.steps;
+  let steps = partitionSupported(p.steps, available).run;
   if (opts.one) {
-    const earliest = steps
-      .filter((s) => s.object === "entries")
-      .sort((a, b) =>
-        String(
-          (a.variables.input as Record<string, unknown>).startAt,
-        ).localeCompare(
-          String((b.variables.input as Record<string, unknown>).startAt),
-        ),
-      )[0];
-    if (!earliest) {
-      console.log("--one: every entry already exists; nothing to do");
+    const target = oneTarget(steps);
+    if (!target) {
+      console.log("--one: nothing left to create");
       return;
     }
-    steps = closure(steps, earliest, map);
+    steps = closure(steps, target, map);
     console.log(
-      `--one: creating ${earliest.ourId} (${(earliest.variables.input as Record<string, unknown>).startAt}) and ${steps.length - 1} record(s) it needs`,
-    );
-  }
-
-  const absent = await missingMutations(client, steps);
-  if (absent.length) {
-    throw new Error(
-      `STOP before any write: the live schema has no ${absent.join(", ")}. Nothing was created. (see the NOT IN THE LIVE SCHEMA notes in seed/lib/jobber-mutations.ts)`,
+      `--one: creating ${target.object} ${target.ourId} and ${steps.length - 1} record(s) it needs`,
     );
   }
 
