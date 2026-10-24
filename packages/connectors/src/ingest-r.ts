@@ -21,12 +21,14 @@ import {
   Anonymizer,
   anonymizeExports,
   anonymizeJobberPull,
+  chartWordsOf,
   findRealTokens,
   loadOrCreateSalt,
   type PseudonymMap,
 } from "./anonymize.ts";
 import { readGustoPayrollJournalCsv } from "./exports/gusto-payroll-journal-csv.ts";
 import { readJobberTimesheetsXlsx } from "./exports/jobber-timesheets-xlsx.ts";
+import { readQboXlsx } from "./exports/qbo-xlsx.ts";
 import {
   authFromEnv,
   DEFAULT_TOKEN_PATH,
@@ -45,6 +47,8 @@ export interface IngestOptions {
   timezone: string;
   timesheets: string[];
   journals: string[];
+  /** QBO Excel exports (.xlsx or the Export data zip) */
+  qbo?: string[];
   dryRun?: boolean;
   now?: () => Date;
 }
@@ -61,6 +65,7 @@ export interface IngestCounts {
   jobs: number;
   timeEntries: number;
   paidRows: number;
+  expenses: number;
   syncRuns: RunCount[];
   outPath: string | null;
 }
@@ -122,8 +127,10 @@ async function persist(
   payload: { namesAnonymized: true },
   name: string,
   dryRun?: boolean,
+  chartWords?: Set<string>,
 ): Promise<string | null> {
-  const json = assertSafeToWrite(payload, a.realTokens());
+  const tokens = a.realTokens(chartWords);
+  const json = assertSafeToWrite(payload, tokens);
   if (dryRun) return null;
   await mkdir(join(privateDir, "out"), { recursive: true, mode: 0o700 });
   const outPath = join(privateDir, "out", `${name}.json`);
@@ -133,7 +140,7 @@ async function persist(
   );
   await writePrivate(
     join(privateDir, "real-tokens.txt"),
-    `${a.realTokens().join("\n")}\n`,
+    `${tokens.join("\n")}\n`,
   );
   await writePrivate(outPath, json);
   return outPath;
@@ -144,7 +151,7 @@ const stamp = (d: Date) => d.toISOString().replace(/[:.]/g, "-");
 export async function ingestR(o: IngestOptions): Promise<IngestCounts> {
   const companyId = o.companyId ?? "r";
   const now = o.now ?? (() => new Date());
-  for (const p of [...o.timesheets, ...o.journals]) {
+  for (const p of [...o.timesheets, ...o.journals, ...(o.qbo ?? [])]) {
     if (!inside(o.privateDir, p))
       throw new Error(`input must be inside the private dir (${o.privateDir})`);
   }
@@ -187,9 +194,21 @@ export async function ingestR(o: IngestOptions): Promise<IngestCounts> {
     journals.push({ fileTag, rows: r.rows });
   }
 
+  const qbo = [];
+  for (const p of o.qbo ?? []) {
+    const { bytes, fileTag } = await tagged(p);
+    const r = await readQboXlsx(
+      { bytes: new Uint8Array(bytes), fileName: fileTag },
+      { companyId, now },
+    );
+    // scrub also drops workbook and sheet names, which can carry the company's name
+    syncRuns.push(scrub(r.syncRun, "qbo-xlsx", fileTag));
+    qbo.push({ fileTag, rows: r.rows });
+  }
+
   const generatedAt = now();
   const bundle = {
-    ...anonymizeExports(a, companyId, { timesheets, journals }),
+    ...anonymizeExports(a, companyId, { timesheets, journals, qbo }),
     syncRuns,
     generatedAt: generatedAt.toISOString(),
   };
@@ -199,6 +218,7 @@ export async function ingestR(o: IngestOptions): Promise<IngestCounts> {
     bundle,
     `${companyId}-exports-${stamp(generatedAt)}`,
     o.dryRun,
+    chartWordsOf(bundle.expenses.map((x) => x.accountName)),
   );
   return {
     workers: bundle.workers.length,
@@ -206,6 +226,7 @@ export async function ingestR(o: IngestOptions): Promise<IngestCounts> {
     jobs: bundle.jobs.length,
     timeEntries: bundle.timeEntries.length,
     paidRows: bundle.paid.length,
+    expenses: bundle.expenses.length,
     syncRuns: runCounts(syncRuns),
     outPath,
   };
@@ -299,6 +320,7 @@ if (import.meta.main) {
       to: { type: "string" },
       timesheets: { type: "string", multiple: true },
       journal: { type: "string", multiple: true },
+      qbo: { type: "string", multiple: true },
       "dry-run": { type: "boolean" },
     },
   });
@@ -309,7 +331,7 @@ if (import.meta.main) {
     (source === "jobber-api" && (!values.from || !values.to))
   ) {
     console.error(
-      "usage: ingest-r.ts --tz <IANA> [--timesheets data/private/r/x.xlsx ...] [--journal data/private/r/y.csv ...] [--dry-run]",
+      "usage: ingest-r.ts --tz <IANA> [--timesheets data/private/r/x.xlsx ...] [--journal data/private/r/y.csv ...] [--qbo data/private/r/z.zip ...] [--dry-run]",
     );
     console.error(
       "       ingest-r.ts --source jobber-api --tz <IANA> --from YYYY-MM-DD --to YYYY-MM-DD [--dry-run]",
@@ -330,6 +352,7 @@ if (import.meta.main) {
           timezone: values.tz,
           timesheets: values.timesheets ?? [],
           journals: values.journal ?? [],
+          qbo: values.qbo ?? [],
           dryRun: values["dry-run"],
         });
   job
