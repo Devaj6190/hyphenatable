@@ -12,30 +12,77 @@
 
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { type Fixtures, type IdMap, type PlanResult, type Step, MUTATIONS, OBJECTS, QUERIES, buildPlan, resolveRefs } from "./lib/jobber-mutations";
-import { PRIVATE_DIR, SeedClient, authorizeUrl, exchangeCode, readJsonOrNull, seedAuthFromEnv, writePrivateJson } from "./lib/jobber-seed-client";
+import {
+  buildPlan,
+  type Fixtures,
+  type IdMap,
+  MUTATIONS,
+  OBJECTS,
+  type PlanResult,
+  QUERIES,
+  resolveRefs,
+  type Step,
+} from "./lib/jobber-mutations";
+import {
+  authorizeUrl,
+  exchangeCode,
+  PRIVATE_DIR,
+  readJsonOrNull,
+  SeedClient,
+  seedAuthFromEnv,
+  writePrivateJson,
+} from "./lib/jobber-seed-client";
+import { bucket, must } from "./lib/must";
 
-const FIXTURE_FILES = ["workers", "timeEntries", "jobs", "visits", "quotes", "invoices", "payments", "expenses"] as const;
+const FIXTURE_FILES = [
+  "workers",
+  "timeEntries",
+  "jobs",
+  "visits",
+  "quotes",
+  "invoices",
+  "payments",
+  "expenses",
+] as const;
 
-export function loadFixtures(company: string, dir = join(import.meta.dir, "..", "data", "fixtures", company)): { fx: Fixtures; company: Record<string, unknown>; currentCycleId: string } {
-  const read = (f: string) => JSON.parse(readFileSync(join(dir, `${f}.json`), "utf8"));
-  const fx = Object.fromEntries(FIXTURE_FILES.map((f) => [f, read(f)])) as Fixtures;
+export function loadFixtures(
+  company: string,
+  dir = join(import.meta.dir, "..", "data", "fixtures", company),
+): { fx: Fixtures; company: Record<string, unknown>; currentCycleId: string } {
+  const read = (f: string) =>
+    JSON.parse(readFileSync(join(dir, `${f}.json`), "utf8"));
+  const fx = Object.fromEntries(
+    FIXTURE_FILES.map((f) => [f, read(f)]),
+  ) as Fixtures;
   const cycles = read("cycles") as Record<string, unknown>[];
-  const current = cycles.find((c) => c.stage !== "closed") ?? cycles.at(-1)!;
+  const current =
+    cycles.find((c) => c.stage !== "closed") ?? must(cycles.at(-1));
   return { fx, company: read("company"), currentCycleId: current.id as string };
 }
 
-export const mapPath = (company: string) => join(PRIVATE_DIR, `${company}-jobber-map.json`);
+export const mapPath = (company: string) =>
+  join(PRIVATE_DIR, `${company}-jobber-map.json`);
 
 export function plan(company: string, map: IdMap): PlanResult {
   const { fx, company: co, currentCycleId } = loadFixtures(company);
-  return buildPlan(fx, map, { currentCycleId, companyName: String(co.name).split(" (")[0], timezone: String(co.timezone) });
+  return buildPlan(fx, map, {
+    currentCycleId,
+    companyName: String(co.name).split(" (")[0],
+    timezone: String(co.timezone),
+  });
 }
 
 /** Steps needed for one target step, dependencies first (for --one). */
 export function closure(steps: Step[], target: Step, map: IdMap): Step[] {
   const byKey = new Map(steps.map((s) => [`${s.object}:${s.ourId}`, s]));
-  const producer: Record<string, string> = { clients: "clients", properties: "properties", quotes: "quotes", jobs: "jobs", visits: "visits", invoices: "invoices" };
+  const producer: Record<string, string> = {
+    clients: "clients",
+    properties: "properties",
+    quotes: "quotes",
+    jobs: "jobs",
+    visits: "visits",
+    invoices: "invoices",
+  };
   const out: Step[] = [];
   const seen = new Set<string>();
   const visit = (s: Step) => {
@@ -60,10 +107,19 @@ export function closure(steps: Step[], target: Step, map: IdMap): Step[] {
   return out;
 }
 
-export function printDryRun(company: string, p: PlanResult, map: IdMap, opts: { verbose: boolean; log?: (s: string) => void }) {
+export function printDryRun(
+  company: string,
+  p: PlanResult,
+  map: IdMap,
+  opts: { verbose: boolean; log?: (s: string) => void },
+) {
   const log = opts.log ?? console.log;
-  log(`DRY RUN: Jobber seed plan for company ${company}. No network calls, no credentials read.`);
-  log(`id map: ${mapPath(company)} (${Object.values(map).reduce((n, m) => n + Object.keys(m ?? {}).length, 0)} ids already mapped)`);
+  log(
+    `DRY RUN: Jobber seed plan for company ${company}. No network calls, no credentials read.`,
+  );
+  log(
+    `id map: ${mapPath(company)} (${Object.values(map).reduce((n, m) => n + Object.keys(m ?? {}).length, 0)} ids already mapped)`,
+  );
   log("");
   log("Manual steps BEFORE the push (no user-create mutation exists):");
   for (const l of p.manual.before) log(l);
@@ -71,7 +127,9 @@ export function printDryRun(company: string, p: PlanResult, map: IdMap, opts: { 
   log("Counts (to create / already mapped):");
   for (const o of OBJECTS) {
     const n = p.steps.filter((s) => s.object === o).length;
-    log(`  ${o.padEnd(15)} ${String(n).padStart(4)} / ${Object.keys(map[o] ?? {}).length}`);
+    log(
+      `  ${o.padEnd(15)} ${String(n).padStart(4)} / ${Object.keys(map[o] ?? {}).length}`,
+    );
   }
   log(`  ${"total".padEnd(15)} ${String(p.steps.length).padStart(4)}`);
   if (p.skipped.length) {
@@ -79,13 +137,20 @@ export function printDryRun(company: string, p: PlanResult, map: IdMap, opts: { 
     for (const s of p.skipped) log(`  ${s.object} ${s.ourId}: ${s.reason}`);
   }
   log("");
-  log(opts.verbose ? "Mutation plan (all steps):" : "Mutation plan (first 2 per object; --verbose for all):");
+  log(
+    opts.verbose
+      ? "Mutation plan (all steps):"
+      : "Mutation plan (first 2 per object; --verbose for all):",
+  );
   for (const o of OBJECTS) {
     const list = p.steps.filter((s) => s.object === o);
     for (const s of opts.verbose ? list : list.slice(0, 2)) {
-      log(`  ${s.mutation} ${s.ourId} ${JSON.stringify(s.variables)}${s.note ? `  # ${s.note}` : ""}`);
+      log(
+        `  ${s.mutation} ${s.ourId} ${JSON.stringify(s.variables)}${s.note ? `  # ${s.note}` : ""}`,
+      );
     }
-    if (!opts.verbose && list.length > 2) log(`  ... ${list.length - 2} more ${o}`);
+    if (!opts.verbose && list.length > 2)
+      log(`  ... ${list.length - 2} more ${o}`);
   }
   log("");
   log("Manual steps AFTER the push:");
@@ -94,16 +159,31 @@ export function printDryRun(company: string, p: PlanResult, map: IdMap, opts: { 
 
 // ---------------------------------------------------------------- live
 
-const get = (o: unknown, path: string): unknown => path.split(".").reduce<unknown>((x, k) => (x == null ? x : (x as Record<string, unknown>)[k]), o);
+const get = (o: unknown, path: string): unknown =>
+  path
+    .split(".")
+    .reduce<unknown>(
+      (x, k) => (x == null ? x : (x as Record<string, unknown>)[k]),
+      o,
+    );
 const MARKER_RE = /payrollpilot:([a-z0-9-]+)/;
 
-async function paginate(client: SeedClient, query: string, root: string, vars: Record<string, unknown> = {}) {
+async function paginate(
+  client: SeedClient,
+  query: string,
+  root: string,
+  vars: Record<string, unknown> = {},
+) {
   const nodes: Record<string, unknown>[] = [];
   let after: string | null = null;
   for (;;) {
     const r = await client.gql(query, { ...vars, after });
-    if (r.errors.length) throw new Error(`${root}: ${r.errors.map((e) => e.message).join("; ")}`);
-    const conn = r.data?.[root] as { nodes: Record<string, unknown>[]; pageInfo: { hasNextPage: boolean; endCursor: string } };
+    if (r.errors.length)
+      throw new Error(`${root}: ${r.errors.map((e) => e.message).join("; ")}`);
+    const conn = r.data?.[root] as {
+      nodes: Record<string, unknown>[];
+      pageInfo: { hasNextPage: boolean; endCursor: string };
+    };
     nodes.push(...conn.nodes);
     if (!conn.pageInfo.hasNextPage) return nodes;
     after = conn.pageInfo.endCursor;
@@ -121,29 +201,47 @@ export async function requireAllowedAccount(
 ): Promise<{ id: string; name: string }> {
   const r = await client.gql(QUERIES.account);
   const account = r.data?.account as { id: string; name: string } | undefined;
-  if (!account?.id) throw new Error(`account query failed: ${r.errors.map((e) => e.message).join("; ")}`);
+  if (!account?.id)
+    throw new Error(
+      `account query failed: ${r.errors.map((e) => e.message).join("; ")}`,
+    );
   const allowed = env.JOBBER_SEED_ACCOUNT_ID?.trim();
   if (allowed && account.id === allowed) return account;
   throw new Error(
     `REFUSED: authorized Jobber account id=${account.id} name="${account.name}" is not allowlisted. ` +
-      (allowed ? `JOBBER_SEED_ACCOUNT_ID is set to a different account (${allowed}).` : "JOBBER_SEED_ACCOUNT_ID is not set.") +
+      (allowed
+        ? `JOBBER_SEED_ACCOUNT_ID is set to a different account (${allowed}).`
+        : "JOBBER_SEED_ACCOUNT_ID is not set.") +
       " If this is the PayrollPilot seed account, set JOBBER_SEED_ACCOUNT_ID to this id in .env and rerun.",
   );
 }
 
 /** Mutations the steps need that the live schema does not have. Live mode writes nothing if any are missing. */
-export async function missingMutations(client: Pick<SeedClient, "gql">, steps: Step[]): Promise<string[]> {
+export async function missingMutations(
+  client: Pick<SeedClient, "gql">,
+  steps: Step[],
+): Promise<string[]> {
   const r = await client.gql(QUERIES.mutationNames);
-  const fields = ((r.data?.__type as { fields?: { name: string }[] } | undefined)?.fields ?? []).map((f) => f.name);
-  if (!fields.length) throw new Error(`could not read the Mutation type: ${r.errors.map((e) => e.message).join("; ")}`);
-  return [...new Set(steps.map((s) => s.mutation))].filter((m) => !fields.includes(m)).sort();
+  const fields = (
+    (r.data?.__type as { fields?: { name: string }[] } | undefined)?.fields ??
+    []
+  ).map((f) => f.name);
+  if (!fields.length)
+    throw new Error(
+      `could not read the Mutation type: ${r.errors.map((e) => e.message).join("; ")}`,
+    );
+  return [...new Set(steps.map((s) => s.mutation))]
+    .filter((m) => !fields.includes(m))
+    .sort();
 }
 
 async function live(company: string, opts: { one: boolean }) {
   const auth = seedAuthFromEnv();
   const client = new SeedClient(auth);
   const account = await requireAllowedAccount(client);
-  console.log(`account ${account.id} "${account.name}" allowed (JOBBER_SEED_ACCOUNT_ID)`);
+  console.log(
+    `account ${account.id} "${account.name}" allowed (JOBBER_SEED_ACCOUNT_ID)`,
+  );
 
   const map: IdMap = readJsonOrNull<IdMap>(mapPath(company)) ?? {};
   const save = () => writePrivateJson(mapPath(company), map);
@@ -151,65 +249,120 @@ async function live(company: string, opts: { one: boolean }) {
 
   // users: no create mutation; map by display name (manual step adds them)
   const users = [
-    ...(await paginate(client, QUERIES.users, "users", { status: "ACTIVATED" })),
-    ...(await paginate(client, QUERIES.users, "users", { status: "DEACTIVATED" })),
+    ...(await paginate(client, QUERIES.users, "users", {
+      status: "ACTIVATED",
+    })),
+    ...(await paginate(client, QUERIES.users, "users", {
+      status: "DEACTIVATED",
+    })),
   ];
   map.users = {};
   const missing: string[] = [];
   for (const w of fx.workers) {
-    const u = users.find((x) => (x.name as { full: string }).full === w.displayName);
+    const u = users.find(
+      (x) => (x.name as { full: string }).full === w.displayName,
+    );
     if (u) map.users[w.id as string] = u.id as string;
     else missing.push(`${w.displayName} (${w.id})`);
   }
   save();
   if (missing.length) {
-    console.error(`STOP: ${missing.length} worker(s) not found as Jobber users: ${missing.join(", ")}. Add them in Manage Team (dry run prints the checklist).`);
+    console.error(
+      `STOP: ${missing.length} worker(s) not found as Jobber users: ${missing.join(", ")}. Add them in Manage Team (dry run prints the checklist).`,
+    );
     process.exit(4);
   }
 
   // discover markers already in the account (a lost map file never causes duplicates)
-  const discover = (kind: keyof IdMap, nodes: Record<string, unknown>[], field: string) => {
+  const discover = (
+    kind: keyof IdMap,
+    nodes: Record<string, unknown>[],
+    field: string,
+  ) => {
     for (const n of nodes) {
       const m = MARKER_RE.exec(String(n[field] ?? ""));
-      if (m) (map[kind] ??= {})[m[1]] = n.id as string;
+      if (m) bucket(map, kind)[m[1]] = n.id as string;
     }
   };
   const starts = fx.timeEntries.map((e) => e.startAt as string).sort();
-  discover("entries", await paginate(client, QUERIES.entries, "timeSheetEntries", { from: starts[0], to: new Date(Date.parse(starts.at(-1)!) + 86_400_000).toISOString() }), "note");
+  discover(
+    "entries",
+    await paginate(client, QUERIES.entries, "timeSheetEntries", {
+      from: starts[0],
+      to: new Date(Date.parse(must(starts.at(-1))) + 86_400_000).toISOString(),
+    }),
+    "note",
+  );
   discover("jobs", await paginate(client, QUERIES.jobs, "jobs"), "title");
-  discover("expenses", await paginate(client, QUERIES.expenses, "expenses"), "title");
-  discover("clients", await paginate(client, QUERIES.clients, "clients"), "companyName");
+  discover(
+    "expenses",
+    await paginate(client, QUERIES.expenses, "expenses"),
+    "title",
+  );
+  discover(
+    "clients",
+    await paginate(client, QUERIES.clients, "clients"),
+    "companyName",
+  );
   discover("quotes", await paginate(client, QUERIES.quotes, "quotes"), "title");
   save();
 
   const p = plan(company, map);
   let steps = p.steps;
   if (opts.one) {
-    const earliest = steps.filter((s) => s.object === "entries").sort((a, b) => String((a.variables.input as Record<string, unknown>).startAt).localeCompare(String((b.variables.input as Record<string, unknown>).startAt)))[0];
+    const earliest = steps
+      .filter((s) => s.object === "entries")
+      .sort((a, b) =>
+        String(
+          (a.variables.input as Record<string, unknown>).startAt,
+        ).localeCompare(
+          String((b.variables.input as Record<string, unknown>).startAt),
+        ),
+      )[0];
     if (!earliest) {
       console.log("--one: every entry already exists; nothing to do");
       return;
     }
     steps = closure(steps, earliest, map);
-    console.log(`--one: creating ${earliest.ourId} (${(earliest.variables.input as Record<string, unknown>).startAt}) and ${steps.length - 1} record(s) it needs`);
+    console.log(
+      `--one: creating ${earliest.ourId} (${(earliest.variables.input as Record<string, unknown>).startAt}) and ${steps.length - 1} record(s) it needs`,
+    );
   }
 
   const absent = await missingMutations(client, steps);
   if (absent.length) {
-    throw new Error(`STOP before any write: the live schema has no ${absent.join(", ")}. Nothing was created. (see the NOT IN THE LIVE SCHEMA notes in seed/lib/jobber-mutations.ts)`);
+    throw new Error(
+      `STOP before any write: the live schema has no ${absent.join(", ")}. Nothing was created. (see the NOT IN THE LIVE SCHEMA notes in seed/lib/jobber-mutations.ts)`,
+    );
   }
 
   let done = 0;
   for (const s of steps) {
     const missingRefs: string[] = [];
-    const variables = resolveRefs(s.variables, map, missingRefs) as Record<string, unknown>;
-    if (missingRefs.length) throw new Error(`${s.object} ${s.ourId}: unresolved ${missingRefs.join(", ")}`);
+    const variables = resolveRefs(s.variables, map, missingRefs) as Record<
+      string,
+      unknown
+    >;
+    if (missingRefs.length)
+      throw new Error(
+        `${s.object} ${s.ourId}: unresolved ${missingRefs.join(", ")}`,
+      );
     const r = await client.gql(MUTATIONS[s.mutation], variables);
-    const payload = r.data?.[s.mutation] as { userErrors?: { message: string }[] } | undefined;
-    const errs = [...r.errors.map((e) => e.message), ...(payload?.userErrors ?? []).map((e) => e.message)];
-    if (errs.length) throw new Error(`${s.mutation} ${s.ourId}: ${errs.join("; ")} (check the input shape in GraphiQL on the seed app)`);
-    const id = s.idPath ? (get(r.data, s.idPath) as string | undefined) : undefined;
-    (map[s.object] ??= {})[s.ourId] = id ?? "done";
+    const payload = r.data?.[s.mutation] as
+      | { userErrors?: { message: string }[] }
+      | undefined;
+    const errs = [
+      ...r.errors.map((e) => e.message),
+      ...(payload?.userErrors ?? []).map((e) => e.message),
+    ];
+    if (errs.length)
+      throw new Error(
+        `${s.mutation} ${s.ourId}: ${errs.join("; ")} (check the input shape in GraphiQL on the seed app)`,
+      );
+    const id = s.idPath
+      ? (get(r.data, s.idPath) as string | undefined)
+      : undefined;
+    bucket(map, s.object)[s.ourId] = id ?? "done";
     save();
     done++;
     if (done % 25 === 0) console.log(`  ${done}/${steps.length}`);
@@ -222,9 +375,14 @@ async function live(company: string, opts: { one: boolean }) {
 }
 
 /** The redirected address for auth-code: argument, else PASTED_URL, else stdin. */
-export async function pastedAddress(arg: string | undefined, env: Record<string, string | undefined>, readStdin: () => Promise<string> = () => Bun.stdin.text()): Promise<string> {
+export async function pastedAddress(
+  arg: string | undefined,
+  env: Record<string, string | undefined>,
+  readStdin: () => Promise<string> = () => Bun.stdin.text(),
+): Promise<string> {
   const v = arg ?? env.PASTED_URL ?? (await readStdin());
-  if (!v?.trim()) throw new Error("no address given: pipe it on stdin or set PASTED_URL");
+  if (!v?.trim())
+    throw new Error("no address given: pipe it on stdin or set PASTED_URL");
   return v.trim();
 }
 
@@ -247,15 +405,23 @@ if (import.meta.main) {
           "The code is single-use and expires within minutes.",
       );
     } else if (args[0] === "auth-code") {
-      await exchangeCode(seedAuthFromEnv(), await pastedAddress(args[1], process.env));
+      await exchangeCode(
+        seedAuthFromEnv(),
+        await pastedAddress(args[1], process.env),
+      );
       console.log("seed-app token saved under data/private/");
     } else {
       const company = val("company");
-      if (!company) throw new Error("usage: bun run seed/push-jobber.ts --company <a|b> [--live [--one]] [--verbose]");
+      if (!company)
+        throw new Error(
+          "usage: bun run seed/push-jobber.ts --company <a|b> [--live [--one]] [--verbose]",
+        );
       if (flag("live")) await live(company, { one: flag("one") });
       else {
         const map = readJsonOrNull<IdMap>(mapPath(company)) ?? {};
-        printDryRun(company, plan(company, map), map, { verbose: flag("verbose") });
+        printDryRun(company, plan(company, map), map, {
+          verbose: flag("verbose"),
+        });
       }
     }
   } catch (e) {

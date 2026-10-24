@@ -27,7 +27,8 @@ export function rng(seed: string | number): Rng {
     t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
-  const int = (min: number, max: number) => min + Math.floor(next() * (max - min + 1));
+  const int = (min: number, max: number) =>
+    min + Math.floor(next() * (max - min + 1));
   return {
     next,
     int,

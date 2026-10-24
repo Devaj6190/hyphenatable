@@ -6,7 +6,7 @@
 // Exits 0 only if every expected file exists, parses, matches its schema, and
 // the cross-references (companyId, worker/job/cycle/visit/quote/invoice ids) resolve.
 
-import { readFileSync, existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { z } from "zod";
 
@@ -42,7 +42,11 @@ export const Worker = z.strictObject({
   managerId: nid,
   contactRef: nid,
   jobber: z
-    .strictObject({ userId: id, labourRateCents: cents.nullable(), status: z.string() })
+    .strictObject({
+      userId: id,
+      labourRateCents: cents.nullable(),
+      status: z.string(),
+    })
     .nullable(),
   gusto: z
     .strictObject({
@@ -66,8 +70,16 @@ export const Cycle = z.strictObject({
   periodEnd: isoTime,
   cutoffAt: isoTime,
   stage: z.enum([
-    "setup", "syncing", "checking", "asking", "gate1_ready", "stage1_filled",
-    "reconciling", "gate2_ready", "stage2_filled", "closed",
+    "setup",
+    "syncing",
+    "checking",
+    "asking",
+    "gate1_ready",
+    "stage1_filled",
+    "reconciling",
+    "gate2_ready",
+    "stage2_filled",
+    "closed",
   ]),
   gustoPayrollId: nid,
   gustoOffCyclePayrollId: nid,
@@ -188,9 +200,21 @@ export const Expense = z.strictObject({
 });
 
 export const RuleType = z.enum([
-  "overtime_policy", "pay_rate", "venmo_rate", "long_shift_threshold", "expense_account_kind",
-  "vendor_job_hint", "disposal_parent_link", "in_person_quoter", "commission_plan", "tip_policy",
-  "manager_split", "routing", "worker_mapping", "deposit_vs_final", "catch_all_threshold",
+  "overtime_policy",
+  "pay_rate",
+  "venmo_rate",
+  "long_shift_threshold",
+  "expense_account_kind",
+  "vendor_job_hint",
+  "disposal_parent_link",
+  "in_person_quoter",
+  "commission_plan",
+  "tip_policy",
+  "manager_split",
+  "routing",
+  "worker_mapping",
+  "deposit_vs_final",
+  "catch_all_threshold",
 ]);
 
 export const Rule = z.strictObject({
@@ -209,7 +233,11 @@ export const Rule = z.strictObject({
     evidence: z.array(z.string()),
   }),
   backtest: z
-    .strictObject({ cycles: z.number().int(), agree: z.number().int(), disagree: z.number().int() })
+    .strictObject({
+      cycles: z.number().int(),
+      agree: z.number().int(),
+      disagree: z.number().int(),
+    })
     .nullable(),
   confidence: z.number().min(0).max(1),
 });
@@ -224,7 +252,15 @@ export const Question = z.strictObject({
   text: z.string().max(240),
   options: z.array(z.string()).max(4).nullable(),
   kind: z.enum(["text", "poll"]),
-  status: z.enum(["draft", "approved", "sent", "reminded", "answered", "expired", "denied"]),
+  status: z.enum([
+    "draft",
+    "approved",
+    "sent",
+    "reminded",
+    "answered",
+    "expired",
+    "denied",
+  ]),
   approvedBy: nid,
   approvedAt: isoTime.nullable(),
   sentAt: isoTime.nullable(),
@@ -267,7 +303,14 @@ export const AnswerKeyRow = z.strictObject({
   }),
   truth: z.string().min(1),
   correctAnswer: z.strictObject({
-    kind: z.enum(["confirm", "change", "fixed_in_source", "escalate", "ambiguous", "stop"]),
+    kind: z.enum([
+      "confirm",
+      "change",
+      "fixed_in_source",
+      "escalate",
+      "ambiguous",
+      "stop",
+    ]),
     values: z.record(z.string(), z.union([z.string(), z.number()])),
   }),
   registerCategory: z.string().min(1),
@@ -317,7 +360,9 @@ export function validateDir(dir: string): string[] {
     const result = (array ? z.array(schema) : schema).safeParse(json);
     if (!result.success) {
       for (const issue of result.error.issues) {
-        errors.push(`${file}: ${issue.path.join(".") || "(root)"}: ${issue.message}`);
+        errors.push(
+          `${file}: ${issue.path.join(".") || "(root)"}: ${issue.message}`,
+        );
       }
       continue;
     }
@@ -352,10 +397,13 @@ export function validateDir(dir: string): string[] {
   const expenses = ids("expenses.json");
   const ref = (file: string, r: Rec, field: string, set: Set<string>) => {
     const v = r[field];
-    if (v != null && !set.has(v as string)) errors.push(`${file}: ${r.id}.${field} -> unknown ${v}`);
+    if (v != null && !set.has(v as string))
+      errors.push(`${file}: ${r.id}.${field} -> unknown ${v}`);
   };
-  for (const r of data["workers.json"]) ref("workers.json", r, "managerId", workers);
-  for (const r of data["syncRuns.json"]) ref("syncRuns.json", r, "cycleId", cycles);
+  for (const r of data["workers.json"])
+    ref("workers.json", r, "managerId", workers);
+  for (const r of data["syncRuns.json"])
+    ref("syncRuns.json", r, "cycleId", cycles);
   for (const r of data["timeEntries.json"]) {
     ref("timeEntries.json", r, "cycleId", cycles);
     ref("timeEntries.json", r, "workerId", workers);
@@ -371,7 +419,8 @@ export function validateDir(dir: string): string[] {
   for (const r of data["visits.json"]) {
     ref("visits.json", r, "jobId", jobs);
     for (const w of r.assignedWorkerIds as string[]) {
-      if (!workers.has(w)) errors.push(`visits.json: ${r.id}.assignedWorkerIds -> unknown ${w}`);
+      if (!workers.has(w))
+        errors.push(`visits.json: ${r.id}.assignedWorkerIds -> unknown ${w}`);
     }
   }
   for (const r of data["quotes.json"]) {
@@ -383,12 +432,19 @@ export function validateDir(dir: string): string[] {
     ref("payments.json", r, "invoiceId", invoices);
     ref("payments.json", r, "quoteId", quotes);
   }
-  for (const r of data["expenses.json"]) ref("expenses.json", r, "matchedJobId", jobs);
+  for (const r of data["expenses.json"])
+    ref("expenses.json", r, "matchedJobId", jobs);
   for (const r of data["pastPayrolls.json"]) {
     ref("pastPayrolls.json", r, "cycleId", cycles);
     ref("pastPayrolls.json", r, "workerId", workers);
-    const sum = (r.earnings as Rec[]).reduce((s, e) => s + (e.amountCents as number), 0);
-    if (sum !== r.grossCents) errors.push(`pastPayrolls.json: ${r.id} grossCents ${r.grossCents} != sum of earnings ${sum}`);
+    const sum = (r.earnings as Rec[]).reduce(
+      (s, e) => s + (e.amountCents as number),
+      0,
+    );
+    if (sum !== r.grossCents)
+      errors.push(
+        `pastPayrolls.json: ${r.id} grossCents ${r.grossCents} != sum of earnings ${sum}`,
+      );
   }
   for (const r of data["questions.json"]) {
     ref("questions.json", r, "cycleId", cycles);
@@ -400,24 +456,31 @@ export function validateDir(dir: string): string[] {
     ref("answer-key.json", s as Rec & { id: unknown }, "workerId", workers);
     ref("answer-key.json", s as Rec & { id: unknown }, "jobId", jobs);
     for (const e of s.entryIds as string[]) {
-      if (!entries.has(e)) errors.push(`answer-key.json: ${r.id} entryIds -> unknown ${e}`);
+      if (!entries.has(e))
+        errors.push(`answer-key.json: ${r.id} entryIds -> unknown ${e}`);
     }
     for (const e of s.expenseIds as string[]) {
-      if (!expenses.has(e)) errors.push(`answer-key.json: ${r.id} expenseIds -> unknown ${e}`);
+      if (!expenses.has(e))
+        errors.push(`answer-key.json: ${r.id} expenseIds -> unknown ${e}`);
     }
   }
   // Every time entry's interval must be consistent: endAt - startAt == durationSec unless ticking.
   for (const r of data["timeEntries.json"]) {
     if (r.ticking) {
-      if (r.endAt !== null) errors.push(`timeEntries.json: ${r.id} ticking but has endAt`);
+      if (r.endAt !== null)
+        errors.push(`timeEntries.json: ${r.id} ticking but has endAt`);
       continue;
     }
     if (r.endAt === null) {
       errors.push(`timeEntries.json: ${r.id} not ticking but endAt is null`);
       continue;
     }
-    const d = (Date.parse(r.endAt as string) - Date.parse(r.startAt as string)) / 1000;
-    if (d !== r.durationSec) errors.push(`timeEntries.json: ${r.id} durationSec ${r.durationSec} != endAt-startAt ${d}`);
+    const d =
+      (Date.parse(r.endAt as string) - Date.parse(r.startAt as string)) / 1000;
+    if (d !== r.durationSec)
+      errors.push(
+        `timeEntries.json: ${r.id} durationSec ${r.durationSec} != endAt-startAt ${d}`,
+      );
   }
   return errors;
 }
