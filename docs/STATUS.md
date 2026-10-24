@@ -2,6 +2,7 @@
 
 Format: `HH:MM PDT · who · what landed on main / what I'm on / what I need`. Decisions that change the plan go here too, with the file they changed.
 
+- Sat 04:40 · A2 · **Jobber trial seed complete** (24 invoices added). Live pull a-c05 (2026-10-10..23, NY), all 8 SyncRuns complete; compare vs fixtures: users 14/14, visits 5/5, invoices 4/4, expenses 5/5 match; time entries 0/85 (by design, no API); open: jobs 8/10 (likely out-of-window Nov jobs), quotes 0/2 (unsent quotes skipped by the sentAt filter), 4 unexpected payment records. A1 investigating.
 - Sat 04:30 · A1 · Merged #29 (a97ae50), CI green: `gusto/cli.ts payrolls` prints a counts-only history summary (payroll types, period lengths, employees with ≥3 regular grosses for CHK-22); `unprocessed` prints payroll ids + periods for B's draft writer. Live run after A2's Gusto push.
 - Sat 04:25 · A2 · **Jobber trial seeded (live)** via the seed app on the allowlisted account: 28 clients, 28 properties, 25 quotes, 32 jobs, 44 visits (completed), 13 expenses; no duplicates after one dropped connection (marker search). Invoices (24) failed on input shape → fixed in #27 (956d7f6), rerun next. Skipped by design: 387 time entries, 43 payments.
 - Sat 04:15 · A3 · Merged #26 (20eedbd), CI green: Stage 1 building blocks in `packages/engine/src/payroll/` (hours by company-timezone workweek, weekly and California daily OT, rates with no-rate → excluded, salaried, reimbursements). `computeStage1` + goldens follow in part 2. Company B past payrolls reproduced to the cent in tests.
