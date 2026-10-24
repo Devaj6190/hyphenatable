@@ -8,13 +8,13 @@ import { numberedText } from "./polls.ts";
 import { Relay } from "./relay.ts";
 import { StubBackend } from "./stub.ts";
 
-const OWNER = "+15555550100";
+const EMPLOYEE = "+15555550100";
 const MANAGER = "+15555550101";
 const KEY = "test-key";
 const LONG_DIGITS = /\d{7,}/;
 
 function setup() {
-  const contacts = new Contacts({ owner: OWNER, manager: MANAGER });
+  const contacts = new Contacts({ manager: MANAGER, employee: EMPLOYEE });
   const stub = new StubBackend(KEY);
   const fake = new FakeTransport();
   const relay = new Relay(stub, fake, contacts, KEY, 1);
@@ -26,19 +26,19 @@ const settle = () => Bun.sleep(10);
 
 describe("contacts", () => {
   test("conversationKey is sha256, stable across formats, with no long digit runs", () => {
-    expect(conversationKey(OWNER)).toBe(conversationKey("+1 (555) 555-0100"));
-    expect(conversationKey(OWNER)).toStartWith("sha256:");
+    expect(conversationKey(EMPLOYEE)).toBe(conversationKey("+1 (555) 555-0100"));
+    expect(conversationKey(EMPLOYEE)).toStartWith("sha256:");
     for (let i = 0; i < 200; i++) expect(conversationKey(`+1555555${String(i).padStart(4, "0")}`)).not.toMatch(LONG_DIGITS);
   });
 
   test("unknown refs and phones are not resolved", () => {
-    const contacts = new Contacts({ owner: OWNER });
+    const contacts = new Contacts({ employee: EMPLOYEE });
     expect(contacts.phoneFor("judge")).toBeNull();
     expect(contacts.isRegistered("+15555550199")).toBe(false);
   });
 
   test("log lines mask phones", () => {
-    expect(mask(`sent to ${OWNER} ok`)).toBe("sent to +1••••0100 ok");
+    expect(mask(`sent to ${EMPLOYEE} ok`)).toBe("sent to +1••••0100 ok");
     expect(mask("on 10/24 your 8h entry")).toBe("on 10/24 your 8h entry");
   });
 });
@@ -48,7 +48,7 @@ describe("outbound", () => {
     const { stub, fake } = setup();
     const m = stub.enqueue({ contactRef: "manager", text: "Which job was it? 1 Job 118 2 Job 121" });
     await settle();
-    stub.enqueue({ contactRef: "owner", text: "second" }); // triggers another pending update
+    stub.enqueue({ contactRef: "employee", text: "second" }); // triggers another pending update
     await settle();
     expect(fake.outbox.filter((o) => o.text.startsWith("Which job"))).toHaveLength(1);
     expect(fake.outbox[0]?.phone).toBe(MANAGER);
@@ -99,7 +99,7 @@ describe("inbound", () => {
 
   test("STOP passes through unchanged as text", async () => {
     const { stub, fake, relay } = setup();
-    await relay.handleInbound(fake.inject(OWNER, { text: "STOP" }));
+    await relay.handleInbound(fake.inject(EMPLOYEE, { text: "STOP" }));
     expect(stub.messages[0]).toMatchObject({ text: "STOP", kind: "text" });
   });
 
