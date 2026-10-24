@@ -19,16 +19,9 @@ import {
   typePrefix,
 } from "@/lib/audit";
 import { AUDIT_FIXTURE_SOURCE } from "@/lib/sources";
+import { formatWhen } from "@/lib/time";
 import type { AuditEvent } from "@/lib/types";
 import type { AuditViewData } from "@/lib/view-types";
-
-const when = new Intl.DateTimeFormat("en-US", {
-  month: "short",
-  day: "numeric",
-  hour: "numeric",
-  minute: "2-digit",
-  timeZone: "America/Los_Angeles",
-});
 
 const refLabel: Record<string, string> = {
   flagId: "flag",
@@ -73,9 +66,11 @@ function Refs({
 export function AuditLog({
   data,
   dataKind,
+  timezone,
 }: {
   data: AuditViewData;
   dataKind: DataKind;
+  timezone: string;
 }) {
   const { role } = useRole();
   const [prefix, setPrefix] = useState<string>("all");
@@ -192,7 +187,7 @@ export function AuditLog({
               >
                 <div className="flex items-center justify-between gap-2 lg:contents">
                   <div className="text-sm text-muted-foreground lg:col-start-1 lg:row-start-1">
-                    {when.format(new Date(e.at))}
+                    {formatWhen(e.at, timezone)}
                     <div className="text-xs">{cycleLabel(e.cycleId)}</div>
                   </div>
                   <div className="lg:col-start-2 lg:row-start-1">

@@ -17,7 +17,11 @@ export default async function ManagerPage({
           Hours and jobs only. Pay amounts are never shown here.
         </p>
       </div>
-      <ManagerInbox data={managerInbox(companyId)} dataKind={company.kind} />
+      <ManagerInbox
+        data={managerInbox(companyId)}
+        dataKind={company.kind}
+        timezone={company.timezone}
+      />
     </div>
   );
 }

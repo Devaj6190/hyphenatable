@@ -2,6 +2,7 @@
 
 Format: `HH:MM PDT · who · what landed on main / what I'm on / what I need`. Decisions that change the plan go here too, with the file they changed.
 
+- Sat 11:31 PDT · B · Merged #55 (4dad86f): server-only fixtures and viewer redaction; main verified. Manager payload redaction assertions passed; timezone follows.
 - Sat 11:29 PDT · B · Merged #53 (395ed1b): Varnika audit polish; main verified. Interrupted UI worktrees remain untouched; server-fixtures then timezone land before UI foundation.
 - Sat 11:25 · A3 · Merged #52: `marginHistory()` in `packages/engine/src/payroll/`: per past cycle revenue/labor/job cost/profit/margin (cents, %), stats, and a **proposed** low-margin threshold with evidence (Company A and B both 29%; fixtures assume 20%; owner decides). Incomplete cycles never count as zero. **Devaj:** onboarding (Analyst) evidence for CHK-21's threshold.
 - Sat 11:25 · A1 · Merged #51: readers for Company R's real export layouts (Jobber Timesheets CSV, sectioned Gusto Payroll Journal; taxes/address/net dropped at read). Real dry run (counts only): 283/283 timesheet rows; fixing rounding tolerance and gross-from-Payment next.

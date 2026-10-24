@@ -24,6 +24,7 @@ export default async function FlagPage({
       companyId={companyId}
       data={flagDetail(viewer, companyId, flagId)}
       dataKind={company.kind}
+      timezone={company.timezone}
     />
   );
 }
