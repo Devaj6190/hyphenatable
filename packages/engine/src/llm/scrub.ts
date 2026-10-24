@@ -50,13 +50,22 @@ function checkString(s: string, path: string) {
 // digit-run rule; phone, SSN and bank fields are strings in the contract. Free-text names inside a
 // string value cannot be detected here; keep free text out of model input except the reply being read.
 /** Deep-walks `input` and throws a `ScrubError` on the first forbidden key or value. */
-export function scrub(input: unknown, path = ""): void {
-  if (typeof input === "string") checkString(input, path);
+export function scrub(input: unknown): void {
+  walk(input, "", false);
+}
+
+// Values under id keys are not scanned: a Convex id is 32 lowercase alphanumerics and can hold a
+// 9+ digit run. Keys under them are still checked. `sourceId`, `recordId`, `providerId` match `Id$`.
+const isIdKey = (key: string) =>
+  key === "id" || key === "conversationKey" || /Ids?$/.test(key);
+
+function walk(input: unknown, path: string, idValue: boolean): void {
+  if (typeof input === "string" && !idValue) checkString(input, path);
   if (input === null || typeof input !== "object") return;
   for (const [key, v] of Object.entries(input)) {
     const p = path ? `${path}.${key}` : key;
     if (!Array.isArray(input)) checkKey(key, p);
-    scrub(v, p);
+    walk(v, p, idValue || isIdKey(key));
   }
 }
 

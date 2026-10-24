@@ -129,7 +129,7 @@ describe("complete", () => {
     );
     const body = calls[0];
     expect(body.model).toBe("claude-haiku-5-5");
-    expect(body.max_tokens).toBe(4096);
+    expect(body.max_tokens).toBe(16_000);
     expect(body.output_config?.effort).toBe("low");
     expect(body.output_config?.format?.type).toBe("json_schema");
     expect(body.output_config?.format?.schema).toMatchObject({

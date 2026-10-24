@@ -3,7 +3,11 @@
 //   bun run packages/engine/scripts/llm-smoke.ts
 import Anthropic from "@anthropic-ai/sdk";
 import { assertNoMoney, complete } from "../src/llm";
-import { InterpretationOutput, QuestionDraft } from "../src/schemas";
+import {
+  InterpretationOutput,
+  pairsToRecord,
+  QuestionDraft,
+} from "../src/schemas";
 
 if (!process.env.ANTHROPIC_API_KEY) {
   console.error("ANTHROPIC_API_KEY is not set; live smoke skipped.");
@@ -64,6 +68,7 @@ const interp = await complete({
   },
 });
 print("InterpretationOutput (claude-haiku-5-5, effort low)", interp);
+console.log("values as record", pairsToRecord(interp.value.values));
 
 function print(
   label: string,

@@ -40,7 +40,7 @@ export type CompleteOptions<T> = {
   maxRetries?: number;
   /** Agent + task, e.g. "messenger.draft". Carried on errors for the audit log. */
   tag: string;
-  /** Default 4096. Thinking tokens count against it. */
+  /** Default 16000. Opus 5.5 adaptive thinking always counts against it; 16000 is safe non-streaming. */
   maxTokens?: number;
 };
 
@@ -134,7 +134,7 @@ export async function complete<T>(
     effort,
     tag,
     maxRetries = 2,
-    maxTokens = 4096,
+    maxTokens = 16_000,
   } = opts;
   const started = Date.now();
 

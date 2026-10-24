@@ -45,6 +45,34 @@ describe("scrub", () => {
     expect(() => scrub(flagFacts)).not.toThrow();
   });
 
+  test("does not scan values under id keys (Convex ids can hold digit runs)", () => {
+    const convexId = "jd7f2k1234567890qx8m0v3c9w5z2n4b"; // 32 chars, 10-digit run
+    expect(() =>
+      scrub({
+        workerId: convexId,
+        entryIds: [convexId, "te_14"],
+        id: convexId,
+        conversationKey: convexId,
+        nested: {
+          sourceId: convexId,
+          recordId: convexId,
+          providerId: convexId,
+        },
+      }),
+    ).not.toThrow();
+  });
+
+  test("still checks keys under id keys", () => {
+    expect(() => scrub({ workerId: { displayName: "x" } })).toThrow(
+      /forbidden key/,
+    );
+  });
+
+  test("still scans values under non-id keys", () => {
+    expect(() => scrub({ text: "call 415-555-0123" })).toThrow(/phone-like/);
+    expect(() => scrub({ paid: "4155550123" })).toThrow(/phone-like/);
+  });
+
   test("throws on displayName", () => {
     expect(() => scrub({ worker: { id: "w_07", displayName: "x" } })).toThrow(
       ScrubError,
