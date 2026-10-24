@@ -37,7 +37,7 @@ describe("readJobberTimesheetsXlsx", () => {
     const [a, b, c, d] = r.rows;
     expect(a).toEqual({
       rowNumber: 5, workerName: "Avery Reed", date: "2026-10-12", startAt: "2026-10-12T15:00:00.000Z", endAt: "2026-10-12T23:30:00.000Z",
-      durationSec: 30600, jobText: "Job #101 - Spring cleanup", clientName: "Client Alpha", category: "General", approved: true, hasNote: false,
+      durationSec: 30600, jobText: "Job #101 - Spring cleanup", clientName: "Brookside Dental", category: "General", approved: true, hasNote: false,
     });
     expect(b).toMatchObject({ durationSec: 29700, hasNote: true, jobText: "Job #102 - Total care" });
     // no hours value: duration from start/end; no job; not approved
