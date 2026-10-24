@@ -42,7 +42,30 @@ type Item = {
   question: Question | undefined;
   thread: ThreadView;
   name: (workerId: string) => string;
+  /** True when this browser changed the question (approved, denied, answered); nothing is saved to Convex. */
+  local: boolean;
 };
+
+// The worker thread, or nothing when no text has gone back and forth yet.
+function Replies({
+  thread,
+  dataKind,
+  timezone,
+}: {
+  thread: ThreadView;
+  dataKind: DataKind;
+  timezone: string;
+}) {
+  if (thread.messages.length === 0) return null;
+  return (
+    <WorkerThread
+      thread={thread}
+      title="Replies"
+      dataKind={dataKind}
+      timezone={timezone}
+    />
+  );
+}
 
 const OPEN_TO_MANAGER: Question["status"][] = ["sent", "reminded"];
 
@@ -67,16 +90,26 @@ export function ManagerInbox({
   const firstName = manager?.displayName.split(" ")[0];
   const name = (id: string) => names[id] ?? id;
 
-  const items: Item[] = [...data.needsOk, ...data.rest].map((i) => ({
-    flag: crewView(i.flag),
-    question: i.question ? withLocal(i.question, local) : undefined,
-    thread: i.thread ?? {
-      workerName:
-        i.recipientName ?? (i.question ? name(i.question.toWorkerId) : "Reply"),
-      messages: [],
-    },
-    name,
-  }));
+  // Server thread plus replies recorded in this browser (demo panel, answers given here), oldest first.
+  const items: Item[] = [...data.needsOk, ...data.rest].map((i) => {
+    const qid = i.question?.id;
+    return {
+      flag: crewView(i.flag),
+      question: i.question ? withLocal(i.question, local) : undefined,
+      thread: {
+        workerName:
+          i.thread?.workerName ??
+          i.recipientName ??
+          (i.question ? name(i.question.toWorkerId) : "Reply"),
+        messages: [
+          ...(i.thread?.messages ?? []),
+          ...local.messages.filter((m) => m.questionId === qid),
+        ].sort((a, b) => a.at.localeCompare(b.at)),
+      },
+      name,
+      local: qid !== undefined && qid in local.questions,
+    };
+  });
 
   const needsYou = items.filter(({ question: q }) =>
     q?.toRole === "employee"
@@ -89,6 +122,7 @@ export function ManagerInbox({
   );
 
   const n = needsYou.length;
+  const localCount = items.filter((i) => i.local).length;
   const title =
     n === 0
       ? `${firstName ? `${firstName}, n` : "N"}othing needs you right now`
@@ -107,7 +141,11 @@ export function ManagerInbox({
       />
       <div className="-mt-3 mb-5 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
         <DataLabel kind={dataKind} detail={companyLabel} />
-        <span>Your crew · Source: {FIXTURE_SOURCE}</span>
+        <span>
+          Your crew · Source: {FIXTURE_SOURCE}
+          {localCount > 0 &&
+            `. ${localCount} counted here changed in the demo, ${LOCAL_SOURCE}`}
+        </span>
       </div>
 
       <Tabs defaultValue="inbox" className="gap-5">
@@ -197,7 +235,12 @@ export function ManagerInbox({
             <section className="mt-4 flex flex-col gap-3">
               <h2 className="text-lg font-semibold">Waiting</h2>
               {waiting.map((i) => (
-                <Waiting key={i.flag.id} item={i} timeZone={tz} />
+                <Waiting
+                  key={i.flag.id}
+                  item={i}
+                  dataKind={dataKind}
+                  timeZone={tz}
+                />
               ))}
             </section>
           )}
@@ -213,11 +256,7 @@ export function ManagerInbox({
               status="closed"
               statusLabel="Answered"
             >
-              <WorkerThread
-                thread={i.thread}
-                questionId={i.question?.id}
-                timezone={tz}
-              />
+              <Replies thread={i.thread} dataKind={dataKind} timezone={tz} />
               <p className="text-sm text-muted-foreground">
                 The owner approves any change this answer makes.
               </p>
@@ -236,7 +275,7 @@ export function ManagerInbox({
 
 // Shared frame: status, agents, headline, then who / job / where it came from. No money anywhere.
 function ItemCard({
-  item: { flag, question, name },
+  item: { flag, question, name, local },
   status,
   statusLabel,
   eyebrow,
@@ -288,6 +327,11 @@ function ItemCard({
         </div>
       </div>
       {children}
+      {local && (
+        <p className="text-xs font-medium text-muted-foreground">
+          Demo change, {LOCAL_SOURCE}
+        </p>
+      )}
     </Card>
   );
 }
@@ -484,7 +528,15 @@ function AnswerQuestion({
   );
 }
 
-function Waiting({ item, timeZone }: { item: Item; timeZone: string }) {
+function Waiting({
+  item,
+  dataKind,
+  timeZone,
+}: {
+  item: Item;
+  dataKind: DataKind;
+  timeZone: string;
+}) {
   const q = item.question;
   const who = q ? item.name(q.toWorkerId) : null;
   const [status, label, note]: [Status, string, string] =
@@ -506,11 +558,7 @@ function Waiting({ item, timeZone }: { item: Item; timeZone: string }) {
   return (
     <ItemCard item={item} status={status} statusLabel={label}>
       <p className="text-sm text-muted-foreground">{note}</p>
-      <WorkerThread
-        thread={item.thread}
-        questionId={q?.id}
-        timezone={timeZone}
-      />
+      <Replies thread={item.thread} dataKind={dataKind} timezone={timeZone} />
     </ItemCard>
   );
 }

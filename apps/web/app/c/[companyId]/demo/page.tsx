@@ -4,7 +4,7 @@ import { DemoPanel } from "@/components/DemoPanel";
 import { PageHeader } from "@/components/PageHeader";
 import { companies } from "@/lib/companies";
 import { DEMO_MODE } from "@/lib/demo";
-import { demoQuestions } from "@/lib/server/demo";
+import { currentViewer, demoQuestions } from "@/lib/server/fixtures";
 
 // Hidden unless NEXT_PUBLIC_DEMO_MODE=1. Params are read inside Suspense (Next 16).
 export default function DemoPage({ params }: PageProps<"/c/[companyId]/demo">) {
@@ -32,7 +32,7 @@ async function Body({
     <DemoPanel
       companyId={companyId}
       dataKind={company.kind}
-      {...demoQuestions(companyId)}
+      {...demoQuestions(await currentViewer(companyId), companyId)}
     />
   );
 }

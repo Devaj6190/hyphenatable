@@ -7,12 +7,15 @@ import { Money } from "@/components/Money";
 import { SimulatedChip } from "@/components/SimulatedChip";
 import { SourceChip } from "@/components/SourceChip";
 import {
+  actorLabel,
   categoryLabel,
   cycleLabel,
   eventSource,
+  isLocal,
   isSimulated,
   sourceRecord,
 } from "@/lib/audit";
+import { LOCAL_SOURCE } from "@/lib/demoLocal";
 import { formatWhen } from "@/lib/time";
 import type { AuditEvent } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -101,7 +104,8 @@ export function AuditRow({
 }) {
   const source = sourceRecord(e);
   const pay = showPay ? e.data?.effectPayCents : undefined;
-  const chip = <AgentChip agent={actor} />;
+  const chip = <AgentChip agent={actor} label={actorLabel(e.actor)} />;
+  const payRecord = e.refs.correctionId ?? e.refs.draftId;
   return (
     <tr className="border-b align-top transition-colors duration-(--dur-hover) last:border-0 hover:bg-muted/40">
       <td className="py-3 pr-2 pl-4 text-muted-foreground tabular-nums md:pr-3 md:whitespace-nowrap">
@@ -123,13 +127,17 @@ export function AuditRow({
           {e.summary}
           {isSimulated(e) && <SimulatedChip className="ml-2 align-middle" />}
         </p>
+        {isLocal(e) && (
+          <p className="mt-1 text-xs font-medium text-muted-foreground">
+            Demo row, {LOCAL_SOURCE}
+          </p>
+        )}
         <p className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
           <code className="font-mono">{e.type}</code>
           <span aria-hidden>·</span>
-          {source ? (
+          <span>via {eventSource(e)}</span>
+          {source && (
             <SourceChip system={source.system} recordId={source.recordId} />
-          ) : (
-            <span>via {eventSource(e)}</span>
           )}
         </p>
         {pay != null && (
@@ -140,6 +148,7 @@ export function AuditRow({
             <span className="text-muted-foreground">
               {dataKind}, from the workbook
             </span>
+            {payRecord && <SourceChip system="Workbook" recordId={payRecord} />}
             {e.refs.flagId && (
               <button
                 type="button"

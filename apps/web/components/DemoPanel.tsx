@@ -31,7 +31,8 @@ const demoReset = makeFunctionReference<
 >("demo:reset");
 const hasConvex = Boolean(process.env.NEXT_PUBLIC_CONVEX_URL);
 
-const OPEN: Question["status"][] = ["draft", "approved", "sent", "reminded"];
+// Only a text that was approved and actually sent can get a reply; drafts and approved-but-unsent texts can't.
+const OPEN: Question["status"][] = ["sent", "reminded"];
 const statusWord: Record<Question["status"], string> = {
   draft: "not approved yet",
   approved: "approved",
@@ -234,10 +235,10 @@ function ResetCard({
           disabled={localCount === 0}
           onClick={clearLocal}
         >
-          Clear this browser’s demo changes
+          Clear demo rows (not part of the log)
         </Button>
         <span className="text-muted-foreground tabular-nums">
-          {localCount} recorded here ({LOCAL_SOURCE})
+          {localCount} demo rows recorded here ({LOCAL_SOURCE})
         </span>
       </div>
     </Section>
@@ -356,7 +357,8 @@ function SimulatedReplyCard({
       </p>
       {questions.length === 0 ? (
         <p className="rounded-control border border-dashed px-4 py-6 text-center text-muted-foreground">
-          No open questions to reply to.
+          No sent texts to reply to. A text has to be approved and sent first,
+          and fixture mode never sends one, so this needs Convex.
         </p>
       ) : (
         <form

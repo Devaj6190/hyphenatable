@@ -2,8 +2,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { ManagerInbox } from "@/components/ManagerInbox";
 import { companies } from "@/lib/companies";
-import { managerCrew } from "@/lib/server/demo";
-import { managerInbox } from "@/lib/server/fixtures";
+import { managerCrew, managerInbox } from "@/lib/server/fixtures";
 
 // Params are read inside Suspense so the shell stays instant (Next 16). The title counts open items, so
 // ManagerInbox renders its own PageHeader.

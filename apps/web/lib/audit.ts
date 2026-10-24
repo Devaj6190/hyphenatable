@@ -44,16 +44,32 @@ export function eventSource(e: AuditEvent): string {
   return "PayrollPilot engine";
 }
 
-const SYSTEMS: SourceSystem[] = ["Jobber", "QuickBooks", "Gusto", "Workbook"];
+// Which outside system owns a record, by the ref key. Our own ids (syncRunId, flagId, draftId, questionId,
+// correctionId, ruleId) are never chipped as Jobber/QuickBooks/Gusto records. No fixture event carries a Gusto
+// record id yet; add its key here when one does.
+const EXTERNAL_REF: Record<string, SourceSystem> = {
+  entryId: "Jobber",
+  expenseId: "QuickBooks",
+};
 
-/** The source as a record chip when it is exactly one system and the event names a record. */
+/** The first outside record this event names, as a SourceChip. */
 export function sourceRecord(
   e: AuditEvent,
 ): { system: SourceSystem; recordId: string } | null {
-  const system = SYSTEMS.find((s) => s === e.data?.source);
-  const recordId = Object.values(e.refs)[0];
-  return system && recordId ? { system, recordId } : null;
+  for (const [key, recordId] of Object.entries(e.refs)) {
+    const system = EXTERNAL_REF[key];
+    if (system) return { system, recordId };
+  }
+  return null;
 }
+
+/** The demo persona says which seat it played ("persona:owner" → "Simulated owner"). */
+export function actorLabel(actor: AuditEvent["actor"]): string | undefined {
+  const persona = actor.id.match(/^persona:(\w+)/)?.[1];
+  return persona ? `Simulated ${persona}` : undefined;
+}
+
+export const isLocal = (e: AuditEvent) => e.id.startsWith("local-");
 
 // Company A's two demo cycles (docs/DEMO.md): Cycle 1 is a-c05, Cycle 2 is a-c06. Other ids show as they are,
 // because the digits in an id are not the cycle number (a-c01 to a-c04 are past history cycles).

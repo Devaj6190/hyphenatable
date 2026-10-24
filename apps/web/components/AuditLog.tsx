@@ -16,6 +16,7 @@ import {
   cycleLabel,
   eventSource,
   forViewerEvents,
+  isLocal,
   isSimulated,
   NO_CYCLE,
 } from "@/lib/audit";
@@ -27,7 +28,7 @@ import type { AuditViewData } from "@/lib/view-types";
 const selectClass =
   "h-10 rounded-control border border-input bg-card px-3 text-sm text-foreground outline-none focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-1 focus-visible:outline-ring";
 
-const actorWord: Record<string, string> = { simulated: "Simulated manager" };
+const actorWord: Record<string, string> = { simulated: "Simulated persona" };
 const word = (k: string) => actorWord[k] ?? k[0].toUpperCase() + k.slice(1);
 
 function Chip({
@@ -167,16 +168,21 @@ export function AuditLog({
     setQuery("");
   };
 
+  const localCount = visible.filter(isLocal).length;
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
         <DataLabel kind={dataKind} detail={companyLabel} />
-        <span className="tabular-nums">{visible.length} events</span>
+        <span className="tabular-nums">
+          {visible.length - localCount} events
+          {localCount > 0 && ` + ${localCount} demo rows`}
+        </span>
         <span aria-hidden>·</span>
         <span>
           Source: {AUDIT_FIXTURE_SOURCE}
-          {local.events.length > 0 &&
-            ` + ${local.events.length} from the demo panel and inbox (${LOCAL_SOURCE})`}
+          {localCount > 0 &&
+            `. Demo rows come from the demo panel and inbox, ${LOCAL_SOURCE}, and are not part of the log`}
         </span>
       </div>
 
@@ -354,7 +360,9 @@ export function AuditLog({
 
       <p className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
         <span className="tabular-nums">
-          Showing {shown.length} of {visible.length} · {order} first
+          Showing {shown.length} of {visible.length}
+          {localCount > 0 && ` (${localCount} demo rows, this browser only)`} ·{" "}
+          {order} first
         </span>
         {visible.some(isSimulated) && (
           <>

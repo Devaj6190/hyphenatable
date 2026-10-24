@@ -3,8 +3,7 @@ import { Suspense } from "react";
 import { AuditLog } from "@/components/AuditLog";
 import { PageHeader } from "@/components/PageHeader";
 import { companies } from "@/lib/companies";
-import { managerIds } from "@/lib/server/demo";
-import { auditView, currentViewer } from "@/lib/server/fixtures";
+import { auditView, currentViewer, managerIds } from "@/lib/server/fixtures";
 
 // Params are read inside Suspense so the shell stays instant (Next 16).
 export default function AuditPage({
