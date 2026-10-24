@@ -10,9 +10,11 @@ import type { InboxItem, ManagerInboxData } from "@/lib/view-types";
 export function ManagerInbox({
   data,
   dataKind,
+  timezone,
 }: {
   data: ManagerInboxData;
   dataKind: DataKind;
+  timezone: string;
 }) {
   const card = (i: InboxItem) => (
     <FlagCard flag={i.flag} dataKind={dataKind} viewerRole="manager" />
@@ -57,6 +59,7 @@ export function ManagerInbox({
                 thread={i.thread}
                 title="Replies"
                 dataKind={dataKind}
+                timezone={timezone}
               />
             )}
           </div>

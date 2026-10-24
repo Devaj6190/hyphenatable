@@ -19,7 +19,11 @@ export default async function AuditPage({
           after the fact.
         </p>
       </div>
-      <AuditLog data={auditView(viewer, companyId)} dataKind={company.kind} />
+      <AuditLog
+        data={auditView(viewer, companyId)}
+        dataKind={company.kind}
+        timezone={company.timezone}
+      />
     </div>
   );
 }

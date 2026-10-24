@@ -24,11 +24,13 @@ export function FlagDetail({
   companyId,
   data,
   dataKind,
+  timezone,
   viewerRole,
 }: {
   companyId: string;
   data: FlagDetailData | null;
   dataKind: DataKind;
+  timezone: string;
   viewerRole?: ViewerRole;
 }) {
   const [markedFixed, setMarkedFixed] = useState(false);
@@ -120,6 +122,7 @@ export function FlagDetail({
           thread={data.thread}
           title="Replies"
           dataKind={dataKind}
+          timezone={timezone}
         />
       )}
 
@@ -143,7 +146,11 @@ export function FlagDetail({
       <Card>
         <CardContent className="flex flex-col gap-3">
           <h2 className="text-lg font-semibold">What happened so far</h2>
-          <FlagTimeline events={events} dataKind={dataKind} />
+          <FlagTimeline
+            events={events}
+            dataKind={dataKind}
+            timezone={timezone}
+          />
         </CardContent>
       </Card>
     </div>

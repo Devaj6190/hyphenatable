@@ -1,26 +1,21 @@
 import type { DataKind } from "@/components/DataLabel";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { formatWhen } from "@/lib/time";
 import { cn } from "@/lib/utils";
 import type { ThreadView } from "@/lib/view-types";
-
-const when = new Intl.DateTimeFormat("en-US", {
-  month: "short",
-  day: "numeric",
-  hour: "numeric",
-  minute: "2-digit",
-  timeZone: "America/Los_Angeles",
-});
 
 // Texts only: worker, time, words. No pay, no phone numbers.
 export function WorkerThread({
   thread,
   title,
   dataKind,
+  timezone,
 }: {
   thread: ThreadView;
   title: string;
   dataKind: DataKind;
+  timezone: string;
 }) {
   const { workerName: who, messages } = thread;
   return (
@@ -43,7 +38,7 @@ export function WorkerThread({
               <span>{m.text}</span>
               <span className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                 {m.direction === "out" ? "PayrollPilot" : who} ·{" "}
-                {when.format(new Date(m.at))} · {dataKind}
+                {formatWhen(m.at, timezone)} · {dataKind}
                 {m.simulated && (
                   <Badge
                     variant="outline"

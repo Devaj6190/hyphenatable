@@ -1,21 +1,16 @@
 import { AgentChip } from "@/components/AgentChip";
 import type { DataKind } from "@/components/DataLabel";
+import { formatWhen } from "@/lib/time";
 import type { FlagEvent } from "@/lib/types";
-
-const when = new Intl.DateTimeFormat("en-US", {
-  month: "short",
-  day: "numeric",
-  hour: "numeric",
-  minute: "2-digit",
-  timeZone: "America/Los_Angeles",
-});
 
 export function FlagTimeline({
   events,
   dataKind,
+  timezone,
 }: {
   events: FlagEvent[];
   dataKind: DataKind;
+  timezone: string;
 }) {
   if (events.length === 0)
     return <p className="text-sm text-muted-foreground">Nothing yet.</p>;
@@ -24,7 +19,7 @@ export function FlagTimeline({
       {events.map((e) => (
         <li key={e.id} className="flex flex-wrap items-center gap-2 text-sm">
           <span className="w-24 text-muted-foreground">
-            {when.format(new Date(e.at))}
+            {formatWhen(e.at, timezone)}
           </span>
           <AgentChip actor={e.actor} />
           <span>{e.summary}</span>
