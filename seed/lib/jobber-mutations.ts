@@ -95,6 +95,9 @@ export const MUTATIONS = {
   // NOT IN THE LIVE SCHEMA (invoiceCreate exists: clientId!, dueDetails!, tax!, lineItems!, jobIds; not wired yet).
   // LIVE (seed token): invoiceCreate(input: { clientId!, propertyId, jobIds, subject, issuedDate, markSent, dueDetails! { dueDate, invoiceNet }, tax! { taxCalculationMethod: EXCLUSIVE|INCLUSIVE }, lineItems! [{ name!, quantity, unitPrice }] })
   invoiceCreate: `mutation($input: InvoiceCreateInput!) { invoiceCreate(input: $input) { invoice { id invoiceNumber } userErrors { message path } } }`,
+  // LIVE (seed token): jobEdit(jobId!, input: { title, ... }) and expenseEdit(expenseId!, input: { title, ... }); used by --retitle only
+  jobEdit: `mutation($jobId: EncodedId!, $input: JobEditInput!) { jobEdit(jobId: $jobId, input: $input) { job { id title } userErrors { message path } } }`,
+  expenseEdit: `mutation($expenseId: EncodedId!, $input: ExpenseEditInput!) { expenseEdit(expenseId: $expenseId, input: $input) { expense { id title } userErrors { message path } } }`,
   // NOT IN THE LIVE SCHEMA.
   invoiceCreatePaymentRecord: `mutation($input: InvoiceCreatePaymentRecordInput!) { invoiceCreatePaymentRecord(input: $input) { paymentRecord { id } userErrors { message path } } }`,
   // NOT IN THE LIVE SCHEMA.
@@ -560,4 +563,34 @@ export function partitionSupported(
     run.push(s);
   }
   return { run, skipped };
+}
+
+export type Retitle = {
+  kind: "jobs" | "expenses";
+  ourId: string;
+  jobberId: string;
+  from: string;
+  to: string;
+};
+
+/**
+ * Titles to fix: for every mapped job and Jobber expense, the title the plan would create (fixture title +
+ * marker) against the title Jobber has now. Only differing titles are listed; unmapped records are ignored.
+ */
+export function retitlePlan(
+  fullSteps: Step[],
+  map: IdMap,
+  current: Map<string, string>,
+): Retitle[] {
+  const out: Retitle[] = [];
+  for (const s of fullSteps) {
+    if (s.object !== "jobs" && s.object !== "expenses") continue;
+    const jobberId = map[s.object]?.[s.ourId];
+    if (!jobberId) continue;
+    const to = String((s.variables.input as Record<string, unknown>).title);
+    const from = current.get(jobberId);
+    if (from === undefined || from === to) continue;
+    out.push({ kind: s.object, ourId: s.ourId, jobberId, from, to });
+  }
+  return out;
 }

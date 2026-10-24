@@ -139,3 +139,7 @@ Jobber has no API to create time entries. Every hour in Company A comes from the
 ## Cycle extensions: `companies/a-c06.json`, `lib/cycle-a06.ts`
 
 `generate.ts --company a` also writes every `companies/<company>-cNN.json` extension to `data/fixtures/<company>/cycles/<cycle>/`. Today that is a-c06, demo cycle 2, with the same error mix and `resolvableByRuleType` on its answer-key rows. The base output is untouched; `__tests__/cycle-a06.test.ts` pins its own hash, `EXPECTED_SHA256_A06`. Details are in `data/fixtures/README.md`.
+
+### Retitle (street-name fix)
+
+Five a-c04 records used to have "undefined" as the street, because the past-street pool ran out: jobs a-j28..a-j32 and the Jobber expense a-ex-4006 ("Dump fee - …"). `lib/names.ts` now has `STREETS_OVERFLOW`, taken in order once the pool is empty, so only those titles changed and every id is the same. They are already in the Jobber trial, so `bun run seed/push-jobber.ts --company a --live --retitle`, run from the main checkout against the allowlisted account, renames them. It checks that `jobEdit`/`expenseEdit` exist and edits only the titles of mapped jobs and expenses that differ from the fixtures; nothing else changes and nothing is created.
