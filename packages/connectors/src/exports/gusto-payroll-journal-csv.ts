@@ -85,6 +85,8 @@ export interface PayrollJournalRow {
   employeeType?: string | null;
   /** "Owner’s draw" employee type: an owner draw, not a wage (kept, excluded from the M4 wage comparison) */
   payKind?: "wage" | "owner_draw";
+  /** sectioned journal: owner draws, kept apart from grossCents (which is wage gross, like Gusto's Gross) */
+  ownerDrawCents?: number;
   /** per pay-type rate in cents, when the report gives one */
   ratesCents?: Record<string, number>;
   /** itemized pay lines with their job (a role such as "Landscaper", not a person) and rate: M4 needs per-job rates */
