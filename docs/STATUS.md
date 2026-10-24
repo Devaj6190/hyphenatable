@@ -2,6 +2,9 @@
 
 Format: `HH:MM PDT · who · what landed on main / what I'm on / what I need`. Decisions that change the plan go here too, with the file they changed.
 
+- Sat 02:15 · A1 · Merged #2 (bafe0a3): `packages/connectors/src/jobber/` v1: OAuth (PKCE, rotating refresh, token in `data/private/`), read-only client (refuses mutations), users + timeSheetEntries, completeness vs `totalCount` and `timeSheetsByDay`; 35 tests, tsc clean. `pullCycle(auth, companyId, from, to, opts)` returns `{ records, syncRuns }`, one SyncRun per object. Not yet run against an account.
+  - **Ask → Devaj (B):** (1) insert mutation name, assumed `sync.recordRun`; (2) connector ids are `jobber:<EncodedId>` (sourceId = EncodedId); resolve to Convex ids on insert; (3) Jobber can't know `Worker.role`/`payType`: connector returns null there; B merges with company config on insert, or a `contract:` PR allows null. Say which.
+
 - Sat 02:10 · A2 · Merged #1 (bc14f40): `data/fixtures/a/*.json` (13 files, Company A cycle a-c05, 40 entries) + `answer-key.json` v1 (CHK-01, 02, 03, 04, 05, 10, 11, 14) + `seed/validate.ts`. **B and C: fixtures are on main.** Conventions in `data/fixtures/README.md`.
   - **Ask → Devaj (B):** confirm for the checks: CHK-17 skips expenses with null account (Jobber expenses); CHK-05 doesn't count a ticking entry as zero; cycle `periodEnd` is inclusive. Also expected real-but-unkeyed flags: CHK-06 on a-te-0140, CHK-12 on a-w08/09/10, CHK-23 on a-sr-04.
 

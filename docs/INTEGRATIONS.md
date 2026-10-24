@@ -13,6 +13,11 @@ Status values: **tested** (ran here, evidence noted), **unverified** (docs read 
 | H7 | Embeddings: one Voyage or OpenAI call; one vector stored and searched with a company filter | B | unverified | | lexical match on structured rule fields |
 | H8 | Playwright `storageState` login to the Jobber tester account; one Timesheets report read | A (after G1) | unverified | | Browser Use Cloud |
 
+## Dated notes
+- Sat 02:00 · A1 · Jobber GraphQL 2026-09-25: unauthenticated introspection returns HTTP 200; `users`, `timeSheetEntries` (startAt filter, START_AT sort, `totalCount`), `User.timeSheetsByDay` and `targetItem` exist; the connector's 4 query documents validate against the live schema. **tested** (schema only, no account).
+- Sat 02:15 · A1 · H1 follow-up: the connector gets its refresh token from `packages/connectors/src/jobber/cli.ts auth` (app OAuth, PKCE, `http://localhost:3000/auth`), not GraphiQL. **pending** a browser.
+- Sat 02:00 · A · H2 Gusto developer org "PayrollPilot" and application "PayrollPilot Demo" being created (signup ~01:55). **in progress**.
+
 ## Live proofs (fill in as they happen)
 - First real text round trip (G1):
 - First Gusto draft filled in demo (G2):
