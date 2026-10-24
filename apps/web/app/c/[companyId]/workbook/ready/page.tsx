@@ -1,11 +1,23 @@
-import { Placeholder } from "@/components/Placeholder";
+import { notFound } from "next/navigation";
+import { Suspense } from "react";
+import { ReadyView } from "@/components/workbook/ReadyView";
+import { companies } from "@/lib/companies";
 
-export default function Page() {
+// Next 16 instant navigation: params are read inside a Suspense child, never at the top of the page.
+export default function ReadyPage({
+  params,
+}: PageProps<"/c/[companyId]/workbook/ready">) {
   return (
-    <Placeholder
-      title="Payroll is ready for your review"
-      description="Draft only. PayrollPilot never submits payroll."
-      board="3 · Payroll ready (Gusto draft filled)"
-    />
+    <Suspense>
+      <Ready params={params} />
+    </Suspense>
   );
+}
+
+async function Ready({
+  params,
+}: Pick<PageProps<"/c/[companyId]/workbook/ready">, "params">) {
+  const { companyId } = await params;
+  if (!companies[companyId]) notFound();
+  return <ReadyView companyId={companyId} />;
 }

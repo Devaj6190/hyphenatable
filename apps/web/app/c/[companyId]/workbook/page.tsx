@@ -1,11 +1,23 @@
-import { Placeholder } from "@/components/Placeholder";
+import { notFound } from "next/navigation";
+import { Suspense } from "react";
+import { WorkbookView } from "@/components/workbook/WorkbookView";
+import { companies } from "@/lib/companies";
 
-export default function Page() {
+// Next 16 instant navigation: params are read inside a Suspense child, never at the top of the page.
+export default function WorkbookPage({
+  params,
+}: PageProps<"/c/[companyId]/workbook">) {
   return (
-    <Placeholder
-      title="Workbook and readiness"
-      description="Every worker’s lines to the cent, held items with reasons, and the Gusto draft status."
-      board="8 · Workbook and readiness"
-    />
+    <Suspense>
+      <Workbook params={params} />
+    </Suspense>
   );
+}
+
+async function Workbook({
+  params,
+}: Pick<PageProps<"/c/[companyId]/workbook">, "params">) {
+  const { companyId } = await params;
+  if (!companies[companyId]) notFound();
+  return <WorkbookView companyId={companyId} />;
 }
