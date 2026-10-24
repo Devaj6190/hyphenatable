@@ -1,8 +1,8 @@
 # Spec conflicts
 
-Fill in **Decision** and **Decided by** under each open item, then move the result into [final.md](final.md).
+Every item is now decided and carried into [final.md](final.md). To change one, edit both files in one PR.
 
-Status: 30 open · 13 resolved · 34 agreed (21 conflicts, 22 solo items)
+Status: 0 open · 43 resolved · 34 agreed (21 conflicts, 22 solo items). The last 30 were resolved by the implementation plan on Oct 24 at 1:00 AM; see final.md section 14.
 
 This compared Devaj's, Shannin's and Varnika's specs, with the old DESIGN.md as background. Those files were removed on Oct 24, 2026 and are in git history at commit `a8a52f3`; each person's position is quoted under every item below. Rule and rubric notes cite [../docs/sources/](../docs/sources/README.md).
 
@@ -19,18 +19,18 @@ The biggest split is **C-2-1 (what the demo runs on)**. C-4-1, C-5-1 and C-12-2 
 - **Decision:** A person submits payroll. The agent fills the Gusto drafts and never submits.
 - **Decided by:** Devaj
 
-### C-1-2 Who is the target customer in the pitch? (OPEN)
+### C-1-2 Who is the target customer in the pitch? (RESOLVED)
 - **Varnika:** any company size. Its open questions ask whether to lead with enterprise scale or "works for any company".
 - **Devaj:** must generalize across many companies. No size given.
 - **Shannin:** the proof customer is a 15-person landscaping company. The target is large service companies: "same engine, more rules, more people to ask".
 - **DESIGN.md:** a 1,200-person hospital network.
-- **Decision:**
-- **Decided by:**
+- **Decision:** Proof customer: the real 15-person landscaping company. Target: service companies with field crews, 10 to 500 workers, on job software. Pitch line: same engine, more rules, more people to ask. No enterprise claim this weekend.
+- **Decided by:** Implementation plan, Oct 24 1:00 AM (team may overrule by PR)
 
-### S-1-1 Working name "Payroll Ops Agent" (OPEN)
+### S-1-1 Working name "Payroll Ops Agent" (RESOLVED)
 - **Proposed by:** Varnika: working name "Payroll Ops Agent", to be renamed. It's already in the root README.
-- **Decision:** keep / drop / change to …
-- **Decided by:**
+- **Decision:** Change to working name PayCheck ("it checks the pay before the paycheck"); rename before G0 if the team prefers. Code is name-free.
+- **Decided by:** Implementation plan, Oct 24 1:00 AM (team may overrule by PR)
 
 ### Agreed
 - The seat it takes over is the person who prepares and checks payroll before it's submitted. (Devaj, Shannin, Varnika)
@@ -47,12 +47,12 @@ The biggest split is **C-2-1 (what the demo runs on)**. C-4-1, C-5-1 and C-12-2 
 - **Decision:** Synthetic companies in the real tools' sandboxes, read through their APIs, plus one real company: Shannin's, using its real Jobber data. Everything on screen is anonymized with fake names.
 - **Decided by:** Devaj
 
-### C-2-2 How do we show it works beyond one company? (OPEN)
+### C-2-2 How do we show it works beyond one company? (RESOLVED)
 - **Varnika:** a large synthetic company for scale, plus Shannin's company.
 - **Devaj:** two synthetic companies set up differently: a 12-person landscaping crew paid every two weeks and a 30-person HVAC company paid weekly.
 - **Shannin:** stretch goal: onboard a second real company (the owner's father's painting business).
-- **Decision:**
-- **Decided by:**
+- **Decision:** Company B: a 30-person HVAC company paid weekly, seeded with the same generator and different rules (P1). Shannin's father's business is a stretch only.
+- **Decided by:** Implementation plan, Oct 24 1:00 AM (team may overrule by PR)
 
 ### Agreed
 - The main company is paid biweekly. (Devaj, Shannin, Varnika)
@@ -75,10 +75,10 @@ The biggest split is **C-2-1 (what the demo runs on)**. C-4-1, C-5-1 and C-12-2 
 - **Decision:** Go with Shannin's spec: code calculates wages, overtime, commissions, tips and the manager split, checked to the cent, then fills Gusto. Gusto does taxes.
 - **Decided by:** Devaj
 
-### S-3-1 Financial reconciliation and profit checks (OPEN)
+### S-3-1 Financial reconciliation and profit checks (RESOLVED)
 - **Proposed by:** Shannin: match customer payments, job profit (invoice minus labor minus expenses), wages as a share of revenue over time, and a low-profit flag with likely reasons.
-- **Decision:** keep / drop / change to …
-- **Decided by:**
+- **Decision:** Keep as the financial reconciliation stage (payments matched, job cost vs. overhead, job profit, low-profit flag). Wages as a share of revenue is P2.
+- **Decided by:** Implementation plan, Oct 24 1:00 AM (team may overrule by PR)
 
 ### Agreed
 - Tax calculation is out; Gusto does it. (Shannin, Varnika)
@@ -101,12 +101,12 @@ The biggest split is **C-2-1 (what the demo runs on)**. C-4-1, C-5-1 and C-12-2 
 - **Decision:** API first. Spreadsheet export and browser automation are fallbacks.
 - **Decided by:** Devaj
 
-### C-4-3 How do we get QuickBooks data? (OPEN)
+### C-4-3 How do we get QuickBooks data? (RESOLVED)
 - **Varnika:** not covered.
 - **Devaj:** the QuickBooks Online API.
 - **Shannin:** a spreadsheet export.
-- **Decision:**
-- **Decided by:**
+- **Decision:** API for the synthetic companies (sandbox verified). Excel export for the real company unless Shannin connects it.
+- **Decided by:** Implementation plan, Oct 24 1:00 AM (team may overrule by PR)
 
 ### Agreed
 - Every read is checked for completeness (records pulled vs. the total the source shows) before use, and a mismatch blocks what it affects. (Devaj, Shannin, Varnika)
@@ -114,39 +114,39 @@ The biggest split is **C-2-1 (what the demo runs on)**. C-4-1, C-5-1 and C-12-2 
 
 ## 5. What it catches
 
-### C-5-1 Do we check bank details, tax forms and benefit deductions? (OPEN)
+### C-5-1 Do we check bank details, tax forms and benefit deductions? (RESOLVED)
 - **Varnika:** yes: "new hire missing bank details or tax form" and "deduction doesn't match benefit election". It anonymizes SSNs and bank numbers before the model sees them.
 - **Devaj:** not covered.
 - **Shannin:** no. It never collects SSNs, bank details, tax forms, or medical or leave reasons; Gusto keeps them.
 - **Note:** Shannin's legal research cites Pennsylvania's reasonable-care duty for SSN and bank data (Dittman v. UPMC).
-- **Decision:**
-- **Decided by:**
+- **Decision:** No. Never collect SSNs, bank details, tax forms, medical or leave reasons. The only new-hire check reads Gusto's `onboarded` flag.
+- **Decided by:** Implementation plan, Oct 24 1:00 AM (team may overrule by PR)
 
-### S-5-1 Catch-all: net pay changed more than 20% vs. last period (OPEN)
+### S-5-1 Catch-all: net pay changed more than 20% vs. last period (RESOLVED)
 - **Proposed by:** Varnika: flag any net-pay change of more than 20%, routed to the payroll owner.
 - **Note:** the validation session named a catch-all like this (it suggested 25%) as the biggest single lever for handling a judge's own scenario ([findings](../docs/sources/README.md)).
-- **Decision:** keep / drop / change to …
-- **Decided by:**
+- **Decision:** Keep. Gross pay changed more than 25% vs. the worker's average of the last three cycles, routed to the owner, always.
+- **Decided by:** Implementation plan, Oct 24 1:00 AM (team may overrule by PR)
 
-### S-5-2 Job with work done but no labor recorded (OPEN)
+### S-5-2 Job with work done but no labor recorded (RESOLVED)
 - **Proposed by:** Devaj: a job shows work done, but no labor was logged against it.
-- **Decision:** keep / drop / change to …
-- **Decided by:**
+- **Decision:** Keep, P1 (a job with completed visits and no time entries).
+- **Decided by:** Implementation plan, Oct 24 1:00 AM (team may overrule by PR)
 
-### S-5-3 Workers the Jobber-to-Gusto sync doesn't cover (OPEN)
+### S-5-3 Workers the Jobber-to-Gusto sync doesn't cover (RESOLVED)
 - **Proposed by:** Varnika: salaried, contractor and commission workers aren't covered by the Jobber-to-Gusto sync, per Gusto's support page.
-- **Decision:** keep / drop / change to …
-- **Decided by:**
+- **Decision:** Keep. The engine classifies every worker by Gusto `flsa_status` / `payment_unit` / contractor and handles salaried, contractor and commission workers itself.
+- **Decided by:** Implementation plan, Oct 24 1:00 AM (team may overrule by PR)
 
-### S-5-4 Sort expenses into job cost vs. overhead before matching (OPEN)
+### S-5-4 Sort expenses into job cost vs. overhead before matching (RESOLVED)
 - **Proposed by:** Shannin: only job costs (materials, equipment, disposal fees) need a job. Overhead (subscriptions, insurance, software) goes to a cycle total.
-- **Decision:** keep / drop / change to …
-- **Decided by:**
+- **Decision:** Keep, as a learned per-company mapping on the QuickBooks expense account (job cost vs. overhead) applied before matching.
+- **Decided by:** Implementation plan, Oct 24 1:00 AM (team may overrule by PR)
 
-### S-5-5 Venmo-paid workers (OPEN)
+### S-5-5 Venmo-paid workers (RESOLVED)
 - **Proposed by:** Shannin: every Jobber worker is matched to Gusto or to the owner's Venmo list, and the cycle summary includes a Venmo pay list.
-- **Decision:** keep / drop / change to …
-- **Decided by:**
+- **Decision:** Keep. Every Jobber worker maps to a Gusto employee, a Gusto contractor or the owner's Venmo list; Venmo rates are owner-entered rules; the cycle summary includes a Venmo pay list.
+- **Decided by:** Implementation plan, Oct 24 1:00 AM (team may overrule by PR)
 
 ### Agreed
 - A pay rate that differs between Jobber and Gusto is flagged. (Devaj, Shannin)
@@ -189,22 +189,22 @@ The biggest split is **C-2-1 (what the demo runs on)**. C-4-1, C-5-1 and C-12-2 
 - **Decision:** The agent records each correction in the review workbook (before, after, effect on pay) and pays from it, but only after a human approves the correction. Source systems are not changed.
 - **Decided by:** Devaj
 
-### C-6-5 What's the escalation path when nobody answers? (OPEN)
+### C-6-5 What's the escalation path when nobody answers? (RESOLVED)
 - **Varnika:** the owner's manager, then HR or the payroll owner. Anything unresolved at the deadline is marked as blocking in the hand-off.
 - **Devaj:** a reminder, then escalation to the payroll owner. Still unresolved at cutoff means that item is held or paid on undisputed hours only.
 - **Shannin:** unanswered items stay held. No escalation chain is given.
-- **Decision:**
-- **Decided by:**
+- **Decision:** Reminder after 4 business hours (2 minutes in demo mode), then the owner is notified. At cutoff the item stays held: undisputed hours are paid, the disputed item is excluded from the draft and listed for the owner. Never zero, never guessed.
+- **Decided by:** Implementation plan, Oct 24 1:00 AM (team may overrule by PR)
 
-### S-6-1 Numbered reply options in texts (OPEN)
+### S-6-1 Numbered reply options in texts (RESOLVED)
 - **Proposed by:** Varnika: e.g. "1 = correct, 2 = change to 8 hrs, 3 = I'll fix it in Jobber".
-- **Decision:** keep / drop / change to …
-- **Decided by:**
+- **Decision:** Keep. Up to four options go out as an iMessage poll (the vote comes back tied to the question); otherwise numbered text. One open question per conversation, because inbound replies carry no thread id.
+- **Decided by:** Implementation plan, Oct 24 1:00 AM (team may overrule by PR)
 
-### S-6-2 Opt-out by replying STOP (OPEN)
+### S-6-2 Opt-out by replying STOP (RESOLVED)
 - **Proposed by:** Varnika: anyone can reply STOP, and managers decide whether their employees may be contacted.
-- **Decision:** keep / drop / change to …
-- **Decided by:**
+- **Decision:** Keep, minimal: STOP marks the contact do-not-text and routes their questions to their manager; a company setting says whether employees may be contacted at all.
+- **Decided by:** Implementation plan, Oct 24 1:00 AM (team may overrule by PR)
 
 ### Agreed
 - Only the affected worker or item is held, never the whole payroll. (Devaj, Shannin, Varnika)
@@ -214,23 +214,23 @@ The biggest split is **C-2-1 (what the demo runs on)**. C-4-1, C-5-1 and C-12-2 
 
 ## 7. Learning over time
 
-### C-7-1 Who approves what the agent learns? (OPEN)
+### C-7-1 Who approves what the agent learns? (RESOLVED)
 - **Varnika:** past resolutions are applied automatically and marked "auto-resolved, based on past approval by X". The owner can see every learned rule and switch it off. Blocking issues, anything new, anything over a dollar threshold, and anything a human has previously overridden always go to a person.
 - **Devaj:** tiered. Low-risk changes (message wording, reminder timing) apply on their own and are logged. Anything that changes what gets flagged or paid needs the owner's approval. Every change can be undone.
 - **Shannin:** the owner confirms, edits or rejects every proposed rule before it's used, and every answer becomes a rule.
 - **Note:** controller-approved learned rules didn't stand out at HackMIT, where Hyphenate judged five teams doing it. Their own coffee-chain slide auto-saves a manager's answer as a policy ([slides](../docs/sources/hyphenate-workshop-slides.md)).
-- **Decision:**
-- **Decided by:**
+- **Decision:** Tiered with separation of duties. Anything that changes what is flagged or paid needs the owner's approval before use; low-risk changes (wording, reminder timing, who to ask first) apply on their own, are logged and reversible. A manager's answer resolves the case but becomes a standing rule only when the owner approves it; the answerer never approves the rule.
+- **Decided by:** Implementation plan, Oct 24 1:00 AM (team may overrule by PR)
 
-### S-7-1 Owner-entered rules in plain words (OPEN)
+### S-7-1 Owner-entered rules in plain words (RESOLVED)
 - **Proposed by:** Shannin: the owner types a rule, the agent restates it precisely for confirmation, labels it "stated by owner, not seen in history", and checks it against past cycles.
-- **Decision:** keep / drop / change to …
-- **Decided by:**
+- **Decision:** Keep. Restated precisely, labelled "stated by owner, not seen in history", backtested.
+- **Decided by:** Implementation plan, Oct 24 1:00 AM (team may overrule by PR)
 
-### S-7-2 Owner's runbook as the answer key (OPEN)
+### S-7-2 Owner's runbook as the answer key (RESOLVED)
 - **Proposed by:** Shannin: the agent is never shown the owner's payroll runbook. We grade its learned rules against the runbook.
-- **Decision:** keep / drop / change to …
-- **Decided by:**
+- **Decision:** Keep. The agent never sees the runbook; learned rules are graded against it and only aggregate scores are published.
+- **Decided by:** Implementation plan, Oct 24 1:00 AM (team may overrule by PR)
 
 ### Agreed
 - Onboarding learns from the company's past pay cycles. (Devaj, Shannin)
@@ -241,7 +241,7 @@ The biggest split is **C-2-1 (what the demo runs on)**. C-4-1, C-5-1 and C-12-2 
 
 ## 8. Access, safety and audit
 
-### S-8-1 Shannin's safety rules (OPEN)
+### S-8-1 Shannin's safety rules (RESOLVED)
 - **Proposed by:** Shannin:
   - Unknown blocks the item, never zero, and it never invents a rate.
   - It never trims hours or assumes breaks.
@@ -250,8 +250,8 @@ The biggest split is **C-2-1 (what the demo runs on)**. C-4-1, C-5-1 and C-12-2 
   - Role-based views: the job manager never sees others' pay.
   - An access log of who viewed or exported data.
   - Retention and deletion rules.
-- **Decision:** keep all / keep some (list) / drop
-- **Decided by:**
+- **Decision:** Keep all.
+- **Decided by:** Implementation plan, Oct 24 1:00 AM (team may overrule by PR)
 
 ### Agreed
 - Read-only on source systems. (Devaj, Shannin, Varnika)
@@ -269,10 +269,10 @@ The biggest split is **C-2-1 (what the demo runs on)**. C-4-1, C-5-1 and C-12-2 
 - **Decision:** Managers log in too: they read the full error details and approve employee messages in the dashboard. The owner has the final pay-run approval.
 - **Decided by:** Devaj
 
-### S-9-1 Readiness report with dollars corrected and hours saved (OPEN)
+### S-9-1 Readiness report with dollars corrected and hours saved (RESOLVED)
 - **Proposed by:** Varnika: clean, fixed and open counts, dollars corrected, hours saved, and a download of the corrected file.
-- **Decision:** keep / drop / change to …
-- **Decided by:**
+- **Decision:** Keep: clean / fixed / open / held counts, dollars changed, questions asked this cycle vs. last, Gusto draft status, download. No "hours saved" unless measured.
+- **Decided by:** Implementation plan, Oct 24 1:00 AM (team may overrule by PR)
 
 ### Agreed
 - The main screen centers on what needs a human now, with one-tap approve, edit or deny. (Devaj, Shannin, Varnika)
@@ -281,20 +281,20 @@ The biggest split is **C-2-1 (what the demo runs on)**. C-4-1, C-5-1 and C-12-2 
 
 ## 10. Tech stack
 
-### C-10-1 Which model, and is it swappable? (OPEN)
+### C-10-1 Which model, and is it swappable? (RESOLVED)
 - **Varnika:** not covered.
 - **Devaj:** the most accurate model: Claude Opus 5.5 for judgment calls and onboarding mapping.
 - **Shannin:** Claude by default, swappable so an open-source model can run the most sensitive steps.
-- **Decision:**
-- **Decided by:**
+- **Decision:** Claude Opus 5.5 for judgment and rule extraction, Claude Haiku 5.5 for structured reply interpretation and classification, behind one adapter so the model is swappable.
+- **Decided by:** Implementation plan, Oct 24 1:00 AM (team may overrule by PR)
 
-### C-10-2 Where does the agent's memory of the business live? (OPEN)
+### C-10-2 Where does the agent's memory of the business live? (RESOLVED)
 - **Varnika:** Backboard (stated in the root README, not in the spec).
 - **Devaj:** not covered.
 - **Shannin:** confirmed rules are stored as structured records because they drive pay. A memory tool is still to research: Backboard, Cognee, Mem0 or Letta.
 - **DESIGN.md:** a SQLite policy table.
-- **Decision:**
-- **Decided by:**
+- **Decision:** Our own `rules` (structured, drive money) and `lessons` (text + vector index per company) tables in Convex, with a classifier that compares each new lesson with the nearest known ones (new / confirmed / superseded / contradiction). Backboard only as an optional mirror.
+- **Decided by:** Implementation plan, Oct 24 1:00 AM (team may overrule by PR)
 
 ### Agreed
 - Plain code owns the payroll state, the approvals and all the math. Deterministic checks handle anything with a clear answer, and Claude handles the fuzzy cases. (Devaj, Shannin)
@@ -303,11 +303,11 @@ The biggest split is **C-2-1 (what the demo runs on)**. C-4-1, C-5-1 and C-12-2 
 
 ## 11. Sponsor tracks
 
-### S-11-1 Shannin's sponsor list (OPEN)
+### S-11-1 Shannin's sponsor list (RESOLVED)
 - **Proposed by:** Shannin: Microsoft "Built for the Real World", Anthropic, Cal Hacks overall, MLH Commit Fellowship, and maybe MLH Backboard and Apify. Devaj's spec says Devaj is handling sponsors separately.
 - **Note:** the validation findings say Devpost lists no Anthropic prize ([findings](../docs/sources/README.md)). Confirm with the organizers before building for it.
-- **Decision:** keep / drop / change to …
-- **Decided by:**
+- **Decision:** Enter Hyphenate, Cal Hacks overall and Most Technically Complex, Microsoft, Anthropic, MLH Gen AI, MLH Commit, Convex; Backboard and Apify only if their pieces exist; skip Atlassian, CRS, Bright Data, voice tracks; Creao pending Devaj reading the restricted doc.
+- **Decided by:** Implementation plan, Oct 24 1:00 AM (team may overrule by PR)
 
 ## 12. Demo and proof
 
@@ -328,50 +328,50 @@ The biggest split is **C-2-1 (what the demo runs on)**. C-4-1, C-5-1 and C-12-2 
 - **Decision:** Both: synthetic companies with planted errors and an answer key, plus the real company's anonymized data with its real errors.
 - **Decided by:** Devaj
 
-### S-12-1 Judges' own scenario: escalate instead of guessing (OPEN)
+### S-12-1 Judges' own scenario: escalate instead of guessing (RESOLVED)
 - **Proposed by:** Shannin: given a situation it hasn't seen, the agent escalates instead of guessing.
-- **Decision:** keep / drop / change to …
-- **Decided by:**
+- **Decision:** Keep, plus the 25% catch-all.
+- **Decided by:** Implementation plan, Oct 24 1:00 AM (team may overrule by PR)
 
-### S-12-2 Demo length and script (OPEN)
+### S-12-2 Demo length and script (RESOLVED)
 - **Proposed by:** Varnika: a 7-step, 3-minute demo script.
 - **Note:** the hacker guide says a 2-minute pitch; the validation findings say Devpost lists a 3-minute pitch plus 2 minutes of Q&A. Confirm which one applies.
-- **Decision:** keep / drop / change to …
-- **Decided by:**
+- **Decision:** Video under 3 minutes opening with the moment; live pitch 3 minutes plus 2 of questions (Devpost, verified). Varnika's 7-step script is adapted in docs/DEMO.md.
+- **Decided by:** Implementation plan, Oct 24 1:00 AM (team may overrule by PR)
 
 ## 13. Work split and timeline
 
-### S-13-1 Hour-by-hour timeline (OPEN)
+### S-13-1 Hour-by-hour timeline (RESOLVED)
 - **Proposed by:** Varnika: hours 0–4 data model and generator; 4–12 sync and checks; 12–20 routing, SMS and corrections; 20–26 escalation and learning; 26–30 real-data sync; 30–36 polish and rehearsals. Devaj and Shannin both leave the work split for after the final spec.
-- **Decision:** keep / drop / change to …
-- **Decided by:**
+- **Decision:** Replaced by the plan's clock and gates (docs/plans/00-shared-context.md).
+- **Decided by:** Implementation plan, Oct 24 1:00 AM (team may overrule by PR)
 
 ## Shannin's added sections (15–19)
 
-### S-15-1 Map the product onto Hyphenate's four pillars (OPEN)
+### S-15-1 Map the product onto Hyphenate's four pillars (RESOLVED)
 - **Proposed by:** Shannin: self-learning onboarding, autonomous run, escalation, self-improvement. These match the Learns → Runs → Escalates → Improves loop in Hyphenate's workshop slides ([slides](../docs/sources/hyphenate-workshop-slides.md)).
-- **Decision:** keep / drop / change to …
-- **Decided by:**
+- **Decision:** Keep, in Hyphenate's words: Learns, Runs, Escalates, Improves.
+- **Decided by:** Implementation plan, Oct 24 1:00 AM (team may overrule by PR)
 
-### S-16-1 The two-stage payroll cycle with two owner gates (OPEN)
+### S-16-1 The two-stage payroll cycle with two owner gates (RESOLVED)
 - **Proposed by:** Shannin: set up, Stage 1 wages, Gate 1, financial reconciliation, Stage 2, Gate 2. Depends on C-3-1.
-- **Decision:** keep / drop / change to …
-- **Decided by:**
+- **Decision:** Keep: Stage 1 wages with Gate 1 into the regular Gusto run; reconciliation; Stage 2 with Gate 2 into an off-cycle Bonus run. Stage 2 math and report are P0; filling the off-cycle draft is P1.
+- **Decided by:** Implementation plan, Oct 24 1:00 AM (team may overrule by PR)
 
-### S-17-1 The feature list F1–F30 as the basis for tickets (OPEN)
+### S-17-1 The feature list F1–F30 as the basis for tickets (RESOLVED)
 - **Proposed by:** Shannin: 30 numbered features across collect, find problems, calculate, ask, learn, improve, prepare and prove.
-- **Decision:** keep / drop / change to …
-- **Decided by:**
+- **Decision:** Superseded by the plan's task IDs.
+- **Decided by:** Implementation plan, Oct 24 1:00 AM (team may overrule by PR)
 
-### S-18-1 Shared engine vs. learned company rules (OPEN)
+### S-18-1 Shared engine vs. learned company rules (RESOLVED)
 - **Proposed by:** Shannin: the engine stays the same for every company, and only the learned rules change. This fits Devaj's "must generalize" and the hybrid-detection item agreed above.
-- **Decision:** keep / drop / change to …
-- **Decided by:**
+- **Decision:** Keep; it is the architecture.
+- **Decided by:** Implementation plan, Oct 24 1:00 AM (team may overrule by PR)
 
-### S-19-1 Privacy and the law (OPEN)
+### S-19-1 Privacy and the law (RESOLVED)
 - **Proposed by:** Shannin: product rules P1–P7, based on research into pay-sharing, the NLRA, Dittman v. UPMC and ADA medical data. It's research, not legal advice.
-- **Decision:** keep / drop / change to …
-- **Decided by:**
+- **Decision:** Keep all (P1 to P7).
+- **Decided by:** Implementation plan, Oct 24 1:00 AM (team may overrule by PR)
 
 ## 14. Open questions
 
