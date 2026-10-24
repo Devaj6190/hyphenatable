@@ -47,4 +47,22 @@ New ids never reuse v1 (#1) ids. v1 a-c05 time entries `a-te-0101..0140` are pin
 
 ## Pushers (A-05..A-07)
 
-Not built yet. They will run `--dry-run` by default against these fixtures, read credentials only from the env vars in shared-context section 16, and write id maps to `data/private/` (gitignored).
+Each pusher is a dry run unless given `--live`. A dry run reads only the fixtures (and the id map, if present), makes no network call and reads no credentials.
+
+### Jobber (A-05): `push-jobber.ts`, `lib/jobber-mutations.ts`, `lib/jobber-seed-client.ts`
+
+```bash
+bun run seed/push-jobber.ts --company a [--verbose]      # plan: counts per object, mutations, both manual checklists
+# live, once the tester account and the "PayrollPilot Seed" app exist (needs JOBBER_SEED_CLIENT_ID / _SECRET):
+bun run seed/push-jobber.ts auth-url                      # a person opens the URL as the tester admin
+bun run seed/push-jobber.ts auth-code <code>              # stores data/private/jobber-seed-tokens.json (not the read app's token)
+bun run seed/push-jobber.ts --company a --live --one      # step 4: one past-dated entry plus what it needs; check it in Jobber
+bun run seed/push-jobber.ts --company a --live            # the rest; rerunnable
+```
+
+- **Safety:** live mode queries `account { tester }` first and refuses unless `tester = true`. Writes go only to `api.getjobber.com` with the seed app's token. Never uses GraphiQL on the read app.
+- **Order:** clients, properties, quotes, jobs (linked to their quote), visits, visit completes, time entries, Jobber expenses, invoices (from job), mark sent, payment records (quote deposits on the quote; the CHK-19 deposit on the invoice).
+- **Idempotent:** every record carries `payrollpilot:<id>` (entry note, title, company name, invoice subject, payment details). Before writing, live mode looks up existing markers in the account. The id map `data/private/<company>-jobber-map.json` is saved after every create. A rerun creates only what is missing.
+- **Not pushed:** the open timer (a-te-0140), which has to be started by hand just before the pull; tip payments (history only); QuickBooks purchases (A-06). `labourRate` is not sent per entry: Jobber costs entries at the user's labour rate, set by hand in Manage Team.
+- **Manual steps** (printed by the dry run): before the push, add every worker in Manage Team with the exact display name. After the push, approve all but the CHK-06 entries, start the CHK-02 timer, and deactivate a-w13.
+- **UNVERIFIED input shapes** (names are verified by introspection; see the comments in `lib/jobber-mutations.ts`): clientCreate, propertyCreate, quoteCreate line items, jobCreate `invoicing`, visitCreate argument placement, invoiceCreateFromJob, payment-record enums. Check them once in GraphiQL on the seed app, or let `--one` surface the error; the run stops on the first `userErrors`.
