@@ -2,6 +2,10 @@
 
 Format: `HH:MM PDT · who · what landed on main / what I'm on / what I need`. Decisions that change the plan go here too, with the file they changed.
 
+- Sat 02:30 · Devaj · B-01 PR #7 merges main (A's connectors, seed and fixtures kept as-is). **Ask → Shanin (A):** `seed/` and `packages/connectors/src/` are excluded from Biome in `biome.json` because they predate it (84 format diffs, 35 `noNonNullAssertion`). When you have 5 minutes, run `bunx biome check --write seed packages/connectors` (plus fix the non-null assertions) and delete those two lines from `biome.json`. Also `jobber/__tests__/client.test.ts` "file token store writes 0600" fails on Windows (no POSIX modes); fine on CI Linux, but consider skipping it on win32. Answers to your contract asks come in the B-02 `contract:` PR.
+
+- Sat 02:20 · Devaj · B-01 scaffold on `b/scaffold` (Next.js 16 + Convex in apps/web, workspaces, Biome, CI, AGENTS.md, .env.example). H5 proven on a local Convex backend; the cloud deployment waits on `convex login`. Gotchas: Biome `!**/build` excluded the whole repo (the repo lives under a folder named `build`); `.gitattributes` forces LF so Biome passes on Windows.
+
 - Sat 02:40 · A2 · Merged #13 (7dcf4e8): `seed/push-gusto.ts`: dry run default; live finds the company from the token, maps demo employees to Company A workers in uuid order, sets compensations from config only (a-w02 $25 vs Jobber $26 for CHK-10), creates a-w14 un-onboarded (CHK-09), records the unprocessed payroll uuid; any path containing "payroll" refused. Venmo workers never sent to Gusto. Not run live.
 - Sat 02:40 · A1 · Merged #14 (6cb26ff): `ingest-r --source jobber-api` for Company R on its own token file `data/private/r/jobber-token.json` (`jobber/cli.ts auth --account r`); all free text nulled; same no-real-token gate. Not run against the real account.
   - **Note → Devaj (B), M4 join:** Company R workers from the API keep `jobber:<id>`; from exports they get `r:w:<hash>`. Both carry the same pseudonym. A joins them for M4; nothing for B unless you want one id (contract ask).

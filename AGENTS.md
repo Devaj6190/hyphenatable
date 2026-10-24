@@ -1,0 +1,13 @@
+# PayrollPilot agent rules
+- Read docs/plans/00-shared-context.md and your role plan before changing code.
+- Plain code owns state, approvals and money. Agents return validated proposals; nothing happens without a human approval or a deterministic rule.
+- Pure logic lives in packages/engine (no IO, Vitest). Convex functions are thin. The UI never computes pay.
+- Money is integer cents. Times are ISO UTC. Ids trace back to the source record.
+- The model never receives names, phone numbers, notes, pay amounts in texts, SSNs or bank data. Ids only.
+- Checks fire only on exact conditions; anything that needs judgment becomes a question. Never auto-correct. Never invent a rate. Never trim hours.
+- Every sync records pulled vs expected. Incomplete blocks what it covers.
+- Never call Gusto submit. There is no submit function in this codebase.
+- Edit only the folders your role owns. Contract files change only by a `contract:` PR.
+- Every PR targets main. One feature per PR. Check main after merging.
+- No secrets in the repo. No real names anywhere. data/private is gitignored.
+- Numbers shown to users say where they came from and whether they are synthetic.

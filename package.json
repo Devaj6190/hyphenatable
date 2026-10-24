@@ -1,0 +1,19 @@
+{
+  "name": "payrollpilot",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "seed",
+    "eval"
+  ],
+  "scripts": {
+    "dev": "bun run --filter web dev",
+    "test": "bun run --filter '*' test",
+    "check": "biome check . && bun run --filter '*' typecheck"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.4.2",
+    "typescript": "^5"
+  }
+}
