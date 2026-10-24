@@ -1,10 +1,7 @@
 # Payroll Ops Agent
 
-An autonomous agent that syncs every system feeding payroll, finds errors, gets the right person to confirm fixes by SMS, and hands the payroll team a verified pay run.
+An agent that prepares and checks payroll before it's submitted. It pulls from Jobber, QuickBooks and Gusto, finds what's wrong or missing, gets managers to approve fixes, and fills the Gusto drafts for a person to submit. Built for the Cal Hacks 13.0 Hyphenate track. The name isn't final.
 
-Product spec: [docs/product-spec.md](docs/product-spec.md)
-
-A 36-hour hackathon project for the Cal Hacks 13.0 Hyphenate track, using Backboard for memory.
-
-- [docs/](docs/): product spec, design draft, diagrams, research sources
-- [specs/](specs/): each teammate's spec, the conflicts between them, and the final spec
+- [specs/final.md](specs/final.md): the product spec (draft)
+- [specs/conflicts.md](specs/conflicts.md): decisions made and still open
+- [docs/sources/](docs/sources/README.md): hackathon guide, Hyphenate track and workshop notes, validation research

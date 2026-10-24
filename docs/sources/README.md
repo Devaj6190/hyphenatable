@@ -10,9 +10,7 @@ Everything the team has collected for the Cal Hacks 13.0 payroll agent (Hyphenat
 - **Live site and app:** sponsor starter packs and workshop times are posted there once hacking starts.
 
 ## Our work
-- **[../DESIGN.md](../DESIGN.md):** the agreed system design.
-- **[../payroll-agent.excalidraw](../payroll-agent.excalidraw):** the detailed architecture diagram.
-- **[../payroll-simple.excalidraw](../payroll-simple.excalidraw):** two simple diagrams, the architecture and one payday.
+- **[../../specs/final.md](../../specs/final.md):** the team's product spec (draft).
 - **Sponsor stacking page:** https://claude.ai/artifact/GvEA9bPYZNrFjTGxcT8TYS (private until shared).
 - **[hackathon-validation-findings.md](hackathon-validation-findings.md):** the validation session's findings (copied here; the session keeps its own copy up to date).
 
@@ -21,4 +19,3 @@ Everything the team has collected for the Cal Hacks 13.0 payroll agent (Hyphenat
 - What still reads as new to them: payroll as the handoff from hiring to paying, and getting each error fixed in its source system, then re-checking.
 - CRS has no fraud or bank-account endpoint. Use a CRS identity check, and don't pull credit reports on employees.
 - The biggest single lever: a catch-all rule (net pay changed more than 25% from last period) plus a path where the controller refuses, so a judge's own scenario still gets caught.
-- The proposed DESIGN.md edits are waiting for the user's yes.
