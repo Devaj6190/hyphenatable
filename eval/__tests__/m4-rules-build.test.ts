@@ -183,6 +183,7 @@ describe("m4-r: Monday workweek, Stage 2 pay left out, separate reasons", () => 
       },
     ],
   };
+  const WIN = { from: "2026-09-14", to: "2026-09-27" };
   const setup = (workweek: string): RSetup => ({
     source: "owner_stated",
     timezone: "America/Los_Angeles",
@@ -221,13 +222,13 @@ describe("m4-r: Monday workweek, Stage 2 pay left out, separate reasons", () => 
     ],
   });
   test("Monday-Sunday matches the paid Stage 1 wages exactly; Sunday-Saturday would not", () => {
-    const mon = backtestR(b, setup("Monday-Sunday"), null);
+    const mon = backtestR(b, setup("Monday-Sunday"), null, WIN);
     expect(mon.pre).toMatchObject({
       compared: 1,
       exact: 1,
       separate: { [MULTI_RATE]: 1 },
     });
-    const sun = backtestR(b, setup("Sunday-Saturday"), null);
+    const sun = backtestR(b, setup("Sunday-Saturday"), null, WIN);
     expect(sun.pre).toMatchObject({
       compared: 1,
       exact: 0,

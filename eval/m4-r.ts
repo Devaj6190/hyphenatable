@@ -135,9 +135,49 @@ export type Pass = {
   maxDiffCents: number;
   /** Worker-periods paid with no engine line, or computed with nothing paid. */
   unmatched: number;
+  /** Of within100: differences explainable by Jobber's 2-dp per-entry rounding (≤ 0.005 h × entries × rate). */
+  withinRounding: number;
   /** Worker-periods not compared, by reason. */
   separate: Record<string, number>;
+  perPeriod: PeriodStats[];
 };
+export type PeriodStats = {
+  period: string;
+  coverage: Coverage;
+  compared: number;
+  exact: number;
+  within100: number;
+  withinRounding: number;
+  maxDiffCents: number;
+};
+export type Coverage = "full" | "partial" | "none";
+/** The timesheet export's date window (local dates, inclusive). */
+export type Window = { from: string; to: string; source: "entries" | "given" };
+
+export const OUTSIDE_WINDOW = "outside the timesheet export window";
+
+/** A pay period is compared only when it lies fully inside the timesheet export window. */
+export function coverageOf(from: string, to: string, w: Window): Coverage {
+  if (from >= w.from && to <= w.to) return "full";
+  if (to < w.from || from > w.to) return "none";
+  return "partial";
+}
+
+/** The export window: given (from SyncRun / export metadata), else the min and max entry date. */
+export function exportWindow(
+  entries: { date: string }[],
+  given?: { from?: string; to?: string },
+): Window | null {
+  if (given?.from && given?.to)
+    return { from: given.from, to: given.to, source: "given" };
+  if (!entries.length) return null;
+  const ds = entries.map((e) => e.date).sort();
+  return {
+    from: given?.from ?? ds[0],
+    to: given?.to ?? (ds.at(-1) as string),
+    source: "entries",
+  };
+}
 export type Trail = {
   workerId: string;
   period: string;
@@ -150,12 +190,23 @@ export type Trail = {
 /** Reported separately: the journal shows several rates for the worker and timesheets don't say which applies. */
 export const MULTI_RATE = "rate depends on job role, not in timesheets";
 
-const PassSchema = z.object({
+const Counts = {
   compared: z.number().int(),
   exact: z.number().int(),
   within100: z.number().int(),
+  withinRounding: z.number().int(),
   maxDiffCents: z.number().int(),
+};
+const PassSchema = z.object({
+  ...Counts,
   unmatched: z.number().int(),
+  perPeriod: z.array(
+    z.object({
+      period: z.string(),
+      coverage: z.enum(["full", "partial", "none"]),
+      ...Counts,
+    }),
+  ),
   /** Worker-periods not compared, by reason (paid outside Gusto, rate depends on job role, ...). */
   separate: z.record(z.string(), z.number().int()),
 });
@@ -165,6 +216,18 @@ export const M4Summary = z.object({
   measuredAt: z.iso.datetime(),
   rulesSource: z.enum(["owner_stated", "onboarding"]),
   periods: z.number().int(),
+  window: z
+    .object({
+      from: z.string(),
+      to: z.string(),
+      source: z.enum(["entries", "given"]),
+    })
+    .nullable(),
+  coverage: z.object({
+    full: z.number().int(),
+    partial: z.number().int(),
+    none: z.number().int(),
+  }),
   notes: z.array(z.string()),
   pre: PassSchema,
   post: PassSchema.nullable(),
@@ -173,6 +236,8 @@ export type M4Summary = z.infer<typeof M4Summary>;
 
 export type RBacktest = {
   periods: string[];
+  window: Window | null;
+  coverage: Record<Coverage, number>;
   notes: string[];
   pre: Pass;
   post: Pass | null;
@@ -313,6 +378,7 @@ function pass(
   setup: RSetup,
   es: AnonBundle["timeEntries"],
   notes: Set<string>,
+  window: Window,
 ) {
   const { workers, entries } = toEngine(
     { ...bundle, timeEntries: es },
@@ -354,10 +420,32 @@ function pass(
     within100: 0,
     maxDiffCents: 0,
     unmatched: 0,
+    withinRounding: 0,
     separate: {},
+    perPeriod: [],
   };
+  const rateOf = new Map(setup.workers.map((w) => [w.id, w.rateCents]));
   for (const period of [...periods].sort()) {
     const [from, to] = period.split("..");
+    const coverage = coverageOf(from, to, window);
+    const pp: PeriodStats = {
+      period,
+      coverage,
+      compared: 0,
+      exact: 0,
+      within100: 0,
+      withinRounding: 0,
+      maxDiffCents: 0,
+    };
+    out.perPeriod.push(pp);
+    if (coverage !== "full") {
+      // Pay periods the timesheet export does not fully cover would compare a partial week with a full paycheck.
+      for (const k of paidBy.keys())
+        if (k.endsWith(`|${period}`))
+          out.separate[OUTSIDE_WINDOW] =
+            (out.separate[OUTSIDE_WINDOW] ?? 0) + 1;
+      continue;
+    }
     const cycle: Cycle = {
       id: `r:${period}`,
       companyId: bundle.companyId,
@@ -417,10 +505,31 @@ function pass(
         continue;
       }
       const d = Math.abs(engine - paid);
-      out.compared++;
-      if (d === 0) out.exact++;
-      if (d <= 100) out.within100++;
-      out.maxDiffCents = Math.max(out.maxDiffCents, d);
+      // Jobber rounds each entry to 0.01 h, so a payroll built from it can differ by up to 0.005 h per entry
+      // at the worker's rate (times the highest multiplier the worker earned in the period).
+      const t0 = Date.parse(cycle.periodStart);
+      const t1 = Date.parse(cycle.periodEnd);
+      const n = entries.filter(
+        (e) =>
+          e.workerId === workerId &&
+          Date.parse(e.startAt) >= t0 &&
+          Date.parse(e.startAt) <= t1,
+      ).length;
+      const rate = rateOf.get(workerId) ?? p?.rateCents ?? 0;
+      const mult = Math.max(
+        1,
+        ...(p?.earnings ?? [])
+          .filter((x) => (x.seconds ?? 0) > 0)
+          .map((x) => x.multiplier),
+      );
+      const rounding = d > 0 && d <= 100 && d <= 0.005 * n * rate * mult;
+      for (const s of [out, pp]) {
+        s.compared++;
+        if (d === 0) s.exact++;
+        if (d <= 100) s.within100++;
+        if (rounding) s.withinRounding++;
+        s.maxDiffCents = Math.max(s.maxDiffCents, d);
+      }
       trails.push({
         workerId,
         period,
@@ -438,8 +547,19 @@ export function backtestR(
   bundle: AnonBundle,
   setup: RSetup,
   corrections: RCorrections | null,
+  /** The timesheet export's window, from SyncRun / export metadata; default: min and max entry date. */
+  given?: { from?: string; to?: string },
 ): RBacktest {
   const notes = new Set<string>();
+  const window = exportWindow(bundle.timeEntries, given) ?? {
+    from: "9999-12-31",
+    to: "0000-01-01",
+    source: "entries" as const,
+  };
+  if (!bundle.timeEntries.length)
+    notes.add(
+      "no time entries: no pay period is covered by a timesheet export",
+    );
   if (
     !setup.rules.some(
       (r) => r.type === "overtime_policy" && r.status === "active",
@@ -448,17 +568,22 @@ export function backtestR(
     notes.add(
       "no active overtime_policy rule: hourly workers with hours are excluded (never guessed)",
     );
-  const pre = pass(bundle, setup, bundle.timeEntries, notes);
+  const pre = pass(bundle, setup, bundle.timeEntries, notes, window);
   const post = corrections
     ? pass(
         bundle,
         setup,
         applyCorrections(bundle.timeEntries, corrections),
         notes,
+        window,
       )
     : null;
+  const coverage: Record<Coverage, number> = { full: 0, partial: 0, none: 0 };
+  for (const p of pre.out.perPeriod) coverage[p.coverage]++;
   return {
     periods: pre.periods,
+    window: bundle.timeEntries.length || given?.from ? window : null,
+    coverage,
     notes: [...notes].sort(),
     pre: pre.out,
     post: post?.out ?? null,
