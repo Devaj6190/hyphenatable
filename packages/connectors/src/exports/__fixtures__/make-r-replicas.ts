@@ -137,7 +137,7 @@ export const GUSTO_JOURNAL_SECTIONED_CSV = [
     Amount: "750.00",
   }),
   pay("Team Leader", "Regular", "10.000", "30.00", "300.00"),
-  pay("Totals", "Regular", "40.000", "", "1050.00"),
+  // blank-Job lines inherit the job above (Team Leader) ...
   pay("", "Overtime", "2.000", "37.50", "75.00"),
   pay(
     "",
@@ -146,6 +146,10 @@ export const GUSTO_JOURNAL_SECTIONED_CSV = [
     "37.50",
     "37.50",
   ),
+  // ... and after "Totals" they are subtotals: the same Overtime lines repeat in the subtotal block
+  pay("Totals", "Regular", "40.000", "", "1050.00"),
+  pay("", "Overtime", "2.000", "", "75.00"),
+  pay("", "Overtime (adjustment 08/15/26 - 08/28/26)", "1.000", "", "37.50"),
   pay("", "Gross", "", "", "1162.50"),
   person("Okafor", "Sam", "Owner’s draw", "Check"),
   // the owner draw appears ONLY as a Totals line (no itemized line)
@@ -161,6 +165,8 @@ export const GUSTO_JOURNAL_SECTIONED_CSV = [
     Amount: "750.00",
   }),
   pay("Team Leader", "Regular", "", "", "300.00"),
+  pay("", "Overtime", "", "", "75.00"),
+  pay("", "Overtime (adjustment 08/15/26 - 08/28/26)", "", "", "37.50"),
   pay("Totals", "Regular", "", "", "1050.00"),
   pay("", "Overtime", "", "", "75.00"),
   pay("", "Overtime (adjustment 08/15/26 - 08/28/26)", "", "", "37.50"),

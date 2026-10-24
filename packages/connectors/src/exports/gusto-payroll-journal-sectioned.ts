@@ -2,9 +2,11 @@
 // replicas). Preamble lines, then per payroll:
 //   <title>  /  Pay period, MM/DD/YYYY - MM/DD/YYYY  /  Pay day, MM/DD/YYYY  /  30-column header  /
 //   employee rows  /  Payroll Totals block
-// Employee rows: the first row has Last, First, Employee Type; then one line per (Job, Pay Type): itemized
-// lines per job (Job = a role such as "Landscaper", each with its own Rate) or with no job, then SUBTOTAL
-// lines per pay type with Job = "Totals", then often a "Gross" line.
+// Employee rows: the first row has Last, First, Employee Type; then one line per (Job, Pay Type). A blank Job
+// INHERITS the previous non-blank Job (live finding), so lines after a "Totals" line belong to the subtotal block.
+// Order: itemized lines per job (Job = a role such as "Landscaper", each with its own Rate; blank-Job lines
+// such as Overtime belong to that job), then SUBTOTAL lines per pay type starting with Job = "Totals" (blank-Job
+// lines after it are subtotals too), then often a "Gross" line.
 // Read ONLY: names, employee type, job, pay type, hours, rate, amount; period, pay day, section kind. Payment
 // (the payment METHOD), tax columns, Work Address, Net Pay, Check Amount, Employer Cost and Donations are never
 // read (only mapped columns are indexed).
@@ -79,11 +81,20 @@ class LineBlock {
   readonly subtotals = new Map<string, number>();
 
   /** returns true when the line was itemized (so the caller records its earnings detail) */
-  add(job: string | null, type: string, amount: number | null): boolean {
+  /** the job group a blank-Job line belongs to: the last non-blank Job ("Totals" opens the subtotal block) */
+  private group: string | null = null;
+  /** the effective job of the last added line (for jobLines) */
+  lastJob: string | null = null;
+
+  add(rawJob: string | null, type: string, amount: number | null): boolean {
     if (/^gross$/i.test(type)) {
       this.gross = amount;
       return false;
     }
+    // live finding: blank-Job lines INHERIT the previous Job, so an Overtime line after "Totals" is a subtotal
+    if (rawJob) this.group = rawJob;
+    const job = rawJob ?? this.group;
+    this.lastJob = job;
     if (amount === null) return false;
     if (isTotalsJob(job)) {
       this.subtotals.set(type, (this.subtotals.get(type) ?? 0) + amount);
@@ -332,7 +343,7 @@ export async function readGustoPayrollJournalSectionedCsv(
           else if (cur.ratesCents[type] !== rate) delete cur.ratesCents[type];
         }
         cur.jobLines?.push({
-          job,
+          job: block.lastJob,
           payType: type,
           hours: hours === null ? null : hours / 1000,
           rateCents: rate,
