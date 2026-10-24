@@ -5,6 +5,7 @@
   "type": "module",
   "description": "Read-only connectors (Jobber, QuickBooks, Gusto read, exports) returning shared-context section 6 shapes with completeness SyncRuns.",
   "exports": {
+    ".": "./src/index.ts",
     "./jobber": "./src/jobber/index.ts",
     "./qbo": "./src/qbo/index.ts",
     "./gusto": "./src/gusto/read.ts",
