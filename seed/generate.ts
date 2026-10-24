@@ -6,9 +6,10 @@
 // Past cycles follow the company's rules and stay clean; the current cycle gets the planted errors from
 // seed/lib/plant.ts. Never invents a rate the config does not give; unknowns stay null.
 
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { type ConfigB, generateB } from "./lib/company-b";
+import { type CycleExtConfig, generateCycleA06 } from "./lib/cycle-a06";
 import { must } from "./lib/must";
 import { JOBBER_EXPENSE_TITLES, STREETS, VENDORS, WORK } from "./lib/names";
 import { buildAnswerKey, plantCurrent } from "./lib/plant";
@@ -1357,6 +1358,32 @@ export function generateAny(cfg: Config | ConfigB): Record<string, unknown> {
     : generate(cfg as Config);
 }
 
+/**
+ * Cycle extensions (seed/companies/<company>-cNN.json, e.g. a-c06): extra cycles generated on top of the base
+ * output and written to data/fixtures/<company>/cycles/<cycle>/, so the base files stay byte-identical.
+ */
+export function generateExtensions(
+  company: string,
+): Record<string, Record<string, string>> {
+  const out: Record<string, Record<string, string>> = {};
+  const dir = join(import.meta.dir, "companies");
+  const files = readdirSync(dir)
+    .filter((f) => new RegExp(`^${company}-c\\d+\\.json$`).test(f))
+    .sort();
+  if (!files.length) return out;
+  const cfg = loadConfig(company);
+  const base = generate(cfg) as Record<string, Rec[] | Rec>;
+  for (const f of files) {
+    const ext = JSON.parse(
+      readFileSync(join(dir, f), "utf8"),
+    ) as CycleExtConfig;
+    out[ext.cycle.id] = serialize(
+      generateCycleA06(ext, base, cfg.company.timezone, cfg.holidays),
+    );
+  }
+  return out;
+}
+
 export function loadConfig(company: string): Config {
   return JSON.parse(
     readFileSync(join(import.meta.dir, "companies", `${company}.json`), "utf8"),
@@ -1394,6 +1421,13 @@ if (import.meta.main) {
   for (const [f, text] of Object.entries(files))
     writeFileSync(join(out, f), text);
   console.log(`wrote ${Object.keys(files).length} files to ${out}`);
+  for (const [cycleId, ext] of Object.entries(generateExtensions(company))) {
+    const dir = join(out, "cycles", cycleId);
+    mkdirSync(dir, { recursive: true });
+    for (const [f, text] of Object.entries(ext))
+      writeFileSync(join(dir, f), text);
+    console.log(`wrote ${Object.keys(ext).length} files to ${dir}`);
+  }
 }
 
 // keep weekday exported for tests

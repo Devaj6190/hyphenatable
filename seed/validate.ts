@@ -314,6 +314,10 @@ export const AnswerKeyRow = z.strictObject({
     values: z.record(z.string(), z.union([z.string(), z.number()])),
   }),
   registerCategory: z.string().min(1),
+  // cycle extensions (data/fixtures/<co>/cycles/<cycle>/): rows say their cycle, and whether a rule learned
+  // from an earlier cycle's answers resolves them without a question (the RuleType, or null)
+  cycleId: id.optional(),
+  resolvableByRuleType: RuleType.nullable().optional(),
 });
 
 // ---- file map ---------------------------------------------------------------
@@ -340,7 +344,11 @@ const FILES: Record<string, { schema: z.ZodType; array: boolean }> = {
 
 type Rec = Record<string, unknown>;
 
-export function validateDir(dir: string): string[] {
+/**
+ * Validates a fixture folder; with `extDirs`, each extension folder's files (any subset) are validated and
+ * appended to the base before the cross-reference checks, so a cycle extension must resolve against the base.
+ */
+export function validateDir(dir: string, extDirs: string[] = []): string[] {
   const errors: string[] = [];
   const data: Record<string, Rec[]> = {};
 
@@ -367,6 +375,20 @@ export function validateDir(dir: string): string[] {
       continue;
     }
     data[file] = (array ? json : [json]) as Rec[];
+    for (const ext of extDirs) {
+      const ep = join(ext, file);
+      if (!existsSync(ep)) continue;
+      const ej = JSON.parse(readFileSync(ep, "utf8"));
+      const er = z.array(schema).safeParse(ej);
+      if (!er.success) {
+        for (const issue of er.error.issues)
+          errors.push(
+            `${ep}: ${issue.path.join(".") || "(root)"}: ${issue.message}`,
+          );
+        continue;
+      }
+      data[file].push(...(ej as Rec[]));
+    }
   }
   if (errors.length) return errors;
 
@@ -491,7 +513,7 @@ if (import.meta.main) {
     console.error("usage: bun run seed/validate.ts <fixture dir>");
     process.exit(2);
   }
-  const errors = validateDir(dir);
+  const errors = validateDir(dir, process.argv.slice(3));
   if (errors.length) {
     for (const e of errors) console.error(`FAIL ${e}`);
     console.error(`${errors.length} error(s) in ${dir}`);
