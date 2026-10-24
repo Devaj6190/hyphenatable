@@ -7,6 +7,7 @@ Everything the team has collected for the Cal Hacks 13.0 payroll agent (Hyphenat
 - **Hyphenate track doc:** rubric, deliverables and the sandbox list: https://docs.google.com/document/d/1u4iN8R97ILY3kfHTPKC82zdutHrGx4ze5eCAP-J92w4/edit?usp=sharing
 - **Hyphenate workshop slides:** [hyphenate-workshop-slides.md](hyphenate-workshop-slides.md). The Learns → Runs → Escalates → Improves loop, with coffee-chain tips and festival vendor payouts as examples.
 - **CRS sandbox:** keys, docs and test identities at https://calhacks.crscreditapi.com. Use test identities only.
+- **Creao hackathon page:** https://community.creao.ai/CalHacks2026?utm_source=calhacks13-2026&utm_medium=hackathon&utm_campaign=hackathons-oct-2026. **Sign up through this link** to get the upgraded account (paid models, scheduled runs, extra weekend credits; booth tops up on request). It also has the Creao rules, tracks and rubric; summary in [research/creao.md](research/creao.md).
 - **Live site and app:** sponsor starter packs and workshop times are posted there once hacking starts.
 
 ## Our work

@@ -414,6 +414,15 @@ Each ticket is one PR to `main`, under 400 lines where possible (schema and prom
 - **Priority:** P2. Only after G3 with nothing else pending.
 - **Time:** 30 min each. **Fallback:** skip; both are off the hero path.
 
+### B-19 Creao nightly cycle run over a Convex MCP endpoint (P1)
+- **Branch:** `b/creao-mcp`
+- **Goal:** one saved Creao agent runs on a schedule, calls our tools and leaves the owner's morning list ready. Satisfies the Creao rule "at least one CREAO agent does the core work".
+- **Files:** `apps/web/convex/http.ts` (route `POST /mcp`, JSON-RPC `initialize`, `tools/list`, `tools/call`; bearer `MCP_KEY`), `apps/web/convex/creao.ts` (tool handlers; `POST /creao/webhook` stores the run result, dedupe on `runId`).
+- **Tools (ids only, no names, no amounts):** `list_cycles`, `run_checks { cycleId }` (calls `checks.run`), `get_flags { cycleId }` (checkId, status, routeTo, subject ids, `seen`), `propose_question { flagId }` (writes a Question with `status: "draft"`; a human approves).
+- **Depends on:** B-06 runner. Human steps in Creao (the API only runs agents): sign up through the hackathon link, add the MCP server URL + key, save the agent, add a schedule, copy the agent id and a run share link into the Devpost README.
+- **Acceptance:** a scheduled run fires on its own and its `checks.run` audit event shows `actor.kind: "agent"`, `agent: "auditor"`.
+- **Time:** 90 min. **Fallback:** drop Creao (spike rule in `handoff-creao.md` section 6); nothing else depends on it.
+
 ---
 
 ## 7. Risks and fallbacks

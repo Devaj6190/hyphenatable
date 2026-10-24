@@ -2,6 +2,7 @@
 
 Format: `HH:MM PDT · who · what landed on main / what I'm on / what I need`. Decisions that change the plan go here too, with the file they changed.
 
+- Sat 14:45 PDT · B · **Creao decided: enter narrowly** (specs/final.md section 11 and row S-11-2; ticket B-19 in B-agent-backend.md). One scheduled Creao agent over a Convex MCP endpoint; proposals only; live replies stay a direct Claude call. Devaj takes this back from Varnika; handoff and research docs from #68 included. Pending the spike's human steps (Creao signup, agent save, schedule).
 - Sat 11:33 PDT · B · Varnika's sequence is on main: polish #53 (395ed1b), server-fixtures #55 (4dad86f), timezone #56 (20f9aef); each CI green and main verified. Preserved server-only fixture loading/redaction, RoleScope, timezone props, and RoleSwitch refresh. UI foundation #50 remains pending; five interrupted UI page worktrees retain uncommitted work and were not edited.
 - Sat 11:33 PDT · B · Contract #15 conflict repaired at a689659; CI green, local tests 92 engine / 142 connectors / 19 eval / 37 web (one Windows skip). Awaiting A and C acknowledgments; no merge yet. Company A strict fixture validation still fails: lowMarginPct missing, reimbursement fields missing on 66 expenses, sourceId missing on 62 past-payroll rows. A owns regeneration. H6/H7 live probes failed for missing server credentials; see INTEGRATIONS.md. Never substitute zero or guess missing data.
 
