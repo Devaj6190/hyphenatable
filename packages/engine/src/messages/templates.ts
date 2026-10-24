@@ -1,12 +1,13 @@
 import type { Interpretation } from "@payrollpilot/engine/schemas";
+import { PRODUCT_NAME } from "./brand";
 
-// Text templates for every PayrollPilot message (C-03). One short question per text, numbered options,
+// Text templates for every message (C-03); the product name comes from brand.ts. One short question per text, numbered options,
 // never a dollar amount, at most MAX_LEN characters. Placeholders are in braces.
 export const templates = {
-  managerPage:
-    "PayrollPilot: {n} items need you before {day}'s payroll. Open: {link}",
-  ownerPage:
-    "PayrollPilot: {n} decisions are waiting for you before {day}'s payroll. Open: {link}",
+  managerPage: `${PRODUCT_NAME}: {n} items need you before {day}'s payroll. Open: {link}`,
+  ownerPage: `${PRODUCT_NAME}: {n} decisions are waiting for you before {day}'s payroll. Open: {link}`,
+  // Filled by managerSummary() in summary.ts from the cycle's flags.
+  managerSummary: `${PRODUCT_NAME}: {count} {need} you before payroll ({range}): {categories} Review: {link}`,
   entryNoJob:
     "{who}, on {date} your {hours}h entry has no job. Which job was it? 1 {jobA} 2 {jobB} 3 something else",
   overlap:
@@ -17,12 +18,10 @@ export const templates = {
     "{who}, {date} shows a {hours}h shift. Is that right? 1 yes 2 no, it ended earlier 3 forgot to clock out",
   expenseNoJob:
     "{who}, a {vendor} purchase on {date} has no job. Which job? 1 {jobA} 2 {jobB} 3 overhead 4 not sure",
-  venmoRate:
-    "Which rate should PayrollPilot use for {who}? Reply the hourly rate as a number.",
+  venmoRate: `Which rate should ${PRODUCT_NAME} use for {who}? Reply the hourly rate as a number.`,
   followUp: "Thanks. To confirm: {restatement}. Reply 1 yes, 2 no",
   held: "Got it. That item stays on hold until {day}; the rest of {who}'s hours go through.",
-  stopAck:
-    "You won't get texts from PayrollPilot. Questions will go to your manager.",
+  stopAck: `You won't get texts from ${PRODUCT_NAME}. Questions will go to your manager.`,
 } as const;
 
 export type TemplateKey = keyof typeof templates;
@@ -34,6 +33,7 @@ export const audience: Record<
   "manager" | "employee" | "owner" | "recipient"
 > = {
   managerPage: "manager",
+  managerSummary: "manager",
   ownerPage: "owner",
   entryNoJob: "employee",
   overlap: "employee",
@@ -50,12 +50,17 @@ export const MAX_LEN = 240;
 
 const DOLLAR_AMOUNT = /\$|\b\d[\d,]*(\.\d+)?\s*(dollars?|usd|bucks)\b/i;
 
-export function render(key: TemplateKey, vars: Record<string, string>): string {
-  const text = templates[key].replace(/\{(\w+)\}/g, (_, name: string) => {
+// Placeholders filled in, with no checks; render() is what goes to a phone.
+export function fill(key: TemplateKey, vars: Record<string, string>): string {
+  return templates[key].replace(/\{(\w+)\}/g, (_, name: string) => {
     const value = vars[name];
     if (value === undefined) throw new Error(`${key}: missing {${name}}`);
     return value;
   });
+}
+
+export function render(key: TemplateKey, vars: Record<string, string>): string {
+  const text = fill(key, vars);
   if (DOLLAR_AMOUNT.test(text))
     throw new Error(`${key}: texts never carry a dollar amount`);
   if (text.length > MAX_LEN)
