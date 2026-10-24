@@ -5,9 +5,12 @@
 export const JOBBER_TIMESHEETS_CSV = [
   "Totals",
   "",
-  "Total Hours,25.25",
-  "Avery Reed Team Leader,12.50",
-  "Jordan Ellis ,9.25",
+  // totals come from exact seconds, rows are rounded to 0.01 h: totals may be off by rounding drift
+  "Total Hours,25.26",
+  "Avery Reed Team Leader,12.51",
+  // one person, two Jobber accounts (name variants), each with its own total line
+  "Jordan Ellis,4.25",
+  "Jordan Ellis ,5.00",
   "Sam Okafor,3.50",
   "",
   "Name,Date,Start time,End time,Hours,Working on,Note,Client name",
@@ -17,7 +20,7 @@ export const JOBBER_TIMESHEETS_CSV = [
   'Jordan Ellis ,"Sep 2, 2026", 1:00PM,6:00PM,5.00,Maple Grove HOA - Off-Site,"gate code fake",Maple Grove HOA',
   'Sam Okafor,"Sep 2, 2026", 9:00AM, 9:00AM,0.0,Request for hedge quote,"",Maple Grove HOA',
   'Sam Okafor,"Sep 3, 2026", 8:00AM,11:30AM,3.50,Job #521 - Maple Grove HOA,"",Maple Grove HOA',
-  "Report totals:,,,,25.25,,,",
+  "Report totals:,,,,25.26,,,",
 ].join("\n");
 
 export const JOURNAL_HEADER = [
@@ -124,10 +127,10 @@ export const GUSTO_JOURNAL_SECTIONED_CSV = [
   }),
   pay("Overtime", "2.000", "37.50", "75.00"),
   pay("Overtime (adjustment 08/15/26 - 08/28/26)", "1.000", "37.50", "37.50"),
+  // most employees have no Gross line; this multi-line one does (it must agree with Payment)
   pay("Gross", "", "", "1,112.50"),
   person("Okafor", "Sam", "Owner’s draw", "2000.00"),
   pay("Owner's Draw", "", "", "2,000.00"),
-  pay("Gross", "", "", "2,000.00"),
   line({
     "Last Name": "Payroll Totals",
     Payment: "3112.50",
@@ -141,7 +144,8 @@ export const GUSTO_JOURNAL_SECTIONED_CSV = [
   "Pay period, 08/29/2026 - 09/11/2026",
   "Pay day, 09/18/2026",
   JOURNAL_HEADER.join(","),
-  person("Reed", "Avery", "Paid by the hour", "200.00"),
+  // Payment empty: the Gross line is the fallback
+  person("Reed", "Avery", "Paid by the hour", ""),
   pay("Commission", "", "", "150.00"),
   pay("Additional Earnings", "", "", "50.00"),
   pay("Gross", "", "", "200.00"),
@@ -157,10 +161,8 @@ export const GUSTO_JOURNAL_SECTIONED_CSV = [
   JOURNAL_HEADER.join(","),
   person("Reed", "Avery", "Paid by the hour", "1000.00"),
   pay("Regular", "40.000", "25.00", "1,000.00"),
-  pay("Gross", "", "", "1,000.00"),
   person("Ellis", "Jordan", "Paid by the hour", "660.00"),
   pay("Regular", "30.000", "22.00", "660.00"),
-  pay("Gross", "", "", "660.00"),
   line({ "Last Name": "Payroll Totals", Payment: "1660.00" }),
   line({ "Pay Type": "Gross", Amount: "1,660.00" }),
 ].join("\n");

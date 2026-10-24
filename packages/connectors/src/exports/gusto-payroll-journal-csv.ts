@@ -83,6 +83,8 @@ export interface PayrollJournalRow {
   sectionKind?: "regular" | "off_cycle" | "other";
   section?: number;
   employeeType?: string | null;
+  /** "Owner’s draw" employee type: an owner draw, not a wage (kept, excluded from the M4 wage comparison) */
+  payKind?: "wage" | "owner_draw";
   /** per pay-type rate in cents, when the report gives one */
   ratesCents?: Record<string, number>;
 }
