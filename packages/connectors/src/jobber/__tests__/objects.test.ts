@@ -10,8 +10,8 @@ const auth = (fetchImpl: typeof fetch) => ({
   clientId: "cid", clientSecret: "csecret", fetchImpl, sleepImpl: async () => {},
   tokenStore: memoryTokenStore({ accessToken: null, accessTokenExpiresAt: null, refreshToken: "fake-refresh-0" }),
 });
-const pull = (fx = fixtures()) => {
-  const fake = fakeJobberFetch(fx);
+const pull = (fx = fixtures(), hidden?: string[]) => {
+  const fake = fakeJobberFetch(fx, { hidden });
   return pullCycle(auth(fake.fetch), "a", "2026-10-11", "2026-10-24", { timezone: "America/Los_Angeles", now: () => new Date("2026-10-24T12:00:00Z") }).then((r) => ({ ...r, calls: fake.calls }));
 };
 const runOf = (r: Awaited<ReturnType<typeof pull>>, object: string) => r.syncRuns.find((s) => s.object === object);
@@ -115,5 +115,24 @@ describe("pullCycle objects (recorded fixtures)", () => {
     const r = await pull(fx);
     expect(runOf(r, "jobs")).toMatchObject({ complete: false, pulled: 1, expected: 2 });
     expect(runOf(r, "jobs")?.error).toContain("Z2lkOi8vSm9iYmVyL0pvYi8yMDAy");
+  });
+});
+
+describe("fields hidden from the app (live trial account, 2026-10-24)", () => {
+  it("User.labourRate and Expense.accountingCode hidden -> not requested, null, runs still complete", async () => {
+    const r = await pull(fixtures(), ["User.labourRate", "Expense.accountingCode"]);
+    expect(r.syncRuns.filter((s) => !s.complete).map((s) => [s.object, s.error])).toEqual([]);
+    expect(r.records.workers.every((w) => w.jobber?.labourRateCents === null)).toBe(true);
+    expect(r.records.expenses.every((x) => x.accountName === null)).toBe(true);
+    expect(runOf(r, "users")?.method).toContain("User.labourRate hidden");
+    expect(runOf(r, "expenses")?.method).toContain("Expense.accountingCode hidden");
+    // one probe per type per pull
+    expect(r.calls.graphql.filter((c) => c.operation === "PayrollPilotTypeFields").map((c) => c.variables.name)).toEqual(["User", "Expense"]);
+  });
+
+  it("visible fields are still requested and mapped", async () => {
+    const r = await pull();
+    expect(r.records.workers.find((w) => w.jobber?.labourRateCents === 3115)).toBeDefined();
+    expect(r.records.expenses[0]?.accountName).toBe("Materials");
   });
 });

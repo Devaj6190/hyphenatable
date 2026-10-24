@@ -28,8 +28,9 @@ describe("pullCycle (recorded fixtures)", () => {
     expect(te[1]?.variables.after).toBe("Mw");
     // byDay asked per user for the same dates
     const bd = calls.graphql.filter((c) => c.operation === "PayrollPilotUserTimeSheetsByDay");
-    expect(bd).toHaveLength(4);
-    expect(bd[0]?.variables).toMatchObject({ startDate: "2026-10-11", endDate: "2026-10-24" });
+    // Jobber caps timeSheetsByDay at 7 days: 14-day period = two windows per user
+    expect(bd.map((c) => [c.variables.startDate, c.variables.endDate]).slice(0, 2)).toEqual([["2026-10-11", "2026-10-17"], ["2026-10-18", "2026-10-24"]]);
+    expect(bd).toHaveLength(8);
     // headers on every request
     expect(calls.graphql.every((c) => c.version === "2026-09-25" && c.auth === "Bearer fake-access-1")).toBe(true);
   });
@@ -59,14 +60,21 @@ describe("pullCycle (recorded fixtures)", () => {
     expect(run?.error).toContain("timeSheetsByDay sum 6 (diff -1)");
   });
 
-  it("notes users in other statuses without failing the users run", async () => {
+  it("NOT_INVITED workers are active, pulled as normal records and covered by the per-user check", async () => {
     const fx = fixtures();
-    fx.users.COUNT.data.users.totalCount = 5;
+    const jordan = fx.users.ACTIVATED.data.users.nodes[2];
+    if (jordan) jordan.status = "NOT_INVITED"; // added in Manage Team without a login invite
     const { fetch } = fakeJobberFetch(fx);
     const r = await pullCycle(auth(fetch), "a", ...PERIOD, opts);
     const users = r.syncRuns.find((s) => s.object === "users");
     expect(users?.complete).toBe(true);
-    expect(users?.error).toContain("1 users in other statuses");
+    expect(users).toMatchObject({ pulled: 4, expected: 4, error: null });
+    const w = r.records.workers.find((x) => x.jobber?.userId === "Z2lkOi8vSm9iYmVyL1VzZXIvMTAwMw==");
+    expect(w).toMatchObject({ status: "active", jobber: { status: "NOT_INVITED" } });
+    expect(r.records.workers.filter((x) => x.status === "inactive").map((x) => x.jobber?.status)).toEqual(["DEACTIVATED"]);
+    // their entries are checked against their own timeSheetsByDay totals
+    expect(r.syncRuns.find((s) => s.object === "timeSheetEntries")?.complete).toBe(true);
+    expect(r.records.timeEntries.filter((e) => e.workerId === w?.id)).toHaveLength(2);
   });
 
   it("records a failed object as an incomplete SyncRun instead of throwing", async () => {
