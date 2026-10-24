@@ -11,18 +11,13 @@ import { SourceChip } from "@/components/SourceChip";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  MISSED_SOURCE,
-  type MissedQuestion,
-  missedQuestions,
-} from "@/lib/onboardingQuestions";
+import { MISSED_SOURCE, type MissedQuestion } from "@/lib/onboardingQuestions";
 import { useRuleStore } from "@/lib/ruleStore";
 import {
-  closedCycles,
+  closedOf,
   groupRules,
-  incompleteSyncs,
-  ownerId,
   RULES_SOURCE,
+  type RulesViewData,
   shortDate,
   syncWords,
 } from "@/lib/rules";
@@ -170,21 +165,23 @@ export function OnboardingView({
   companyId,
   dataKind,
   label,
+  data,
 }: {
   companyId: string;
   dataKind: DataKind;
   label: string;
+  data: RulesViewData;
 }) {
   const { role } = useRole();
-  const store = useRuleStore(companyId);
-  const owner = ownerId(companyId);
+  const store = useRuleStore(companyId, data.rules);
+  const owner = data.ownerId;
   const approverId = role === "owner" ? owner : null;
-  const past = closedCycles(companyId);
+  const past = closedOf(data.cycles);
   const learned = store.rules.filter((r) => r.source !== "owner_stated");
   const stated = store.rules.filter((r) => r.source === "owner_stated");
   const checked = learned.filter((r) => r.status !== "proposed").length;
-  const questions = missedQuestions.filter((q) => q.companyId === companyId);
-  const gaps = incompleteSyncs(companyId);
+  const questions = data.missedQuestions;
+  const gaps = data.incompleteSyncs;
 
   if (!learned.length) return <RulesEmpty label={label} />;
 
@@ -268,7 +265,7 @@ export function OnboardingView({
                 <RuleCard
                   key={r.id}
                   rule={r}
-                  companyId={companyId}
+                  names={data.names}
                   store={store}
                   viewer={role}
                   approverId={approverId}
@@ -318,7 +315,7 @@ export function OnboardingView({
               <RuleCard
                 key={r.id}
                 rule={r}
-                companyId={companyId}
+                names={data.names}
                 store={store}
                 viewer={role}
                 approverId={approverId}

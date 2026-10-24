@@ -3,6 +3,8 @@ import { Suspense } from "react";
 import { PageHeader } from "@/components/PageHeader";
 import { LearnedView } from "@/components/rules/LearnedView";
 import { companies } from "@/lib/companies";
+import { currentViewer } from "@/lib/server/fixtures";
+import { rulesView } from "@/lib/server/rules";
 
 // Params are read inside Suspense so the shell stays instant (Next 16).
 export default function LearnedPage({
@@ -27,11 +29,13 @@ async function Body({
   const { companyId } = await params;
   const company = companies[companyId];
   if (!company) notFound();
+  const viewer = await currentViewer(companyId);
   return (
     <LearnedView
       companyId={companyId}
       dataKind={company.kind}
       label={company.label}
+      data={rulesView(viewer, companyId)}
     />
   );
 }

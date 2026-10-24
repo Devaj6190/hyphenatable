@@ -1,7 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
-import { fixtureRules, type Rule } from "@/lib/rules";
+import type { Rule, RuleView } from "@/lib/rules";
 
 // ponytail: browser-only stand-in for rules.approve / rules.toggle / rules.stateInPlainWords /
 // onboarding answers, which are not in apps/web/convex yet. Decisions live in sessionStorage so
@@ -25,7 +25,7 @@ type Answer = { choice: string; note: string; by: string; at: string };
 
 type State = {
   changes: Record<string, Change[]>;
-  stated: Rule[];
+  stated: RuleView[];
   answers: Record<string, Answer>;
 };
 
@@ -63,7 +63,7 @@ const subscribe = (l: () => void) => {
 export const blockedApprover = (rule: Rule, by: string) =>
   rule.provenance.answeredBy !== null && rule.provenance.answeredBy === by;
 
-function apply(rule: Rule, changes: Change[] | undefined): Rule {
+function apply(rule: RuleView, changes: Change[] | undefined): RuleView {
   const last = changes?.at(-1);
   if (!last) return rule;
   const approved = last.status === "active";
@@ -78,12 +78,11 @@ function apply(rule: Rule, changes: Change[] | undefined): Rule {
   };
 }
 
-export function useRuleStore(companyId: string) {
+/** `initial` is the server's rules for this viewer (lib/server/rules.ts); this only layers decisions on top. */
+export function useRuleStore(companyId: string, initial: RuleView[]) {
   const s = useSyncExternalStore(subscribe, read, () => EMPTY);
   const stated = s.stated.filter((r) => r.companyId === companyId);
-  const rules = [...fixtureRules(companyId), ...stated].map((r) =>
-    apply(r, s.changes[r.id]),
-  );
+  const rules = [...initial, ...stated].map((r) => apply(r, s.changes[r.id]));
 
   const decide = (
     rule: Rule,
@@ -119,11 +118,14 @@ export function useRuleStore(companyId: string) {
   /** A rule the owner typed. Proposed until they confirm the restatement. */
   const addStated = (text: string, replaces: string | null) => {
     const cur = read();
-    const rule: Rule = {
+    const rule: RuleView = {
       id: `${companyId}-stated-${cur.stated.length + 1}`,
       companyId,
       type: null,
-      params: { text, replaces },
+      params: { replaces },
+      words: text,
+      evidence: null,
+      summary: null,
       status: "proposed",
       source: "owner_stated",
       provenance: {

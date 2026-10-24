@@ -10,16 +10,7 @@ import { SourceChip } from "@/components/SourceChip";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { blockedApprover, type useRuleStore } from "@/lib/ruleStore";
-import {
-  evidenceItems,
-  evidenceSummary,
-  plainWords,
-  type Rule,
-  shortDate,
-  sourceWords,
-  syncWords,
-  workerLabel,
-} from "@/lib/rules";
+import { type RuleView, shortDate, sourceWords, syncWords } from "@/lib/rules";
 import type { ViewerRole } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -49,7 +40,7 @@ export function Disclosure({
   );
 }
 
-function RuleStatus({ rule, store }: { rule: Rule; store: Store }) {
+function RuleStatus({ rule, store }: { rule: RuleView; store: Store }) {
   if (rule.status === "proposed")
     return <StatusBadge status="needs-you" label="Proposed" />;
   if (rule.status === "active")
@@ -101,15 +92,16 @@ function RuleSwitch({
 
 export function RuleCard({
   rule,
-  companyId,
+  names,
   store,
   viewer,
   approverId,
   approveLabel = "Approve",
   highlight = false,
 }: {
-  rule: Rule;
-  companyId: string;
+  rule: RuleView;
+  /** Display names by worker id, from the server. */
+  names: Record<string, string>;
   store: Store;
   viewer: ViewerRole;
   /** The person approving in this session (the owner). */
@@ -123,10 +115,10 @@ export function RuleCard({
   const evidenceId = useId();
   const stated = rule.source === "owner_stated";
   const owner = viewer === "owner" && approverId !== null;
-  const words = plainWords(companyId, rule, viewer === "owner");
+  const words = rule.words;
   const change = store.lastChange(rule.id);
   const sodBlocked = approverId !== null && blockedApprover(rule, approverId);
-  const evidence = stated ? null : evidenceSummary(companyId, rule);
+  const evidence = rule.summary;
   const { answeredBy, approvedBy, approvedAt } = rule.provenance;
   const wasApproved = change
     ? change.label !== "Rejected"
@@ -229,10 +221,10 @@ export function RuleCard({
           {(approvedBy || answeredBy || change || !owner) && (
             <p className="mt-3 text-sm text-muted-foreground">
               {answeredBy
-                ? `Answered by ${workerLabel(companyId, answeredBy)} · `
+                ? `Answered by ${names[answeredBy] ?? answeredBy} · `
                 : ""}
               {approvedBy
-                ? `Approved by ${workerLabel(companyId, approvedBy)}${approvedAt ? `, ${shortDate(approvedAt)}` : ""}`
+                ? `Approved by ${names[approvedBy] ?? approvedBy}${approvedAt ? `, ${shortDate(approvedAt)}` : ""}`
                 : rule.status === "proposed"
                   ? "Needs the owner’s approval"
                   : "Not approved"}
@@ -302,7 +294,7 @@ export function RuleCard({
       {evidence && (
         <Disclosure open={evidenceOpen} id={evidenceId}>
           <ul className="mt-3 flex flex-col gap-1.5 rounded-control bg-muted/70 p-3 text-sm">
-            {evidenceItems(companyId, rule).map((e) => (
+            {rule.evidence?.map((e) => (
               <li key={e.id} className="flex flex-wrap items-center gap-2">
                 {e.kind === "payroll" ? (
                   <SourceChip system="Gusto" recordId={e.id} />

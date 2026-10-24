@@ -9,7 +9,12 @@ import { RuleCard } from "@/components/rules/RuleCard";
 import { PreviewNote, RulesEmpty } from "@/components/rules/RulesBits";
 import { Segmented } from "@/components/Segmented";
 import { useRuleStore } from "@/lib/ruleStore";
-import { groupRules, ownerId, RULES_SOURCE, type Rule } from "@/lib/rules";
+import {
+  groupRules,
+  RULES_SOURCE,
+  type Rule,
+  type RulesViewData,
+} from "@/lib/rules";
 
 type Filter = "all" | Rule["status"];
 
@@ -17,14 +22,16 @@ export function RulesView({
   companyId,
   dataKind,
   label,
+  data,
 }: {
   companyId: string;
   dataKind: DataKind;
   label: string;
+  data: RulesViewData;
 }) {
   const { role } = useRole();
-  const store = useRuleStore(companyId);
-  const approverId = role === "owner" ? ownerId(companyId) : null;
+  const store = useRuleStore(companyId, data.rules);
+  const approverId = role === "owner" ? data.ownerId : null;
   const [filter, setFilter] = useState<Filter>("all");
   const [target, setTarget] = useState<string | null>(null);
 
@@ -112,7 +119,7 @@ export function RulesView({
             <RuleCard
               key={r.id}
               rule={r}
-              companyId={companyId}
+              names={data.names}
               store={store}
               viewer={role}
               approverId={approverId}

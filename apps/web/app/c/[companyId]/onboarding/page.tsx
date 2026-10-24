@@ -4,6 +4,8 @@ import { PageHeader } from "@/components/PageHeader";
 import { OnboardingView } from "@/components/rules/OnboardingView";
 import { SetupSteps } from "@/components/rules/SetupSteps";
 import { companies } from "@/lib/companies";
+import { currentViewer } from "@/lib/server/fixtures";
+import { rulesView } from "@/lib/server/rules";
 
 // Params are read inside Suspense so the shell stays instant (Next 16).
 export default function OnboardingPage({
@@ -29,11 +31,13 @@ async function Body({
   const { companyId } = await params;
   const company = companies[companyId];
   if (!company) notFound();
+  const viewer = await currentViewer(companyId);
   return (
     <OnboardingView
       companyId={companyId}
       dataKind={company.kind}
       label={company.label}
+      data={rulesView(viewer, companyId)}
     />
   );
 }

@@ -8,33 +8,24 @@ import { PreviewNote, RulesEmpty } from "@/components/rules/RulesBits";
 import { StatusBadge } from "@/components/StatusBadge";
 import { buttonVariants } from "@/components/ui/button";
 import { useRuleStore } from "@/lib/ruleStore";
-import {
-  CYCLES_SOURCE,
-  closedCycles,
-  fixtureCycles,
-  ownerId,
-} from "@/lib/rules";
-import questionsA from "../../../../data/fixtures/a/questions.json";
-
-const pastQuestions: Record<
-  string,
-  { id: string; cycleId: string; toRole: string; text: string }[]
-> = { a: questionsA };
+import { CYCLES_SOURCE, closedOf, type RulesViewData } from "@/lib/rules";
 
 export function LearnedView({
   companyId,
   dataKind,
   label,
+  data,
 }: {
   companyId: string;
   dataKind: DataKind;
   label: string;
+  data: RulesViewData;
 }) {
   const { role } = useRole();
-  const store = useRuleStore(companyId);
-  const approverId = role === "owner" ? ownerId(companyId) : null;
-  const past = closedCycles(companyId);
-  const current = fixtureCycles(companyId).find((c) => c.stage !== "closed");
+  const store = useRuleStore(companyId, data.rules);
+  const approverId = role === "owner" ? data.ownerId : null;
+  const past = closedOf(data.cycles);
+  const current = data.cycles.find((c) => c.stage !== "closed");
 
   if (!past.length) return <RulesEmpty label={label} />;
 
@@ -45,7 +36,7 @@ export function LearnedView({
     (r) => store.changedIds.includes(r.id) || r.source === "owner_stated",
   );
   const proposed = store.rules.filter((r) => r.status === "proposed").length;
-  const asked = pastQuestions[companyId] ?? [];
+  const asked = data.pastQuestions;
   const delta = prev ? last.questionsAsked - prev.questionsAsked : 0;
 
   return (
@@ -151,7 +142,7 @@ export function LearnedView({
             <RuleCard
               key={r.id}
               rule={r}
-              companyId={companyId}
+              names={data.names}
               store={store}
               viewer={role}
               approverId={approverId}
