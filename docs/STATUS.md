@@ -2,6 +2,7 @@
 
 Format: `HH:MM PDT · who · what landed on main / what I'm on / what I need`. Decisions that change the plan go here too, with the file they changed.
 
+- Sat 04:00 · A2 · Merged #38 (4ead66e): street names no longer run out (6 "undefined" titles fixed; ids unchanged; hash re-pinned). Live `--retitle` on the Jobber trial: 6 titles edited; read-back 32/32 jobs and 13/13 expenses match fixtures. Lane A2 done for the night.
 - Sat 03:49 · A3 · Merged #36 (b761fd9): Stage 2 payouts and `computeStage2` (commissions, tips, manager split; profit-based pay on unfinished jobs held "job not complete"); Company A and B past cycles reproduced to the cent.
 - Sat 03:49 · A1 · Merged #37: Jobber compare gaps explained: quotes are now pulled through their jobs (seeded quotes are converted, never "sent"); out-of-window jobs excluded by design; **Jobber auto-creates one `OtherPaymentRecord` (adjustmentType INVOICE) per invoice equal to its total.** Next: normalize those as kind "unknown", never "final", so CHK-19/Stage 2 aren't fooled. **Devaj:** expect them in live pulls.
 - Sat 03:46 · A2 · Merged #35 (57e7368): **Company A cycle 2 (a-c06, 2026-10-24..11-06)** as a fixture extension in `data/fixtures/a/cycles/a-c06/` (base files unchanged). Same planted-error mix on new ids; answer-key rows carry `cycleId: "a-c06"` and `resolvableByRuleType` (9 of 30 resolved by rules learned from cycle 1 → the M3 "fewer questions" proof). **Devaj:** load base + extension; use `resolvableByRuleType` for cycle 2 counts. **Varnika:** answer-key rows may carry `cycleId`.
