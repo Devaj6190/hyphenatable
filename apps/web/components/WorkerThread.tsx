@@ -1,68 +1,86 @@
-import type { DataKind } from "@/components/DataLabel";
-import { Badge } from "@/components/ui/badge";
+"use client";
+
+import { type DataKind, DataLabel } from "@/components/DataLabel";
+import { SimulatedChip } from "@/components/SimulatedChip";
 import { Card, CardContent } from "@/components/ui/card";
+import { useDemoLocal } from "@/lib/demoLocal";
 import { fixtureMessages, workerName } from "@/lib/fixtures";
 import { cn } from "@/lib/utils";
 
-const when = new Intl.DateTimeFormat("en-US", {
-  month: "short",
-  day: "numeric",
-  hour: "numeric",
-  minute: "2-digit",
-  timeZone: "America/Los_Angeles",
-});
-
-// Texts only: worker, time, words. No pay, no phone numbers.
+// Texts only: who, when, words. No pay, no phone numbers. Fixture messages plus anything recorded in this
+// browser (demo panel replies, answers given in the inbox), so a reply shows up the moment it is recorded.
+// `title` (+ `dataKind`) wraps the thread in its own card, as the problem detail page uses it.
 export function WorkerThread({
   questionId,
+  timeZone = "America/Los_Angeles",
   title,
   dataKind,
 }: {
   questionId: string;
-  title: string;
-  dataKind: DataKind;
+  timeZone?: string;
+  title?: string;
+  dataKind?: DataKind;
 }) {
-  const messages = fixtureMessages
+  const local = useDemoLocal();
+  const messages = [...fixtureMessages, ...local.messages]
     .filter((m) => m.questionId === questionId)
     .sort((a, b) => a.at.localeCompare(b.at));
   if (messages.length === 0) return null;
-  const who = workerName(messages[0].workerId);
+  const when = new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    timeZone,
+  });
+
+  const thread = (
+    <ol aria-label="Texts" className="flex flex-col gap-3">
+      {messages.map((m) => {
+        const out = m.direction === "out";
+        return (
+          <li
+            key={m.id}
+            className={cn(
+              "flex max-w-[85%] flex-col gap-1",
+              out ? "self-start" : "items-end self-end",
+            )}
+          >
+            <p
+              className={cn(
+                "rounded-2xl px-3.5 py-2 text-[0.9375rem]",
+                out ? "rounded-bl-md bg-muted" : "rounded-br-md bg-accent",
+              )}
+            >
+              {m.text}
+            </p>
+            <p className="flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
+              {out
+                ? "PayrollPilot"
+                : m.simulated
+                  ? "Simulated reply"
+                  : workerName(m.workerId)}
+              <span aria-hidden>·</span>
+              <time dateTime={m.at}>{when.format(new Date(m.at))}</time>
+              {m.simulated && <SimulatedChip />}
+            </p>
+            {m.interpretation && (
+              <p className="text-sm text-foreground">{m.interpretation}</p>
+            )}
+          </li>
+        );
+      })}
+    </ol>
+  );
+  if (!title) return thread;
   return (
     <Card>
       <CardContent className="flex flex-col gap-3">
-        <h2 className="text-lg font-semibold">
-          {title} · {who}
+        <h2 className="flex flex-wrap items-center gap-2 text-lg font-semibold">
+          {title} · {workerName(messages[0].workerId)}
+          {dataKind && <DataLabel kind={dataKind} />}
         </h2>
-        <ul className="flex flex-col gap-2">
-          {messages.map((m) => (
-            <li
-              key={m.id}
-              className={cn(
-                "flex max-w-xl flex-col gap-1 rounded-lg p-3 text-sm",
-                m.direction === "out"
-                  ? "self-start bg-muted"
-                  : "self-end bg-ok-soft",
-              )}
-            >
-              <span>{m.text}</span>
-              <span className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                {m.direction === "out" ? "PayrollPilot" : who} ·{" "}
-                {when.format(new Date(m.at))} · {dataKind}
-                {m.simulated && (
-                  <Badge
-                    variant="outline"
-                    className="border-destructive text-destructive"
-                  >
-                    Simulated
-                  </Badge>
-                )}
-              </span>
-              {m.interpretation && (
-                <span className="text-xs">{m.interpretation}</span>
-              )}
-            </li>
-          ))}
-        </ul>
+        {thread}
       </CardContent>
     </Card>
   );

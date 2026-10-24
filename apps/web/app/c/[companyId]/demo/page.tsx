@@ -1,15 +1,31 @@
 import { notFound } from "next/navigation";
-import { Placeholder } from "@/components/Placeholder";
+import { Suspense } from "react";
+import { DemoPanel } from "@/components/DemoPanel";
+import { PageHeader } from "@/components/PageHeader";
+import { companies } from "@/lib/companies";
 import { DEMO_MODE } from "@/lib/demo";
 
-// Hidden unless NEXT_PUBLIC_DEMO_MODE=1.
-export default function Page() {
+// Hidden unless NEXT_PUBLIC_DEMO_MODE=1. Params are read inside Suspense (Next 16).
+export default function DemoPage({ params }: PageProps<"/c/[companyId]/demo">) {
   if (!DEMO_MODE) notFound();
   return (
-    <Placeholder
-      title="Demo panel"
-      description="Reset Company A, enter a judge’s scenario, play a simulated manager reply."
-      board="12 · Demo panel"
-    />
+    <>
+      <PageHeader
+        title="Demo panel"
+        description="For judging only. Hidden unless demo mode is on. Everything made here is labelled."
+      />
+      <Suspense>
+        <Body params={params} />
+      </Suspense>
+    </>
   );
+}
+
+async function Body({
+  params,
+}: Pick<PageProps<"/c/[companyId]/demo">, "params">) {
+  const { companyId } = await params;
+  const company = companies[companyId];
+  if (!company) notFound();
+  return <DemoPanel companyId={companyId} dataKind={company.kind} />;
 }

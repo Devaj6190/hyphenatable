@@ -1,76 +1,57 @@
 "use client";
 
-import Link from "next/link";
+import { Search, X } from "lucide-react";
 import { useMemo, useState } from "react";
-import { AgentChip } from "@/components/AgentChip";
+import { AuditRow } from "@/components/AuditRow";
 import { type DataKind, DataLabel } from "@/components/DataLabel";
-import { Money } from "@/components/Money";
 import { useRole } from "@/components/RoleProvider";
-import { Badge } from "@/components/ui/badge";
+import { Segmented } from "@/components/Segmented";
+import { SimulatedChip } from "@/components/SimulatedChip";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  AUDIT_PREFIXES,
+  AUDIT_TYPES,
+  actorKind,
+  category,
   cycleLabel,
   eventSource,
   forViewerEvents,
   isSimulated,
-  typePrefix,
 } from "@/lib/audit";
-import {
-  AUDIT_FIXTURE_SOURCE,
-  fixtureAudit,
-  fixtureFlags,
-} from "@/lib/fixtures";
-import type { AuditEvent } from "@/lib/types";
+import { companies } from "@/lib/companies";
+import { LOCAL_SOURCE, useDemoLocal } from "@/lib/demoLocal";
+import { AUDIT_FIXTURE_SOURCE, fixtureAudit } from "@/lib/fixtures";
+import { cn } from "@/lib/utils";
 
-const when = new Intl.DateTimeFormat("en-US", {
-  month: "short",
-  day: "numeric",
-  hour: "numeric",
-  minute: "2-digit",
-  timeZone: "America/Los_Angeles",
-});
+const selectClass =
+  "h-10 rounded-control border border-input bg-card px-3 text-sm text-foreground outline-none focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ring";
 
-const refLabel: Record<string, string> = {
-  flagId: "flag",
-  questionId: "question",
-  correctionId: "correction",
-  entryId: "entry",
-  expenseId: "purchase",
-  syncRunId: "sync run",
-  draftId: "draft",
-  ruleId: "rule",
-};
+const actorWord: Record<string, string> = { simulated: "Simulated manager" };
+const word = (k: string) => actorWord[k] ?? k[0].toUpperCase() + k.slice(1);
 
-function Refs({ event }: { event: AuditEvent }) {
-  const knownFlags = new Set(fixtureFlags.map((f) => f.id));
+function Chip({
+  on,
+  onClick,
+  children,
+}: {
+  on: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
   return (
-    <div className="flex flex-wrap gap-1">
-      {Object.entries(event.refs).map(([k, v]) =>
-        k === "flagId" && knownFlags.has(v) ? (
-          <Link
-            key={k}
-            href={`/c/${event.companyId}/flags/${v}`}
-            className="text-sm text-link hover:underline"
-          >
-            flag {v}
-          </Link>
-        ) : (
-          <span key={k} className="text-sm text-muted-foreground">
-            {refLabel[k] ?? k} {v}
-          </span>
-        ),
+    <button
+      type="button"
+      aria-pressed={on}
+      onClick={onClick}
+      className={cn(
+        "pressable inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full px-3.5 text-sm font-medium whitespace-nowrap transition-colors duration-(--dur-hover) outline-none focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ring",
+        on
+          ? "bg-foreground text-background"
+          : "bg-muted text-foreground hover:bg-accent",
       )}
-    </div>
+    >
+      {children}
+    </button>
   );
 }
 
@@ -83,161 +64,302 @@ export function AuditLog({
   dataKind: DataKind;
 }) {
   const { role } = useRole();
-  const [prefix, setPrefix] = useState<string>("all");
-  const [cycle, setCycle] = useState<string>("all");
+  const local = useDemoLocal();
+  const company = companies[companyId];
+  const tz = company?.timezone ?? "UTC";
+  const [type, setType] = useState("all");
+  const [actor, setActor] = useState("all");
+  const [cycle, setCycle] = useState("all");
+  const [day, setDay] = useState("all");
+  const [item, setItem] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   const [simulatedOnly, setSimulatedOnly] = useState(false);
-  const [newestFirst, setNewestFirst] = useState(false);
+  const [order, setOrder] = useState<"oldest" | "newest">("oldest");
+
+  const { when, dayOf } = useMemo(() => {
+    const d = new Intl.DateTimeFormat("en-US", {
+      month: "short",
+      day: "numeric",
+      timeZone: tz,
+    });
+    return {
+      when: new Intl.DateTimeFormat("en-US", {
+        month: "short",
+        day: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+        timeZone: tz,
+      }),
+      dayOf: (at: string) => d.format(new Date(at)),
+    };
+  }, [tz]);
 
   const visible = useMemo(
     () =>
       forViewerEvents(
-        fixtureAudit.filter((e) => e.companyId === companyId),
+        [...fixtureAudit, ...local.events].filter(
+          (e) => e.companyId === companyId,
+        ),
         role,
-      ),
-    [companyId, role],
+      ).sort((a, b) => a.at.localeCompare(b.at)),
+    [companyId, role, local.events],
   );
-  const cycles = useMemo(
-    () => [...new Set(visible.map((e) => e.cycleId).filter(Boolean))].sort(),
-    [visible],
-  ) as string[];
+  const options = useMemo(
+    () => ({
+      cycles: [
+        ...new Set(visible.map((e) => e.cycleId).filter(Boolean)),
+      ] as string[],
+      days: [...new Set(visible.map((e) => dayOf(e.at)))],
+      actors: [...new Set(visible.map((e) => actorKind(e.actor)))],
+    }),
+    [visible, dayOf],
+  );
 
   const shown = useMemo(() => {
     const q = query.trim().toLowerCase();
     const rows = visible.filter(
       (e) =>
-        (prefix === "all" || typePrefix(e) === prefix) &&
+        (type === "all" || category(e) === type) &&
+        (actor === "all" || actorKind(e.actor) === actor) &&
         (cycle === "all" || e.cycleId === cycle) &&
+        (day === "all" || dayOf(e.at) === day) &&
+        (item === null || Object.values(e.refs).includes(item)) &&
         (!simulatedOnly || isSimulated(e)) &&
         (q === "" ||
-          `${e.summary} ${e.type} ${eventSource(e)}`.toLowerCase().includes(q)),
+          `${e.summary} ${e.type} ${eventSource(e)} ${Object.values(e.refs).join(" ")}`
+            .toLowerCase()
+            .includes(q)),
     );
-    rows.sort((a, b) => a.at.localeCompare(b.at));
-    return newestFirst ? rows.reverse() : rows;
-  }, [visible, prefix, cycle, query, simulatedOnly, newestFirst]);
+    return order === "newest" ? rows.reverse() : rows;
+  }, [
+    visible,
+    type,
+    actor,
+    cycle,
+    day,
+    item,
+    simulatedOnly,
+    query,
+    order,
+    dayOf,
+  ]);
+
+  const filtered =
+    type !== "all" ||
+    actor !== "all" ||
+    cycle !== "all" ||
+    day !== "all" ||
+    item !== null ||
+    simulatedOnly ||
+    query !== "";
+  const clear = () => {
+    setType("all");
+    setActor("all");
+    setCycle("all");
+    setDay("all");
+    setItem(null);
+    setSimulatedOnly(false);
+    setQuery("");
+  };
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-center gap-2">
-        {["all", ...AUDIT_PREFIXES].map((p) => (
-          <Button
-            key={p}
-            size="sm"
-            variant={prefix === p ? "default" : "outline"}
-            aria-pressed={prefix === p}
-            onClick={() => setPrefix(p)}
-          >
-            {p === "all" ? "All" : p}
-          </Button>
-        ))}
-      </div>
-      <div className="flex flex-wrap items-center gap-3">
-        <Input
-          className="max-w-xs"
-          placeholder="Search the log"
-          aria-label="Search the log"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
+      <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+        <DataLabel
+          kind={dataKind}
+          detail={`${company?.label ?? companyId}${company?.cycle ? `, cycle ${company.cycle.number}` : ""}`}
         />
-        <select
-          aria-label="Cycle"
-          className="h-8 rounded-lg border bg-card px-2 text-sm"
-          value={cycle}
-          onChange={(e) => setCycle(e.target.value)}
-        >
-          <option value="all">All cycles</option>
-          {cycles.map((c) => (
-            <option key={c} value={c}>
-              {cycleLabel(c)}
-            </option>
-          ))}
-        </select>
-        <label className="flex items-center gap-2 text-sm">
-          <input
-            type="checkbox"
-            checked={simulatedOnly}
-            onChange={(e) => setSimulatedOnly(e.target.checked)}
-          />
-          Simulated only
-        </label>
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={() => setNewestFirst((v) => !v)}
-        >
-          {newestFirst ? "Newest first" : "Oldest first"}
-        </Button>
+        <span className="tabular-nums">{visible.length} events</span>
+        <span aria-hidden>·</span>
+        <span>
+          Source: {AUDIT_FIXTURE_SOURCE}
+          {local.events.length > 0 &&
+            ` + ${local.events.length} from the demo panel and inbox (${LOCAL_SOURCE})`}
+        </span>
       </div>
 
-      <p className="text-sm text-muted-foreground">
-        Showing {shown.length} of {visible.length} events · Source:{" "}
-        {AUDIT_FIXTURE_SOURCE} · {dataKind}
-      </p>
-
-      {shown.length === 0 ? (
-        <p>No events match.</p>
-      ) : (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Time</TableHead>
-              <TableHead>Who</TableHead>
-              <TableHead>Source</TableHead>
-              <TableHead>What happened</TableHead>
-              <TableHead>Links</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {shown.map((e) => (
-              <TableRow key={e.id}>
-                <TableCell className="whitespace-nowrap align-top text-muted-foreground">
-                  {when.format(new Date(e.at))}
-                  <div className="text-xs">{cycleLabel(e.cycleId)}</div>
-                </TableCell>
-                <TableCell className="align-top">
-                  <AgentChip actor={e.actor} />
-                </TableCell>
-                <TableCell className="align-top whitespace-normal">
-                  <Badge
-                    variant="secondary"
-                    className="h-auto rounded-lg text-left whitespace-normal"
-                  >
-                    {eventSource(e)}
-                  </Badge>
-                  <div className="mt-1">
-                    <DataLabel kind={dataKind} />
-                  </div>
-                </TableCell>
-                <TableCell className="align-top whitespace-normal">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span>{e.summary}</span>
-                    {isSimulated(e) && (
-                      <Badge
-                        variant="outline"
-                        className="border-destructive text-destructive"
-                      >
-                        Simulated
-                      </Badge>
-                    )}
-                  </div>
-                  <div className="text-xs text-muted-foreground">{e.type}</div>
-                  {role === "owner" && e.data?.effectPayCents != null && (
-                    <div className="text-sm">
-                      Effect on pay: <Money cents={e.data.effectPayCents} />{" "}
-                      <span className="text-muted-foreground">
-                        ({dataKind}, from the workbook)
-                      </span>
-                    </div>
-                  )}
-                </TableCell>
-                <TableCell className="align-top whitespace-normal">
-                  <Refs event={e} />
-                </TableCell>
-              </TableRow>
+      <div className="flex flex-col gap-3 rounded-card border bg-card p-4 shadow-card">
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="relative min-w-0 flex-1 basis-60">
+            <Search
+              aria-hidden
+              className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
+            />
+            <Input
+              type="search"
+              className="h-10 pl-9"
+              placeholder="Search the log"
+              aria-label="Search the log"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
+          </div>
+          <select
+            aria-label="Actor"
+            className={selectClass}
+            value={actor}
+            onChange={(e) => setActor(e.target.value)}
+          >
+            <option value="all">Everyone</option>
+            {options.actors.map((a) => (
+              <option key={a} value={a}>
+                {word(a)}
+              </option>
             ))}
-          </TableBody>
-        </Table>
+          </select>
+          <select
+            aria-label="Cycle"
+            className={selectClass}
+            value={cycle}
+            onChange={(e) => setCycle(e.target.value)}
+          >
+            <option value="all">All cycles</option>
+            {options.cycles.map((c) => (
+              <option key={c} value={c}>
+                {cycleLabel(c)}
+              </option>
+            ))}
+          </select>
+          <select
+            aria-label="Day"
+            className={selectClass}
+            value={day}
+            onChange={(e) => setDay(e.target.value)}
+          >
+            <option value="all">Any day</option>
+            {options.days.map((d) => (
+              <option key={d} value={d}>
+                {d}
+              </option>
+            ))}
+          </select>
+          <Segmented
+            label="Order"
+            size="sm"
+            value={order}
+            onValueChange={setOrder}
+            options={[
+              { value: "oldest", label: "Oldest first" },
+              { value: "newest", label: "Newest first" },
+            ]}
+          />
+        </div>
+        <div className="-mx-4 flex gap-1.5 overflow-x-auto px-4 [scrollbar-width:none]">
+          <Chip on={type === "all"} onClick={() => setType("all")}>
+            All
+          </Chip>
+          {AUDIT_TYPES.map((t) => {
+            const n = visible.filter((e) => category(e) === t.value).length;
+            if (n === 0) return null;
+            return (
+              <Chip
+                key={t.value}
+                on={type === t.value}
+                onClick={() => setType(type === t.value ? "all" : t.value)}
+              >
+                {t.label}
+                <span className="tabular-nums opacity-70">{n}</span>
+              </Chip>
+            );
+          })}
+          <Chip on={simulatedOnly} onClick={() => setSimulatedOnly((v) => !v)}>
+            Simulated only
+          </Chip>
+        </div>
+      </div>
+
+      {(item || filtered) && (
+        <div className="flex flex-wrap items-center gap-2 text-sm">
+          {item && (
+            <span className="inline-flex items-center gap-1 rounded-full bg-foreground py-1 pr-1 pl-3 text-background">
+              Only events for {item}
+              <button
+                type="button"
+                aria-label={`Stop filtering by ${item}`}
+                onClick={() => setItem(null)}
+                className="rounded-full p-0.5 outline-none hover:bg-background/20 focus-visible:outline-2 focus-visible:outline-ring"
+              >
+                <X aria-hidden className="size-4" />
+              </button>
+            </span>
+          )}
+          {filtered && (
+            <Button size="sm" variant="quiet" onClick={clear}>
+              Clear filters
+            </Button>
+          )}
+        </div>
       )}
+
+      <div className="overflow-clip rounded-card border bg-card shadow-card">
+        <table className="w-full text-sm">
+          <caption className="sr-only">
+            Audit events, {order} first. Append-only.
+          </caption>
+          <thead className="sticky top-0 z-10 bg-muted text-xs font-medium tracking-wide text-muted-foreground uppercase">
+            <tr className="border-b">
+              <th
+                scope="col"
+                className="w-24 py-2.5 pr-2 pl-4 text-left md:w-36 md:pr-3"
+              >
+                Time
+              </th>
+              <th
+                scope="col"
+                className="hidden w-40 px-3 text-left md:table-cell"
+              >
+                Actor
+              </th>
+              <th
+                scope="col"
+                className="hidden w-28 px-3 text-left md:table-cell"
+              >
+                Type
+              </th>
+              <th scope="col" className="px-3 text-left">
+                What happened
+              </th>
+              <th
+                scope="col"
+                className="hidden w-52 pr-4 pl-3 text-left md:table-cell"
+              >
+                Record
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {shown.map((e) => (
+              <AuditRow
+                key={e.id}
+                event={e}
+                when={when}
+                showPay={role === "owner"}
+                dataKind={dataKind}
+                item={item}
+                onItem={setItem}
+              />
+            ))}
+          </tbody>
+        </table>
+        {shown.length === 0 && (
+          <p className="px-4 py-10 text-center text-muted-foreground">
+            No events match these filters.
+          </p>
+        )}
+      </div>
+
+      <p className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+        <span className="tabular-nums">
+          Showing {shown.length} of {visible.length} · {order} first
+        </span>
+        {visible.some(isSimulated) && (
+          <>
+            <span aria-hidden>·</span>
+            <SimulatedChip /> rows were written by the demo persona, not a
+            person.
+          </>
+        )}
+      </p>
     </div>
   );
 }
