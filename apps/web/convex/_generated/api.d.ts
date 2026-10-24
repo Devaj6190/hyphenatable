@@ -11,6 +11,7 @@
 import type * as audit from "../audit.js";
 import type * as checks from "../checks.js";
 import type * as corrections from "../corrections.js";
+import type * as creao from "../creao.js";
 import type * as cycles from "../cycles.js";
 import type * as demo from "../demo.js";
 import type * as drafts from "../drafts.js";
@@ -40,6 +41,7 @@ declare const fullApi: ApiFromModules<{
   audit: typeof audit;
   checks: typeof checks;
   corrections: typeof corrections;
+  creao: typeof creao;
   cycles: typeof cycles;
   demo: typeof demo;
   drafts: typeof drafts;
