@@ -13,7 +13,7 @@ Draft: *PayrollPilot reads a real Jobber account, a Gusto demo company and a Qui
 | Jobber (trial account) | users, clients, properties, jobs, visits, quotes, invoices, expenses (seeded by API, read back by the read app) | time entries and payment records (the Jobber API has no write for them); loaded from `data/fixtures/a/` | Jobber auto-creates one payment record per invoice; normalized as kind "unknown" |
 | Gusto (demo company) | employees mapped to Company A, compensations, the unprocessed payroll for a-c05 | Company A's past payrolls (`pastPayrolls.json`); the demo's own history is read only as "connected" proof | prepare / update / calculate only; there is no submit in the code |
 | QuickBooks (sandbox) | Company A accounts, vendors, customers, job sub-customers, purchases and bills (seeded by API on our own sandbox, read back; a-c05 purchases 6/6 match) | none | the sandbox's own sample purchases also appear and are counted apart |
-| Company R | measured at G3 | none: real, anonymized | names, notes and client names never leave `data/private/` |
+| Company R | past timesheets (Jobber export) and pay (Gusto Payroll Journal), 4 fully covered pay periods | none: real, anonymized | names, notes and client names never leave `data/private/` |
 | Messages | measured at G3 | demo personas are labelled **simulated** | |
 
 ## 2. Company A (synthetic)
@@ -25,11 +25,11 @@ A 12-person landscaping crew in Pennsylvania. `data/fixtures/a/workers.json` hol
 
 ## 3. Company R (real, anonymized)
 
-A real 15-person landscaping company; 3 past pay periods. **Measured at G3.**
+A real landscaping company in Pennsylvania. Read from two exports (Jobber Timesheets CSV, 283 entries, Aug 4 – Oct 22; Gusto Payroll Journal, 188 rows, 8 pay periods), both complete (rows and report totals reconcile). Anonymized at ingest (names, clients, notes, job titles replaced; taxes, addresses, net pay never read); the data stays on the owner's machine. Found while reading: one worker with two Jobber accounts.
 
 ## 4. Backtest (M4)
 
-- Company R, Stage 1 gross per worker vs what was actually paid: **measured at G3** ("N of M workers match to the cent, max difference X").
+- Company R, Stage 1 gross per worker vs what was actually paid (Gusto Payroll Journal), from the same Jobber timesheet export, rules stated by the owner (weekly OT after 40 h, Monday-start week): **35 of 46 worker pay periods match to the cent; 44 of 46 within $1** (7 of those explained by Jobber rounding each entry to 0.01 h); 2 differences over $1 (largest $671.20), most likely corrections the owner made outside Jobber before paying (not yet verified). Compared only over the 4 pay periods fully covered by the export (2026-08-10..2026-10-04); Venmo-paid workers, workers whose rate depends on the job role, Stage 2 pay (commission, profit share) and owner draws are excluded and counted. Measured 2026-10-24 12:04 PDT on anonymized data (`eval/results.json` m4.companyR). Post-correction: pending.
 - Synthetic self-check, not Company R: Company B's 4 past weekly cycles, 120 of 120 worker-cycles match to the cent, including California daily overtime (`eval/results.json` m4.syntheticSelfCheck, synthetic).
 
 ## 5. Metrics
@@ -40,7 +40,7 @@ A real 15-person landscaping company; 3 past pay periods. **Measured at G3.**
 | M1 precision | flags matching a key row / all flags | measured at G3 |
 | M2 rules vs runbook | N of M onboarding rules match the owner's runbook; K differ; J not learned | measured at G3 |
 | M3 questions per cycle | `Cycle.questionsAsked`, a-c05 vs a-c06, same planted mix | measured at G3 |
-| M4 backtest | Company R workers matching to the cent; max difference | measured at G3 |
+| M4 backtest | Company R workers matching to the cent; max difference | 35 of 46 exact, 44 of 46 within $1 (measured 12:04, see §4) |
 | M5 completeness | share of SyncRuns complete; blocked objects listed | measured at G3 |
 | M6 traceability | share of flags with a `where` ref and a rule or model-call id | measured at G3 |
 
