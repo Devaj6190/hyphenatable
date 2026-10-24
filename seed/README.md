@@ -135,3 +135,7 @@ Jobber has no API to create time entries. Every hour in Company A comes from the
 6. **Pull and compare:** `bun run packages/connectors/src/jobber/cli.ts pull --company a --from 2026-10-10 --to 2026-10-23 --tz America/New_York --compare data/fixtures/a`. timeSheetEntries should show 2 pulled and 2 matched (a-te-0111, a-te-0113). The other 83 remain fixture-only.
 
 **Gusto note for the demo:** the demo company has one employee of its own whose onboarding is not finished and who is **not** mapped to any Company A worker. Gusto shows it as not onboarded. Company A's CHK-09 is about **a-w14** (Reese Calloway) only. That extra employee is Gusto's sample data, not a Company A error.
+
+## Cycle extensions: `companies/a-c06.json`, `lib/cycle-a06.ts`
+
+`generate.ts --company a` also writes every `companies/<company>-cNN.json` extension to `data/fixtures/<company>/cycles/<cycle>/`. Today that is a-c06, demo cycle 2, with the same error mix and `resolvableByRuleType` on its answer-key rows. The base output is untouched; `__tests__/cycle-a06.test.ts` pins its own hash, `EXPECTED_SHA256_A06`. Details are in `data/fixtures/README.md`.

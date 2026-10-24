@@ -1,0 +1,630 @@
+[
+  {
+    "id": "a-ak-61",
+    "cycleId": "a-c06",
+    "checkId": "CHK-01",
+    "subject": {
+      "workerId": "a-w05",
+      "jobId": null,
+      "entryIds": [
+        "a-te-0646"
+      ],
+      "expenseIds": []
+    },
+    "truth": "entry a-te-0646 was on job a-j63 (hedge cleanup)",
+    "correctAnswer": {
+      "kind": "change",
+      "values": {
+        "jobId": "a-j63"
+      }
+    },
+    "registerCategory": "hours with no job",
+    "resolvableByRuleType": null
+  },
+  {
+    "id": "a-ak-62",
+    "cycleId": "a-c06",
+    "checkId": "CHK-02",
+    "subject": {
+      "workerId": "a-w05",
+      "jobId": "a-j62",
+      "entryIds": [
+        "a-te-0683"
+      ],
+      "expenseIds": []
+    },
+    "truth": "a-w05 forgot to clock out again; a-te-0683 ended at 17:00 local (4 h)",
+    "correctAnswer": {
+      "kind": "change",
+      "values": {
+        "endAt": "2026-11-06T22:00:00.000Z",
+        "durationSec": 14400
+      }
+    },
+    "registerCategory": "long or open shifts",
+    "resolvableByRuleType": null
+  },
+  {
+    "id": "a-ak-63",
+    "cycleId": "a-c06",
+    "checkId": "CHK-03",
+    "subject": {
+      "workerId": "a-w07",
+      "jobId": "a-j65",
+      "entryIds": [
+        "a-te-0663"
+      ],
+      "expenseIds": []
+    },
+    "truth": "the 13 h shift a-te-0663 on a-j65 is real (irrigation install day)",
+    "correctAnswer": {
+      "kind": "confirm",
+      "values": {}
+    },
+    "registerCategory": "long or open shifts",
+    "resolvableByRuleType": null
+  },
+  {
+    "id": "a-ak-64",
+    "cycleId": "a-c06",
+    "checkId": "CHK-04",
+    "subject": {
+      "workerId": "a-w03",
+      "jobId": null,
+      "entryIds": [
+        "a-te-0624",
+        "a-te-0630"
+      ],
+      "expenseIds": []
+    },
+    "truth": "entry a-te-0630 belongs to job a-j64 (site prep), not a-j62; a-te-0624 ends at 12:00",
+    "correctAnswer": {
+      "kind": "change",
+      "values": {
+        "a-te-0630.jobId": "a-j64",
+        "a-te-0624.endAt": "2026-10-28T16:00:00.000Z"
+      }
+    },
+    "registerCategory": "overlapping hours",
+    "resolvableByRuleType": null
+  },
+  {
+    "id": "a-ak-65",
+    "cycleId": "a-c06",
+    "checkId": "CHK-05",
+    "subject": {
+      "workerId": "a-w04",
+      "jobId": null,
+      "entryIds": [
+        "a-te-0677"
+      ],
+      "expenseIds": []
+    },
+    "truth": "a-te-0677 is an accidental clock-in; no hours owed",
+    "correctAnswer": {
+      "kind": "confirm",
+      "values": {}
+    },
+    "registerCategory": "zero-minute entries",
+    "resolvableByRuleType": null
+  },
+  {
+    "id": "a-ak-66",
+    "cycleId": "a-c06",
+    "checkId": "CHK-05",
+    "subject": {
+      "workerId": "a-w02",
+      "jobId": null,
+      "entryIds": [
+        "a-te-0612",
+        "a-te-0613"
+      ],
+      "expenseIds": []
+    },
+    "truth": "a-te-0613 duplicates a-te-0612",
+    "correctAnswer": {
+      "kind": "change",
+      "values": {
+        "keep": "a-te-0612",
+        "drop": "a-te-0613"
+      }
+    },
+    "registerCategory": "costs counted twice",
+    "resolvableByRuleType": null
+  },
+  {
+    "id": "a-ak-67",
+    "cycleId": "a-c06",
+    "checkId": "CHK-06",
+    "subject": {
+      "workerId": "a-w01",
+      "jobId": null,
+      "entryIds": [
+        "a-te-0678"
+      ],
+      "expenseIds": []
+    },
+    "truth": "a-te-0678 is correct; approved after cutoff",
+    "correctAnswer": {
+      "kind": "confirm",
+      "values": {}
+    },
+    "registerCategory": "unapproved hours",
+    "resolvableByRuleType": null
+  },
+  {
+    "id": "a-ak-68",
+    "cycleId": "a-c06",
+    "checkId": "CHK-06",
+    "subject": {
+      "workerId": "a-w03",
+      "jobId": null,
+      "entryIds": [
+        "a-te-0679"
+      ],
+      "expenseIds": []
+    },
+    "truth": "a-te-0679 is correct; approved after cutoff",
+    "correctAnswer": {
+      "kind": "confirm",
+      "values": {}
+    },
+    "registerCategory": "unapproved hours",
+    "resolvableByRuleType": null
+  },
+  {
+    "id": "a-ak-69",
+    "cycleId": "a-c06",
+    "checkId": "CHK-06",
+    "subject": {
+      "workerId": "a-w04",
+      "jobId": null,
+      "entryIds": [
+        "a-te-0680"
+      ],
+      "expenseIds": []
+    },
+    "truth": "a-te-0680 is correct; approved after cutoff",
+    "correctAnswer": {
+      "kind": "confirm",
+      "values": {}
+    },
+    "registerCategory": "unapproved hours",
+    "resolvableByRuleType": null
+  },
+  {
+    "id": "a-ak-70",
+    "cycleId": "a-c06",
+    "checkId": "CHK-06",
+    "subject": {
+      "workerId": "a-w05",
+      "jobId": null,
+      "entryIds": [
+        "a-te-0683"
+      ],
+      "expenseIds": []
+    },
+    "truth": "a-te-0683 is unapproved because the timer is running (see CHK-02)",
+    "correctAnswer": {
+      "kind": "change",
+      "values": {
+        "durationSec": 14400
+      }
+    },
+    "registerCategory": "long or open shifts",
+    "resolvableByRuleType": null
+  },
+  {
+    "id": "a-ak-71",
+    "cycleId": "a-c06",
+    "checkId": "CHK-07",
+    "subject": {
+      "workerId": "a-w06",
+      "jobId": null,
+      "entryIds": [],
+      "expenseIds": []
+    },
+    "truth": "a-w06 was not scheduled again this cycle",
+    "correctAnswer": {
+      "kind": "confirm",
+      "values": {}
+    },
+    "registerCategory": "missing hours",
+    "resolvableByRuleType": null
+  },
+  {
+    "id": "a-ak-72",
+    "cycleId": "a-c06",
+    "checkId": "CHK-08",
+    "subject": {
+      "workerId": "a-w13",
+      "jobId": null,
+      "entryIds": [],
+      "expenseIds": []
+    },
+    "truth": "a-w13 is deactivated in Jobber but still active in Gusto; terminate in Gusto",
+    "correctAnswer": {
+      "kind": "fixed_in_source",
+      "values": {}
+    },
+    "registerCategory": "inactive worker with hours",
+    "resolvableByRuleType": null
+  },
+  {
+    "id": "a-ak-73",
+    "cycleId": "a-c06",
+    "checkId": "CHK-09",
+    "subject": {
+      "workerId": "a-w14",
+      "jobId": null,
+      "entryIds": [],
+      "expenseIds": []
+    },
+    "truth": "a-w14 still has not finished Gusto onboarding; hold pay",
+    "correctAnswer": {
+      "kind": "escalate",
+      "values": {}
+    },
+    "registerCategory": "worker not onboarded",
+    "resolvableByRuleType": null
+  },
+  {
+    "id": "a-ak-74",
+    "cycleId": "a-c06",
+    "checkId": "CHK-10",
+    "subject": {
+      "workerId": "a-w02",
+      "jobId": null,
+      "entryIds": [],
+      "expenseIds": []
+    },
+    "truth": "same as cycle 1: a-w02 is $26.00/h; Gusto's compensation still says $25.00",
+    "correctAnswer": {
+      "kind": "change",
+      "values": {
+        "gusto.rateCents": 2600
+      }
+    },
+    "registerCategory": "stale rates",
+    "resolvableByRuleType": "pay_rate"
+  },
+  {
+    "id": "a-ak-75",
+    "cycleId": "a-c06",
+    "checkId": "CHK-11",
+    "subject": {
+      "workerId": "a-w10",
+      "jobId": null,
+      "entryIds": [],
+      "expenseIds": []
+    },
+    "truth": "a-w10 is paid $22.00/h by Venmo (cycle 1 answer)",
+    "correctAnswer": {
+      "kind": "change",
+      "values": {
+        "venmoRateCents": 2200
+      }
+    },
+    "registerCategory": "missing Venmo rates",
+    "resolvableByRuleType": "venmo_rate"
+  },
+  {
+    "id": "a-ak-76",
+    "cycleId": "a-c06",
+    "checkId": "CHK-12",
+    "subject": {
+      "workerId": "a-w08",
+      "jobId": null,
+      "entryIds": [],
+      "expenseIds": []
+    },
+    "truth": "a-w08 is outside the sync; workbook note",
+    "correctAnswer": {
+      "kind": "confirm",
+      "values": {}
+    },
+    "registerCategory": "outside the sync (salaried, contractor)",
+    "resolvableByRuleType": null
+  },
+  {
+    "id": "a-ak-77",
+    "cycleId": "a-c06",
+    "checkId": "CHK-12",
+    "subject": {
+      "workerId": "a-w09",
+      "jobId": null,
+      "entryIds": [],
+      "expenseIds": []
+    },
+    "truth": "a-w09 is outside the sync; workbook note",
+    "correctAnswer": {
+      "kind": "confirm",
+      "values": {}
+    },
+    "registerCategory": "outside the sync (salaried, contractor)",
+    "resolvableByRuleType": null
+  },
+  {
+    "id": "a-ak-78",
+    "cycleId": "a-c06",
+    "checkId": "CHK-12",
+    "subject": {
+      "workerId": "a-w10",
+      "jobId": null,
+      "entryIds": [],
+      "expenseIds": []
+    },
+    "truth": "a-w10 is outside the sync; workbook note",
+    "correctAnswer": {
+      "kind": "confirm",
+      "values": {}
+    },
+    "registerCategory": "outside the sync (salaried, contractor)",
+    "resolvableByRuleType": null
+  },
+  {
+    "id": "a-ak-79",
+    "cycleId": "a-c06",
+    "checkId": "CHK-13",
+    "subject": {
+      "workerId": null,
+      "jobId": "a-j67",
+      "entryIds": [
+        "a-te-0656",
+        "a-te-0657"
+      ],
+      "expenseIds": []
+    },
+    "truth": "a-w02 and a-w03 did the a-j67 visit but logged the day to a-j64 (a-te-0656, a-te-0657)",
+    "correctAnswer": {
+      "kind": "change",
+      "values": {
+        "a-te-0656.jobId": "a-j67",
+        "a-te-0657.jobId": "a-j67"
+      }
+    },
+    "registerCategory": "hours with no job",
+    "resolvableByRuleType": null
+  },
+  {
+    "id": "a-ak-80",
+    "cycleId": "a-c06",
+    "checkId": "CHK-14",
+    "subject": {
+      "workerId": null,
+      "jobId": null,
+      "entryIds": [],
+      "expenseIds": [
+        "a-ex-0603"
+      ]
+    },
+    "truth": "a-ex-0603 (Cedar Creek Supply irrigation fittings) is for a-j65, the only irrigation job running; same vendor and kind as cycle 1's a-ex-0003",
+    "correctAnswer": {
+      "kind": "change",
+      "values": {
+        "matchedJobId": "a-j65"
+      }
+    },
+    "registerCategory": "unmatched material purchases",
+    "resolvableByRuleType": "vendor_job_hint"
+  },
+  {
+    "id": "a-ak-81",
+    "cycleId": "a-c06",
+    "checkId": "CHK-15",
+    "subject": {
+      "workerId": null,
+      "jobId": "a-j65",
+      "entryIds": [],
+      "expenseIds": [
+        "a-ex-0603",
+        "a-ex-0609"
+      ]
+    },
+    "truth": "a-ex-0609 (Jobber) and a-ex-0603 (QuickBooks) are the same purchase",
+    "correctAnswer": {
+      "kind": "change",
+      "values": {
+        "keep": "a-ex-0603",
+        "drop": "a-ex-0609"
+      }
+    },
+    "registerCategory": "costs counted twice",
+    "resolvableByRuleType": null
+  },
+  {
+    "id": "a-ak-82",
+    "cycleId": "a-c06",
+    "checkId": "CHK-16",
+    "subject": {
+      "workerId": null,
+      "jobId": "a-j68",
+      "entryIds": [],
+      "expenseIds": [
+        "a-ex-0610"
+      ]
+    },
+    "truth": "a-j68 (disposal run, Brookhollow Ct) belongs to a-j64 (Brookhollow Ct)",
+    "correctAnswer": {
+      "kind": "change",
+      "values": {
+        "a-j68.parentJobId": "a-j64"
+      }
+    },
+    "registerCategory": "disposal not linked to its parent job",
+    "resolvableByRuleType": "disposal_parent_link"
+  },
+  {
+    "id": "a-ak-83",
+    "cycleId": "a-c06",
+    "checkId": "CHK-17",
+    "subject": {
+      "workerId": null,
+      "jobId": null,
+      "entryIds": [],
+      "expenseIds": [
+        "a-ex-0611"
+      ]
+    },
+    "truth": "Fuel is overhead (owner's cycle 1 answer)",
+    "correctAnswer": {
+      "kind": "change",
+      "values": {
+        "kind": "overhead"
+      }
+    },
+    "registerCategory": "expense category unknown",
+    "resolvableByRuleType": "expense_account_kind"
+  },
+  {
+    "id": "a-ak-84",
+    "cycleId": "a-c06",
+    "checkId": "CHK-18",
+    "subject": {
+      "workerId": "a-w08",
+      "jobId": null,
+      "entryIds": [],
+      "expenseIds": []
+    },
+    "truth": "Jobber still costs a-w08 at $30.00/h; the cost is $32.50/h",
+    "correctAnswer": {
+      "kind": "change",
+      "values": {
+        "jobber.labourRateCents": 3250
+      }
+    },
+    "registerCategory": "stale rates inflating job profit",
+    "resolvableByRuleType": "pay_rate"
+  },
+  {
+    "id": "a-ak-85",
+    "cycleId": "a-c06",
+    "checkId": "CHK-19",
+    "subject": {
+      "workerId": null,
+      "jobId": "a-j69",
+      "entryIds": [],
+      "expenseIds": []
+    },
+    "truth": "a-pay63 ($1,080.00) is the deposit on a-q63, not the final payment; $2,520.00 is still owed on a-in63",
+    "correctAnswer": {
+      "kind": "change",
+      "values": {
+        "a-pay63.kind": "deposit",
+        "a-in63.status": "awaiting_payment"
+      }
+    },
+    "registerCategory": "a deposit mistaken for a final payment",
+    "resolvableByRuleType": "deposit_vs_final"
+  },
+  {
+    "id": "a-ak-86",
+    "cycleId": "a-c06",
+    "checkId": "CHK-20",
+    "subject": {
+      "workerId": "a-w12",
+      "jobId": "a-j70",
+      "entryIds": [],
+      "expenseIds": []
+    },
+    "truth": "a-w05 quoted the lighting job a-j70 in person; salesperson should be a-w05",
+    "correctAnswer": {
+      "kind": "change",
+      "values": {
+        "a-q64.salespersonWorkerId": "a-w05"
+      }
+    },
+    "registerCategory": "wrong in-person quoter",
+    "resolvableByRuleType": "in_person_quoter"
+  },
+  {
+    "id": "a-ak-87",
+    "cycleId": "a-c06",
+    "checkId": "CHK-21",
+    "subject": {
+      "workerId": null,
+      "jobId": "a-j65",
+      "entryIds": [],
+      "expenseIds": []
+    },
+    "truth": "a-j65's margin is about 8%; underpriced (owner confirms)",
+    "correctAnswer": {
+      "kind": "confirm",
+      "values": {}
+    },
+    "registerCategory": "low job profit",
+    "resolvableByRuleType": null
+  },
+  {
+    "id": "a-ak-88",
+    "cycleId": "a-c06",
+    "checkId": "CHK-22",
+    "subject": {
+      "workerId": "a-w01",
+      "jobId": null,
+      "entryIds": [],
+      "expenseIds": []
+    },
+    "truth": "a-w01 worked both Saturdays (11 h overtime a week); the higher gross is right",
+    "correctAnswer": {
+      "kind": "confirm",
+      "values": {}
+    },
+    "registerCategory": "gross change over 25%",
+    "resolvableByRuleType": null
+  },
+  {
+    "id": "a-ak-89",
+    "cycleId": "a-c06",
+    "checkId": "CHK-22",
+    "subject": {
+      "workerId": "a-w06",
+      "jobId": null,
+      "entryIds": [],
+      "expenseIds": []
+    },
+    "truth": "a-w06 has no hours again (see CHK-07)",
+    "correctAnswer": {
+      "kind": "confirm",
+      "values": {}
+    },
+    "registerCategory": "gross change over 25%",
+    "resolvableByRuleType": null
+  },
+  {
+    "id": "a-ak-90",
+    "cycleId": "a-c06",
+    "checkId": "CHK-22",
+    "subject": {
+      "workerId": "a-w13",
+      "jobId": null,
+      "entryIds": [],
+      "expenseIds": []
+    },
+    "truth": "a-w13 left after a-c05; no hours this cycle is right",
+    "correctAnswer": {
+      "kind": "confirm",
+      "values": {}
+    },
+    "registerCategory": "gross change over 25%",
+    "resolvableByRuleType": null
+  },
+  {
+    "id": "a-ak-91",
+    "cycleId": "a-c06",
+    "checkId": "CHK-22",
+    "subject": {
+      "workerId": "a-w10",
+      "jobId": null,
+      "entryIds": [],
+      "expenseIds": []
+    },
+    "truth": "a-w10's gross only looks like a drop because the Venmo rate is missing; at $22.00/h it is in line",
+    "correctAnswer": {
+      "kind": "confirm",
+      "values": {}
+    },
+    "registerCategory": "gross change over 25%",
+    "resolvableByRuleType": "venmo_rate"
+  }
+]

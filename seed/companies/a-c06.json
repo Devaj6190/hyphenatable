@@ -1,0 +1,317 @@
+{
+  "$comment": "Company A cycle 2 (a-c06) for the demo and M3. Extension of seed/companies/a.json: same company and workers, a new cycle with the same planted-error mix as a-c05 on new records. Written to data/fixtures/a/cycles/a-c06/ by seed/generate.ts --company a; the base data/fixtures/a/*.json stay byte-identical. Fixtures only.",
+  "cycle": {
+    "id": "a-c06",
+    "number": 6,
+    "start": "2026-10-24",
+    "end": "2026-11-06",
+    "gustoPayrollId": "749072b9-abc7-4a30-aa64-6e8bd5811a08"
+  },
+  "snapshot": "2026-11-06T18:05",
+  "shift": { "start": "07:00", "end": "15:30" },
+  "schedule": {
+    "a-w01": { "days": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] },
+    "a-w02": { "days": [0, 1, 2, 3, 4, 5, 6, 7, 8] },
+    "a-w03": { "days": [0, 1, 3, 4, 5, 6, 7, 9] },
+    "a-w04": { "days": [0, 1, 3, 5, 6, 7, 9] },
+    "a-w05": { "days": [0, 1, 2, 3, 5, 6, 7, 8] },
+    "a-w07": { "days": [0, 1, 2, 3, 4, 5, 6, 8] },
+    "a-w08": { "days": [0, 1, 2, 3, 5, 6, 7, 8] },
+    "a-w09": { "days": [0, 1, 3, 4, 8, 9] },
+    "a-w10": { "days": [1, 2, 4, 6, 7, 9] },
+    "a-w14": { "days": [0, 1, 2, 3] }
+  },
+  "jobByDay": [
+    "a-j61",
+    "a-j61",
+    "a-j62",
+    "a-j63",
+    "a-j63",
+    "a-j64",
+    "a-j64",
+    "a-j65",
+    "a-j65",
+    "a-j62"
+  ],
+  "jobs": [
+    {
+      "id": "a-j61",
+      "number": 161,
+      "title": "Tree and shrub planting - Wrenfield Rd",
+      "client": "a-cl-61",
+      "status": "requires_invoicing",
+      "salesperson": "a-w12",
+      "quote": "a-q61",
+      "start": "2026-10-26",
+      "end": "2026-10-27",
+      "marginPct": 38
+    },
+    {
+      "id": "a-j62",
+      "number": 162,
+      "title": "Paver walkway - Ashgrove Ln",
+      "client": "a-cl-62",
+      "status": "active",
+      "salesperson": "a-w11",
+      "quote": "a-q62",
+      "start": "2026-10-28",
+      "end": "2026-11-06",
+      "marginPct": 36
+    },
+    {
+      "id": "a-j63",
+      "number": 163,
+      "title": "Hedge trim and cleanup - Meadowlark Dr",
+      "client": "a-cl-63",
+      "status": "requires_invoicing",
+      "salesperson": null,
+      "quote": null,
+      "start": "2026-10-29",
+      "end": "2026-10-30",
+      "marginPct": 45
+    },
+    {
+      "id": "a-j64",
+      "number": 164,
+      "title": "Retaining wall rebuild - Brookhollow Ct",
+      "client": "a-cl-64",
+      "status": "active",
+      "salesperson": "a-w12",
+      "quote": null,
+      "start": "2026-10-28",
+      "end": "2026-11-10",
+      "marginPct": 33
+    },
+    {
+      "id": "a-j65",
+      "number": 165,
+      "title": "Irrigation system install - Saddleback Way",
+      "client": "a-cl-65",
+      "status": "active",
+      "salesperson": "a-w11",
+      "quote": null,
+      "start": "2026-11-04",
+      "end": "2026-11-05",
+      "marginPct": 8
+    },
+    {
+      "id": "a-j67",
+      "number": 167,
+      "title": "Drip line repair - Fernwood Ave",
+      "client": "a-cl-66",
+      "status": "requires_invoicing",
+      "salesperson": null,
+      "quote": null,
+      "start": "2026-11-03",
+      "end": "2026-11-03",
+      "totalCents": 52000
+    },
+    {
+      "id": "a-j68",
+      "number": 168,
+      "title": "Disposal run - Brookhollow Ct",
+      "client": "a-cl-64",
+      "status": "requires_invoicing",
+      "salesperson": null,
+      "quote": null,
+      "start": "2026-11-03",
+      "end": "2026-11-03",
+      "totalCents": null
+    },
+    {
+      "id": "a-j69",
+      "number": 169,
+      "title": "Gravel side yard - Hollyhock Pl",
+      "client": "a-cl-67",
+      "status": "archived",
+      "salesperson": "a-w11",
+      "quote": "a-q63",
+      "start": "2026-10-24",
+      "end": "2026-10-24",
+      "totalCents": 360000
+    },
+    {
+      "id": "a-j70",
+      "number": 170,
+      "title": "Landscape lighting install - Thornbury Ct",
+      "client": "a-cl-68",
+      "status": "upcoming",
+      "salesperson": "a-w12",
+      "quote": "a-q64",
+      "start": "2026-11-18",
+      "end": "2026-11-19",
+      "totalCents": 298000
+    }
+  ],
+  "visits": [
+    { "id": "a-v61", "job": "a-j61", "day": 0 },
+    { "id": "a-v62", "job": "a-j63", "day": 3 },
+    { "id": "a-v63", "job": "a-j64", "day": 5 },
+    { "id": "a-v64", "job": "a-j65", "day": 7 },
+    { "id": "a-v65", "job": "a-j67", "day": 6, "assigned": ["a-w02", "a-w03"] }
+  ],
+  "quotes": [
+    {
+      "id": "a-q61",
+      "job": "a-j61",
+      "salesperson": "a-w12",
+      "sentAt": "2026-10-12T10:00",
+      "status": "converted"
+    },
+    {
+      "id": "a-q62",
+      "job": "a-j62",
+      "salesperson": "a-w11",
+      "sentAt": "2026-10-14T14:30",
+      "status": "converted"
+    },
+    {
+      "id": "a-q63",
+      "job": "a-j69",
+      "salesperson": "a-w11",
+      "sentAt": "2026-10-09T09:00",
+      "status": "converted"
+    },
+    {
+      "id": "a-q64",
+      "job": "a-j70",
+      "salesperson": "a-w12",
+      "sentAt": "2026-10-28T17:00",
+      "status": "converted"
+    }
+  ],
+  "invoices": [
+    {
+      "id": "a-in61",
+      "job": "a-j61",
+      "issued": "2026-10-28",
+      "due": "2026-11-11",
+      "status": "paid"
+    },
+    {
+      "id": "a-in62",
+      "job": "a-j63",
+      "issued": "2026-10-31",
+      "due": "2026-11-14",
+      "status": "awaiting_payment"
+    },
+    {
+      "id": "a-in63",
+      "job": "a-j69",
+      "issued": "2026-10-27",
+      "due": "2026-11-10",
+      "status": "paid"
+    },
+    {
+      "id": "a-in64",
+      "job": "a-j65",
+      "issued": null,
+      "due": null,
+      "status": "draft"
+    }
+  ],
+  "payments": [
+    {
+      "id": "a-pay61",
+      "invoice": null,
+      "quote": "a-q62",
+      "date": "2026-10-19",
+      "amountCents": 60000,
+      "type": "credit_card",
+      "kind": "deposit"
+    },
+    {
+      "id": "a-pay62",
+      "invoice": "a-in61",
+      "quote": null,
+      "date": "2026-11-03",
+      "amountCents": "invoiceTotal",
+      "type": "check",
+      "kind": "final"
+    }
+  ],
+  "expenses": [
+    {
+      "id": "a-ex-0601",
+      "source": "qbo",
+      "date": "2026-10-26",
+      "amountCents": 74250,
+      "vendor": "Greenway Nursery",
+      "description": "Shrubs and trees",
+      "account": "Materials",
+      "job": "a-j61",
+      "kind": "job_cost"
+    },
+    {
+      "id": "a-ex-0602",
+      "source": "qbo",
+      "date": "2026-10-28",
+      "amountCents": 39800,
+      "vendor": "Summit Tool Rental",
+      "description": "Plate compactor day rate",
+      "account": "Equipment Rental",
+      "job": "a-j62",
+      "kind": "job_cost"
+    },
+    {
+      "id": "a-ex-0603",
+      "source": "qbo",
+      "date": "2026-11-04",
+      "amountCents": 18755,
+      "vendor": "Cedar Creek Supply",
+      "description": "Irrigation valves and fittings",
+      "account": "Materials",
+      "job": null,
+      "kind": "job_cost"
+    },
+    {
+      "id": "a-ex-0604",
+      "source": "qbo",
+      "date": "2026-11-02",
+      "amountCents": 17600,
+      "vendor": "County Green Waste",
+      "description": "Green waste tipping fee",
+      "account": "Disposal",
+      "job": "a-j64",
+      "kind": "job_cost"
+    },
+    {
+      "id": "a-ex-0605",
+      "source": "qbo",
+      "date": "2026-11-02",
+      "amountCents": 4999,
+      "vendor": "FieldRoute Software",
+      "description": "Monthly scheduling subscription",
+      "account": "Software",
+      "job": null,
+      "kind": "overhead"
+    },
+    {
+      "id": "a-ex-0606",
+      "source": "jobber",
+      "date": "2026-11-02",
+      "amountCents": 98420,
+      "description": "Wall block and cap",
+      "job": "a-j64",
+      "kind": "job_cost"
+    },
+    {
+      "id": "a-ex-0607",
+      "source": "jobber",
+      "date": "2026-11-05",
+      "amountCents": 8865,
+      "description": "Drip tubing",
+      "job": "a-j65",
+      "kind": "job_cost"
+    },
+    {
+      "id": "a-ex-0608",
+      "source": "jobber",
+      "date": "2026-10-29",
+      "amountCents": 3150,
+      "description": "Trimmer line",
+      "job": "a-j63",
+      "kind": "job_cost"
+    }
+  ]
+}

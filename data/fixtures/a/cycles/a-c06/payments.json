@@ -1,0 +1,35 @@
+[
+  {
+    "id": "a-pay61",
+    "companyId": "a",
+    "sourceId": "a-pay61",
+    "invoiceId": null,
+    "quoteId": "a-q62",
+    "entryDate": "2026-10-19",
+    "amountCents": 60000,
+    "paymentType": "credit_card",
+    "kind": "deposit"
+  },
+  {
+    "id": "a-pay62",
+    "companyId": "a",
+    "sourceId": "a-pay62",
+    "invoiceId": "a-in61",
+    "quoteId": null,
+    "entryDate": "2026-11-03",
+    "amountCents": 786000,
+    "paymentType": "check",
+    "kind": "final"
+  },
+  {
+    "id": "a-pay63",
+    "companyId": "a",
+    "sourceId": "a-pay63",
+    "invoiceId": "a-in63",
+    "quoteId": "a-q63",
+    "entryDate": "2026-10-27",
+    "amountCents": 108000,
+    "paymentType": "credit_card",
+    "kind": "final"
+  }
+]

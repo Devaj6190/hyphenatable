@@ -1,0 +1,42 @@
+[
+  {
+    "id": "a-in61",
+    "companyId": "a",
+    "sourceId": "a-in61",
+    "jobId": "a-j61",
+    "issuedDate": "2026-10-28",
+    "dueDate": "2026-11-11",
+    "status": "paid",
+    "totalCents": 786000
+  },
+  {
+    "id": "a-in62",
+    "companyId": "a",
+    "sourceId": "a-in62",
+    "jobId": "a-j63",
+    "issuedDate": "2026-10-31",
+    "dueDate": "2026-11-14",
+    "status": "awaiting_payment",
+    "totalCents": 568000
+  },
+  {
+    "id": "a-in63",
+    "companyId": "a",
+    "sourceId": "a-in63",
+    "jobId": "a-j69",
+    "issuedDate": "2026-10-27",
+    "dueDate": "2026-11-10",
+    "status": "paid",
+    "totalCents": 360000
+  },
+  {
+    "id": "a-in64",
+    "companyId": "a",
+    "sourceId": "a-in64",
+    "jobId": "a-j65",
+    "issuedDate": null,
+    "dueDate": null,
+    "status": "draft",
+    "totalCents": 360000
+  }
+]
