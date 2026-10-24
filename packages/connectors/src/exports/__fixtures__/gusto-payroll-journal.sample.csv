@@ -1,0 +1,7 @@
+Payroll Journal,,,,,,,,,,,,
+"Synthetic sample, fake names",,,,,,,,,,,,
+Employee Last Name,Employee First Name,Pay Period Start,Pay Period End,Check Date,Regular Hours,Overtime Hours,Regular Earnings,Overtime Earnings,Bonus,Gross Earnings,Employee Taxes,Net Pay
+Park,Riley,09/27/2026,10/10/2026,10/15/2026,80.000,2.500,"2,240.00",105.00,,"2,345.00",454.58,"1,890.42"
+Moore,Casey,09/27/2026,10/10/2026,10/15/2026,,,"2,400.00",,100.00,"2,500.00",489.25,"2,010.75"
+"O'Neil, Jr.",Sam,09/27/2026,10/10/2026,10/15/2026,12.250,,318.50,,,318.50,24.37,294.13
+Totals,,,,,,,,,,"5,163.50",968.20,"4,195.30"

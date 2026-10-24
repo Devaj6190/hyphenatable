@@ -22,8 +22,13 @@ function tzOffsetMs(ms: number, tz: string): number {
 
 /** Midnight at the start of `date` (YYYY-MM-DD) in `tz`, as epoch ms. */
 export function zonedMidnight(date: string, tz: string): number {
+  return zonedWallClock(date, 0, tz);
+}
+
+/** Local wall-clock `date` + `minutes` after midnight in `tz`, as epoch ms. */
+export function zonedWallClock(date: string, minutes: number, tz: string): number {
   const [y, m, d] = date.split("-").map(Number) as [number, number, number];
-  const guess = Date.UTC(y, m - 1, d);
+  const guess = Date.UTC(y, m - 1, d, 0, minutes);
   const first = guess - tzOffsetMs(guess, tz);
   return guess - tzOffsetMs(first, tz);
 }
