@@ -12,6 +12,51 @@ http.route({
   ),
 });
 
+const bearer = (req: Request, key: string | undefined) =>
+  !!key && req.headers.get("authorization") === `Bearer ${key}`;
+
+// ponytail: falls back to MCP_KEY until the two keys are split (creao-plan section 8).
+const agentKey = () => process.env.PAYROLLPILOT_KEY ?? process.env.MCP_KEY;
+
+/** S1: the tool list for Creao agent scripts. Same tools as /mcp, plain JSON. */
+http.route({
+  path: "/agent/tools",
+  method: "GET",
+  handler: httpAction(async (_ctx, req) => {
+    if (!bearer(req, agentKey()))
+      return new Response("unauthorized", { status: 401 });
+    return Response.json({ tools: TOOLS });
+  }),
+});
+
+/**
+ * S1: POST /agent/<tool> with the tool's arguments as the JSON body (empty body = no arguments).
+ * Creao agents call this from their sandbox with PAYROLLPILOT_KEY from Creao Secrets.
+ */
+http.route({
+  pathPrefix: "/agent/",
+  method: "POST",
+  handler: httpAction(async (ctx, req) => {
+    if (!bearer(req, agentKey()))
+      return new Response("unauthorized", { status: 401 });
+    const name = new URL(req.url).pathname.slice("/agent/".length);
+    if (!TOOLS.some((t) => t.name === name))
+      return Response.json({ error: `unknown tool ${name}` }, { status: 404 });
+    let args: Record<string, unknown>;
+    try {
+      const body = await req.text();
+      args = body ? JSON.parse(body) : {};
+    } catch {
+      return Response.json({ error: "body is not JSON" }, { status: 400 });
+    }
+    try {
+      return Response.json(await callTool(ctx, name, args));
+    } catch (e) {
+      return Response.json({ error: (e as Error).message }, { status: 400 });
+    }
+  }),
+});
+
 type Rpc = {
   jsonrpc: "2.0";
   id?: string | number;
@@ -31,8 +76,7 @@ http.route({
   path: "/mcp",
   method: "POST",
   handler: httpAction(async (ctx, req) => {
-    const key = process.env.MCP_KEY;
-    if (!key || req.headers.get("authorization") !== `Bearer ${key}`)
+    if (!bearer(req, process.env.MCP_KEY))
       return new Response("unauthorized", { status: 401 });
     let rpc: Rpc;
     try {

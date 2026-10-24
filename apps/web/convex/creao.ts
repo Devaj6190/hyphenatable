@@ -1,4 +1,4 @@
-// B-19: tools the Creao nightly agent calls through POST /mcp (http.ts). Ids, dates, check ids,
+// B-19: tools the Creao nightly agent calls through POST /mcp and POST /agent/<tool> (http.ts). Ids, dates, check ids,
 // statuses and check sentences only: no names, contact refs or money ever leave through here.
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
