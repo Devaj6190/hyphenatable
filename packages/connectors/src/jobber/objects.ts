@@ -82,7 +82,9 @@ export type ReimbursementStatus = "PENDING_REIMBURSEMENT" | "PAID";
 export const JOBS_BY_ID_QUERY = conn(
   "jobs",
   "{ ids: $ids }",
-  "id jobNumber title jobStatus client { id } salesperson { id } quote { id } startAt endAt total",
+  // the job's quote inline: quotes converted to jobs are often never "sent" (sentAt null), so a sentAt
+  // filter alone misses them; every in-scope job brings its quote
+  "id jobNumber title jobStatus client { id } salesperson { id } quote { id quoteStatus salesperson { id } sentAt amounts { total } } startAt endAt total",
   "$after: String, $first: Int!, $ids: [EncodedId!]!",
 );
 
@@ -137,7 +139,7 @@ export interface RawJob {
   jobStatus: string;
   client: { id: string };
   salesperson: Id;
-  quote: Id;
+  quote: (Omit<RawQuote, "jobs"> & { jobs?: Nested }) | null;
   startAt: string | null;
   endAt: string | null;
   total: number;
@@ -450,11 +452,38 @@ export async function pullObjects(
     runs.push({ object: "jobs", method, startedAt, result: failed(e) });
   }
 
+  // Quotes of in-scope jobs (converted quotes are rarely "sent"): added beside the sentAt-range quotes,
+  // with the job as jobId. Complete by construction: each comes from a job that was fetched.
+  const quoteRecords = quotes.map((r) => normalizeQuote(r, companyId));
+  const seenQuotes = new Set(quotes.map((q) => q.id));
+  let viaJobs = 0;
+  for (const j of jobs) {
+    if (!j.quote || seenQuotes.has(j.quote.id)) continue;
+    seenQuotes.add(j.quote.id);
+    viaJobs++;
+    quoteRecords.push({
+      ...normalizeQuote({ ...j.quote, jobs: null }, companyId),
+      jobId: jobberRef(j.id),
+    });
+  }
+  const quoteRun = runs.find((r) => r.object === "quotes");
+  if (quoteRun && viaJobs) {
+    quoteRun.method += ` + quotes of ${viaJobs} in-scope job(s)`;
+    quoteRun.result = {
+      ...quoteRun.result,
+      pulled: quoteRun.result.pulled + viaJobs,
+      expected:
+        quoteRun.result.expected === null
+          ? null
+          : quoteRun.result.expected + viaJobs,
+    };
+  }
+
   return {
     records: {
       jobs: jobs.map((r) => normalizeJob(r, companyId)),
       visits: visits.map((r) => normalizeVisit(r, companyId)),
-      quotes: quotes.map((r) => normalizeQuote(r, companyId)),
+      quotes: quoteRecords,
       invoices: invoices.map((r) => normalizeInvoice(r, companyId)),
       payments: payments.map((r) => normalizePayment(r, companyId)),
       expenses: expenses.map((r) =>

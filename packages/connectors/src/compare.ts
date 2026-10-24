@@ -115,6 +115,43 @@ const inInstants = (v: unknown, p: Period) =>
   typeof v === "string" && v >= p.startUtc && v < p.endUtc;
 
 /** Jobber pull vs fixtures, through data/private/<company>-jobber-map.json. Ids in the map are bare Jobber EncodedIds. */
+/**
+ * Payments: through the map's `payments` bucket when the pusher recorded one; otherwise by content, since
+ * Jobber can create payment records the pusher never saw (seen live: 4 OtherPaymentRecords on seeded
+ * invoices, no `payments` bucket): same parent invoice/quote (via the map), same amount, entry date within
+ * a day. Each fixture payment is claimed once.
+ */
+export function resolvePayments(
+  pulled: JobberRecords["payments"],
+  inScope: Rec[],
+  map: Record<string, unknown>,
+): (string | null)[] {
+  const byId = reverse(map.payments);
+  const inv = reverse(map.invoices);
+  const quo = reverse(map.quotes);
+  const claimed = new Set<string>();
+  const strip = (r: string | null) => (r ? r.replace(/^jobber:/, "") : null);
+  return pulled.map((p) => {
+    const mapped = byId.get(p.sourceId);
+    if (mapped) return mapped;
+    const invoiceId = inv.get(strip(p.invoiceId) ?? "") ?? null;
+    const quoteId = quo.get(strip(p.quoteId) ?? "") ?? null;
+    const day = Date.parse(p.entryDate.slice(0, 10));
+    const hit = inScope.find(
+      (f) =>
+        !claimed.has(f.id) &&
+        f.amountCents === p.amountCents &&
+        ((invoiceId !== null && f.invoiceId === invoiceId) ||
+          (quoteId !== null && f.quoteId === quoteId)) &&
+        typeof f.entryDate === "string" &&
+        Math.abs(Date.parse(f.entryDate.slice(0, 10)) - day) <= 86_400_000,
+    );
+    if (!hit) return null;
+    claimed.add(hit.id);
+    return hit.id;
+  });
+}
+
 export function compareJobber(
   pulled: JobberRecords,
   fx: Fixtures,
@@ -130,7 +167,6 @@ export function compareJobber(
     inInstants(e.startAt, period),
   );
   const visits = (fx.visits ?? []).filter((v) => inInstants(v.startAt, period));
-  const quotes = (fx.quotes ?? []).filter((q) => inInstants(q.sentAt, period));
   const invoices = (fx.invoices ?? []).filter((i) =>
     inDates(i.issuedDate, period),
   );
@@ -140,12 +176,17 @@ export function compareJobber(
   const expenses = (fx.expenses ?? []).filter(
     (x) => x.source === "jobber" && inDates(x.date, period),
   );
-  // jobs in scope = every job a pulled-in-scope fixture record points at (the connector fetches jobs by reference)
+  // jobs in scope = every job an in-window entry, visit, invoice or expense points at (the connector fetches
+  // jobs by reference). Quotes do not widen it: a quote "sent" in the window can belong to a future job.
   const jobIds = new Set<string>();
-  for (const r of [...entries, ...visits, ...quotes, ...invoices])
+  for (const r of [...entries, ...visits, ...invoices])
     if (typeof r.jobId === "string") jobIds.add(r.jobId);
   for (const x of expenses)
     if (typeof x.matchedJobId === "string") jobIds.add(x.matchedJobId);
+  // quotes in scope = the quotes of in-scope jobs (converted quotes are often never sent, so sentAt is no filter)
+  const quotes = (fx.quotes ?? []).filter(
+    (q) => typeof q.jobId === "string" && jobIds.has(q.jobId),
+  );
   const workers = (fx.workers ?? []).filter(
     (w) => w.jobber !== null && w.jobber !== undefined,
   );
@@ -182,7 +223,7 @@ export function compareJobber(
     compareIds(
       "paymentRecords",
       payments.map((x) => x.id),
-      ours("payments", src(pulled.payments)),
+      resolvePayments(pulled.payments, payments, map),
     ),
     compareIds(
       "expenses",

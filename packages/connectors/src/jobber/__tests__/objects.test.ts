@@ -36,7 +36,7 @@ describe("pullCycle objects (recorded fixtures)", () => {
       ["users", 4, 4, true],
       ["timeSheetEntries", 5, 5, true],
       ["visits", 1, 1, true],
-      ["quotes", 1, 1, true],
+      ["quotes", 2, 2, true], // 1 sent in the period + 1 never sent, brought by its job,
       ["invoices", 1, 1, true],
       ["paymentRecords", 2, 2, true],
       ["expenses", 2, 2, true],
@@ -159,6 +159,29 @@ describe("pullCycle objects (recorded fixtures)", () => {
     expect(runOf(r, "expenses")?.complete).toBe(false);
     expect(runOf(r, "expenses")?.error).toContain(
       "reimbursement status unavailable",
+    );
+  });
+
+  it("a converted quote that was never sent comes in through its job (sentAt alone would miss it)", async () => {
+    const r = await pull();
+    const unsent = r.records.quotes.find(
+      (q) => q.sourceId === "Z2lkOi8vSm9iYmVyL1F1b3RlLzQwMDI=",
+    );
+    expect(unsent).toMatchObject({
+      jobId: J2,
+      sentAt: null,
+      status: "converted",
+      amountCents: 98015,
+      salespersonWorkerId: "jobber:Z2lkOi8vSm9iYmVyL1VzZXIvMTAwMg==",
+    });
+    // the sent one is not duplicated by its job's inline quote
+    expect(
+      r.records.quotes.filter(
+        (q) => q.sourceId === "Z2lkOi8vSm9iYmVyL1F1b3RlLzQwMDE=",
+      ),
+    ).toHaveLength(1);
+    expect(runOf(r, "quotes")?.method).toContain(
+      "+ quotes of 1 in-scope job(s)",
     );
   });
 
