@@ -8,6 +8,7 @@ import {
   normalizePurchase,
   type RawBill,
   type RawPurchase,
+  stripSeedSuffix,
 } from "../normalize.ts";
 
 const purchases = fixture.Purchase as RawPurchase[];
@@ -79,6 +80,34 @@ const auth = (
     refreshToken: `${rt}-rotated`,
     expiresInSec: 3600,
   }),
+});
+
+describe("seed-pushed names", () => {
+  it('strip exactly a trailing " (payrollpilot)" from account and vendor names', () => {
+    expect(stripSeedSuffix("Materials (payrollpilot)")).toBe("Materials");
+    expect(stripSeedSuffix("Materials")).toBe("Materials");
+    expect(stripSeedSuffix("Materials (payrollpilot) Extra")).toBe(
+      "Materials (payrollpilot) Extra",
+    );
+    expect(stripSeedSuffix("Materials(payrollpilot)")).toBe(
+      "Materials(payrollpilot)",
+    );
+    expect(stripSeedSuffix("Materials (PayrollPilot)")).toBe(
+      "Materials (PayrollPilot)",
+    );
+    expect(stripSeedSuffix(null)).toBeNull();
+    const p = structuredClone(purchases[1] as RawPurchase);
+    if (p.EntityRef) p.EntityRef.name = "Rent-All Equipment (payrollpilot)";
+    const line = p.Line?.[0]?.AccountBasedExpenseLineDetail?.AccountRef;
+    if (line) line.name = "Equipment Rental (payrollpilot)";
+    expect(normalizePurchase(p, "a")[0]).toMatchObject({
+      vendor: "Rent-All Equipment",
+      accountName: "Equipment Rental",
+    });
+    const b = structuredClone(bills[0] as RawBill);
+    if (b.VendorRef) b.VendorRef.name = "Metro Disposal (payrollpilot)";
+    expect(normalizeBill(b, "a")[0]?.vendor).toBe("Metro Disposal");
+  });
 });
 
 describe("normalizePurchase / normalizeBill", () => {

@@ -2,21 +2,25 @@
   {
     "id": "a-w05",
     "displayName": "Casey Lindqvist",
-    "role": "field"
+    "role": "field",
+    "managerId": "a-w11"
   },
   {
     "id": "a-w08",
     "displayName": "Rowan Castillo",
-    "role": "field"
+    "role": "field",
+    "managerId": "a-w11"
   },
   {
     "id": "a-w11",
     "displayName": "Dakota Brennan",
-    "role": "manager"
+    "role": "manager",
+    "managerId": "a-w12"
   },
   {
     "id": "a-w12",
     "displayName": "Skyler Ashford",
-    "role": "owner"
+    "role": "owner",
+    "managerId": null
   }
 ]

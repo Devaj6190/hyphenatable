@@ -1,0 +1,170 @@
+{
+  "namesAnonymized": true,
+  "companyId": "r",
+  "workers": [
+    {
+      "id": "r:w:t001",
+      "displayName": "Mara Stone"
+    },
+    {
+      "id": "r:w:t002",
+      "displayName": "Lena Croft"
+    },
+    {
+      "id": "r:w:t003",
+      "displayName": "Iris Vale"
+    },
+    {
+      "id": "r:w:t004",
+      "displayName": "Otto Reyes"
+    },
+    {
+      "id": "r:w:t005",
+      "displayName": "Faye Lund"
+    },
+    {
+      "id": "r:w:t006",
+      "displayName": "Gus Moreau"
+    },
+    {
+      "id": "r:w:t007",
+      "displayName": "Rhea Dunn"
+    },
+    {
+      "id": "r:w:t008",
+      "displayName": "Cole Marsh"
+    },
+    {
+      "id": "r:w:t009",
+      "displayName": "June Pratt"
+    }
+  ],
+  "clients": [],
+  "jobs": [],
+  "timeEntries": [],
+  "paid": [
+    {
+      "workerId": "r:w:t001",
+      "periodStart": "2026-09-14",
+      "periodEnd": "2026-09-27",
+      "checkDate": "2026-10-02",
+      "grossCents": 200000,
+      "sourceId": "csv:build#row1",
+      "sectionKind": "regular",
+      "payKind": "wage",
+      "employeeType": "Hourly",
+      "earningsCents": {
+        "Regular Hours": 200000
+      },
+      "hours": {
+        "Regular Hours": 80
+      }
+    },
+    {
+      "workerId": "r:w:t002",
+      "periodStart": "2026-09-14",
+      "periodEnd": "2026-09-27",
+      "checkDate": "2026-10-02",
+      "grossCents": 160000,
+      "sourceId": "csv:build#row2",
+      "sectionKind": "regular",
+      "payKind": "wage",
+      "employeeType": "Hourly",
+      "earningsCents": {
+        "Regular Hours": 160000
+      },
+      "hours": {
+        "Regular Hours": 80
+      }
+    },
+    {
+      "workerId": "r:w:t003",
+      "periodStart": "2026-09-14",
+      "periodEnd": "2026-09-27",
+      "checkDate": "2026-10-02",
+      "grossCents": 160000,
+      "sourceId": "csv:build#row3",
+      "sectionKind": "regular",
+      "payKind": "wage",
+      "employeeType": "Hourly",
+      "earningsCents": {
+        "Regular Hours": 160000
+      },
+      "hours": {
+        "Regular Hours": 80
+      }
+    },
+    {
+      "workerId": "r:w:t006",
+      "periodStart": "2026-09-14",
+      "periodEnd": "2026-09-27",
+      "checkDate": "2026-10-02",
+      "grossCents": 168000,
+      "sourceId": "csv:build#row4",
+      "sectionKind": "regular",
+      "payKind": "wage",
+      "employeeType": "Hourly",
+      "earningsCents": {
+        "Regular Hours": 168000
+      },
+      "hours": {
+        "Regular Hours": 80
+      }
+    },
+    {
+      "workerId": "r:w:t007",
+      "periodStart": "2026-09-14",
+      "periodEnd": "2026-09-27",
+      "checkDate": "2026-10-02",
+      "grossCents": 180000,
+      "sourceId": "csv:build#row5",
+      "sectionKind": "regular",
+      "payKind": "wage",
+      "employeeType": "Hourly",
+      "earningsCents": {
+        "Regular - Crew": 80000,
+        "Regular - Lead": 100000
+      },
+      "hours": {
+        "Regular - Crew": 40,
+        "Regular - Lead": 40
+      }
+    },
+    {
+      "workerId": "r:w:t008",
+      "periodStart": "2026-09-14",
+      "periodEnd": "2026-09-27",
+      "checkDate": "2026-10-02",
+      "grossCents": 250000,
+      "sourceId": "csv:build#row6",
+      "sectionKind": "regular",
+      "payKind": "wage",
+      "employeeType": "Hourly",
+      "earningsCents": {
+        "Salary": 250000
+      },
+      "hours": {}
+    },
+    {
+      "workerId": "r:w:t009",
+      "periodStart": "2026-09-14",
+      "periodEnd": "2026-09-27",
+      "checkDate": "2026-10-02",
+      "grossCents": 181000,
+      "sourceId": "csv:build#row7",
+      "sectionKind": "regular",
+      "payKind": "wage",
+      "employeeType": "Hourly",
+      "earningsCents": {
+        "Regular Hours": 176000,
+        "Commission": 5000
+      },
+      "hours": {
+        "Regular Hours": 80
+      }
+    }
+  ],
+  "expenses": [],
+  "syncRuns": [],
+  "generatedAt": "2026-10-24T12:00:00.000Z"
+}

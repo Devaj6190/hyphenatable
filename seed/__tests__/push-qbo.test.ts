@@ -95,7 +95,12 @@ describe("push-qbo dry run (default path)", () => {
     expect(jobs).toHaveLength(fx.jobs.length);
     for (const s of jobs) {
       expect(s.body.Job).toBe(true);
-      expect(s.requireMarker).toBe(marker(s.key));
+      expect(s.requireMarker).toEqual({ field: "Notes", value: marker(s.key) });
+      const job = must(fx.jobs.find((j) => j.id === s.key));
+      expect(s.lookup).toEqual({
+        field: "FullyQualifiedName",
+        value: `Company A client ${job.clientRef}:${job.jobNumber}`,
+      });
       expect(s.body.DisplayName).toBe(
         String(must(fx.jobs.find((j) => j.id === s.key)).jobNumber),
       );
@@ -174,5 +179,48 @@ describe("live safety (fake fetch, no network)", () => {
       SyncToken: "0",
     });
     expect(() => c.query("DELETE FROM Purchase")).toThrow("SELECT only");
+  });
+});
+
+describe("accounts, vendors and customers never collide with sandbox sample data", () => {
+  const { fx, currentPeriodStartDate, companyName } = loadQbo("a");
+  const steps = buildQboPlan(
+    fx,
+    {},
+    { currentPeriodStartDate, companyName },
+  ).steps;
+  test("accounts: our suffixed name, looked up by FullyQualifiedName, never a bare Name", () => {
+    const acc = steps.filter((s) => s.object === "accounts");
+    expect(acc.length).toBeGreaterThan(0);
+    for (const s of acc) {
+      expect(s.lookup?.field).toBe("FullyQualifiedName");
+      expect(String(s.lookup?.value)).toEndWith(" (payrollpilot)");
+      expect(s.body.Name).toBe(s.lookup?.value);
+      expect(s.requireMarker).toEqual({
+        field: "Description",
+        value: "payrollpilot:account",
+      });
+    }
+    const er = must(acc.find((s) => s.key === "Equipment Rental"));
+    expect(er.body).toEqual({
+      Name: "Equipment Rental (payrollpilot)",
+      AccountType: "Expense",
+      Description: "payrollpilot:account",
+    });
+  });
+  test("purchases still reference accounts by the fixture name (the map key), so kinds are unchanged", () => {
+    const pur = must(steps.find((s) => s.key === "a-ex-0002"));
+    expect(JSON.stringify(pur.body)).toContain(
+      '"$ref":"accounts:Equipment Rental"',
+    );
+  });
+  test("vendors: suffixed DisplayName with our marker in Notes", () => {
+    for (const s of steps.filter((x) => x.object === "vendors")) {
+      expect(String(s.body.DisplayName)).toEndWith(" (payrollpilot)");
+      expect(s.requireMarker).toEqual({
+        field: "Notes",
+        value: "payrollpilot:vendor",
+      });
+    }
   });
 });
