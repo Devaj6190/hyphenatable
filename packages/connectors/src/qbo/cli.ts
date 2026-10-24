@@ -7,6 +7,12 @@
 import { writeFile } from "node:fs/promises";
 import { resolve, sep } from "node:path";
 import { parseArgs } from "node:util";
+import {
+  compareQbo,
+  formatCompare,
+  loadFixtures,
+  loadIdMap,
+} from "../compare.ts";
 import { fileTokenStore } from "../tokens.ts";
 import { QBO_TOKEN_PATH, qboAuthFromEnv } from "./client.ts";
 import { pullExpenses } from "./index.ts";
@@ -19,6 +25,7 @@ const { positionals, values } = parseArgs({
     to: { type: "string" },
     cycle: { type: "string" },
     out: { type: "string" },
+    compare: { type: "string" },
   },
 });
 
@@ -67,6 +74,17 @@ async function pull() {
       throw new Error("--out must be under data/private/");
     await writeFile(out, JSON.stringify(r, null, 2));
     console.log(`wrote ${out}`);
+  }
+  if (values.compare) {
+    const rows = compareQbo(
+      r.records.expenses,
+      await loadFixtures(values.compare),
+      await loadIdMap(company, "qbo"),
+      from,
+      to,
+    );
+    console.log(`\n${formatCompare(rows)}`);
+    if (rows.some((x) => x.missing || x.extra)) process.exitCode = 1;
   }
   if (r.syncRuns.some((s) => !s.complete)) process.exitCode = 1;
 }
