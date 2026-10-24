@@ -1,6 +1,7 @@
 {
   "_comment": "Hand-built from the 2026-09-25 introspected schema. Fake ids and data, no names. Node lists per connection; the fake server wraps them (totalCount = length unless totalCounts overrides). Job 2001's quote paid a deposit; its invoice was paid the rest.",
   "totalCounts": {},
+  "expenseStatus": { "PENDING_REIMBURSEMENT": [{ "id": "Z2lkOi8vSm9iYmVyL0V4cGVuc2UvODAwMQ==" }], "PAID": [] },
   "visits": [
     { "id": "Z2lkOi8vSm9iYmVyL1Zpc2l0LzMwMDE=", "job": { "id": "Z2lkOi8vSm9iYmVyL0pvYi8yMDAy" }, "startAt": "2026-10-13T08:00:00-07:00", "endAt": "2026-10-13T16:00:00-07:00", "isComplete": true,
       "assignedUsers": { "totalCount": 1, "nodes": [{ "id": "Z2lkOi8vSm9iYmVyL1VzZXIvMTAwMg==" }] } }
@@ -18,8 +19,8 @@
     { "id": "Z2lkOi8vSm9iYmVyL1BheW1lbnRSZWNvcmQvNzAwMg==", "amount": 950.4, "entryDate": "2026-10-21T17:00:00Z", "paymentType": "CREDIT_CARD", "invoice": { "id": "Z2lkOi8vSm9iYmVyL0ludm9pY2UvNjAwMQ==" }, "quote": null }
   ],
   "expenses": [
-    { "id": "Z2lkOi8vSm9iYmVyL0V4cGVuc2UvODAwMQ==", "title": "Mulch", "description": null, "date": "2026-10-12T00:00:00-07:00", "total": 214.37, "linkedJob": { "id": "Z2lkOi8vSm9iYmVyL0pvYi8yMDAx" }, "accountingCode": { "code": "Materials" } },
-    { "id": "Z2lkOi8vSm9iYmVyL0V4cGVuc2UvODAwMg==", "title": "Dump fee", "description": "transfer station", "date": "2026-10-16T00:00:00-07:00", "total": null, "linkedJob": null, "accountingCode": null }
+    { "id": "Z2lkOi8vSm9iYmVyL0V4cGVuc2UvODAwMQ==", "title": "Mulch", "description": null, "date": "2026-10-12T00:00:00-07:00", "total": 214.37, "linkedJob": { "id": "Z2lkOi8vSm9iYmVyL0pvYi8yMDAx" }, "accountingCode": { "code": "Materials" }, "reimbursableTo": { "id": "Z2lkOi8vSm9iYmVyL1VzZXIvMTAwMg==" } },
+    { "id": "Z2lkOi8vSm9iYmVyL0V4cGVuc2UvODAwMg==", "title": "Dump fee", "description": "transfer station", "date": "2026-10-16T00:00:00-07:00", "total": null, "linkedJob": null, "accountingCode": null, "reimbursableTo": null }
   ],
   "jobs": [
     { "id": "Z2lkOi8vSm9iYmVyL0pvYi8yMDAx", "jobNumber": 101, "title": "Spring cleanup", "jobStatus": "requires_invoicing", "client": { "id": "Z2lkOi8vSm9iYmVyL0NsaWVudC85MDAx" },

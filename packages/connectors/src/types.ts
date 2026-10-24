@@ -144,4 +144,8 @@ export interface Expense {
   kind: "job_cost" | "overhead" | "unknown";
   matchedJobId: string | null;
   matchConfidence: number | null;
+  /** Local extension pending a contract PR (A-10 reimbursements). Jobber only; null for QBO. */
+  reimbursableToWorkerId: string | null;
+  /** Jobber ExpensePaymentStatus, from the paymentStatus filter; null when not reimbursable or unknown. */
+  reimbursementStatus: "PENDING_REIMBURSEMENT" | "PAID" | null;
 }
