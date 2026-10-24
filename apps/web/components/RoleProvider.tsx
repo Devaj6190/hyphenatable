@@ -8,7 +8,7 @@ import {
   useMemo,
   useSyncExternalStore,
 } from "react";
-import { ROLE_COOKIE } from "@/lib/role";
+import { parseRole, ROLE_COOKIE } from "@/lib/role";
 import type { ViewerRole } from "@/lib/types";
 
 // Demo-mode stand-in for login (cut-order item 5): the role lives in a cookie.
@@ -20,7 +20,7 @@ function readRole(): ViewerRole {
   const hit = document.cookie
     .split("; ")
     .find((c) => c.startsWith(`${ROLE_COOKIE}=`));
-  return hit?.split("=")[1] === "manager" ? "manager" : "owner";
+  return parseRole(hit?.split("=")[1]);
 }
 
 function subscribe(cb: () => void) {
@@ -28,12 +28,18 @@ function subscribe(cb: () => void) {
   return () => window.removeEventListener(EVENT, cb);
 }
 
-export function RoleProvider({ children }: { children: ReactNode }) {
-  // The server snapshot is "owner", so first paint is the owner view and the cookie applies after hydration.
+export function RoleProvider({
+  initialRole,
+  children,
+}: {
+  initialRole: ViewerRole;
+  children: ReactNode;
+}) {
+  // The server reads the same cookie and passes it in, so the first HTML and hydration already match the role.
   const role = useSyncExternalStore<ViewerRole>(
     subscribe,
     readRole,
-    () => "owner",
+    () => initialRole,
   );
   const setRole = useCallback((r: ViewerRole) => {
     // biome-ignore lint/suspicious/noDocumentCookie: sync write needed so useSyncExternalStore reads it back at once; Cookie Store API is async.

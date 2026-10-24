@@ -51,7 +51,7 @@
       "entryIds": [],
       "expenseIds": ["a-exp-0231"]
     },
-    "seen": "A Harlan Supply purchase on Oct 9 has no job. Best guess is job 121, not sure.",
+    "seen": "A Harlan Supply purchase on Oct 9 has no job. Best guess is job a-j02, not sure.",
     "where": [
       {
         "system": "QuickBooks",
@@ -79,7 +79,7 @@
     "companyId": "a",
     "cycleId": "a-c05",
     "checkId": "CHK-01",
-    "status": "asked",
+    "status": "answered",
     "subject": {
       "workerId": "a-w08",
       "jobId": null,

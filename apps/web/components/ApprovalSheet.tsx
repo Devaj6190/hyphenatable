@@ -25,7 +25,13 @@ const statusText: Record<Question["status"], string> = {
 };
 
 // Fixture mode: decisions live in component state only. Convex wiring (questions.approve/edit/deny) comes with B-02.
-export function ApprovalSheet({ question }: { question: Question }) {
+export function ApprovalSheet({
+  question,
+  recipientName,
+}: {
+  question: Question;
+  recipientName?: string;
+}) {
   const [status, setStatus] = useState(question.status);
   const [text, setText] = useState(question.text);
   const [draft, setDraft] = useState(question.text);
@@ -41,7 +47,7 @@ export function ApprovalSheet({ question }: { question: Question }) {
       <CardContent className="flex flex-col gap-3">
         <div className="flex flex-wrap items-center gap-2">
           <h3 className="text-base font-semibold">
-            Text to send to {roleLabel[question.toRole]}
+            Text to send to {recipientName ?? roleLabel[question.toRole]}
           </h3>
           <Badge
             variant="outline"
@@ -141,7 +147,8 @@ export function ApprovalSheet({ question }: { question: Question }) {
         {status === "approved" && (
           <p className="text-sm text-muted-foreground">
             Approved by you. Fixture mode: nothing was sent. With the courier
-            running, this goes to the manager’s phone.
+            running, this goes to {recipientName ?? roleLabel[question.toRole]}
+            ’s phone.
           </p>
         )}
         {status === "denied" && (

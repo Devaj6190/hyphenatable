@@ -21,6 +21,8 @@ const badgeVariants = cva(
       variant: {
         soft: "",
         outline: "bg-transparent",
+        /** Legacy shadcn name, same as soft. */
+        secondary: "",
       },
     },
     compoundVariants: [

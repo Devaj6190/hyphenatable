@@ -73,3 +73,43 @@ export type FlagEvent = {
   type: string;
   summary: string;
 };
+
+// One line in a per-worker text thread. Phone numbers never appear here; the courier owns them.
+export type ThreadMessage = {
+  id: string;
+  questionId: string;
+  workerId: string;
+  direction: "out" | "in";
+  text: string;
+  at: string;
+  kind: "text" | "poll" | "poll_vote" | "reaction";
+  simulated?: boolean;
+  interpretation?: string;
+};
+
+export type FixtureWorker = {
+  id: string;
+  displayName: string;
+  role: "field" | "manager" | "owner" | "office";
+};
+
+// Mirrors AuditEvent in docs/plans/00-shared-context.md section 6. B's audit.list replaces the fixture.
+// Summaries never carry pay amounts: pay lives in data.effectPayCents and is shown to the owner only.
+export type AuditData = {
+  source?: string;
+  simulated?: boolean;
+  ownerOnly?: boolean;
+  effectPayCents?: number;
+};
+
+export type AuditEvent = {
+  id: string;
+  companyId: string;
+  cycleId: string | null;
+  at: string;
+  actor: FlagEvent["actor"];
+  type: string;
+  summary: string;
+  refs: Record<string, string>;
+  data: AuditData | null;
+};
