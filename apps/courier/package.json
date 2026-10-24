@@ -1,5 +1,21 @@
 {
   "name": "courier",
+  "version": "0.0.1",
   "private": true,
-  "type": "module"
+  "type": "module",
+  "scripts": {
+    "start": "bun src/index.ts",
+    "dev": "bun --watch src/index.ts",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit -p ."
+  },
+  "dependencies": {
+    "convex": "^1.48.0",
+    "spectrum-ts": "^12.14.0"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/node": "^26.6.5",
+    "typescript": "^5"
+  }
 }
