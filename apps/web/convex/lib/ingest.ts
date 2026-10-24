@@ -108,7 +108,7 @@ export function setPath(
   obj: Record<string, unknown>,
   path: string,
   value: unknown,
-) {
+): Record<string, unknown> {
   const [head, ...rest] = path.split(".");
   if (!rest.length) return { ...obj, [head]: value };
   const child = obj[head];

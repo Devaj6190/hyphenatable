@@ -16,8 +16,11 @@ const lit = <const T extends readonly [string, string, ...string[]]>(
   );
 const json = v.union(v.string(), v.number(), v.boolean(), v.null());
 
-const ruleType = lit(...RuleType.options);
-const checkId = lit(...CheckId.options);
+/** A zod enum's values as a Convex literal union, so the two can never list different values. */
+const fromEnum = <T extends string>(e: { options: T[] }) =>
+  lit(...(e.options as [T, T, ...T[]]));
+const ruleType = fromEnum(RuleType);
+const checkId = fromEnum(CheckId);
 
 export default defineSchema({
   companies: defineTable({
