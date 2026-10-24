@@ -40,7 +40,7 @@ const input = {
   rules: [],
 };
 
-const ids = checks.map((c) => c.id as string);
+const ids = checks.filter((c) => c.id <= "CHK-06").map((c) => c.id as string);
 const key = (raw("answer-key") as KeyRow[]).filter((r) =>
   ids.includes(r.checkId),
 );
@@ -54,7 +54,7 @@ const matches = (f: Flag, r: KeyRow) =>
 
 test("CHK-01..06 catch every planted a-c05 error and nothing else", () => {
   expect(input.cycle).toBeDefined();
-  const flags = valid(runAll(input));
+  const flags = valid(runAll(input)).filter((f) => ids.includes(f.checkId));
 
   const rows = ids.map((checkId) => {
     const keyed = key.filter((r) => r.checkId === checkId);

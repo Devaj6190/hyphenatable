@@ -1,6 +1,15 @@
 // Hand-written synthetic records for check tests. Every builder parses through the zod
 // schema, so a fixture that drifts from the contract fails loudly.
-import { Company, Cycle, Flag, Rule, TimeEntry } from "../../schemas";
+import { sample } from "../../__fixtures__/sample";
+import {
+  Company,
+  Cycle,
+  Flag,
+  Rule,
+  SyncRun,
+  TimeEntry,
+  Worker,
+} from "../../schemas";
 import type { CheckInput } from "../types";
 
 export const company = (over: Partial<Company> = {}): Company =>
@@ -98,3 +107,22 @@ export const input = (
 
 /** Parses every flag against the contract; use on all check output in tests. */
 export const valid = (flags: Flag[]): Flag[] => flags.map((f) => Flag.parse(f));
+
+export const worker = (over: Partial<Worker> = {}): Worker =>
+  Worker.parse({ ...sample.workers[1], id: "w_01", role: "field", ...over });
+export const syncRun = (over: Partial<SyncRun> = {}): SyncRun =>
+  SyncRun.parse({
+    id: "sync_1",
+    companyId: "co_a",
+    cycleId: "cy_1",
+    source: "jobber",
+    object: "timeEntries",
+    startedAt: "2026-10-12T16:00:00Z",
+    finishedAt: "2026-10-12T16:01:00Z",
+    pulled: 9,
+    expected: 10,
+    complete: false,
+    method: "fixture",
+    error: null,
+    ...over,
+  });

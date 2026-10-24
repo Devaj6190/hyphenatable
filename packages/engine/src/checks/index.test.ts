@@ -33,7 +33,7 @@ const planted = () =>
   ]);
 
 describe("checks registry", () => {
-  test("covers CHK-01 to CHK-06 once each, in order", () => {
+  test("covers time, worker and incomplete-sync checks once each, in order", () => {
     expect(checks.map((c) => c.id)).toEqual([
       "CHK-01",
       "CHK-02",
@@ -41,6 +41,13 @@ describe("checks registry", () => {
       "CHK-04",
       "CHK-05",
       "CHK-06",
+      "CHK-07",
+      "CHK-08",
+      "CHK-09",
+      "CHK-10",
+      "CHK-11",
+      "CHK-12",
+      "CHK-23",
     ]);
   });
 

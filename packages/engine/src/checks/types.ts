@@ -9,6 +9,7 @@ import type {
   Payment,
   Quote,
   Rule,
+  SyncRun,
   TimeEntry,
   Visit,
   Worker,
@@ -29,6 +30,7 @@ export type CheckInput = {
   /** workerId → gross cents of past cycles. */
   pastCycles: { gross: Record<string, number[]> };
   rules: Rule[];
+  syncRuns?: SyncRun[];
 };
 
 export type Check = {
