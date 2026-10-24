@@ -1,5 +1,20 @@
 {
   "name": "@payrollpilot/eval",
   "private": true,
-  "type": "module"
+  "type": "module",
+  "scripts": {
+    "metrics": "bun run run.ts",
+    "flags": "bun run make-flags.ts",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@payrollpilot/engine": "workspace:*",
+    "zod": "^4"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "typescript": "^5",
+    "vitest": "^4"
+  }
 }
