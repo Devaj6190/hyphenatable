@@ -385,8 +385,8 @@ export function buildPlan(
       idPath: "invoiceCreate.invoice.id",
       variables: {
         input: {
+          // Live error: "Cannot set a property when jobs or visits are attached" (the job carries it).
           clientId: ref("clients", clientRef),
-          propertyId: ref("properties", clientRef),
           jobIds: [ref("jobs", i.jobId as string)],
           subject: marker(i.id as string),
           issuedDate: noon(i.issuedDate),

@@ -11,8 +11,10 @@ import {
 import {
   codeFromRedirect,
   DEFAULT_REDIRECT_URI,
+  isMutation,
   JOBBER_GRAPHQL_URL,
   SEED_TOKEN_PATH,
+  SeedClient,
   seedAuthFromEnv,
 } from "../lib/jobber-seed-client";
 import { bucket, must } from "../lib/must";
@@ -329,6 +331,7 @@ describe("live safety", () => {
     expect(input.tax).toEqual({ taxCalculationMethod: "EXCLUSIVE" });
     expect(input.dueDetails).toEqual({});
     expect(input.subject).toBe("payrollpilot:a-in03");
+    expect(input.propertyId).toBeUndefined();
   });
   test("refuses when the account query fails", async () => {
     const broken = {
@@ -394,5 +397,49 @@ describe("seed auth: paste-the-address code exchange", () => {
     await expect(
       pastedAddress(undefined, {}, async () => "  "),
     ).rejects.toThrow("no address");
+  });
+});
+
+describe("seed client: dropped connections", () => {
+  const fresh = {
+    accessToken: "t",
+    accessTokenExpiresAt: Date.now() + 3_600_000,
+    refreshToken: "r",
+  };
+  const flaky = (failures: number) => {
+    let n = 0;
+    return (async () => {
+      n++;
+      if (n <= failures) throw new Error("ECONNRESET");
+      return new Response(JSON.stringify({ data: { ok: true } }), {
+        status: 200,
+      });
+    }) as unknown as typeof fetch;
+  };
+  test("a read is retried after a dropped connection", async () => {
+    const c = new SeedClient(
+      { clientId: "a", clientSecret: "b" },
+      flaky(2),
+      async () => {},
+      () => {},
+      fresh,
+    );
+    expect((await c.gql("query { account { id } }")).data).toEqual({
+      ok: true,
+    });
+  });
+  test("a mutation is never retried blindly", async () => {
+    const c = new SeedClient(
+      { clientId: "a", clientSecret: "b" },
+      flaky(1),
+      async () => {},
+      () => {},
+      fresh,
+    );
+    await expect(
+      c.gql("mutation($i: X!) { clientCreate(input: $i) { client { id } } }"),
+    ).rejects.toThrow("may have been applied");
+    expect(isMutation("  mutation { a }")).toBe(true);
+    expect(isMutation("query { a }")).toBe(false);
   });
 });
