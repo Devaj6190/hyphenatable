@@ -1,4 +1,4 @@
-import { AgentChip } from "@/components/AgentChip";
+import { AgentChip, agentFromActor } from "@/components/AgentChip";
 import type { DataKind } from "@/components/DataLabel";
 import type { FlagEvent } from "@/lib/types";
 
@@ -26,7 +26,7 @@ export function FlagTimeline({
           <span className="w-24 text-muted-foreground">
             {when.format(new Date(e.at))}
           </span>
-          <AgentChip actor={e.actor} />
+          <AgentChip agent={agentFromActor(e.actor)} />
           <span>{e.summary}</span>
           <span className="text-muted-foreground">({dataKind})</span>
         </li>
