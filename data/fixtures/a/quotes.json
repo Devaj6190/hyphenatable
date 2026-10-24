@@ -1,0 +1,32 @@
+[
+  {
+    "id": "a-q01",
+    "companyId": "a",
+    "sourceId": "a-q01",
+    "jobId": "a-j01",
+    "salespersonWorkerId": "a-w12",
+    "sentAt": "2026-09-29T17:00:00.000Z",
+    "status": "converted",
+    "amountCents": 184000
+  },
+  {
+    "id": "a-q02",
+    "companyId": "a",
+    "sourceId": "a-q02",
+    "jobId": "a-j02",
+    "salespersonWorkerId": "a-w11",
+    "sentAt": "2026-10-01T21:30:00.000Z",
+    "status": "converted",
+    "amountCents": 362500
+  },
+  {
+    "id": "a-q03",
+    "companyId": "a",
+    "sourceId": "a-q03",
+    "jobId": null,
+    "salespersonWorkerId": "a-w12",
+    "sentAt": "2026-10-20T23:00:00.000Z",
+    "status": "awaiting_response",
+    "amountCents": 128000
+  }
+]

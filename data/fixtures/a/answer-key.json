@@ -1,0 +1,157 @@
+[
+  {
+    "id": "a-ak-01",
+    "checkId": "CHK-01",
+    "subject": {
+      "workerId": "a-w05",
+      "jobId": null,
+      "entryIds": [
+        "a-te-0121"
+      ],
+      "expenseIds": []
+    },
+    "truth": "entry a-te-0121 was on job a-j03 (hedge cleanup), the job was not picked on the timer",
+    "correctAnswer": {
+      "kind": "change",
+      "values": {
+        "jobId": "a-j03"
+      }
+    },
+    "registerCategory": "hours with no job"
+  },
+  {
+    "id": "a-ak-02",
+    "checkId": "CHK-02",
+    "subject": {
+      "workerId": "a-w06",
+      "jobId": "a-j02",
+      "entryIds": [
+        "a-te-0140"
+      ],
+      "expenseIds": []
+    },
+    "truth": "a-w06 forgot to clock out; entry a-te-0140 ended at 17:00 local (4 h)",
+    "correctAnswer": {
+      "kind": "change",
+      "values": {
+        "endAt": "2026-10-24T00:00:00.000Z",
+        "durationSec": 14400
+      }
+    },
+    "registerCategory": "long or open shifts"
+  },
+  {
+    "id": "a-ak-03",
+    "checkId": "CHK-03",
+    "subject": {
+      "workerId": "a-w07",
+      "jobId": "a-j05",
+      "entryIds": [
+        "a-te-0130"
+      ],
+      "expenseIds": []
+    },
+    "truth": "the 13 h shift a-te-0130 on a-j05 is real (irrigation install day); pay it as logged",
+    "correctAnswer": {
+      "kind": "confirm",
+      "values": {}
+    },
+    "registerCategory": "long or open shifts"
+  },
+  {
+    "id": "a-ak-04",
+    "checkId": "CHK-04",
+    "subject": {
+      "workerId": "a-w03",
+      "jobId": null,
+      "entryIds": [
+        "a-te-0111",
+        "a-te-0113"
+      ],
+      "expenseIds": []
+    },
+    "truth": "entry a-te-0113 belongs to job a-j04, not a-j02; a-w03 left a-j02 at 12:00 local, so a-te-0111 ends at 12:00",
+    "correctAnswer": {
+      "kind": "change",
+      "values": {
+        "a-te-0113.jobId": "a-j04",
+        "a-te-0111.endAt": "2026-10-14T19:00:00.000Z"
+      }
+    },
+    "registerCategory": "overlapping hours"
+  },
+  {
+    "id": "a-ak-05",
+    "checkId": "CHK-05",
+    "subject": {
+      "workerId": "a-w04",
+      "jobId": null,
+      "entryIds": [
+        "a-te-0137"
+      ],
+      "expenseIds": []
+    },
+    "truth": "entry a-te-0137 is an accidental clock-in with no time worked; no hours owed",
+    "correctAnswer": {
+      "kind": "confirm",
+      "values": {}
+    },
+    "registerCategory": "zero-minute entries"
+  },
+  {
+    "id": "a-ak-06",
+    "checkId": "CHK-10",
+    "subject": {
+      "workerId": "a-w02",
+      "jobId": null,
+      "entryIds": [],
+      "expenseIds": []
+    },
+    "truth": "a-w02 got a raise to $26.00/h; Jobber is right and Gusto still has the old $25.00/h",
+    "correctAnswer": {
+      "kind": "change",
+      "values": {
+        "gusto.rateCents": 2600
+      }
+    },
+    "registerCategory": "stale rates"
+  },
+  {
+    "id": "a-ak-07",
+    "checkId": "CHK-11",
+    "subject": {
+      "workerId": "a-w10",
+      "jobId": null,
+      "entryIds": [],
+      "expenseIds": []
+    },
+    "truth": "a-w10 is paid $22.00/h by Venmo (owner's answer; never assumed)",
+    "correctAnswer": {
+      "kind": "change",
+      "values": {
+        "venmoRateCents": 2200
+      }
+    },
+    "registerCategory": "missing Venmo rates"
+  },
+  {
+    "id": "a-ak-08",
+    "checkId": "CHK-14",
+    "subject": {
+      "workerId": null,
+      "jobId": null,
+      "entryIds": [],
+      "expenseIds": [
+        "a-ex-0003"
+      ]
+    },
+    "truth": "purchase a-ex-0003 (PVC fittings, $214.37) was for job a-j05 (irrigation install)",
+    "correctAnswer": {
+      "kind": "change",
+      "values": {
+        "matchedJobId": "a-j05"
+      }
+    },
+    "registerCategory": "unmatched material purchases"
+  }
+]

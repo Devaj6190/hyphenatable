@@ -1,0 +1,62 @@
+[
+  {
+    "id": "a-v01",
+    "companyId": "a",
+    "jobId": "a-j01",
+    "sourceId": "a-v01",
+    "startAt": "2026-10-12T14:00:00.000Z",
+    "endAt": "2026-10-12T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "a-w01",
+      "a-w03",
+      "a-w05",
+      "a-w07",
+      "a-w08"
+    ]
+  },
+  {
+    "id": "a-v02",
+    "companyId": "a",
+    "jobId": "a-j03",
+    "sourceId": "a-v02",
+    "startAt": "2026-10-15T14:00:00.000Z",
+    "endAt": "2026-10-15T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "a-w02",
+      "a-w05",
+      "a-w09"
+    ]
+  },
+  {
+    "id": "a-v03",
+    "companyId": "a",
+    "jobId": "a-j04",
+    "sourceId": "a-v03",
+    "startAt": "2026-10-19T14:00:00.000Z",
+    "endAt": "2026-10-19T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "a-w01",
+      "a-w03",
+      "a-w06",
+      "a-w08"
+    ]
+  },
+  {
+    "id": "a-v04",
+    "companyId": "a",
+    "jobId": "a-j05",
+    "sourceId": "a-v04",
+    "startAt": "2026-10-21T14:00:00.000Z",
+    "endAt": "2026-10-21T22:30:00.000Z",
+    "isComplete": true,
+    "assignedWorkerIds": [
+      "a-w01",
+      "a-w05",
+      "a-w07",
+      "a-w08"
+    ]
+  }
+]
