@@ -6,6 +6,8 @@ import {
   allFlagParams,
   currentViewer,
   flagDetail,
+  homeFlags,
+  viewerForRole,
 } from "@/lib/server/fixtures";
 
 export function generateStaticParams() {
@@ -35,6 +37,11 @@ async function Flag({
     <FlagDetail
       companyId={companyId}
       data={flagDetail(viewer, companyId, flagId)}
+      flagIds={homeFlags(viewer, companyId).map((f) => f.id)}
+      roleOf={{
+        [viewerForRole(companyId, "owner").workerId]: "owner",
+        [viewerForRole(companyId, "manager").workerId]: "manager",
+      }}
       dataKind={company.kind}
       timezone={company.timezone}
     />
