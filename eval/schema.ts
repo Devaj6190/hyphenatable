@@ -1,5 +1,6 @@
 // The results.json contract the readiness screen and docs/PROOF.md read (plan A-11 step 6).
 import { z } from "zod";
+import { M4Summary } from "./m4-r";
 
 const Ratio = z.object({
   num: z.number().int().min(0),
@@ -54,7 +55,10 @@ export const Results = z.object({
     ),
   }),
   m4: z.object({
-    companyR: z.object({ status: z.literal("pending"), reason: z.string() }),
+    companyR: z.union([
+      z.object({ status: z.literal("pending"), reason: z.string() }),
+      M4Summary,
+    ]),
     syntheticSelfCheck: z
       .object({
         company: z.string(),

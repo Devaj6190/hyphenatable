@@ -1,0 +1,6 @@
+[
+  { "ruleId": "r-rule-s01", "runbookId": "RB-01", "verdict": "match" },
+  { "ruleId": "r-rule-s02", "runbookId": "RB-02", "verdict": "match" },
+  { "ruleId": "r-rule-s03", "runbookId": "RB-03", "verdict": "differs" },
+  { "ruleId": null, "runbookId": "RB-04", "verdict": "not_learned" }
+]
