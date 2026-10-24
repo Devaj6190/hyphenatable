@@ -6,19 +6,19 @@ Every number here says where it was measured, and when. A target is never shown 
 
 > One-line statement for the video and Devpost: **measured at G3** (draft below).
 
-Draft: *PayrollPilot reads a real Jobber account, a Gusto demo company and a QuickBooks sandbox, seeded with a synthetic 12-person landscaping crew. Hours are simulated because Jobber's API cannot create time entries. It prepares the Gusto draft and never submits.*
+Draft: *PayrollPilot reads a real Jobber account, a Gusto demo company and a QuickBooks sandbox, seeded with a synthetic 12-person landscaping crew (14 worker records: the 12, plus a new hire not yet onboarded and a former worker who still has hours). Most hours come from fixtures because Jobber's API cannot create time entries; the planted overlap and a few other planted entries were entered in Jobber by hand. It prepares the Gusto draft and never submits.*
 
 | System | Real | Simulated | Notes |
 |---|---|---|---|
 | Jobber (trial account) | users, clients, properties, jobs, visits, quotes, invoices, expenses (seeded by API, read back by the read app) | time entries and payment records (the Jobber API has no write for them); loaded from `data/fixtures/a/` | Jobber auto-creates one payment record per invoice; normalized as kind "unknown" |
 | Gusto (demo company) | employees mapped to Company A, compensations, the unprocessed payroll for a-c05 | Company A's past payrolls (`pastPayrolls.json`); the demo's own history is read only as "connected" proof | prepare / update / calculate only; there is no submit in the code |
-| QuickBooks (sandbox) | measured at G3 | measured at G3 | waiting on sandbox credentials (H3) |
+| QuickBooks (sandbox) | Company A accounts, vendors, customers, job sub-customers, purchases and bills (seeded by API on our own sandbox, read back; a-c05 purchases 6/6 match) | none | the sandbox's own sample purchases also appear and are counted apart |
 | Company R | measured at G3 | none: real, anonymized | names, notes and client names never leave `data/private/` |
 | Messages | measured at G3 | demo personas are labelled **simulated** | |
 
 ## 2. Company A (synthetic)
 
-A 12-person landscaping crew in Pennsylvania (`America/New_York`), paid biweekly on Gusto's Sat–Fri schedule, with weekly overtime after 40 h. Cycle 1 is a-c05 (2026-10-10..10-23); cycle 2 is a-c06 (2026-10-24..11-06). Planted errors cover CHK-01 to CHK-22 in each cycle (answer key: `data/fixtures/a/answer-key.json` and `cycles/a-c06/answer-key.json`). The model never sees the answer key.
+A 12-person landscaping crew in Pennsylvania. `data/fixtures/a/workers.json` holds 14 worker records: the 12 (10 field incl. 2 Venmo contractors and 1 salaried crew lead, 1 manager, 1 owner), plus a-w13 (a former worker, deactivated, with hours: CHK-08) and a-w14 (a new hire not onboarded in Gusto: CHK-09). Timezone `America/New_York`; paid biweekly on Gusto's Sat–Fri schedule, with weekly overtime after 40 h. Cycle 1 is a-c05 (2026-10-10..10-23); cycle 2 is a-c06 (2026-10-24..11-06). Planted errors cover CHK-01 to CHK-22 in each cycle (answer key: `data/fixtures/a/answer-key.json` and `cycles/a-c06/answer-key.json`). The model never sees the answer key.
 
 - Stage 1 on a-c05 (engine golden, synthetic): Gusto wages 2,224,383¢ over 545.08 h. a-w10 is excluded because it has no Venmo rate. Hand-computed in `packages/engine/src/payroll/__golden__/a-c05.json`.
 - Live run: **measured at G3**.
