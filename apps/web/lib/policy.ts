@@ -25,6 +25,9 @@ export function viewerFor(
   return { role, workerId, crew: new Set(crew) };
 }
 
+/** Pay amounts (rates, totals, plain words that state them) are for the owner only. */
+export const canSeePay = (viewer: Viewer) => viewer.role === "owner";
+
 /**
  * A manager sees manager-routed flags about their crew, plus manager-routed job flags that name no worker.
  * Owner-routed flags are money or policy and stay with the owner.
