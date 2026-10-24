@@ -521,10 +521,29 @@ export const AccessEvent = z.object({
 });
 
 // ── Agent outputs (plan B 4.4); every one is a proposal, never an action ─────
-const Params = z.record(
-  z.string(),
-  z.union([z.string(), z.number(), z.boolean()]),
+// Structured outputs only accept closed objects: a z.record becomes `{}` and the model could never fill
+// it. Open key/value maps are therefore lists of pairs here; `pairsToRecord` turns them back after parse.
+const Params = z.array(
+  z.object({
+    key: z.string(),
+    value: z.union([z.string(), z.number(), z.boolean()]),
+  }),
 );
+const Values = z.array(
+  z.object({ key: z.string(), value: z.union([z.string(), z.number()]) }),
+);
+
+/** `[{ key: "jobId", value: "job_12" }]` → `{ jobId: "job_12" }`. A repeated key is a model error. */
+export function pairsToRecord<V>(
+  pairs: { key: string; value: V }[],
+): Record<string, V> {
+  const out: Record<string, V> = {};
+  for (const { key, value } of pairs) {
+    if (Object.hasOwn(out, key)) throw new Error(`duplicate key "${key}"`);
+    out[key] = value;
+  }
+  return out;
+}
 
 export const ProposedRule = z.object({
   type: RuleType,
@@ -580,7 +599,8 @@ export const QuestionDraft = z.object({
 export const InterpretationOutput = z.object({
   kind: InterpretationKind,
   optionIndex: nul(z.number().int().min(0).max(3)),
-  values: z.record(z.string(), z.union([z.string(), z.number()])),
+  /** e.g. [{ key: "jobId", value: "job_12" }]; stored as Interpretation.result.values via pairsToRecord. */
+  values: Values,
   confidence: z.number().min(0).max(1),
   needsFollowUp: z.boolean(),
   followUpText: nul(z.string().max(240)),
