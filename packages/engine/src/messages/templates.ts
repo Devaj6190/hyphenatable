@@ -1,13 +1,104 @@
-import type { Interpretation } from "@payrollpilot/engine/schemas";
+import type { CheckId, Interpretation } from "@payrollpilot/engine/schemas";
 import { PRODUCT_NAME } from "./brand";
+
+// ── Manager summary: edit wording here ─────────────────────────────────────────────────────────────────
+// The text a manager gets before payroll. {issue} is the most common flag type this cycle, from issuePhrases.
+// "one" is used when a single item needs them. The link sentence is left off when DASHBOARD_URL is not set.
+export const managerSummaryWording = {
+  many: "Hi {name}, before we run payroll ({range}) there are {count} timesheet items to check, mostly {issue}.",
+  one: "Hi {name}, before we run payroll ({range}) there is 1 timesheet item to check, about {issue}.",
+  link: " Details here: {link}",
+} as const;
+
+// Every flag type in plain English: "many" follows "mostly", "one" follows "about".
+export const issuePhrases: Record<CheckId, { one: string; many: string }> = {
+  "CHK-01": {
+    one: "hours logged without a job",
+    many: "hours logged without a job",
+  },
+  "CHK-02": { one: "a timer left running", many: "timers left running" },
+  "CHK-03": { one: "an unusually long shift", many: "unusually long shifts" },
+  "CHK-04": { one: "two entries that overlap", many: "entries that overlap" },
+  "CHK-05": {
+    one: "a duplicate or zero-hour entry",
+    many: "duplicate or zero-hour entries",
+  },
+  "CHK-06": {
+    one: "hours not approved by the cutoff",
+    many: "hours not approved by the cutoff",
+  },
+  "CHK-07": {
+    one: "a worker with no hours logged",
+    many: "workers with no hours logged",
+  },
+  "CHK-08": {
+    one: "an inactive worker with hours",
+    many: "inactive workers with hours",
+  },
+  "CHK-09": {
+    one: "a worker not set up in Gusto",
+    many: "workers not set up in Gusto",
+  },
+  "CHK-10": {
+    one: "a pay rate that differs between systems",
+    many: "pay rates that differ between systems",
+  },
+  "CHK-11": {
+    one: "a contractor with no rate on file",
+    many: "contractors with no rate on file",
+  },
+  "CHK-12": {
+    one: "someone paid outside the payroll sync",
+    many: "people paid outside the payroll sync",
+  },
+  "CHK-13": {
+    one: "a job with no labor recorded",
+    many: "jobs with no labor recorded",
+  },
+  "CHK-14": { one: "a purchase with no job", many: "purchases with no job" },
+  "CHK-15": {
+    one: "a purchase that may be counted twice",
+    many: "purchases that may be counted twice",
+  },
+  "CHK-16": {
+    one: "a disposal fee not linked to its job",
+    many: "disposal fees not linked to their jobs",
+  },
+  "CHK-17": {
+    one: "a purchase not sorted as job cost or overhead",
+    many: "purchases not sorted as job cost or overhead",
+  },
+  "CHK-18": {
+    one: "an old rate used for labor",
+    many: "old rates used for labor",
+  },
+  "CHK-19": {
+    one: "a deposit counted as a final payment",
+    many: "deposits counted as final payments",
+  },
+  "CHK-20": {
+    one: "a quote credited to the wrong person",
+    many: "quotes credited to the wrong person",
+  },
+  "CHK-21": { one: "a job with low profit", many: "jobs with low profit" },
+  "CHK-22": {
+    one: "pay that changed more than usual",
+    many: "pay that changed more than usual",
+  },
+  "CHK-23": { one: "an incomplete data pull", many: "incomplete data pulls" },
+};
+// ────────────────────────────────────────────────────────────────────────────────────────────────────────
 
 // Text templates for every message (C-03); the product name comes from brand.ts. One short question per text, numbered options,
 // never a dollar amount, at most MAX_LEN characters. Placeholders are in braces.
 export const templates = {
   managerPage: `${PRODUCT_NAME}: {n} items need you before {day}'s payroll. Open: {link}`,
   ownerPage: `${PRODUCT_NAME}: {n} decisions are waiting for you before {day}'s payroll. Open: {link}`,
-  // Filled by managerSummary() in summary.ts from the cycle's flags.
-  managerSummary: `${PRODUCT_NAME}: {count} {need} you before payroll ({range}): {categories} Review: {link}`,
+  // Filled by managerSummary() in summary.ts; wording lives in managerSummaryWording above.
+  managerSummary: `${managerSummaryWording.many}${managerSummaryWording.link}`,
+  managerSummaryNoLink: managerSummaryWording.many,
+  managerSummaryOne: `${managerSummaryWording.one}${managerSummaryWording.link}`,
+  managerSummaryOneNoLink: managerSummaryWording.one,
   entryNoJob:
     "{who}, on {date} your {hours}h entry has no job. Which job was it? 1 {jobA} 2 {jobB} 3 something else",
   overlap:
@@ -34,6 +125,9 @@ export const audience: Record<
 > = {
   managerPage: "manager",
   managerSummary: "manager",
+  managerSummaryNoLink: "manager",
+  managerSummaryOne: "manager",
+  managerSummaryOneNoLink: "manager",
   ownerPage: "owner",
   entryNoJob: "employee",
   overlap: "employee",
