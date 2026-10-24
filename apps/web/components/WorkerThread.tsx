@@ -1,8 +1,8 @@
 import type { DataKind } from "@/components/DataLabel";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { fixtureMessages, workerName } from "@/lib/fixtures";
 import { cn } from "@/lib/utils";
+import type { ThreadView } from "@/lib/view-types";
 
 const when = new Intl.DateTimeFormat("en-US", {
   month: "short",
@@ -14,19 +14,15 @@ const when = new Intl.DateTimeFormat("en-US", {
 
 // Texts only: worker, time, words. No pay, no phone numbers.
 export function WorkerThread({
-  questionId,
+  thread,
   title,
   dataKind,
 }: {
-  questionId: string;
+  thread: ThreadView;
   title: string;
   dataKind: DataKind;
 }) {
-  const messages = fixtureMessages
-    .filter((m) => m.questionId === questionId)
-    .sort((a, b) => a.at.localeCompare(b.at));
-  if (messages.length === 0) return null;
-  const who = workerName(messages[0].workerId);
+  const { workerName: who, messages } = thread;
   return (
     <Card>
       <CardContent className="flex flex-col gap-3">

@@ -417,5 +417,24 @@
     "data": {
       "source": "Rules (learned in cycle 1)"
     }
+  },
+  {
+    "id": "a-au-22",
+    "companyId": "a",
+    "cycleId": "a-c05",
+    "at": "2026-10-24T08:12:40.000Z",
+    "actor": {
+      "kind": "system",
+      "id": "controller",
+      "agent": null
+    },
+    "type": "check.fired",
+    "summary": "CHK-10 found a labor rate that differs between Jobber and Gusto.",
+    "refs": {
+      "flagId": "a-flag-10"
+    },
+    "data": {
+      "source": "Checks engine (rule: certain)"
+    }
   }
 ]

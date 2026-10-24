@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { ManagerInbox } from "@/components/ManagerInbox";
 import { companies } from "@/lib/companies";
+import { managerInbox } from "@/lib/server/fixtures";
 
 export default async function ManagerPage({
   params,
@@ -16,7 +17,7 @@ export default async function ManagerPage({
           Hours and jobs only. Pay amounts are never shown here.
         </p>
       </div>
-      <ManagerInbox companyId={companyId} dataKind={company.kind} />
+      <ManagerInbox data={managerInbox(companyId)} dataKind={company.kind} />
     </div>
   );
 }

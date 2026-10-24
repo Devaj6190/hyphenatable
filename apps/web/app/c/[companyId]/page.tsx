@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { FlagsList } from "@/components/FlagsList";
 import { companies } from "@/lib/companies";
+import { currentViewer, homeFlags } from "@/lib/server/fixtures";
 
 export default async function OwnerHome({
   params,
@@ -8,6 +9,8 @@ export default async function OwnerHome({
   const { companyId } = await params;
   const company = companies[companyId];
   if (!company) notFound();
+  // Fixture mode: the server picks the viewer from the role cookie and strips pay before anything is sent.
+  const viewer = await currentViewer(companyId);
   return (
     <div className="flex flex-col gap-4">
       <div>
@@ -16,7 +19,12 @@ export default async function OwnerHome({
           Flags for this pay cycle. Details are one click away.
         </p>
       </div>
-      <FlagsList companyId={companyId} dataKind={company.kind} />
+      <FlagsList
+        companyId={companyId}
+        dataKind={company.kind}
+        flags={homeFlags(viewer, companyId)}
+        viewerId={viewer.workerId}
+      />
     </div>
   );
 }
