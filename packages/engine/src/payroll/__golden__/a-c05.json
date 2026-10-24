@@ -1,0 +1,128 @@
+{
+  "note": "Hand-computed from data/fixtures/a (PA, America/New_York, Sat-Fri weeks 2026-10-10 and 2026-10-17), every rule in rules.json treated as active, nothing held. Re-pin after a fixture regeneration with PIN_GOLDEN=1 and review the diff by hand.",
+  "lines": [
+    {
+      "workerId": "a-w01",
+      "excluded": false,
+      "hourly": [
+        { "name": "Regular Hours", "hours": 80 },
+        { "name": "Overtime", "hours": 5 }
+      ],
+      "fixed": [],
+      "heldFlagIds": [],
+      "grossCents": 245000
+    },
+    {
+      "workerId": "a-w02",
+      "excluded": false,
+      "hourly": [
+        { "name": "Regular Hours", "hours": 74 },
+        { "name": "Overtime", "hours": 11 }
+      ],
+      "fixed": [],
+      "heldFlagIds": [],
+      "grossCents": 235300
+    },
+    {
+      "workerId": "a-w03",
+      "excluded": false,
+      "hourly": [
+        { "name": "Regular Hours", "hours": 74 },
+        { "name": "Overtime", "hours": 6.5 }
+      ],
+      "fixed": [],
+      "heldFlagIds": [],
+      "grossCents": 201000
+    },
+    {
+      "workerId": "a-w04",
+      "excluded": false,
+      "hourly": [
+        { "name": "Regular Hours", "hours": 78.5 },
+        { "name": "Overtime", "hours": 7 }
+      ],
+      "fixed": [],
+      "heldFlagIds": [],
+      "grossCents": 213600
+    },
+    {
+      "workerId": "a-w05",
+      "excluded": false,
+      "hourly": [{ "name": "Regular Hours", "hours": 77.08 }],
+      "fixed": [],
+      "heldFlagIds": [],
+      "grossCents": 169583
+    },
+    {
+      "workerId": "a-w06",
+      "excluded": false,
+      "hourly": [],
+      "fixed": [],
+      "heldFlagIds": [],
+      "grossCents": 0
+    },
+    {
+      "workerId": "a-w07",
+      "excluded": false,
+      "hourly": [
+        { "name": "Regular Hours", "hours": 78.5 },
+        { "name": "Overtime", "hours": 2.5 }
+      ],
+      "fixed": [],
+      "heldFlagIds": [],
+      "grossCents": 164500
+    },
+    {
+      "workerId": "a-w08",
+      "excluded": false,
+      "hourly": [],
+      "fixed": [],
+      "heldFlagIds": [],
+      "grossCents": 260000
+    },
+    {
+      "workerId": "a-w11",
+      "excluded": false,
+      "hourly": [],
+      "fixed": [],
+      "heldFlagIds": [],
+      "grossCents": 280000
+    },
+    {
+      "workerId": "a-w12",
+      "excluded": false,
+      "hourly": [],
+      "fixed": [],
+      "heldFlagIds": [],
+      "grossCents": 350000
+    },
+    {
+      "workerId": "a-w13",
+      "excluded": false,
+      "hourly": [{ "name": "Regular Hours", "hours": 17 }],
+      "fixed": [],
+      "heldFlagIds": [],
+      "grossCents": 37400
+    },
+    {
+      "workerId": "a-w14",
+      "excluded": false,
+      "hourly": [{ "name": "Regular Hours", "hours": 34 }],
+      "fixed": [],
+      "heldFlagIds": [],
+      "grossCents": 68000
+    }
+  ],
+  "venmoList": [
+    {
+      "workerId": "a-w09",
+      "hours": 51,
+      "rateCents": 2500,
+      "amountCents": 127500
+    }
+  ],
+  "excluded": {
+    "a-w10": "no Venmo rate (CHK-11): no active venmo_rate rule and venmoRateCents is null"
+  },
+  "totals": { "grossCents": 2224383, "hours": 545.08 }
+}
