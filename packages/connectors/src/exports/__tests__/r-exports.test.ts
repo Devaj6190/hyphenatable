@@ -249,14 +249,14 @@ describe("Gusto Payroll Journal Report (sectioned)", () => {
         amountCents: 30000,
       },
       {
-        job: null,
+        job: "Team Leader", // a blank Job inherits the job above
         payType: "Overtime",
         hours: 2,
         rateCents: 3750,
         amountCents: 7500,
       },
       {
-        job: null,
+        job: "Team Leader",
         payType: "Overtime (adjustment 08/15/26 - 08/28/26)",
         hours: 1,
         rateCents: 3750,
@@ -374,6 +374,23 @@ describe("Gusto Payroll Journal Report (sectioned)", () => {
       ownerDrawCents: 10000,
       payKind: "wage",
     });
+  });
+
+  it("blank-Job lines inherit the previous Job: an Overtime line after 'Totals' is a subtotal, not added twice", async () => {
+    const r = await gj();
+    const avery = r.rows[0];
+    // Overtime appears in both blocks with the same amount; counted once
+    expect(avery?.earningsCents.Overtime).toBe(7500);
+    expect(avery?.jobLines?.filter((l) => l.payType === "Overtime")).toEqual([
+      {
+        job: "Team Leader",
+        payType: "Overtime",
+        hours: 2,
+        rateCents: 3750,
+        amountCents: 7500,
+      },
+    ]);
+    expect(r.syncRun.error).not.toMatch(/Gross line|Payroll Totals \d/);
   });
 
   it("a section without any totals amount is incomplete", async () => {

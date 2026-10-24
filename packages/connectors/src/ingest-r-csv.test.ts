@@ -133,8 +133,8 @@ describe("ingest-r with the real-layout CSVs (replicas)", () => {
     expect(b.paid[0].jobLines.map((l: { job: string }) => l.job)).toEqual([
       "Landscaper",
       "Team Leader",
-      null,
-      null,
+      "Team Leader",
+      "Team Leader",
     ]);
     const tokens = (await readFile(join(dir, "real-tokens.txt"), "utf8"))
       .trim()
