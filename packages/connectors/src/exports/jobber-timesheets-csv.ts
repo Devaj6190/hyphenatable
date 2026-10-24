@@ -231,12 +231,23 @@ export async function readJobberTimesheetsCsv(
   const notes: string[] = [];
   const perAccount = new Map<string, { h: number; rows: number }>();
   let unmatched = 0;
+  const notInTotals = new Map<string, { rows: number; h: number }>();
   const exactKeys = new Set(
     detail.map((d) => d.key).filter((k) => accounts.some((a) => a.key === k)),
   );
   for (const d of detail) {
     // exact raw spelling first; else the one account of that person whose spelling no detail row uses
     let acct = accounts.find((a) => a.key === d.key);
+    if (
+      !acct &&
+      [...exactKeys].some((k) => normalizeWorkerName(k).name === d.norm)
+    ) {
+      // live finding: a second Jobber account of a person whose other spelling has the only total line.
+      // That total covers its exact spelling only; these rows are reported, not compared (still merged in output)
+      const v = notInTotals.get(d.key) ?? { rows: 0, h: 0 };
+      notInTotals.set(d.key, { rows: v.rows + 1, h: v.h + d.h });
+      continue;
+    }
     if (!acct) {
       const same = accounts.filter((a) => a.norm === d.norm);
       acct =
@@ -293,6 +304,15 @@ export async function readJobberTimesheetsCsv(
     notes.push(
       `${drifting} user total(s) differ from their rows by per-row rounding only (within 0.005 h per row)`,
     );
+  if (notInTotals.size) {
+    const n = [...notInTotals.values()].reduce(
+      (s, v) => ({ rows: s.rows + v.rows, h: s.h + v.h }),
+      { rows: 0, h: 0 },
+    );
+    notes.push(
+      `account not in totals block: ${notInTotals.size} name variant(s) of listed workers, ${n.rows} row(s), ${fmt(n.h)} h (merged into their worker in the output)`,
+    );
+  }
 
   return {
     rows,

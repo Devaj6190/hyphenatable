@@ -29,18 +29,18 @@ describe("ingest-r with the real-layout CSVs (replicas)", () => {
       now: () => new Date("2026-10-24T12:00:00Z"),
     });
     expect(c).toMatchObject({
-      workers: 3,
-      timeEntries: 6,
-      paidRows: 5,
-      paidPeriods: 4,
+      workers: 4,
+      timeEntries: 7,
+      paidRows: 6,
+      paidPeriods: 5,
       paidPeriodsWithOffCycle: 1,
       ownerDrawRows: 1,
       jobs: 2,
       clients: 2,
     });
     expect(c.syncRuns).toEqual([
-      { object: "timeSheetEntries", pulled: 6, expected: 6, complete: true }, // drift and merged accounts are notes
-      { object: "payrollJournal", pulled: 5, expected: 5, complete: true },
+      { object: "timeSheetEntries", pulled: 7, expected: 7, complete: true }, // drift, merged and unlisted accounts are notes
+      { object: "payrollJournal", pulled: 6, expected: 6, complete: true },
     ]);
 
     const out = await readFile(c.outPath as string, "utf8");
@@ -120,6 +120,8 @@ describe("ingest-r with the real-layout CSVs (replicas)", () => {
       "Team Leader",
       "1234.56",
       "777.77",
+      "Direct Deposit",
+      "Quinlan",
     ]) {
       expect(out).not.toContain(s);
     }
