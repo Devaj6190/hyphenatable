@@ -1,15 +1,14 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import type { Company, Cycle, Flag } from "@payrollpilot/engine/schemas";
-import { describe, expect, test } from "vitest";
-import { PRODUCT_NAME } from "./brand";
 import {
-  DASHBOARD_URL_PLACEHOLDER,
-  dateRange,
-  managerLink,
-  managerSummary,
-} from "./summary";
-import { MAX_LEN, templates } from "./templates";
+  CheckId,
+  type Company,
+  type Cycle,
+  type Flag,
+} from "@payrollpilot/engine/schemas";
+import { describe, expect, test } from "vitest";
+import { dateRange, managerLink, managerSummary, topIssue } from "./summary";
+import { issuePhrases, MAX_LEN, render } from "./templates";
 
 const fixtures = join(import.meta.dirname, "../../../../data/fixtures/a");
 const read = <T>(name: string): T =>
@@ -25,71 +24,103 @@ const summary = (overrides: Partial<Parameters<typeof managerSummary>[0]>) =>
     flags,
     cycle,
     timeZone: company.timezone,
+    managerFirstName: "Dakota",
     dashboardUrl: "https://rollpay.app",
     ...overrides,
   });
 
+const timer = flags.find(
+  (f) => f.routeTo === "manager" && f.checkId === "CHK-02",
+) as Flag;
+
 describe("manager summary", () => {
-  test("Company A's current cycle: count, range and top 3 categories from the flags", () => {
+  test("many items: count, range and the most common flag type, then the link", () => {
     expect(summary({})).toBe(
-      "Rollpay: 10 items need you before payroll (Oct 10–23): 3 hour mix-ups, 1 running timer, 1 long shift… Review: https://rollpay.app/c/a/manager",
+      "Hi Dakota, before we run payroll (Oct 10–23) there are 10 timesheet items to check, mostly duplicate or zero-hour entries. Details here: https://rollpay.app/c/a/manager",
     );
   });
 
-  test("every template and the summary use the one product name", () => {
-    expect(PRODUCT_NAME).toBe("Rollpay");
-    for (const text of Object.values(templates))
-      expect(text).not.toMatch(/PayrollPilot/);
-    expect(summary({})?.startsWith(`${PRODUCT_NAME}:`)).toBe(true);
+  test("one item: 'there is 1 timesheet item', and 'about' instead of 'mostly'", () => {
+    expect(summary({ flags: [timer] })).toBe(
+      "Hi Dakota, before we run payroll (Oct 10–23) there is 1 timesheet item to check, about a timer left running. Details here: https://rollpay.app/c/a/manager",
+    );
+  });
+
+  test("no DASHBOARD_URL: the text ends after the issue, with no link and no placeholder", () => {
+    for (const dashboardUrl of [undefined, null, "", "  "]) {
+      expect(summary({ dashboardUrl })).toBe(
+        "Hi Dakota, before we run payroll (Oct 10–23) there are 10 timesheet items to check, mostly duplicate or zero-hour entries.",
+      );
+      expect(summary({ flags: [timer], dashboardUrl })).toBe(
+        "Hi Dakota, before we run payroll (Oct 10–23) there is 1 timesheet item to check, about a timer left running.",
+      );
+    }
+    expect(managerLink(undefined, "a")).toBeNull();
+    expect(managerLink("https://rollpay.app/", "a")).toBe(
+      "https://rollpay.app/c/a/manager",
+    );
+  });
+
+  test("reads like a person: no product prefix, no bullets or dots, no dollar amount", () => {
+    for (const text of [
+      summary({}),
+      summary({ dashboardUrl: null }),
+      summary({ flags: [timer] }),
+    ] as string[]) {
+      expect(text.startsWith("Hi Dakota,")).toBe(true);
+      expect(text).not.toMatch(/Rollpay:|·|•|\$/);
+      expect(text.length).toBeLessThanOrEqual(MAX_LEN);
+    }
   });
 
   test("only open, asked or answered flags routed to the manager in this cycle count", () => {
-    const one = flags.find(
-      (f) => f.routeTo === "manager" && f.checkId === "CHK-02",
-    ) as Flag;
     const others: Flag[] = [
-      { ...one, id: "x1", routeTo: "owner" },
-      { ...one, id: "x2", status: "corrected" },
-      { ...one, id: "x3", cycleId: "a-c04" },
+      { ...timer, id: "x1", routeTo: "owner" },
+      { ...timer, id: "x2", status: "corrected" },
+      { ...timer, id: "x3", cycleId: "a-c04" },
     ];
-    expect(summary({ flags: [one, ...others] })).toBe(
-      "Rollpay: 1 item needs you before payroll (Oct 10–23): 1 running timer Review: https://rollpay.app/c/a/manager",
+    expect(summary({ flags: [timer, ...others] })).toContain(
+      "there is 1 timesheet item to check, about a timer left running.",
     );
-  });
-
-  test("nothing for the manager means no text", () => {
     expect(
       summary({ flags: flags.filter((f) => f.routeTo !== "manager") }),
     ).toBeNull();
   });
 
-  test("the link is {DASHBOARD_URL}/c/{companyId}/manager, with a clear placeholder when unset", () => {
-    expect(managerLink("https://rollpay.app/", "a")).toBe(
-      "https://rollpay.app/c/a/manager",
-    );
-    for (const unset of [undefined, null, "", "  "])
-      expect(managerLink(unset, "a")).toBe(
-        `${DASHBOARD_URL_PLACEHOLDER}/c/a/manager`,
-      );
-    expect(summary({ dashboardUrl: undefined })).toContain(
-      `Review: ${DASHBOARD_URL_PLACEHOLDER}/c/a/manager`,
-    );
+  test("the most common flag type wins; a tie goes to the lower check number", () => {
+    const longShift = { ...timer, checkId: "CHK-03" as const };
+    expect(topIssue([longShift, timer, longShift])).toBe("CHK-03");
+    expect(topIssue([longShift, timer])).toBe("CHK-02");
   });
 
-  test("a long link drops categories to stay under the limit; never a dollar amount", () => {
-    const dashboardUrl = `https://${"x".repeat(120)}.example.com`;
-    const text = summary({ dashboardUrl }) as string;
-    expect(text.length).toBeLessThanOrEqual(MAX_LEN);
-    expect(text).toContain("3 hour mix-ups");
-    expect(text).not.toContain("long shift");
-    expect(text).toContain("…");
-    expect(text).not.toMatch(/\$/);
+  test("every flag type has a phrase, and each fits the limit with a long name and link", () => {
+    for (const checkId of CheckId.options) {
+      const phrase = issuePhrases[checkId];
+      expect(phrase.one.length).toBeGreaterThan(0);
+      expect(phrase.many.length).toBeGreaterThan(0);
+      const flag = { ...timer, checkId };
+      const many = summary({
+        flags: [flag, { ...flag, id: "x" }],
+        managerFirstName: "Maximiliana",
+        dashboardUrl: "https://rollpay-dashboard-preview.vercel.app",
+      }) as string;
+      expect(many).toContain(`mostly ${phrase.many}.`);
+      expect(many.length).toBeLessThanOrEqual(MAX_LEN);
+    }
   });
 
-  test("a link too long for any version of the text is refused, not sent", () => {
+  test("render refuses a text over the limit or with a dollar amount", () => {
     expect(() =>
-      summary({ dashboardUrl: `https://${"x".repeat(240)}.com` }),
+      summary({ dashboardUrl: `https://${"x".repeat(200)}.com` }),
     ).toThrow(/240/);
+    expect(() =>
+      render("managerSummaryNoLink", {
+        name: "Dakota",
+        range: "Oct 10–23",
+        count: "10",
+        issue: "$120 in tips",
+      }),
+    ).toThrow(/dollar/);
   });
 
   test("ranges across a month name both months, in the company timezone", () => {
