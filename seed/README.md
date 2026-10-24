@@ -53,14 +53,14 @@ Each pusher is a dry run unless given `--live`. A dry run reads only the fixture
 
 ```bash
 bun run seed/push-jobber.ts --company a [--verbose]      # plan: counts per object, mutations, both manual checklists
-# live, once the tester account and the "PayrollPilot Seed" app exist (needs JOBBER_SEED_CLIENT_ID / _SECRET):
-bun run seed/push-jobber.ts auth-url                      # a person opens the URL as the tester admin
+# live, once the seed account and the "PayrollPilot Seed" app exist (needs JOBBER_SEED_CLIENT_ID / _SECRET / _ACCOUNT_ID):
+bun run seed/push-jobber.ts auth-url                      # a person opens the URL as the seed account admin
 bun run seed/push-jobber.ts auth-code <code>              # stores data/private/jobber-seed-tokens.json (not the read app's token)
 bun run seed/push-jobber.ts --company a --live --one      # step 4: one past-dated entry plus what it needs; check it in Jobber
 bun run seed/push-jobber.ts --company a --live            # the rest; rerunnable
 ```
 
-- **Safety:** live mode queries `account { tester }` first and refuses unless `tester = true`. Writes go only to `api.getjobber.com` with the seed app's token. Never uses GraphiQL on the read app.
+- **Safety:** live mode queries `account { id name tester }` first and refuses unless the id equals `JOBBER_SEED_ACCOUNT_ID` (the free-trial account made for seeding, since the developer-testing signup is broken) or Jobber reports `tester = true`. With the variable unset only a tester account passes; there is no "any account" fallback. The refusal prints the account id and name to copy into `.env`. Writes go only to `api.getjobber.com` with the seed app's token. Never uses GraphiQL on the read app.
 - **Order:** clients, properties, quotes, jobs (linked to their quote), visits, visit completes, time entries, Jobber expenses, invoices (from job), mark sent, payment records (quote deposits on the quote; the CHK-19 deposit on the invoice).
 - **Idempotent:** every record carries `payrollpilot:<id>` (entry note, title, company name, invoice subject, payment details). Before writing, live mode looks up existing markers in the account. The id map `data/private/<company>-jobber-map.json` is saved after every create. A rerun creates only what is missing.
 - **Not pushed:** the open timer (a-te-0140), which has to be started by hand just before the pull; tip payments (history only); QuickBooks purchases (A-06). `labourRate` is not sent per entry: Jobber costs entries at the user's labour rate, set by hand in Manage Team.

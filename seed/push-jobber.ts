@@ -1,11 +1,12 @@
-// Push a company's fixtures into the Jobber tester account through the seed app (A-05).
+// Push a company's fixtures into the allowlisted Jobber seed account through the seed app (A-05).
 //
 //   bun run seed/push-jobber.ts --company a                 dry run (default): plan, counts, manual checklists. No network, no credentials.
 //   bun run seed/push-jobber.ts --company a --live --one    live: create ONE past-dated entry (and what it needs) to test back-dating
 //   bun run seed/push-jobber.ts --company a --live          live: everything not yet in data/private/a-jobber-map.json
 //   bun run seed/push-jobber.ts auth-url | auth-code <code> one-time seed-app authorization (a person opens the URL)
 //
-// Live mode refuses to run unless the authorized account reports Account.tester = true. Idempotent:
+// Live mode refuses to run unless the authorized account id equals JOBBER_SEED_ACCOUNT_ID (or Jobber reports
+// it as a developer tester account). Idempotent:
 // every record carries `payrollpilot:<id>`; the id map in data/private/ is updated after each create, and
 // existing markers in the account are discovered before anything is written. Never touches the read app's token.
 
@@ -109,20 +110,33 @@ async function paginate(client: SeedClient, query: string, root: string, vars: R
   }
 }
 
-/** Refuses (throws) unless the authorized account is a Jobber tester account. */
-export async function requireTester(client: Pick<SeedClient, "gql">): Promise<{ id: string; name: string; tester: boolean }> {
+/**
+ * Refuses (throws) unless the authorized account is allowlisted: its id equals JOBBER_SEED_ACCOUNT_ID,
+ * or Jobber reports it as a developer tester account. There is no "any account" fallback: with the env
+ * var unset, only a tester account passes. The refusal prints the id and name so it can be set.
+ */
+export async function requireAllowedAccount(
+  client: Pick<SeedClient, "gql">,
+  env: Record<string, string | undefined> = process.env,
+): Promise<{ id: string; name: string; tester: boolean; via: "allowlist" | "tester" }> {
   const r = await client.gql(QUERIES.account);
   const account = r.data?.account as { id: string; name: string; tester: boolean } | undefined;
-  if (!account) throw new Error(`account query failed: ${r.errors.map((e) => e.message).join("; ")}`);
-  if (account.tester !== true) throw new Error(`REFUSED: account ${account.id} is not a Jobber tester account (tester=${account.tester}); the seed pusher only writes to a tester account`);
-  return account;
+  if (!account?.id) throw new Error(`account query failed: ${r.errors.map((e) => e.message).join("; ")}`);
+  const allowed = env.JOBBER_SEED_ACCOUNT_ID?.trim();
+  if (allowed && account.id === allowed) return { ...account, via: "allowlist" };
+  if (account.tester === true) return { ...account, via: "tester" };
+  throw new Error(
+    `REFUSED: authorized Jobber account id=${account.id} name="${account.name}" tester=${account.tester} is not allowlisted. ` +
+      (allowed ? `JOBBER_SEED_ACCOUNT_ID is set to a different account (${allowed}).` : "JOBBER_SEED_ACCOUNT_ID is not set.") +
+      " If this is the PayrollPilot seed account, set JOBBER_SEED_ACCOUNT_ID to this id in .env and rerun.",
+  );
 }
 
 async function live(company: string, opts: { one: boolean }) {
   const auth = seedAuthFromEnv();
   const client = new SeedClient(auth);
-  const account = await requireTester(client);
-  console.log(`account ${account.id} tester=true`);
+  const account = await requireAllowedAccount(client);
+  console.log(`account ${account.id} "${account.name}" allowed (${account.via})`);
 
   const map: IdMap = readJsonOrNull<IdMap>(mapPath(company)) ?? {};
   const save = () => writePrivateJson(mapPath(company), map);
@@ -206,7 +220,7 @@ if (import.meta.main) {
   };
   try {
     if (args[0] === "auth-url") {
-      console.log(`Open this URL as the tester account admin, approve, then run auth-code with the ?code= value:\n${authorizeUrl(seedAuthFromEnv().clientId, val("redirect"))}`);
+      console.log(`Open this URL as the seed account admin, approve, then run auth-code with the ?code= value:\n${authorizeUrl(seedAuthFromEnv().clientId, val("redirect"))}`);
     } else if (args[0] === "auth-code") {
       await exchangeCode(seedAuthFromEnv(), args[1]);
       console.log("seed-app token saved under data/private/");

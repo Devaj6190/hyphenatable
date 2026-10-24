@@ -1,7 +1,7 @@
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { type IdMap, OBJECTS, buildPlan, marker, resolveRefs } from "../lib/jobber-mutations";
 import { JOBBER_GRAPHQL_URL, SEED_TOKEN_PATH, seedAuthFromEnv } from "../lib/jobber-seed-client";
-import { closure, loadFixtures, printDryRun, requireTester } from "../push-jobber";
+import { closure, loadFixtures, printDryRun, requireAllowedAccount } from "../push-jobber";
 
 const { fx, currentCycleId } = loadFixtures("a");
 const opts = { currentCycleId, companyName: "Company A" };
@@ -115,12 +115,20 @@ describe("live safety", () => {
     expect(JOBBER_GRAPHQL_URL.startsWith("https://api.getjobber.com/")).toBe(true);
     expect(SEED_TOKEN_PATH.endsWith("data/private/jobber-seed-tokens.json")).toBe(true);
   });
-  test("refuses a non-tester account", async () => {
-    const fake = { gql: async () => ({ data: { account: { id: "X", name: "Real business", tester: false } }, errors: [] }) };
-    await expect(requireTester(fake)).rejects.toThrow("REFUSED");
+  const acct = (id: string, tester: boolean) => ({ gql: async () => ({ data: { account: { id, name: `Acct ${id}`, tester } }, errors: [] }) });
+  test("refuses a non-allowlisted, non-tester account and prints its id and name", async () => {
+    await expect(requireAllowedAccount(acct("X", false), {})).rejects.toThrow('REFUSED: authorized Jobber account id=X name="Acct X"');
+    await expect(requireAllowedAccount(acct("X", false), { JOBBER_SEED_ACCOUNT_ID: "OTHER" })).rejects.toThrow("REFUSED");
+    await expect(requireAllowedAccount(acct("X", false), { JOBBER_SEED_ACCOUNT_ID: "  " })).rejects.toThrow("REFUSED");
+  });
+  test("accepts the allowlisted account (a regular trial, tester=false)", async () => {
+    expect((await requireAllowedAccount(acct("TRIAL1", false), { JOBBER_SEED_ACCOUNT_ID: "TRIAL1" })).via).toBe("allowlist");
   });
   test("accepts a tester account", async () => {
-    const fake = { gql: async () => ({ data: { account: { id: "T", name: "Tester", tester: true } }, errors: [] }) };
-    expect((await requireTester(fake)).id).toBe("T");
+    expect((await requireAllowedAccount(acct("T", true), {})).via).toBe("tester");
+  });
+  test("refuses when the account query fails", async () => {
+    const broken = { gql: async () => ({ data: null, errors: [{ message: "UNAUTHENTICATED" }] }) };
+    await expect(requireAllowedAccount(broken, { JOBBER_SEED_ACCOUNT_ID: "TRIAL1" })).rejects.toThrow("account query failed");
   });
 });
