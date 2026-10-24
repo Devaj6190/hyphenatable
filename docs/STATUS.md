@@ -2,6 +2,9 @@
 
 Format: `HH:MM PDT · who · what landed on main / what I'm on / what I need`. Decisions that change the plan go here too, with the file they changed.
 
+- Sat 11:33 PDT · B · Varnika's sequence is on main: polish #53 (395ed1b), server-fixtures #55 (4dad86f), timezone #56 (20f9aef); each CI green and main verified. Preserved server-only fixture loading/redaction, RoleScope, timezone props, and RoleSwitch refresh. UI foundation #50 remains pending; five interrupted UI page worktrees retain uncommitted work and were not edited.
+- Sat 11:33 PDT · B · Contract #15 conflict repaired at a689659; CI green, local tests 92 engine / 142 connectors / 19 eval / 37 web (one Windows skip). Awaiting A and C acknowledgments; no merge yet. Company A strict fixture validation still fails: lowMarginPct missing, reimbursement fields missing on 66 expenses, sourceId missing on 62 past-payroll rows. A owns regeneration. H6/H7 live probes failed for missing server credentials; see INTEGRATIONS.md. Never substitute zero or guess missing data.
+
 - Sat 11:31 PDT · B · Merged #55 (4dad86f): server-only fixtures and viewer redaction; main verified. Manager payload redaction assertions passed; timezone follows.
 - Sat 11:29 PDT · B · Merged #53 (395ed1b): Varnika audit polish; main verified. Interrupted UI worktrees remain untouched; server-fixtures then timezone land before UI foundation.
 - Sat 11:25 · A3 · Merged #52: `marginHistory()` in `packages/engine/src/payroll/`: per past cycle revenue/labor/job cost/profit/margin (cents, %), stats, and a **proposed** low-margin threshold with evidence (Company A and B both 29%; fixtures assume 20%; owner decides). Incomplete cycles never count as zero. **Devaj:** onboarding (Analyst) evidence for CHK-21's threshold.
