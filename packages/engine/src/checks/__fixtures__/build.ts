@@ -15,6 +15,7 @@ export const company = (over: Partial<Company> = {}): Company =>
       otWeeklyHours: 40,
       grossChangePct: 25,
       employeesMayBeTexted: false,
+      lowMarginPct: 20,
     },
     ...over,
   });
