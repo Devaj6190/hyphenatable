@@ -92,7 +92,13 @@
       "jobStatus": "requires_invoicing",
       "client": { "id": "Z2lkOi8vSm9iYmVyL0NsaWVudC85MDAx" },
       "salesperson": { "id": "Z2lkOi8vSm9iYmVyL1VzZXIvMTAwMw==" },
-      "quote": { "id": "Z2lkOi8vSm9iYmVyL1F1b3RlLzQwMDE=" },
+      "quote": {
+        "id": "Z2lkOi8vSm9iYmVyL1F1b3RlLzQwMDE=",
+        "quoteStatus": "converted",
+        "salesperson": { "id": "Z2lkOi8vSm9iYmVyL1VzZXIvMTAwMw==" },
+        "sentAt": "2026-10-11T18:00:00Z",
+        "amounts": { "total": 1250.4 }
+      },
       "startAt": "2026-10-12T15:00:00Z",
       "endAt": null,
       "total": 1250.4
@@ -104,7 +110,13 @@
       "jobStatus": "active",
       "client": { "id": "Z2lkOi8vSm9iYmVyL0NsaWVudC85MDAx" },
       "salesperson": null,
-      "quote": null,
+      "quote": {
+        "id": "Z2lkOi8vSm9iYmVyL1F1b3RlLzQwMDI=",
+        "quoteStatus": "converted",
+        "salesperson": { "id": "Z2lkOi8vSm9iYmVyL1VzZXIvMTAwMg==" },
+        "sentAt": null,
+        "amounts": { "total": 980.15 }
+      },
       "startAt": null,
       "endAt": null,
       "total": 980.15

@@ -139,6 +139,109 @@ describe("compareJobber (fake pull + id map)", () => {
   });
 });
 
+describe("compareJobber scope rules (live trial findings, 2026-10-24)", () => {
+  const empty = {
+    workers: [],
+    timeEntries: [],
+    jobs: [],
+    visits: [],
+    quotes: [],
+    invoices: [],
+    payments: [],
+    expenses: [],
+  };
+  const fx: Fixtures = {
+    visits: [
+      { id: "a-v01", startAt: "2026-10-12T15:00:00.000Z", jobId: "a-j01" },
+    ],
+    jobs: [{ id: "a-j01" }, { id: "a-j10" }],
+    // a-q10 was "sent" in the window but its job a-j10 is next month: out of scope; a-q01 has no sentAt but its job is in scope
+    quotes: [
+      { id: "a-q01", jobId: "a-j01", sentAt: null },
+      { id: "a-q10", jobId: "a-j10", sentAt: "2026-10-13T15:00:00.000Z" },
+    ],
+    invoices: [{ id: "a-in01", issuedDate: "2026-10-14", jobId: "a-j01" }],
+    payments: [
+      {
+        id: "a-pay02",
+        invoiceId: "a-in01",
+        quoteId: null,
+        amountCents: 814000,
+        entryDate: "2026-10-20",
+      },
+      {
+        id: "a-pay03",
+        invoiceId: "a-in01",
+        quoteId: null,
+        amountCents: 120000,
+        entryDate: "2026-10-14",
+      },
+    ],
+  };
+  const map = {
+    jobs: { "a-j01": "J1", "a-j10": "J10" },
+    quotes: { "a-q01": "Q1", "a-q10": "Q10" },
+    invoices: { "a-in01": "I1" },
+    visits: { "a-v01": "V1" },
+  };
+  const pay = (sourceId: string, amountCents: number, entryDate: string) => ({
+    id: `jobber:${sourceId}`,
+    companyId: "a",
+    sourceId,
+    invoiceId: "jobber:I1",
+    quoteId: null,
+    entryDate,
+    amountCents,
+    paymentType: null,
+    kind: "final" as const,
+  });
+
+  it("jobs come from entries/visits/invoices/expenses only; quotes are those of in-scope jobs", () => {
+    const rows = Object.fromEntries(
+      compareJobber(
+        {
+          ...empty,
+          quotes: [{ sourceId: "Q1" }] as never,
+          jobs: [{ sourceId: "J1" }] as never,
+        },
+        fx,
+        map,
+        period,
+      ).map((r) => [r.object, r]),
+    );
+    expect(rows.jobs).toMatchObject({ fixture: 1, matched: 1, missing: 0 });
+    expect(rows.quotes).toMatchObject({
+      fixture: 1,
+      matched: 1,
+      missing: 0,
+      extra: 0,
+    });
+  });
+
+  it("payments without a map entry match by parent, amount and date; Jobber's own invoice-total records stay extra", () => {
+    const pulled = [
+      pay("P-auto", 814000, "2026-10-14T07:00:00.000Z"),
+      pay("P-seed", 120000, "2026-10-14T04:00:00.000Z"),
+    ];
+    const rows = Object.fromEntries(
+      compareJobber(
+        { ...empty, payments: pulled } as never,
+        fx,
+        map,
+        period,
+      ).map((r) => [r.object, r]),
+    );
+    // P-auto has a-pay02's amount but is dated 6 days earlier: not ours. P-seed matches a-pay03.
+    expect(rows.paymentRecords).toMatchObject({
+      fixture: 2,
+      pulled: 2,
+      matched: 1,
+      missing: 1,
+      extra: 1,
+    });
+  });
+});
+
 describe("compareQbo", () => {
   it("seed marker first, then the map; split lines count once; date range scopes fixtures", () => {
     const expenses = [
