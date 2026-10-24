@@ -52,6 +52,42 @@ Both runners print counts only. Everything they read and write stays under `data
 bun run m2-run.ts   # "M2: N of M onboarding rules match the owner's runbook; K differ; J were not learned"
 ```
 
+### M4 setup from the owner's facts: `m4-rules-build.ts`
+
+```bash
+bun run m4-rules-build.ts   # [--private data/private/r] → data/private/r/m4-rules.json; prints counts only
+```
+
+It reads three private inputs:
+
+1. **`owner-facts.json`** (real first names):
+
+   ```
+   { source, timezone, payFrequency,
+     overtime: { workweekStartsOn, weeklyHours, multiplier, dailyOvertime },
+     longShiftReviewHours,
+     venmo: { latestCycle, earlierCycle (full names), movedVenmoToGusto },
+     salaried, commission: { plan, recordedRecipients }, managerProfitShare: { recipients } }
+   ```
+
+2. **`pseudonyms.json`**: ingest-r's map from a real-name key to a pseudonymous display name.
+3. **`out/*.json`**: the anonymized bundles.
+
+How it builds the setup:
+
+- **Name resolution:** a first name resolves when exactly one map key contains it, and a full name needs an exact key. Ambiguous or missing names are counted as unresolved, never guessed. The display name is then joined to the bundle's worker id.
+- **Rates:** each worker's Regular rate comes from regular-section journal rows, using the row's rate, else amount / hours.
+  - One rate: the worker is hourly at that rate.
+  - Several rates: `multiRate: true`. M4 reports these workers separately as "rate depends on job role, not in timesheets".
+  - No rate: the worker is excluded with that reason.
+- **Venmo:** Venmo workers (latest and earlier cycles, minus those who moved to Gusto) are excluded with "paid outside Gusto".
+- **Salaried:** a salaried worker needs one consistent Salary amount per period, which becomes a `Paycheck` rate.
+- **Stage 2:** commission and manager-share recipients are listed only as ids. Their Stage 2 pay types are left out of the Stage 1 comparison.
+- **Rules:** the overtime rule takes the owner's workweek (for example `Monday-Sunday`).
+- **Output:** ids only. A leak check refuses to write the file if any word of a real name appears in it.
+
+Synthetic test inputs: `fixtures/r-build/` (every name invented).
+
 ### M4: the Company R backtest
 
 The backtest takes three inputs:

@@ -71,6 +71,7 @@ describe("M4 Company R backtest on a synthetic sample", () => {
       within100: 2,
       maxDiffCents: 24000,
       unmatched: 0,
+      separate: {},
     });
     expect(r.post).toEqual({
       compared: 3,
@@ -78,6 +79,7 @@ describe("M4 Company R backtest on a synthetic sample", () => {
       within100: 3,
       maxDiffCents: 0,
       unmatched: 0,
+      separate: {},
     });
     const t = r.trails.pre.find((x) => x.workerId === "r:w:s0002");
     expect(t?.diffCents).toBe(24000);

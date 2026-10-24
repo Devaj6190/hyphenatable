@@ -79,7 +79,11 @@ if (import.meta.main) {
   );
   const line = (name: string, p: M4Summary["pre"] | null) =>
     p
-      ? `${name}: ${p.exact} of ${p.compared} exact, ${p.within100} within $1, max diff ${p.maxDiffCents}¢, ${p.unmatched} unmatched`
+      ? `${name}: ${p.exact} of ${p.compared} exact, ${p.within100} within $1, max diff ${p.maxDiffCents}¢, ${p.unmatched} unmatched${Object.entries(
+          p.separate,
+        )
+          .map(([why, n]) => `; ${n} not compared (${why})`)
+          .join("")}`
       : `${name}: no corrections file`;
   console.log(
     [
