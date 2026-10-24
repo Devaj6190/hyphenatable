@@ -1,6 +1,7 @@
 import type { Contacts } from "./contacts.ts";
 import type { FakeTransport } from "./fake.ts";
 import { log } from "./log.ts";
+import { summaryFromFixtures } from "./summary.ts";
 import type {
   Backend,
   Id,
@@ -141,6 +142,7 @@ export function serveStubControl(
   contacts: Contacts,
   fake: FakeTransport | null,
   port: number,
+  summary: { fixturesDir: string; dashboardUrl: string | null } | null = null,
 ) {
   const server = Bun.serve({
     hostname: "127.0.0.1",
@@ -158,6 +160,33 @@ export function serveStubControl(
             options?: string[];
           };
           return Response.json(stub.enqueue(body));
+        }
+        // The manager's summary from the fixtures; dryRun returns the text without queueing it.
+        if (req.method === "POST" && url.pathname === "/summary") {
+          if (!summary)
+            return new Response("summary is not configured\n", { status: 409 });
+          const body = (await req.json().catch(() => ({}))) as {
+            contactRef?: string;
+            companyId?: string;
+            cycleId?: string;
+            dryRun?: boolean;
+          };
+          const contactRef = body.contactRef ?? "contact:a-w11";
+          if (!contacts.phoneFor(contactRef))
+            return new Response(`unknown contactRef ${contactRef}\n`, {
+              status: 404,
+            });
+          const { text, cycleId } = summaryFromFixtures({
+            ...summary,
+            companyId: body.companyId ?? "a",
+            cycleId: body.cycleId,
+          });
+          if (!text)
+            return Response.json({ cycleId, text: null, queued: null });
+          const queued = body.dryRun
+            ? null
+            : stub.enqueue({ contactRef, text });
+          return Response.json({ cycleId, text, length: text.length, queued });
         }
         if (req.method === "POST" && url.pathname === "/reply") {
           if (!fake)
@@ -181,9 +210,12 @@ export function serveStubControl(
             kind: event.kind,
           });
         }
-        return new Response("GET /messages, POST /outbound, POST /reply\n", {
-          status: 404,
-        });
+        return new Response(
+          "GET /messages, POST /outbound, POST /reply, POST /summary\n",
+          {
+            status: 404,
+          },
+        );
       } catch (error) {
         return new Response(`${String(error)}\n`, { status: 400 });
       }

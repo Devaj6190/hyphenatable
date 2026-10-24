@@ -1,9 +1,10 @@
 # Courier
 
-The only PayrollPilot process that touches phones. It sends what Convex says is pending and relays what arrives; Convex decides everything else (shared-context section 10, ticket C-02).
+The only Rollpay process that touches phones. It sends what Convex says is pending and relays what arrives; Convex decides everything else (shared-context section 10, ticket C-02).
 
 - **Out:** subscribes to `messages.pendingOutbound({ courierKey })`, sends each row with Photon (`space.send`, or an iMessage poll when `kind` is `"poll"`, falling back to numbered text), then calls `messages.markSent({ courierKey, messageId, providerId, conversationKey })`. A message that has a `providerId` is never sent again.
 - **In:** reads `app.messages` (no tunnel, no webhook) and calls `messages.inbound({ courierKey, conversationKey, providerId, text, kind, pollTarget })`. `kind` is `text`, `poll_vote` (with the poll's id as `pollTarget`) or `reaction` (with the reacted message's id). `STOP` goes through unchanged as text; Convex handles it in code.
+- **Ids are opaque.** Every provider id sent to Convex or written to the log is `sha256:` + base64url(sha256(id)), because a Photon poll vote's id embeds the voter's phone (found in H4). It is deterministic, so a vote's `pollTarget` still equals its poll's `providerId`. Phone numbers typed into a reply are replaced with `[phone]`.
 - **Phones stay here.** `contacts.json` maps each `Worker.contactRef` to a registered demo phone: for Company A, `contact:a-w11` (the crew manager) and `contact:a-w03` (the field employee in the planted overlap). The owner works in the dashboard and is never texted and is gitignored. Convex only ever sees `conversationKey = "sha256:" + base64url(sha256(E.164 phone))`. Rows for an unknown `contactRef` are refused (`unregistered_contact`); replies from unknown phones are dropped. Every log line masks phones (`+1••••0101`).
 
 ## Setup
@@ -45,6 +46,15 @@ curl -s 127.0.0.1:3210/messages
 ```
 
 With Photon connected, `/reply` is off: reply from the real phone instead.
+
+The manager's summary text, built from `data/fixtures/<company>/flags.json` for the current cycle (template in `packages/engine/src/messages/summary.ts`; link from `DASHBOARD_URL`):
+
+```bash
+# see the text without sending it
+curl -s -X POST 127.0.0.1:3210/summary -d '{"dryRun":true}'
+# queue it for the manager phone (contact:a-w11 by default; companyId "a", current cycle)
+curl -s -X POST 127.0.0.1:3210/summary -d '{}'
+```
 
 ## Test
 

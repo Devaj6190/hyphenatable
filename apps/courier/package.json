@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit -p ."
   },
   "dependencies": {
+    "@payrollpilot/engine": "workspace:*",
     "convex": "^1.48.0",
     "spectrum-ts": "^12.14.0"
   },
