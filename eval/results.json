@@ -492,12 +492,7 @@
     "syntheticSelfCheck": {
       "company": "b",
       "synthetic": true,
-      "cycles": [
-        "b-c01",
-        "b-c02",
-        "b-c03",
-        "b-c04"
-      ],
+      "cycles": ["b-c01", "b-c02", "b-c03", "b-c04"],
       "workers": 120,
       "exact": 120,
       "maxDiffCents": 0,
