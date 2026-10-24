@@ -1,4 +1,4 @@
-# Role A: Data and Payroll (PayCheck, Cal Hacks 13.0)
+# Role A: Data and Payroll (PayrollPilot, Cal Hacks 13.0)
 
 Binding context: `docs/plans/00-shared-context.md` (wins on any conflict), `specs/final.md`, `docs/plan-research.md` (sections 9 to 14 are A's reference material). Written Sat 2026-10-24 about 1:30 AM PDT. All clock times are PDT. Anything not confirmed is marked **UNVERIFIED** and has a first-hour check. No number in this file is invented; every figure has a source or is labelled synthetic.
 
@@ -27,7 +27,7 @@ Person: Shanin. Also the only person who can run anything against Company R (the
 
 ## 2. Role onboarding (15 minutes)
 
-1. **Accounts.** Jobber Developer Center (Shanin's; app "PayCheck (Dev)" read-only, plus a new "PayCheck Seed" app with write scopes; a tester account from the "developer testing signup link" on https://developer.getjobber.com/docs/getting_started). Gusto developer org at https://dev.gusto.com (A creates it in H2 and invites Devaj, because activation time is undocumented and it must start first). QuickBooks developer account (Devaj's sandbox per the spec; confirm in H3 whose it is and get `QBO_CLIENT_ID`, `QBO_CLIENT_SECRET`, `QBO_REALM_ID` into the shared `.env`). Convex project (B invites A). Photon dashboard (Shanin's; C needs the owner phone and the "manager" phone registered as users).
+1. **Accounts.** Jobber Developer Center (Shanin's; app "PayrollPilot (Dev)" read-only, plus a new "PayrollPilot Seed" app with write scopes; a tester account from the "developer testing signup link" on https://developer.getjobber.com/docs/getting_started). Gusto developer org at https://dev.gusto.com (A creates it in H2 and invites Devaj, because activation time is undocumented and it must start first). QuickBooks developer account (Devaj's sandbox per the spec; confirm in H3 whose it is and get `QBO_CLIENT_ID`, `QBO_CLIENT_SECRET`, `QBO_REALM_ID` into the shared `.env`). Convex project (B invites A). Photon dashboard (Shanin's; C needs the owner phone and the "manager" phone registered as users).
 2. **Tools.** Bun 1.4.3 and Node 22.22 are installed. Playwright Chromium 1248 is cached (`bunx playwright install chromium` only if a reader fails to launch). No `uv`, no `cloudflared`; neither is needed.
 3. **Repo.** After B's scaffold lands (G0): `git pull`, `bun install`, `cp .env.example .env`, fill from the shared vault message. Branch names `a/<feature>`. Every PR targets `main`; check `main` after merging.
 4. **Where A's files live** (from shared-context section 5):
@@ -126,7 +126,7 @@ Each ticket is one PR under 400 changed lines where possible (fixture files may 
 - **Depends on:** nothing. Start at 01:45.
 - **Steps:**
   1. **H2 Gusto first.** Sign up at dev.gusto.com, create Organization and Application, copy `GUSTO_CLIENT_ID` / `GUSTO_CLIENT_SECRET` into `.env`. Create a demo company from the Developer Portal. With a company token, call `GET https://api.gusto-demo.com/v1/companies/{c}/payrolls?processing_statuses=unprocessed&payroll_types=regular,off_cycle` with header `X-Gusto-API-Version: 2026-06-15`. Record: activation time, company uuid, employee count, pay schedule, number of past payrolls. Invite Devaj to the org.
-  2. **H1 Jobber.** Create a tester account from the Getting Started link. In the Developer Center, open "PayCheck (Dev)" (the existing read app; rename later), click "Test in GraphiQL" once, authorize the tester account, run `{ timeSheetEntries(first: 5) { totalCount nodes { id approved ticking finalDuration startAt user { id } job { id } } } }` with header `X-JOBBER-GRAPHQL-VERSION: 2026-09-25`. Record which scopes were needed. **Then do not use GraphiQL again on that account** (it invalidates the app's refresh token). Create the second app "PayCheck Seed" with write scopes on clients, properties, jobs, visits, timesheets, expenses, quotes, invoices, payments. **Check the user cap:** try adding users in the tester account's Settings → Manage Team until it refuses; record the number.
+  2. **H1 Jobber.** Create a tester account from the Getting Started link. In the Developer Center, open "PayrollPilot (Dev)" (the existing read app; rename later), click "Test in GraphiQL" once, authorize the tester account, run `{ timeSheetEntries(first: 5) { totalCount nodes { id approved ticking finalDuration startAt user { id } job { id } } } }` with header `X-JOBBER-GRAPHQL-VERSION: 2026-09-25`. Record which scopes were needed. **Then do not use GraphiQL again on that account** (it invalidates the app's refresh token). Create the second app "PayrollPilot Seed" with write scopes on clients, properties, jobs, visits, timesheets, expenses, quotes, invoices, payments. **Check the user cap:** try adding users in the tester account's Settings → Manage Team until it refuses; record the number.
   3. **H3 QuickBooks.** With Devaj: OAuth 2.0 Playground → pick the sandbox → tokens and `realmId`. Run `SELECT count(*) FROM Purchase` and `SELECT * FROM Purchase MAXRESULTS 5`. Record whose developer account it is and put `QBO_*` in the shared `.env`.
   4. Write one row per check in `docs/INTEGRATIONS.md`: check, time, result, what was verified, what was not, fallback chosen if any.
 - **Acceptance test:** three rows in INTEGRATIONS.md with real response excerpts (ids only); `.env` has all `JOBBER_*`, `GUSTO_*`, `QBO_*` names filled.
@@ -193,7 +193,7 @@ Each ticket is one PR under 400 changed lines where possible (fixture files may 
 - **Safe to start:** mutation strings and dry-run mode against fixtures now.
 - **Steps:**
   1. **Manual first (print a checklist):** add the 12 workers as users in the tester account UI (Settings → Manage Team) with the fake names; the pusher then reads `users` and maps by name to `a-wNN`. If the cap is below 12, use the reduced config from A-01's fallback.
-  2. Order: `clientCreate` → `propertyCreate` → `jobCreate(propertyId, invoicing, salespersonId)` → `visitCreate` (assigned users, startAt/endAt) → `timeSheetEntryCreate({ startAt, duration, userId, jobId | visitId | label, labourRate, note: "paycheck:a-te-0142" })` → `expenseCreate({ title, date, total, reimbursableToId, linkedJobId })` → `quoteCreate({ clientId, propertyId, lineItems, salespersonId })` → `invoiceCreate` / `invoiceCreateFromJob` → `invoiceCreatePaymentRecord` and `quoteCreatePaymentRecord` (deposits). Field names verified by introspection (research section 10); check argument shapes in GraphiQL **on the seed app only**.
+  2. Order: `clientCreate` → `propertyCreate` → `jobCreate(propertyId, invoicing, salespersonId)` → `visitCreate` (assigned users, startAt/endAt) → `timeSheetEntryCreate({ startAt, duration, userId, jobId | visitId | label, labourRate, note: "payrollpilot:a-te-0142" })` → `expenseCreate({ title, date, total, reimbursableToId, linkedJobId })` → `quoteCreate({ clientId, propertyId, lineItems, salespersonId })` → `invoiceCreate` / `invoiceCreateFromJob` → `invoiceCreatePaymentRecord` and `quoteCreatePaymentRecord` (deposits). Field names verified by introspection (research section 10); check argument shapes in GraphiQL **on the seed app only**.
   3. Idempotent: before creating, query by our marker (`note` on entries, `title` prefix on expenses, `jobNumber` mapping file `data/private/a-jobber-map.json`). Re-running creates nothing new.
   4. Past cycles: create entries with past `startAt`; **UNVERIFIED** whether the API accepts entries far in the past; test one before the batch.
   5. Print the second manual checklist: approve all but the three CHK-06 entries (Timesheets → Approve Timesheets, cutoff slider), leave the CHK-02 timer ticking (`timeSheetClockIn` for W05 just before the pull, or a manual timer), deactivate W13 after the entries exist.
@@ -210,8 +210,8 @@ Each ticket is one PR under 400 changed lines where possible (fixture files may 
 - **Depends on:** A-01 (H3 tokens), A-04.
 - **Steps:**
   1. Create sub-customers for jobs: `POST /v3/company/{realmId}/customer` with `Job: true`, `ParentRef` to a Company A customer, `DisplayName` = job number. Record the mapping in `data/private/a-qbo-map.json`.
-  2. `POST /v3/company/{realmId}/purchase` per expense: `PaymentType` CreditCard, `AccountRef` (bank/card account from the sandbox chart), `TxnDate`, `PrivateNote: "paycheck:a-ex-0007"`, lines `AccountBasedExpenseLineDetail` with `AccountRef` (Materials, Equipment Rental, Disposal, Fuel, Software), `CustomerRef` to the sub-customer when tagged, none for CHK-14. Bills for two vendor invoices.
-  3. Idempotent via `SELECT * FROM Purchase WHERE PrivateNote LIKE 'paycheck:%'`; delete with `?operation=delete` on re-seed. Never "Clear data and reset".
+  2. `POST /v3/company/{realmId}/purchase` per expense: `PaymentType` CreditCard, `AccountRef` (bank/card account from the sandbox chart), `TxnDate`, `PrivateNote: "payrollpilot:a-ex-0007"`, lines `AccountBasedExpenseLineDetail` with `AccountRef` (Materials, Equipment Rental, Disposal, Fuel, Software), `CustomerRef` to the sub-customer when tagged, none for CHK-14. Bills for two vendor invoices.
+  3. Idempotent via `SELECT * FROM Purchase WHERE PrivateNote LIKE 'payrollpilot:%'`; delete with `?operation=delete` on re-seed. Never "Clear data and reset".
   4. Respect 10 requests/s; sleep on 429 for 60 s.
 - **Acceptance test:** `SELECT count(*) FROM Purchase WHERE TxnDate >= '<cycle start>'` equals the fixture count; the CHK-14 purchase has no `CustomerRef`.
 - **Verification:** `bun run seed/push-qbo.ts --company a && bun run packages/connectors/src/qbo/cli.ts pull --from … --to … --compare data/fixtures/a`
@@ -252,7 +252,7 @@ Each ticket is one PR under 400 changed lines where possible (fixture files may 
 - **Goal:** The real company's three past cycles (and later the current one) in Convex with fake names, ids only to the model, and the pseudonym map kept private.
 - **Priority:** P0. Criterion: real enough (real data, real errors); the moment.
 - **Files:** `packages/connectors/src/anonymize.ts`, `packages/connectors/src/anonymize.test.ts`, `seed/ingest-r.ts`, `data/private/r/` (exports, pseudonym map; gitignored), `docs/PROOF.md` section "Company R".
-- **Depends on:** A-03 (Jobber read against the real account: authorize "PayCheck (Dev)" on the real account via the app's own OAuth flow, **not** GraphiQL), A-08 export readers (QuickBooks Excel, Gusto Payroll Journal).
+- **Depends on:** A-03 (Jobber read against the real account: authorize "PayrollPilot (Dev)" on the real account via the app's own OAuth flow, **not** GraphiQL), A-08 export readers (QuickBooks Excel, Gusto Payroll Journal).
 - **Steps:**
   1. `anonymize.ts`: deterministic pseudonyms from a seeded generator keyed by `sha256(realName + salt)`; map stored at `data/private/r/pseudonyms.json`; drops `note`, addresses, client names (clients become `Client C07`), phone numbers; keeps dates, durations, amounts, job numbers (renumbered), approval states.
   2. `ingest-r.ts`: pull the three past cycles through the Jobber connector (read-only), anonymize, write via B's fixture loader into company `r`; read the Gusto Payroll Journal CSVs for the same periods into `data/private/r/paid/*.csv` (never Convex: only aggregate gross per pseudonymous worker enters Convex, for M4); QuickBooks Excel export for expenses.
@@ -354,7 +354,7 @@ Each ticket is one PR under 400 changed lines where possible (fixture files may 
 
 ### A-16 Live run on the current real cycle (stretch, the moment)
 - **Branch:** none (operational), plus `docs/PROOF.md` and `docs/DEMO.md` lines.
-- **Goal:** Run PayCheck on Company R's current cycle and catch the known double-booked hours live, before any draft is filled.
+- **Goal:** Run PayrollPilot on Company R's current cycle and catch the known double-booked hours live, before any draft is filled.
 - **Priority:** P2 unless G3 is met on time; then it becomes the video's opening.
 - **Depends on:** A-09 on the current cycle, B's checks, C's recording setup. Gusto for Company R is **never** written (no partner access, and it is real payroll): the Gusto step is shown on Company A only.
 - **Steps:** pull the current cycle read-only; anonymize; run `checks.run`; confirm CHK-04 fires on the known overlap; record the screen; the question goes to Shanin's own phone as the manager stand-in.

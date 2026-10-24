@@ -1,4 +1,4 @@
-# PayCheck: Shared Context and Binding Conventions (all three role plans follow this)
+# PayrollPilot: Shared Context and Binding Conventions (all three role plans follow this)
 
 Read this first. Every role plan (`A-data-payroll.md`, `B-agent-backend.md`, `C-product-messaging-demo.md`) builds on it. If a plan and this file disagree, this file wins until the team changes it in a PR. Written Sat 2026-10-24 at about 1:15 AM PDT. All clock times are PDT.
 
@@ -12,7 +12,7 @@ Related files:
 
 ## 1. Product in one paragraph
 
-PayCheck is the agent a service company would hire to prepare and check payroll before a person submits it. It onboards by reading past pay cycles from Jobber, QuickBooks and Gusto and proposing the company's rules (**Learns**). Every cycle it syncs the three systems with completeness checks, runs a deterministic checks engine over hours, jobs, expenses and pay, computes pay to the cent, and fills the Gusto draft (**Runs**). When something is missing or contradictory it holds only that item and asks the right person one short question by text, with a confidence and a precedent note (**Escalates**). Every human answer becomes a lesson, is compared with what it already knows, is backtested, and, once the owner approves, becomes a rule, so the next cycle asks less (**Improves**). People approve every message, correction and rule; the owner submits payroll; PayCheck never does.
+PayrollPilot is the agent a service company would hire to prepare and check payroll before a person submits it. It onboards by reading past pay cycles from Jobber, QuickBooks and Gusto and proposing the company's rules (**Learns**). Every cycle it syncs the three systems with completeness checks, runs a deterministic checks engine over hours, jobs, expenses and pay, computes pay to the cent, and fills the Gusto draft (**Runs**). When something is missing or contradictory it holds only that item and asks the right person one short question by text, with a confidence and a precedent note (**Escalates**). Every human answer becomes a lesson, is compared with what it already knows, is backtested, and, once the owner approves, becomes a rule, so the next cycle asks less (**Improves**). People approve every message, correction and rule; the owner submits payroll; PayrollPilot never does.
 
 **Hero path (never cut):** Company A (synthetic, seeded in the real Jobber, QuickBooks and Gusto sandboxes) → onboarding proposes rules from history → cycle 1 syncs with completeness checks, flags the planted errors, one flag becomes a question, the question reaches a real phone, the reply comes back and is interpreted, the correction is approved on the dashboard, the workbook updates, the Gusto draft is filled (prepare + update, never submit) → cycle 2 asks fewer questions → the judge's own scenario escalates with "no precedent" instead of guessing → the audit log traces every number. Plus the video opening with the moment.
 
@@ -90,7 +90,7 @@ bunx convex dev --once   # creates convex/ and a dev deployment; prints NEXT_PUB
 cd ../..
 # workspaces
 cat > package.json <<'JSON'
-{ "name": "paycheck", "private": true, "workspaces": ["apps/*", "packages/*", "seed", "eval"],
+{ "name": "payrollpilot", "private": true, "workspaces": ["apps/*", "packages/*", "seed", "eval"],
   "scripts": { "dev": "bun run --filter web dev", "test": "bun run --filter '*' test", "check": "bunx biome check . && bun run --filter '*' typecheck" } }
 JSON
 ```
@@ -99,7 +99,7 @@ Then `packages/engine` (`bun init`, `vitest`, `zod`), `packages/connectors`, `ap
 ### 4.3 First-hour checks (from `docs/plan-research.md` section 13; each result goes in `docs/INTEGRATIONS.md`)
 | # | Check | Owner | Fallback |
 |---|---|---|---|
-| H1 | Jobber tester account created; "PayCheck (Dev)" read app authorized via GraphiQL once; `timeSheetEntries(first: 5)` returns `approved`, `ticking`, `totalCount`; second write-scope app "PayCheck Seed" created. **Also check how many users a tester account can have** (unknown; Company A needs 12) | A | fewer workers (6) or the Excel export route |
+| H1 | Jobber tester account created; "PayrollPilot (Dev)" read app authorized via GraphiQL once; `timeSheetEntries(first: 5)` returns `approved`, `ticking`, `totalCount`; second write-scope app "PayrollPilot Seed" created. **Also check how many users a tester account can have** (unknown; Company A needs 12) | A | fewer workers (6) or the Excel export route |
 | H2 | Gusto developer org + application created at dev.gusto.com; demo company created; `GET /v1/companies/{c}/payrolls?processing_statuses=unprocessed` works; `prepare` on it works | A (signup) then B | local mock of the six payroll endpoints; UI labels Gusto "simulated" |
 | H3 | QuickBooks sandbox: OAuth Playground tokens; `SELECT count(*) FROM Purchase`; credentials in the shared `.env`; whose developer account | A | Devaj's sandbox or export fixtures |
 | H4 | Photon: owner phone and "manager" phone registered as project users; one message sent from `spectrum-ts`; one reply received through `app.messages` without a tunnel | C | Telegram provider; last resort an in-app inbox labelled simulated |
@@ -295,14 +295,14 @@ Precision rule: a check fires only when the condition is met exactly; anything t
 - The courier is `apps/courier`, a Bun process running `spectrum-ts`. It subscribes with the Convex client to `messages.pendingOutbound({ courierKey })`, sends each with `space.send` (or a poll for `kind = "poll"`), then calls `messages.markSent({ courierKey, messageId, providerId })`. Inbound: `for await (const [space, message] of app.messages)` → `messages.inbound({ courierKey, conversationKey, providerId, text, kind, pollTarget })`. `courierKey` is a shared secret in `.env`; mutations reject anything else.
 - `conversationKey` = sha256(phone) computed in the courier; the phone itself never leaves the courier. The courier holds the `contactRef → phone` map (`apps/courier/contacts.json`, gitignored) for the registered demo phones only.
 - **One open question per conversation.** The Convex side never marks a second question `approved` for a `conversationKey` that has one `sent` and unanswered. The courier is dumb: it sends what is pending and relays what arrives.
-- Message templates (`packages/engine/src/messages/templates.ts`): manager page: `PayCheck: {n} items need you before {day}'s payroll. Open: {link}`; employee question: `{firstNameOrRole}, on {date} your {hours}h entry has no job. Which job was it? 1 {job A} 2 {job B} 3 something else`; follow-up: `Thanks. To confirm: {restatement}. Reply 1 yes, 2 no`. Never a dollar amount. Max 240 characters. In demo mode the owner's phone receives the manager pages and the employee questions, each prefixed `[to: manager]` or `[to: employee]`.
+- Message templates (`packages/engine/src/messages/templates.ts`): manager page: `PayrollPilot: {n} items need you before {day}'s payroll. Open: {link}`; employee question: `{firstNameOrRole}, on {date} your {hours}h entry has no job. Which job was it? 1 {job A} 2 {job B} 3 something else`; follow-up: `Thanks. To confirm: {restatement}. Reply 1 yes, 2 no`. Never a dollar amount. Max 240 characters. In demo mode the owner's phone receives the manager pages and the employee questions, each prefixed `[to: manager]` or `[to: employee]`.
 - Replies are interpreted by the Messenger (Haiku 5.5) into `Interpretation`; `STOP` is handled by code before any model call; `ambiguous` triggers one follow-up, then the item is held.
 
 ---
 
 ## 11. Learning contract (B)
 
-1. **Evaluate**: when a question is answered (or a correction approved, or at the end of a cycle when Gusto's paid amounts are known), the controller writes a `Lesson` with `evaluation.expected` (what PayCheck assumed) and `evaluation.actual` (what the human said or what was paid).
+1. **Evaluate**: when a question is answered (or a correction approved, or at the end of a cycle when Gusto's paid amounts are known), the controller writes a `Lesson` with `evaluation.expected` (what PayrollPilot assumed) and `evaluation.actual` (what the human said or what was paid).
 2. **Compare**: embed the lesson text; query the company's `lessons` vector index (top 5); the Analyst classifies: `new`, `confirmed` (same as a known lesson), `superseded` (replaces a known lesson, which is marked), or `conflict` (contradicts an active rule → a flag for the owner, `routeTo: owner`).
 3. **Backtest**: if the lesson maps to a `RuleType`, run the rule over past cycles with `packages/engine` and store `{cycles, agree, disagree}`.
 4. **Approve**: a proposed `Rule` appears on the rules screen with provenance and backtest; the owner approves, edits or rejects; low-risk types (`routing`, message wording) activate on their own and are logged.
@@ -314,7 +314,7 @@ Separation of duties: the user id on `Rule.provenance.approvedBy` must differ fr
 
 ## 12. Gusto draft contract (B writes; A supplies `Draft.lines`)
 
-Stage 1: `GET /v1/companies/{c}/payrolls?processing_statuses=unprocessed&payroll_types=regular` → pick the one covering the cycle → `PUT …/payrolls/{p}/prepare` → `PUT /v1/companies/{c}/payrolls/{p}` with `employee_compensations` built from `Draft.lines` (hourly `Regular Hours` / `Overtime`, fixed `Reimbursement`, `excluded` for held workers only if every hour is disputed, `memo` with the PayCheck draft id) → `PUT …/calculate` → store `Draft.status = "calculated"` and the returned totals for the readiness report. **Never `PUT …/submit`.** The code path has no submit function at all.
+Stage 1: `GET /v1/companies/{c}/payrolls?processing_statuses=unprocessed&payroll_types=regular` → pick the one covering the cycle → `PUT …/payrolls/{p}/prepare` → `PUT /v1/companies/{c}/payrolls/{p}` with `employee_compensations` built from `Draft.lines` (hourly `Regular Hours` / `Overtime`, fixed `Reimbursement`, `excluded` for held workers only if every hour is disputed, `memo` with the PayrollPilot draft id) → `PUT …/calculate` → store `Draft.status = "calculated"` and the returned totals for the readiness report. **Never `PUT …/submit`.** The code path has no submit function at all.
 Stage 2 (P1): `POST /v1/companies/{c}/payrolls` with `off_cycle: true, off_cycle_reason: "Bonus"`, then the same prepare → update with `fixed_compensations` `Commission`, `Cash Tips` / `Paycheck Tips`, `Bonus` (manager split) → calculate.
 Workers paid by Venmo are never sent to Gusto; they appear on the workbook's Venmo list.
 
@@ -388,7 +388,7 @@ A target is never presented as a result. Every number on screen says "measured o
 ## 18. AGENTS.md (copy into the repo root)
 
 ```
-# PayCheck agent rules
+# PayrollPilot agent rules
 - Read docs/plans/00-shared-context.md and your role plan before changing code.
 - Plain code owns state, approvals and money. Agents return validated proposals; nothing happens without a human approval or a deterministic rule.
 - Pure logic lives in packages/engine (no IO, Vitest). Convex functions are thin. The UI never computes pay.

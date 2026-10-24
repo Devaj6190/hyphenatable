@@ -1,4 +1,4 @@
-# PayCheck: Team Brief (read this first, 10 minutes)
+# PayrollPilot: Team Brief (read this first, 10 minutes)
 
 Cal Hacks 13.0, Palace of Fine Arts, SF. Team of 3. Written Sat 2026-10-24 at about 1:30 AM PDT. Submission **Sun 9:00 AM PDT, hard**; everyone at the venue by **8:00 AM**; judging 10:30 to 12:30; pitch 3 minutes plus 2 of questions; live demo required; all work during the hackathon.
 
@@ -6,7 +6,7 @@ Binding files: [00-shared-context.md](00-shared-context.md) (contracts, stack, c
 
 ## What we are building, in one breath
 
-PayCheck is the agent a service company hires to prepare and check payroll before the owner submits it. It **learns** the company's rules from past cycles in Jobber, QuickBooks and Gusto, **runs** each cycle on its own with completeness checks and a deterministic checks engine, **escalates** by texting the right person one short question with a confidence and a precedent note, and **improves** by turning each answer into a backtested rule the owner approves, so cycle 2 asks less. People approve every message, correction and rule. The owner submits payroll. PayCheck fills the Gusto draft and never submits.
+PayrollPilot is the agent a service company hires to prepare and check payroll before the owner submits it. It **learns** the company's rules from past cycles in Jobber, QuickBooks and Gusto, **runs** each cycle on its own with completeness checks and a deterministic checks engine, **escalates** by texting the right person one short question with a confidence and a precedent note, and **improves** by turning each answer into a backtested rule the owner approves, so cycle 2 asks less. People approve every message, correction and rule. The owner submits payroll. PayrollPilot fills the Gusto draft and never submits.
 
 Proof: a synthetic 12-person landscaping company seeded into the real Jobber, QuickBooks and Gusto sandboxes with planted errors and an answer key, plus Shanin's real company's past cycles, anonymized, as a backtest. The moment: double-booked hours caught before the draft is filled.
 
@@ -54,7 +54,7 @@ Rule: never block. If your dependency is late, build against fixtures and open y
 
 ## The first hour, per person (01:45 to 03:00)
 
-**Shanin (A).** (1) Create the Jobber developer tester account from the Getting Started signup link; authorize "PayCheck (Dev)" through GraphiQL once; run `timeSheetEntries(first: 5)` with header `X-JOBBER-GRAPHQL-VERSION: 2026-09-25`; note the user cap of the tester account. (2) Create the second Jobber app "PayCheck Seed" with write scopes. (3) Create the Gusto developer organization and application at dev.gusto.com; create a demo company from the portal; put the client id and secret in the shared `.env` message. (4) QuickBooks: confirm with Devaj whose developer account holds the sandbox; get tokens in the OAuth Playground. (5) Start `data/fixtures/a/` from the shared-context shapes. Log every result in `docs/INTEGRATIONS.md`.
+**Shanin (A).** (1) Create the Jobber developer tester account from the Getting Started signup link; authorize "PayrollPilot (Dev)" through GraphiQL once; run `timeSheetEntries(first: 5)` with header `X-JOBBER-GRAPHQL-VERSION: 2026-09-25`; note the user cap of the tester account. (2) Create the second Jobber app "PayrollPilot Seed" with write scopes. (3) Create the Gusto developer organization and application at dev.gusto.com; create a demo company from the portal; put the client id and secret in the shared `.env` message. (4) QuickBooks: confirm with Devaj whose developer account holds the sandbox; get tokens in the OAuth Playground. (5) Start `data/fixtures/a/` from the shared-context shapes. Log every result in `docs/INTEGRATIONS.md`.
 
 **Devaj (B).** (1) Scaffold per shared-context 4.2 (Next.js in `apps/web`, `bunx convex dev`, workspaces, Biome, CI, `AGENTS.md`, `.env.example`). (2) H5: one table, one scheduled function, one HTTP action, one subscribed page. (3) H6: one structured-output call to `claude-opus-5-5` from a `"use node"` action. (4) H7: one embedding stored and searched with a company filter. (5) Open the `contract:` PR with the schema and function stubs. (6) Invite A and C to the Convex project.
 
@@ -90,4 +90,4 @@ Rule: never block. If your dependency is late, build against fixtures and open y
 
 ## Decisions the plan made that the team can overrule (say so in `docs/STATUS.md` by G0)
 
-Convex + Next.js + a Bun courier (vs. Postgres + a worker); one-to-one texting on Photon's free plan with polls (vs. a paid group line); three named agents over one engine; Stage 2 math P0 and off-cycle fill P1; working name PayCheck; the sponsor list in `specs/final.md` section 11.
+Convex + Next.js + a Bun courier (vs. Postgres + a worker); one-to-one texting on Photon's free plan with polls (vs. a paid group line); three named agents over one engine; Stage 2 math P0 and off-cycle fill P1; working name PayrollPilot; the sponsor list in `specs/final.md` section 11.

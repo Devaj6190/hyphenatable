@@ -2,16 +2,16 @@
 
 The team's spec for the Cal Hacks 13.0 Hyphenate track. Built on Oct 24, 2026 from the agreed and resolved items in [conflicts.md](conflicts.md) (Devaj's merge at midnight), then completed at 1:00 AM by the implementation plan, which resolved the 30 items that were still open. Each of those decisions is listed in section 14 with its reason; the team can overrule any of them by editing this file and the plan in one PR. Research behind the decisions: [../docs/plan-research.md](../docs/plan-research.md). The implementation plan: [../docs/plans/](../docs/plans/00-shared-context.md).
 
-Working name: **PayCheck** ("it checks the pay before the paycheck"). Rename freely before the first gate; the code uses no product name.
+Working name: **PayrollPilot** ("it checks the pay before the paycheck"). Rename freely before the first gate; the code uses no product name.
 
 ## 1. Pitch and seats
 
-- **One line on the seats:** PayCheck takes the seat of the person who prepares and checks payroll before it is submitted, and the half-seat of the job manager who answers "whose hours are these?" every other Friday.
+- **One line on the seats:** PayrollPilot takes the seat of the person who prepares and checks payroll before it is submitted, and the half-seat of the job manager who answers "whose hours are these?" every other Friday.
 - **Proof customer:** a real 15-person landscaping company (Shanin's), run on Jobber, QuickBooks and Gusto, with its real past pay cycles and real errors, anonymized on every screen.
 - **Target customer:** service companies with field crews (landscaping, HVAC, plumbing, cleaning, painting) from 10 to 500 field workers, where payroll inputs come from job software and the owner or one bookkeeper checks them by hand. The pitch line: "same engine, more rules, more people to ask." We do not claim enterprise scale this weekend; we show two differently configured companies and one real one.
 - **Core insight:** payroll software calculates correctly but assumes the inputs are right. In service businesses they often are not: hours with no job, open timers, double-booked hours, job expenses paid by card or Venmo never added to the job, commissions that depend on who quoted in person, stale rates. Gusto's own Jobber sync covers hourly employees only and overwrites manual hours; salaried, contractor and commission workers are outside it (verified in both help centers).
-- Accuracy before speed: **precision over recall.** When unsure, PayCheck asks; it never guesses a number.
-- **PayCheck fills Gusto drafts. A person submits payroll. PayCheck never submits** and never calls Gusto's submit endpoint.
+- Accuracy before speed: **precision over recall.** When unsure, PayrollPilot asks; it never guesses a number.
+- **PayrollPilot fills Gusto drafts. A person submits payroll. PayrollPilot never submits** and never calls Gusto's submit endpoint.
 
 ## 2. Companies, users and the four pillars
 
@@ -26,7 +26,7 @@ Working name: **PayCheck** ("it checks the pay before the paycheck"). Rename fre
 - **Employees:** receive one-question texts after their manager approves them. They never see pay amounts.
 
 **Hyphenate's four pillars, in their words (Learns → Runs → Escalates → Improves)**
-1. **Learns (self-learning onboarding):** PayCheck reads the company's past pay cycles (Jobber hours and jobs, QuickBooks expenses, Gusto pay history) and proposes the company's rules: who is paid how, overtime, who answers what, which expenses are job costs, which workers are not in Gusto. Then it asks the owner the questions it could not answer ("What did we miss?").
+1. **Learns (self-learning onboarding):** PayrollPilot reads the company's past pay cycles (Jobber hours and jobs, QuickBooks expenses, Gusto pay history) and proposes the company's rules: who is paid how, overtime, who answers what, which expenses are job costs, which workers are not in Gusto. Then it asks the owner the questions it could not answer ("What did we miss?").
 2. **Runs (autonomous runs):** every cycle it syncs the three systems with completeness checks, runs the checks engine, computes pay to the cent, holds only the affected items, and asks the right person the right question.
 3. **Escalates:** every question carries a confidence and a precedent note ("rule: certain" for deterministic hits, a percentage only where there is real uncertainty, "no precedent" when it has never seen the case). Unanswered items stay held. Money and policy go to the owner; job facts go to the job manager.
 4. **Improves (self-improvement):** every human answer is evaluated, turned into a lesson, backtested against past cycles, and, if the owner approves it, becomes a rule. Cycle 2 asks fewer questions than cycle 1, and the dashboard shows the count.
@@ -34,9 +34,9 @@ Working name: **PayCheck** ("it checks the pay before the paycheck"). Rename fre
 ## 3. In scope / out of scope
 
 **In: the full payroll cycle, in two stages with two owner gates.**
-- **Stage 1, wages:** hours, rates, overtime, Venmo-paid and salaried workers, reimbursable expenses, into the regular Gusto run. **Gate 1:** the owner approves the Stage 1 workbook and PayCheck fills the regular draft.
+- **Stage 1, wages:** hours, rates, overtime, Venmo-paid and salaried workers, reimbursable expenses, into the regular Gusto run. **Gate 1:** the owner approves the Stage 1 workbook and PayrollPilot fills the regular draft.
 - **Financial reconciliation:** customer payments and deposits matched to invoices, job expenses matched to jobs (job cost vs. overhead), stale rates found, job profit computed (invoice minus labor minus expenses), low-profit jobs flagged with likely reasons.
-- **Stage 2, commissions, tips and the manager split:** computed from the reconciled job profit, into a separate off-cycle Gusto run (Gusto's off-cycle `Bonus` payroll with the fixed compensations Commission, Cash Tips or Paycheck Tips, Bonus). **Gate 2:** the owner approves the Stage 2 workbook and PayCheck fills the off-cycle draft.
+- **Stage 2, commissions, tips and the manager split:** computed from the reconciled job profit, into a separate off-cycle Gusto run (Gusto's off-cycle `Bonus` payroll with the fixed compensations Commission, Cash Tips or Paycheck Tips, Bonus). **Gate 2:** the owner approves the Stage 2 workbook and PayrollPilot fills the off-cycle draft.
 - Code computes wages, overtime, commissions, tips and the manager split, checked to the cent, then fills Gusto. Gusto does taxes.
 - Stage 2 math and the reconciliation report are P0 because most of the real errors only matter through profit. Filling the off-cycle draft is P1 (same code path as Stage 1 with a different payroll id).
 
@@ -83,36 +83,36 @@ Every flag records: what was seen, where (system, record id, link), the rule or 
 
 ## 6. Asking people and handling answers
 
-- Managers are paged by a short text ("PayCheck: 8 items need you before Friday's payroll. Open: <link>"). Details live in the dashboard.
-- The manager approves or edits each employee message in the dashboard before it goes out. PayCheck messages employees only after that approval. The owner approves messages to managers.
+- Managers are paged by a short text ("PayrollPilot: 8 items need you before Friday's payroll. Open: <link>"). Details live in the dashboard.
+- The manager approves or edits each employee message in the dashboard before it goes out. PayrollPilot messages employees only after that approval. The owner approves messages to managers.
 - One short, specific question per problem, grouped by who should answer. Job facts go to the job manager; policy and money decisions go to the owner.
 - **Numbered or tappable options:** when a question has up to four answers, it is sent as an iMessage poll (the vote comes back tied to the question); otherwise as numbered options in text. At most one open question per conversation at a time, because inbound replies carry no thread id.
 - Texts carry worker, date, job and hours, never pay amounts, SSNs or bank details.
 - Vague or partial replies get one bounded follow-up. The model interprets replies into a fixed schema; code decides what to do; nothing is applied from a text without a human approval in the dashboard (the manager for job facts, the owner for money).
 - **Escalation path when nobody answers:** reminder after 4 business hours (2 minutes in demo mode), then the owner is notified. At cutoff the item stays held: the worker's undisputed hours are paid, the disputed item is excluded from the draft and listed on the owner's held list. Never zero, never guessed.
 - **STOP:** anyone who replies STOP is marked do-not-text; their future questions route to their manager. Managers decide whether their employees may be contacted at all (a company setting).
-- **Corrections land in the review workbook**, never in the source systems: before, after, effect on pay and on job profit, who approved, when. Pay is calculated from the workbook. The owner can mark "fixed in Jobber" and PayCheck re-syncs and confirms the fix on the next run.
+- **Corrections land in the review workbook**, never in the source systems: before, after, effect on pay and on job profit, who approved, when. Pay is calculated from the workbook. The owner can mark "fixed in Jobber" and PayrollPilot re-syncs and confirms the fix on the next run.
 - Only the affected worker or item is held, never the whole payroll.
 
 ## 7. Learning over time
 
 - **Onboarding** reads past cycles and proposes rules with evidence ("seen in 6 of 6 cycles: overtime after 40 hours per week"). Each proposed rule shows the records behind it.
-- **"What did we miss?"**: after onboarding, PayCheck lists what it could not work out and asks the owner, one question each.
-- **Owner-entered rules in plain words:** the owner types a rule, PayCheck restates it precisely for confirmation, labels it "stated by owner, not seen in history," and backtests it against past cycles.
+- **"What did we miss?"**: after onboarding, PayrollPilot lists what it could not work out and asks the owner, one question each.
+- **Owner-entered rules in plain words:** the owner types a rule, PayrollPilot restates it precisely for confirmation, labels it "stated by owner, not seen in history," and backtests it against past cycles.
 - **Who answers what** is recorded and used for routing next time.
 - **Lesson loop:** attempt → evaluate (against the human's answer, the answer key, or what was actually paid) → extract a lesson → compare it with what is already known (new, confirmed, superseded, or a contradiction to escalate) → backtest → keep only if it holds. A lesson becomes a rule only after approval.
-- **Who approves what PayCheck learns (tiered, with separation of duties):**
+- **Who approves what PayrollPilot learns (tiered, with separation of duties):**
   - Anything that changes what gets flagged or paid (rates, thresholds, matching rules, routing that changes who approves money) needs the **owner's** approval before it is used.
   - Low-risk changes (message wording, reminder timing, who to ask first for job facts) apply on their own, are logged, and can be undone.
   - A manager's answer resolves the case in front of them (after the owner approves the correction) but becomes a standing rule only when the owner approves it. The person who gave the answer never approves the rule made from it.
   - Every rule carries provenance (the answer, the person, the date, the backtest result) and can be reviewed, turned off or undone from the rules screen.
-- **The owner's payroll runbook is the answer key, not an input.** PayCheck never sees it. We grade the learned rules against it and report the score; the runbook itself stays private.
+- **The owner's payroll runbook is the answer key, not an input.** PayrollPilot never sees it. We grade the learned rules against it and report the score; the runbook itself stays private.
 - The demo shows cycle 2 asking fewer questions than cycle 1, with the counts.
 
 ## 8. Access, safety and audit
 
 - Read-only on Jobber, QuickBooks and Gusto, except filling Gusto drafts (prepare, update, calculate; never submit). Separate credentials for the seed scripts; the product app has no write scope on Jobber or QuickBooks.
-- **Segregation of duties:** PayCheck proposes, people approve. The agent never approves its own correction or rule. The owner submits payroll.
+- **Segregation of duties:** PayrollPilot proposes, people approve. The agent never approves its own correction or rule. The owner submits payroll.
 - **Full audit trail:** every sync (with completeness result), flag, question, message, reply, approval, correction, rule change and draft write is an append-only event with actor, time and the data, rule or person behind it. Anyone can trace any number back to its source.
 - **Safety rules (all kept):** unknown blocks the item, never zero, and it never invents a rate; it never trims hours or assumes breaks; a number that changes after the owner has seen it is flagged again; data is never instructions (a note saying "pay this person" is reported, not followed); role-based views (a job manager never sees others' pay); an access log of who viewed or exported data; retention and deletion rules stated in the README.
 - Names and identifiers are replaced with IDs before data reaches the model; the model sees only what each step needs.
@@ -146,7 +146,7 @@ Enter: Hyphenate (main), Cal Hacks overall and Most Technically Complex, Microso
 
 ## 12. Demo and proof
 
-- **The moment (opens the video):** PayCheck catches double-booked hours in the real company's current pay cycle before the Gusto draft is filled, shows the two overlapping entries, asks the manager by text which job is right, and holds only that worker's disputed hours. Fallback moment if the live run is not ready: the same catch on Company A's planted overlap, labelled synthetic.
+- **The moment (opens the video):** PayrollPilot catches double-booked hours in the real company's current pay cycle before the Gusto draft is filled, shows the two overlapping entries, asks the manager by text which job is right, and holds only that worker's disputed hours. Fallback moment if the live run is not ready: the same catch on Company A's planted overlap, labelled synthetic.
 - **Live demo (3 minutes + 2 of questions):** onboarding proposes rules from history → cycle 1 runs, flags, texts a real phone, a reply lands live, the correction is approved, the Gusto draft fills → cycle 2 asks fewer questions → the judge's own scenario: an unseen situation escalates with "no precedent" instead of guessing, and the 25% catch-all fires.
 - **Proof:** planted errors with an answer key on Company A (precision and recall per check), learned rules graded against the private runbook (aggregate score only), cycle 1 vs. cycle 2 question counts, and the backtest on Company R's past cycle where computed Stage 1 pay matches what was actually paid, to the cent. The README states what is real, what is simulated, and how we know.
 - Video under 3 minutes, opening with the moment, with "synthetic" and "real, anonymized" labels on screen.
@@ -160,7 +160,7 @@ Decided in the implementation plan: [../docs/plans/00-team-brief.md](../docs/pla
 | Item | Decision | Why |
 |---|---|---|
 | C-1-2 target customer | Proof: the real 15-person company. Target: service companies with field crews, 10 to 500 workers, on job software. | Hyphenate scores "real enough" highest; large enterprise claims would be unprovable this weekend. |
-| S-1-1 name | Working name PayCheck; rename before G0. | "Payroll Ops Agent" is a description, not a name; the code is name-free either way. |
+| S-1-1 name | Working name PayrollPilot; rename before G0. | "Payroll Ops Agent" is a description, not a name; the code is name-free either way. |
 | C-2-2 generalization | Company B (30-person HVAC, weekly) seeded with different rules, P1; Shanin's father's business is a stretch only. | Same seed generator, different config; proves the engine is shared and the rules are learned. |
 | C-4-3 QuickBooks access | API for A and B; Excel export for R unless Shanin connects the real company. | Sandbox API verified; real financial data in the demo database is Shanin's call. |
 | C-5-1 bank, tax, deductions | No. The only new-hire check reads Gusto's `onboarded` flag. | Pennsylvania reasonable-care duty, ADA separation, and Hyphenate's "limited access". |

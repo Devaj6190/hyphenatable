@@ -1,6 +1,6 @@
-# PayCheck (working name)
+# PayrollPilot (working name)
 
-The agent a service company hires to prepare and check payroll before a person submits it. It learns the company's rules from past pay cycles in Jobber, QuickBooks and Gusto, runs each cycle on its own with completeness checks and a deterministic checks engine, texts the right person one short question when something is missing or contradictory, and turns each answer into a backtested rule the owner approves, so the next cycle asks less. People approve every message, correction and rule. The owner submits payroll; PayCheck fills the Gusto draft and never submits.
+The agent a service company hires to prepare and check payroll before a person submits it. It learns the company's rules from past pay cycles in Jobber, QuickBooks and Gusto, runs each cycle on its own with completeness checks and a deterministic checks engine, texts the right person one short question when something is missing or contradictory, and turns each answer into a backtested rule the owner approves, so the next cycle asks less. People approve every message, correction and rule. The owner submits payroll; PayrollPilot fills the Gusto draft and never submits.
 
 Built for the Cal Hacks 13.0 Hyphenate track ("The Hyphenated Enterprise: Autonomous Systems for Finance").
 

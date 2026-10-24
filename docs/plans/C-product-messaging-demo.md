@@ -1,4 +1,4 @@
-# Role C: Product, Messaging and Demo (PayCheck, Cal Hacks 13.0)
+# Role C: Product, Messaging and Demo (PayrollPilot, Cal Hacks 13.0)
 
 Binding context: `docs/plans/00-shared-context.md` (wins on any conflict), `specs/final.md` (sections 6, 9, 12), `docs/plan-research.md` (sections 3, 9a, 13). Written Sat 2026-10-24 about 1:30 AM PDT. All clock times are PDT. Anything not confirmed is marked **UNVERIFIED**. Every name in this file is fictional.
 
@@ -6,7 +6,7 @@ Binding context: `docs/plans/00-shared-context.md` (wins on any conflict), `spec
 
 ## 1. Role summary
 
-**Mission.** Make PayCheck something an owner would actually hire: a dashboard that shows only what needs a human now, texts that reach a real phone and come back, and a demo, video and Devpost page that put the evidence up front.
+**Mission.** Make PayrollPilot something an owner would actually hire: a dashboard that shows only what needs a human now, texts that reach a real phone and come back, and a demo, video and Devpost page that put the evidence up front.
 
 **Two phases.**
 - **Product (Sat 01:45 to Sun 02:00):** the courier (Photon worker), the message templates and reply schema, the Next.js dashboard (owner home, problem detail, manager inbox, onboarding, rules, workbook and readiness, audit log, demo panel), demo mode and the simulated-manager persona.
@@ -131,7 +131,7 @@ C reads Convex through `useQuery` / `useMutation` from `convex/react`; the dashb
 | **Data label** | every page header and every card from Company R | `synthetic` (grey) or `real, anonymized` (green outline). Never missing. |
 | **Agent hand-off** | audit log rows and the problem timeline | `Analyst`, `Auditor`, `Messenger` chips in three hues; `Controller` in grey; `You`/`Owner`/`Manager` in black. |
 | **Simulated** | any message or reply produced by `demo.simulatedReply` | red outline chip, always, also in the video. |
-| **Never submits** | next to Gusto draft status | static text: "Draft only. PayCheck never submits payroll." |
+| **Never submits** | next to Gusto draft status | static text: "Draft only. PayrollPilot never submits payroll." |
 
 ### 4.4 Copy rules
 - Second person, plain words, sentences under 20 words. Ids become fake display names only in the UI (`Worker.displayName`).
@@ -168,7 +168,7 @@ C reads Convex through `useQuery` / `useMutation` from `convex/react`; the dashb
 | `/c/[companyId]/manager` | **Manager inbox** | `flags.list({routeTo: "manager"})` | their crew's problems; each employee message to approve or edit; replies as they arrive; **no pay amounts**; in demo mode a role switch in the header (Owner / Manager) stands in for login (login is cut-order item 5) |
 | `/c/[companyId]/onboarding` | **Onboarding** | `onboarding.run`, `rules.list({status: "proposed"})`, `onboarding.questions` | proposed rules with evidence ("seen in 4 of 4 cycles", record ids), Accept / Edit / Reject; "What did we miss?" questions with answer boxes; owner-entered rule box → `rules.stateInPlainWords` → restatement to confirm, labelled "stated by owner, not seen in history" |
 | `/c/[companyId]/rules` | **Rules** | `rules.list` | `RuleCard` list grouped by type; filters active / proposed / off; undo |
-| `/c/[companyId]/workbook` | **Workbook and readiness** | `drafts.get({stage: 1})`, `drafts.get({stage: 2})`, `eval.summary` | Stage 1 lines per worker (hours, OT, rate, gross; held flags listed), Venmo list, Stage 2 lines (commission, tips, manager split) and the reconciliation report (job profit table, low-profit reasons); readiness: clean / fixed / open / held, dollars changed, questions this cycle vs last, Gusto draft status with "Draft only. PayCheck never submits payroll."; `Approve Gate 1` → `Fill Gusto draft`; download CSV |
+| `/c/[companyId]/workbook` | **Workbook and readiness** | `drafts.get({stage: 1})`, `drafts.get({stage: 2})`, `eval.summary` | Stage 1 lines per worker (hours, OT, rate, gross; held flags listed), Venmo list, Stage 2 lines (commission, tips, manager split) and the reconciliation report (job profit table, low-profit reasons); readiness: clean / fixed / open / held, dollars changed, questions this cycle vs last, Gusto draft status with "Draft only. PayrollPilot never submits payroll."; `Approve Gate 1` → `Fill Gusto draft`; download CSV |
 | `/c/[companyId]/audit` | **Audit log** | `audit.list` | searchable table; filter by type and actor; each row links to its refs |
 | `/c/[companyId]/demo` | **Demo panel** (hidden unless `DEMO_MODE=1`) | `demo.*` | Reset to cycle 1 / cycle 2; simulated reply for an open question (persona manager/owner, labelled); judge scenario entry (free text → stored as a Flag with `checkId: "CHK-22"` or an Auditor "unknown case" → shows the escalation); timer status |
 
@@ -240,17 +240,17 @@ Each ticket: branch, goal, priority and rubric line, files, dependencies, safe-t
 ```ts
 // packages/engine/src/messages/templates.ts
 export const templates = {
-  managerPage:   "PayCheck: {n} items need you before {day}'s payroll. Open: {link}",
-  ownerPage:     "PayCheck: {n} decisions are waiting for you before {day}'s payroll. Open: {link}",
+  managerPage:   "PayrollPilot: {n} items need you before {day}'s payroll. Open: {link}",
+  ownerPage:     "PayrollPilot: {n} decisions are waiting for you before {day}'s payroll. Open: {link}",
   entryNoJob:    "{who}, on {date} your {hours}h entry has no job. Which job was it? 1 {jobA} 2 {jobB} 3 something else",
   overlap:       "{who}, on {date} two entries overlap ({a} and {b}). Which one is right? 1 {a} 2 {b} 3 both, different jobs 4 neither",
   openTimer:     "{who}, your timer from {date} {start} is still running. When did you stop? Reply the time, e.g. 4:30pm",
   longShift:     "{who}, {date} shows a {hours}h shift. Is that right? 1 yes 2 no, it ended earlier 3 forgot to clock out",
   expenseNoJob:  "{who}, a {vendor} purchase on {date} has no job. Which job? 1 {jobA} 2 {jobB} 3 overhead 4 not sure",
-  venmoRate:     "Which rate should PayCheck use for {who}? Reply the hourly rate as a number.",   // owner only; still no amount sent out
+  venmoRate:     "Which rate should PayrollPilot use for {who}? Reply the hourly rate as a number.",   // owner only; still no amount sent out
   followUp:      "Thanks. To confirm: {restatement}. Reply 1 yes, 2 no",
   held:          "Got it. That item stays on hold until {day}; the rest of {who}'s hours go through.",
-  stopAck:       "You won't get texts from PayCheck. Questions will go to your manager.",
+  stopAck:       "You won't get texts from PayrollPilot. Questions will go to your manager.",
 } as const;
 export const MAX_LEN = 240;
 export function render(key: keyof typeof templates, vars: Record<string, string>): string  // throws if > MAX_LEN or if a "$" survives
@@ -341,7 +341,7 @@ export const Interpretation = z.object({
 - **Priority:** P0 (Stage 2 rows P0 as a report; off-cycle fill button P1).
 - **Files:** `apps/web/app/c/[companyId]/workbook/page.tsx`, `apps/web/components/WorkbookTable.tsx`, `ReadinessReport.tsx`, `GateButton.tsx`, `apps/web/app/api/workbook.csv/route.ts`.
 - **Depends on:** B-02 `drafts.*`, `eval.summary`; A's `Draft.lines` (A-10). Safe to start: fixture draft.
-- **Steps:** tabs Stage 1 / Stage 2 / Reconciliation; per-worker rows (hours, OT, rate, gross; `heldFlagIds` as amber chips; Venmo list separate; `excluded` rows greyed); readiness: `Counts`, dollars changed (sum of approved `effectPayCents`), "Questions this cycle vs last", Gusto draft status (`computed` → `approved` → `filled` → `calculated`) with the static line "Draft only. PayCheck never submits payroll."; `Approve Gate 1` (owner, confirmation dialog) → `drafts.approveGate` → `Fill Gusto draft` → `drafts.fillGusto` → spinner → status `calculated` and Gusto totals; every metric line says "measured on Company A, cycle N, {time}" from `eval.summary.measuredAt`; CSV download of the lines.
+- **Steps:** tabs Stage 1 / Stage 2 / Reconciliation; per-worker rows (hours, OT, rate, gross; `heldFlagIds` as amber chips; Venmo list separate; `excluded` rows greyed); readiness: `Counts`, dollars changed (sum of approved `effectPayCents`), "Questions this cycle vs last", Gusto draft status (`computed` → `approved` → `filled` → `calculated`) with the static line "Draft only. PayrollPilot never submits payroll."; `Approve Gate 1` (owner, confirmation dialog) → `drafts.approveGate` → `Fill Gusto draft` → `drafts.fillGusto` → spinner → status `calculated` and Gusto totals; every metric line says "measured on Company A, cycle N, {time}" from `eval.summary.measuredAt`; CSV download of the lines.
 - **Acceptance:** Gate 1 then Fill produces `status: "calculated"` against the Gusto demo (or the labelled mock); totals shown equal the sum of lines; CSV opens in Numbers/Excel.
 - **Verify:** `bun dev`; `curl localhost:3000/api/workbook.csv?cycleId=…`.
 - **Time:** 2.5 h. **Fallback:** hide Stage 2 tab; CSV cut.
@@ -431,14 +431,14 @@ Recording: C records the screen (QuickTime, 1280×800 browser window, 2× scale)
 
 | Time | Shot | Voice (Shanin) | On-screen label |
 |---|---|---|---|
-| 0:00 to 0:20 | **The moment.** Owner home, Company R (or A fallback). A FlagCard: "Two entries overlap on Thu: 7:30 to 15:30 on Job 118 and 12:00 to 16:00 on Job 121. rule: certain. precedent: cycle 2, same worker." The text goes out; the phone lights up; the reply "1" lands; the correction appears: before 12.5 h, after 8 h; held hours released. | "Last Friday this was in my payroll. PayCheck caught it before the Gusto draft, asked my manager one question, and fixed the workbook, not Jobber." | `real, anonymized` (or `synthetic` fallback) |
-| 0:20 to 0:35 | Title card + seats line. | "PayCheck takes the seat of the person who checks payroll inputs before anyone hits submit. Payroll software does the math right; it assumes the inputs are right. In service businesses they aren't." | |
-| 0:35 to 1:00 | **Learns.** Onboarding screen: rules proposed from four past cycles with evidence; "What did we miss?" with two questions; the owner types a Venmo rate rule in plain words, PayCheck restates it. | "It reads my past cycles in Jobber, QuickBooks and Gusto and proposes my rules with the records behind them. What it can't work out, it asks." | `Learns` |
+| 0:00 to 0:20 | **The moment.** Owner home, Company R (or A fallback). A FlagCard: "Two entries overlap on Thu: 7:30 to 15:30 on Job 118 and 12:00 to 16:00 on Job 121. rule: certain. precedent: cycle 2, same worker." The text goes out; the phone lights up; the reply "1" lands; the correction appears: before 12.5 h, after 8 h; held hours released. | "Last Friday this was in my payroll. PayrollPilot caught it before the Gusto draft, asked my manager one question, and fixed the workbook, not Jobber." | `real, anonymized` (or `synthetic` fallback) |
+| 0:20 to 0:35 | Title card + seats line. | "PayrollPilot takes the seat of the person who checks payroll inputs before anyone hits submit. Payroll software does the math right; it assumes the inputs are right. In service businesses they aren't." | |
+| 0:35 to 1:00 | **Learns.** Onboarding screen: rules proposed from four past cycles with evidence; "What did we miss?" with two questions; the owner types a Venmo rate rule in plain words, PayrollPilot restates it. | "It reads my past cycles in Jobber, QuickBooks and Gusto and proposes my rules with the records behind them. What it can't work out, it asks." | `Learns` |
 | 1:00 to 1:30 | **Runs.** Stage tracker moving: syncing with completeness checks (pulled 58 of 58), checking, flags appear live: hours with no job, open timer, QuickBooks purchase with no job, rate mismatch; counts. | "Every cycle it syncs all three systems, proves the pull is complete, runs the checks, and holds only the items it can't settle." | `Runs`, `synthetic` |
-| 1:30 to 2:05 | **Escalates.** Approval sheet with the exact text; approve; phone receives the poll; manager taps 2; interpretation in plain words; correction diff; approve; workbook version ticks; Gate 1; Fill Gusto draft → `calculated`; "Draft only. PayCheck never submits." | "It asks the right person one question, by text, with a confidence and a precedent. A human approves every message and every correction. Then it fills the Gusto draft. I submit." | `Escalates` |
+| 1:30 to 2:05 | **Escalates.** Approval sheet with the exact text; approve; phone receives the poll; manager taps 2; interpretation in plain words; correction diff; approve; workbook version ticks; Gate 1; Fill Gusto draft → `calculated`; "Draft only. PayrollPilot never submits." | "It asks the right person one question, by text, with a confidence and a precedent. A human approves every message and every correction. Then it fills the Gusto draft. I submit." | `Escalates` |
 | 2:05 to 2:35 | **Improves.** Rules screen: the manager's answer became a lesson, backtested over 4 cycles, approved by the owner, now a rule. Owner home at cycle 2: "Questions this cycle: 6 (last cycle: 14)". | "Every answer becomes a lesson. It's compared with what it already knows, backtested, and only becomes a rule when I approve it. Cycle two asked less than half the questions." | `Improves` |
 | 2:35 to 2:55 | **Proof.** Readiness report: precision 100% on 22 planted errors, recall N%; learned rules vs the owner's runbook: N of M; backtest to the cent on the real company's past cycle; audit log scrolling. | "Planted errors with an answer key. Learned rules graded against my own payroll runbook, which it never saw. And the real company's past cycle, matched to the cent." | `measured …` |
-| 2:55 to 3:00 | End card: name, seats line, repo. | "PayCheck." | |
+| 2:55 to 3:00 | End card: name, seats line, repo. | "PayrollPilot." | |
 
 Fallback moment: if the real-company live run is not ready by Sun 00:00, shoot 0:00 to 0:20 on Company A's planted overlap with the label `synthetic, planted error #4`; the voice-over changes to "This is the error that was in my real payroll last week, planted here with an answer key."
 
@@ -448,7 +448,7 @@ Setup before the judge arrives: Company A at cycle 2 restored (`demo.reset`), on
 
 | Time | Driver | Action | Line |
 |---|---|---|---|
-| 0:00 | Shanin | one line | "I run a 15-person landscaping company. PayCheck fills the seat of the person who checks payroll inputs before submit. Everything you'll see is a real sandbox, labelled synthetic or real." |
+| 0:00 | Shanin | one line | "I run a 15-person landscaping company. PayrollPilot fills the seat of the person who checks payroll inputs before submit. Everything you'll see is a real sandbox, labelled synthetic or real." |
 | 0:15 | C | owner home, stage tracker, counts | "Cycle two. Six items need a human; the rest went through." |
 | 0:35 | C | open a flag; show confidence and precedent; approval sheet | "Rule: certain. Precedent: cycle one, same pattern. Here's the exact text. I approve." |
 | 0:50 | Shanin | phone | the text arrives; Shanin replies with the poll option; the feed updates |
@@ -470,8 +470,8 @@ Likely questions and who answers: "What's real?" (Shanin: the three sandboxes ar
 
 ### 8.4 Devpost text skeleton (`docs/devpost.md`)
 
-- **Title:** PayCheck. **Tagline:** It checks the pay before the paycheck.
-- **Seats:** "PayCheck fills the seat of the person who prepares and checks payroll before it is submitted, and the half-seat of the job manager who answers 'whose hours are these?' every other Friday."
+- **Title:** PayrollPilot. **Tagline:** It checks the pay before the paycheck.
+- **Seats:** "PayrollPilot fills the seat of the person who prepares and checks payroll before it is submitted, and the half-seat of the job manager who answers 'whose hours are these?' every other Friday."
 - **Inspiration:** Shanin's company; the problem register of 125 real problems over three pay periods (counts only, no rows); the Gusto–Jobber sync gap (quote the help-center line).
 - **What it does:** the four pillars in Hyphenate's words: Learns, Runs, Escalates, Improves, one paragraph each.
 - **How we built it:** Convex + Next.js + a Bun courier; Jobber GraphQL, QuickBooks sandbox API, Gusto demo API; deterministic engine with 22 checks; three Claude agents (Analyst, Auditor, Messenger) returning validated schemas; lessons table with vector search and a classifier; Photon for texts.
@@ -485,7 +485,7 @@ Likely questions and who answers: "What's real?" (Shanin: the three sandboxes ar
 - **Links:** repo, video, live URL.
 
 ### 8.5 Project image
-1280×720 PNG: the owner home at cycle 2 with one FlagCard showing "rule: certain" and "precedent", the phone with the text overlaid bottom-right, the label chips visible, the title "PayCheck" top-left. Fake names only. Export from the real UI, not a mockup.
+1280×720 PNG: the owner home at cycle 2 with one FlagCard showing "rule: certain" and "precedent", the phone with the text overlaid bottom-right, the label chips visible, the title "PayrollPilot" top-left. Fake names only. Export from the real UI, not a mockup.
 
 ### 8.6 README outline
 Title and seats line → 60-second demo video link → What's real, what's simulated, how we know (link `docs/PROOF.md`) → The four pillars → Architecture diagram (one image) → Checks catalogue (link) → Safety and privacy (the rules list) → Running it locally → Sponsor notes (Convex, Anthropic, Photon; Backboard/Apify if present) → Team.

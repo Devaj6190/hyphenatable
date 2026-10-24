@@ -29,7 +29,7 @@ The biggest split is **C-2-1 (what the demo runs on)**. C-4-1, C-5-1 and C-12-2 
 
 ### S-1-1 Working name "Payroll Ops Agent" (RESOLVED)
 - **Proposed by:** Varnika: working name "Payroll Ops Agent", to be renamed. It's already in the root README.
-- **Decision:** Change to working name PayCheck ("it checks the pay before the paycheck"); rename before G0 if the team prefers. Code is name-free.
+- **Decision:** Change to working name PayrollPilot ("it checks the pay before the paycheck"); rename before G0 if the team prefers. Code is name-free.
 - **Decided by:** Implementation plan, Oct 24 1:00 AM (team may overrule by PR)
 
 ### Agreed
