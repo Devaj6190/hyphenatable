@@ -1,12 +1,16 @@
+"use client";
+
 import Link from "next/link";
 import { ConfidenceBadge } from "@/components/ConfidenceBadge";
 import { type DataKind, DataLabel } from "@/components/DataLabel";
 import { Money } from "@/components/Money";
 import { PrecedentBadge } from "@/components/PrecedentBadge";
+import { useRole } from "@/components/RoleProvider";
 import { SourceChip } from "@/components/SourceChip";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { checkTitle } from "@/lib/checks";
+import { forViewer } from "@/lib/role";
 import type { Flag, ViewerRole } from "@/lib/types";
 
 const statusLabel: Record<Flag["status"], string> = {
@@ -19,15 +23,18 @@ const statusLabel: Record<Flag["status"], string> = {
 };
 
 export function FlagCard({
-  flag,
+  flag: rawFlag,
   dataKind,
-  viewerRole = "owner",
+  viewerRole,
 }: {
   flag: Flag;
   dataKind: DataKind;
   viewerRole?: ViewerRole;
 }) {
-  const dollars = viewerRole === "owner" ? flag.affects.dollarsCents : null;
+  const { role } = useRole();
+  // Strip pay before render so a manager view cannot show it, whatever the data source sent.
+  const flag = forViewer(rawFlag, viewerRole ?? role);
+  const dollars = flag.affects.dollarsCents;
   return (
     <Card>
       <CardContent className="flex flex-col gap-3">

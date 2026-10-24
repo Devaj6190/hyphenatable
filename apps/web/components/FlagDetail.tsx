@@ -8,23 +8,27 @@ import { type DataKind, DataLabel } from "@/components/DataLabel";
 import { FlagTimeline } from "@/components/FlagTimeline";
 import { Money } from "@/components/Money";
 import { PrecedentBadge } from "@/components/PrecedentBadge";
+import { useRole } from "@/components/RoleProvider";
 import { SourceChip } from "@/components/SourceChip";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { WorkerThread } from "@/components/WorkerThread";
 import { checkTitle } from "@/lib/checks";
 import {
   FIXTURE_SOURCE,
   fixtureEvents,
   fixtureFlags,
   fixtureQuestions,
+  workerName,
 } from "@/lib/fixtures";
+import { forViewer } from "@/lib/role";
 import type { ViewerRole } from "@/lib/types";
 
 export function FlagDetail({
   companyId,
   flagId,
   dataKind,
-  viewerRole = "owner",
+  viewerRole,
 }: {
   companyId: string;
   flagId: string;
@@ -32,7 +36,9 @@ export function FlagDetail({
   viewerRole?: ViewerRole;
 }) {
   const [markedFixed, setMarkedFixed] = useState(false);
-  const flag = fixtureFlags.find(
+  const { role } = useRole();
+  const viewer = viewerRole ?? role;
+  const found = fixtureFlags.find(
     (f) => f.id === flagId && f.companyId === companyId,
   );
   const back = (
@@ -43,7 +49,7 @@ export function FlagDetail({
       ← Back to what we need from you
     </Link>
   );
-  if (!flag) {
+  if (!found) {
     return (
       <div className="flex flex-col gap-3">
         {back}
@@ -51,11 +57,12 @@ export function FlagDetail({
       </div>
     );
   }
+  const flag = forViewer(found, viewer);
   const question = fixtureQuestions.find((q) => q.id === flag.questionId);
   const events = fixtureEvents
     .filter((e) => e.flagId === flag.id)
     .sort((a, b) => a.at.localeCompare(b.at));
-  const dollars = viewerRole === "owner" ? flag.affects.dollarsCents : null;
+  const dollars = flag.affects.dollarsCents;
   const hasJobber = flag.where.some((w) => w.system === "Jobber");
 
   return (
@@ -106,11 +113,27 @@ export function FlagDetail({
       </Card>
 
       {question ? (
-        <ApprovalSheet key={question.id} question={question} />
+        <ApprovalSheet
+          key={question.id}
+          question={question}
+          recipientName={
+            question.toRole === "employee"
+              ? workerName(question.toWorkerId)
+              : undefined
+          }
+        />
       ) : (
         <p className="text-sm text-muted-foreground">
           No text is needed for this one.
         </p>
+      )}
+
+      {question && (
+        <WorkerThread
+          questionId={question.id}
+          title="Replies"
+          dataKind={dataKind}
+        />
       )}
 
       {hasJobber && (
