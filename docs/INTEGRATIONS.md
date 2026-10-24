@@ -32,6 +32,8 @@ Status values: **tested** (ran here, evidence noted), **unverified** (docs read 
 
 - Sat 04:40 · A2 · **Jobber seeded (live, trial):** 28 clients, 28 properties, 25 quotes, 32 jobs, 44 visits (completed), 13 expenses, 24 invoices via the PayrollPilot Seed app on the allowlisted account; ~8 s per mutation, no throttling; one dropped connection, no duplicates. Not possible by API: time entries, payment records. Round-trip pull with `--compare`: users/visits/invoices/expenses match for a-c05. **tested**.
 
+- Sat 04:50 · A2 · **Gusto demo seeded (live):** compensation PUTs and employee + job creation all accepted in demo; 11 existing employees mapped, 1 new hire created un-onboarded; read-back 14/14 complete. No payroll endpoint written. **tested**.
+
 ## Live proofs (fill in as they happen)
 - First real text round trip (G1):
 - First Gusto draft filled in demo (G2):
