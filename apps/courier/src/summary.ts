@@ -1,14 +1,22 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { managerSummary } from "@payrollpilot/engine/messages/summary";
-import type { Company, Cycle, Flag } from "@payrollpilot/engine/schemas";
+import type {
+  Company,
+  Cycle,
+  Flag,
+  Worker,
+} from "@payrollpilot/engine/schemas";
 
 // The manager's summary text, built from the committed fixtures until Convex holds real flags (stub only).
-// The current cycle is the newest one that is not closed, unless cycleId names one.
+// The current cycle is the newest one that is not closed, unless cycleId names one. The greeting uses
+// managerDisplayName (MANAGER_DISPLAY_NAME in .env) or else the first name of the fixture worker behind contactRef.
 export function summaryFromFixtures(opts: {
   fixturesDir: string;
   companyId: string;
   cycleId?: string;
+  contactRef: string;
+  managerDisplayName: string | null;
   dashboardUrl: string | null;
 }): { text: string | null; cycleId: string } {
   const dir = join(opts.fixturesDir, opts.companyId);
@@ -25,10 +33,17 @@ export function summaryFromFixtures(opts: {
     throw new Error(
       `no cycle ${opts.cycleId ?? "open"} for company ${opts.companyId}`,
     );
+  const fixtureName = read<Worker[]>("workers.json")
+    .find((w) => w.contactRef === opts.contactRef)
+    ?.displayName.split(" ")[0];
+  const managerFirstName = opts.managerDisplayName ?? fixtureName;
+  if (!managerFirstName)
+    throw new Error(`no name for ${opts.contactRef}: set MANAGER_DISPLAY_NAME`);
   const text = managerSummary({
     flags: read<Flag[]>("flags.json"),
     cycle,
     timeZone: company.timezone,
+    managerFirstName,
     dashboardUrl: opts.dashboardUrl,
   });
   return { text, cycleId: cycle.id };

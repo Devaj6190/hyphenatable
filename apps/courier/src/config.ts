@@ -24,6 +24,8 @@ export type Config = {
   contactsFile: string;
   // Base URL of the web dashboard for links in texts; unset renders a placeholder in the link.
   dashboardUrl: string | null;
+  // First name the manager's summary greets; unset uses the fixture's fake name. Set it in .env only.
+  managerDisplayName: string | null;
   fixturesDir: string;
 };
 
@@ -41,6 +43,7 @@ export function readConfig(env = process.env): Config {
     stubPort: Number(env.STUB_PORT || 3210),
     contactsFile: env.CONTACTS_FILE || join(COURIER_DIR, "contacts.json"),
     dashboardUrl: env.DASHBOARD_URL || null,
+    managerDisplayName: env.MANAGER_DISPLAY_NAME?.trim() || null,
     fixturesDir: env.FIXTURES_DIR || join(COURIER_DIR, "../../data/fixtures"),
   };
 }
