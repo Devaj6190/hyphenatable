@@ -7,7 +7,8 @@ import type { TimeEntry, Worker } from "../types.ts";
 import type { RawTimeSheetEntry, RawUser } from "./queries.ts";
 
 export const jobberRef = (encodedId: string): string => `jobber:${encodedId}`;
-const ref = (node: { id: string } | null | undefined): string | null => (node?.id ? jobberRef(node.id) : null);
+const ref = (node: { id: string } | null | undefined): string | null =>
+  node?.id ? jobberRef(node.id) : null;
 
 /** ISO 8601 with any offset -> ISO 8601 UTC (`...Z`). Throws on an unparseable timestamp. */
 export function toUtcIso(value: string): string;
@@ -15,7 +16,10 @@ export function toUtcIso(value: string | null): string | null;
 export function toUtcIso(value: string | null): string | null {
   if (value === null) return null;
   const ms = Date.parse(value);
-  if (Number.isNaN(ms)) throw new Error(`Unparseable timestamp from Jobber: ${JSON.stringify(value)}`);
+  if (Number.isNaN(ms))
+    throw new Error(
+      `Unparseable timestamp from Jobber: ${JSON.stringify(value)}`,
+    );
   return new Date(ms).toISOString();
 }
 
@@ -33,15 +37,24 @@ export function normalizeUser(raw: RawUser, companyId: string): Worker {
     status,
     managerId: null,
     contactRef: null,
-    jobber: { userId: raw.id, labourRateCents: toCents(raw.labourRate), status: raw.status },
+    jobber: {
+      userId: raw.id,
+      labourRateCents: toCents(raw.labourRate),
+      status: raw.status,
+    },
     gusto: null,
     venmoRateCents: null,
   };
 }
 
-export function normalizeTimeSheetEntry(raw: RawTimeSheetEntry, companyId: string, cycleId: string | null): TimeEntry {
+export function normalizeTimeSheetEntry(
+  raw: RawTimeSheetEntry,
+  companyId: string,
+  cycleId: string | null,
+): TimeEntry {
   const target = raw.targetItem;
-  const visitId = target?.__typename === "Visit" && target.id ? jobberRef(target.id) : null;
+  const visitId =
+    target?.__typename === "Visit" && target.id ? jobberRef(target.id) : null;
   const jobId =
     ref(raw.job) ??
     (target?.__typename === "Job" && target.id ? jobberRef(target.id) : null) ??

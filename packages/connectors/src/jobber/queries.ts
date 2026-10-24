@@ -30,13 +30,22 @@ export const TYPE_FIELDS_QUERY = /* GraphQL */ `
 
 const probes = new WeakMap<JobberClient, Map<string, Promise<Set<string>>>>();
 /** Cached per client: one introspection per type per pull. */
-export function visibleFields(client: JobberClient, typeName: string): Promise<Set<string>> {
+export function visibleFields(
+  client: JobberClient,
+  typeName: string,
+): Promise<Set<string>> {
   let byType = probes.get(client);
-  if (!byType) probes.set(client, (byType = new Map()));
+  if (!byType) {
+    byType = new Map();
+    probes.set(client, byType);
+  }
   let p = byType.get(typeName);
   if (!p) {
     p = client
-      .query<{ __type: { fields: { name: string }[] | null } | null }>(TYPE_FIELDS_QUERY, { name: typeName })
+      .query<{ __type: { fields: { name: string }[] | null } | null }>(
+        TYPE_FIELDS_QUERY,
+        { name: typeName },
+      )
       .then((d) => new Set((d.__type?.fields ?? []).map((f) => f.name)));
     byType.set(typeName, p);
   }
@@ -127,15 +136,21 @@ export async function paginate<N, R>(
   let drift = false;
   let pages = 0;
   for (;;) {
-    const data: R = await client.query<R>(document, { ...variables, first: PAGE_SIZE, after });
+    const data: R = await client.query<R>(document, {
+      ...variables,
+      first: PAGE_SIZE,
+      after,
+    });
     const conn = pick(data);
-    if (!conn) throw new Error("Jobber response missing the expected connection");
+    if (!conn)
+      throw new Error("Jobber response missing the expected connection");
     pages++;
     if (totalCount === null) totalCount = conn.totalCount;
     else if (conn.totalCount !== totalCount) drift = true;
     nodes.push(...conn.nodes);
     if (!conn.pageInfo.hasNextPage) break;
-    if (!conn.pageInfo.endCursor) throw new Error("Jobber hasNextPage without endCursor");
+    if (!conn.pageInfo.endCursor)
+      throw new Error("Jobber hasNextPage without endCursor");
     after = conn.pageInfo.endCursor;
   }
   return { nodes, totalCount: totalCount ?? 0, totalCountDrift: drift, pages };
@@ -157,7 +172,11 @@ export interface RawTimeSheetEntry {
   id: string;
   user: { id: string } | null;
   job: { id: string } | null;
-  targetItem: { __typename: string; id?: string; job?: { id: string } | null } | null;
+  targetItem: {
+    __typename: string;
+    id?: string;
+    job?: { id: string } | null;
+  } | null;
   startAt: string;
   endAt: string | null;
   finalDuration: number;

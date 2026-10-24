@@ -11,7 +11,10 @@
               "id": "Z2lkOi8vSm9iYmVyL1RpbWVTaGVldEVudHJ5LzUwMDE=",
               "user": { "id": "Z2lkOi8vSm9iYmVyL1VzZXIvMTAwMg==" },
               "job": { "id": "Z2lkOi8vSm9iYmVyL0pvYi8yMDAx" },
-              "targetItem": { "__typename": "Job", "id": "Z2lkOi8vSm9iYmVyL0pvYi8yMDAx" },
+              "targetItem": {
+                "__typename": "Job",
+                "id": "Z2lkOi8vSm9iYmVyL0pvYi8yMDAx"
+              },
               "startAt": "2026-10-12T08:00:00-07:00",
               "endAt": "2026-10-12T16:30:00-07:00",
               "finalDuration": 30600,
@@ -30,7 +33,11 @@
               "id": "Z2lkOi8vSm9iYmVyL1RpbWVTaGVldEVudHJ5LzUwMDI=",
               "user": { "id": "Z2lkOi8vSm9iYmVyL1VzZXIvMTAwMg==" },
               "job": null,
-              "targetItem": { "__typename": "Visit", "id": "Z2lkOi8vSm9iYmVyL1Zpc2l0LzMwMDE=", "job": { "id": "Z2lkOi8vSm9iYmVyL0pvYi8yMDAy" } },
+              "targetItem": {
+                "__typename": "Visit",
+                "id": "Z2lkOi8vSm9iYmVyL1Zpc2l0LzMwMDE=",
+                "job": { "id": "Z2lkOi8vSm9iYmVyL0pvYi8yMDAy" }
+              },
               "startAt": "2026-10-13T15:00:00Z",
               "endAt": "2026-10-13T23:15:00Z",
               "finalDuration": 29700,
@@ -67,7 +74,17 @@
           ]
         }
       },
-      "extensions": { "cost": { "requestedQueryCost": 1050, "actualQueryCost": 63, "throttleStatus": { "maximumAvailable": 10000, "currentlyAvailable": 9905, "restoreRate": 500 } } }
+      "extensions": {
+        "cost": {
+          "requestedQueryCost": 1050,
+          "actualQueryCost": 63,
+          "throttleStatus": {
+            "maximumAvailable": 10000,
+            "currentlyAvailable": 9905,
+            "restoreRate": 500
+          }
+        }
+      }
     },
     "Mw": {
       "data": {
@@ -79,7 +96,10 @@
               "id": "Z2lkOi8vSm9iYmVyL1RpbWVTaGVldEVudHJ5LzUwMDQ=",
               "user": { "id": "Z2lkOi8vSm9iYmVyL1VzZXIvMTAwMw==" },
               "job": { "id": "Z2lkOi8vSm9iYmVyL0pvYi8yMDAy" },
-              "targetItem": { "__typename": "Job", "id": "Z2lkOi8vSm9iYmVyL0pvYi8yMDAy" },
+              "targetItem": {
+                "__typename": "Job",
+                "id": "Z2lkOi8vSm9iYmVyL0pvYi8yMDAy"
+              },
               "startAt": "2026-10-14T10:00:00-07:00",
               "endAt": null,
               "finalDuration": 7200,
@@ -98,7 +118,10 @@
               "id": "Z2lkOi8vSm9iYmVyL1RpbWVTaGVldEVudHJ5LzUwMDU=",
               "user": { "id": "Z2lkOi8vSm9iYmVyL1VzZXIvMTAwNA==" },
               "job": { "id": "Z2lkOi8vSm9iYmVyL0pvYi8yMDAx" },
-              "targetItem": { "__typename": "Job", "id": "Z2lkOi8vSm9iYmVyL0pvYi8yMDAx" },
+              "targetItem": {
+                "__typename": "Job",
+                "id": "Z2lkOi8vSm9iYmVyL0pvYi8yMDAx"
+              },
               "startAt": "2026-10-15T08:00:00-07:00",
               "endAt": "2026-10-15T12:00:00-07:00",
               "finalDuration": 14400,
@@ -116,20 +139,46 @@
           ]
         }
       },
-      "extensions": { "cost": { "requestedQueryCost": 1050, "actualQueryCost": 42, "throttleStatus": { "maximumAvailable": 10000, "currentlyAvailable": 9880, "restoreRate": 500 } } }
+      "extensions": {
+        "cost": {
+          "requestedQueryCost": 1050,
+          "actualQueryCost": 42,
+          "throttleStatus": {
+            "maximumAvailable": 10000,
+            "currentlyAvailable": 9880,
+            "restoreRate": 500
+          }
+        }
+      }
     }
   },
   "byDay": {
     "Z2lkOi8vSm9iYmVyL1VzZXIvMTAwMQ==": [],
     "Z2lkOi8vSm9iYmVyL1VzZXIvMTAwMg==": [
-      { "date": "2026-10-12", "totalDuration": 30600, "entries": { "totalCount": 1 } },
-      { "date": "2026-10-13", "totalDuration": 29700, "entries": { "totalCount": 1 } }
+      {
+        "date": "2026-10-12",
+        "totalDuration": 30600,
+        "entries": { "totalCount": 1 }
+      },
+      {
+        "date": "2026-10-13",
+        "totalDuration": 29700,
+        "entries": { "totalCount": 1 }
+      }
     ],
     "Z2lkOi8vSm9iYmVyL1VzZXIvMTAwMw==": [
-      { "date": "2026-10-14", "totalDuration": 12600, "entries": { "totalCount": 2 } }
+      {
+        "date": "2026-10-14",
+        "totalDuration": 12600,
+        "entries": { "totalCount": 2 }
+      }
     ],
     "Z2lkOi8vSm9iYmVyL1VzZXIvMTAwNA==": [
-      { "date": "2026-10-15", "totalDuration": 14400, "entries": { "totalCount": 1 } }
+      {
+        "date": "2026-10-15",
+        "totalDuration": 14400,
+        "entries": { "totalCount": 1 }
+      }
     ]
   }
 }

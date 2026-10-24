@@ -18,7 +18,8 @@ export interface TokenStore {
 }
 
 /** Absolute path of a file under the repo's data/private/. */
-export const privatePath = (name: string): string => fileURLToPath(new URL(`../../../data/private/${name}`, import.meta.url));
+export const privatePath = (name: string): string =>
+  fileURLToPath(new URL(`../../../data/private/${name}`, import.meta.url));
 
 /** JSON file, written 0600 via an atomic rename so a crash never leaves half a rotated token. */
 export function fileTokenStore(path: string): TokenStore {
@@ -40,5 +41,10 @@ export function fileTokenStore(path: string): TokenStore {
   };
 }
 
-export const tokenFresh = (t: StoredTokens, skewMs = 60_000): t is StoredTokens & { accessToken: string } =>
-  !!t.accessToken && !!t.accessTokenExpiresAt && t.accessTokenExpiresAt - skewMs > Date.now();
+export const tokenFresh = (
+  t: StoredTokens,
+  skewMs = 60_000,
+): t is StoredTokens & { accessToken: string } =>
+  !!t.accessToken &&
+  !!t.accessTokenExpiresAt &&
+  t.accessTokenExpiresAt - skewMs > Date.now();

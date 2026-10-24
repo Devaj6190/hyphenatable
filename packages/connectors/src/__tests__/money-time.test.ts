@@ -27,7 +27,9 @@ describe("toCents", () => {
 
 describe("periods", () => {
   it("date-only periods are inclusive local dates turned into UTC instants", () => {
-    expect(resolvePeriod("2026-10-11", "2026-10-24", "America/Los_Angeles")).toEqual({
+    expect(
+      resolvePeriod("2026-10-11", "2026-10-24", "America/Los_Angeles"),
+    ).toEqual({
       startUtc: "2026-10-11T07:00:00.000Z",
       endUtc: "2026-10-25T07:00:00.000Z",
       startDate: "2026-10-11",
@@ -39,10 +41,23 @@ describe("periods", () => {
     const p = resolvePeriod("2026-10-25", "2026-11-07", "America/Los_Angeles");
     expect(p.startUtc).toBe("2026-10-25T07:00:00.000Z");
     expect(p.endUtc).toBe("2026-11-08T08:00:00.000Z");
-    expect(new Date(zonedMidnight("2026-11-01", "America/Los_Angeles")).toISOString()).toBe("2026-11-01T07:00:00.000Z");
+    expect(
+      new Date(
+        zonedMidnight("2026-11-01", "America/Los_Angeles"),
+      ).toISOString(),
+    ).toBe("2026-11-01T07:00:00.000Z");
   });
   it("ISO instants pass through", () => {
-    const p = resolvePeriod("2026-10-11T07:00:00Z", "2026-10-25T07:00:00Z", "America/Los_Angeles");
-    expect([p.startUtc, p.endUtc, p.startDate, p.endDate]).toEqual(["2026-10-11T07:00:00.000Z", "2026-10-25T07:00:00.000Z", "2026-10-11", "2026-10-24"]);
+    const p = resolvePeriod(
+      "2026-10-11T07:00:00Z",
+      "2026-10-25T07:00:00Z",
+      "America/Los_Angeles",
+    );
+    expect([p.startUtc, p.endUtc, p.startDate, p.endDate]).toEqual([
+      "2026-10-11T07:00:00.000Z",
+      "2026-10-25T07:00:00.000Z",
+      "2026-10-11",
+      "2026-10-24",
+    ]);
   });
 });

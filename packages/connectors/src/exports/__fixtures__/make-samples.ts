@@ -5,15 +5,73 @@ import ExcelJS from "exceljs";
 
 export type SampleRow = (string | number | Date | boolean | null)[];
 
-export const SAMPLE_HEADER = ["Date", "Employee", "Client", "Job", "Type", "Start Time", "End Time", "Hours", "Approved", "Notes"];
+export const SAMPLE_HEADER = [
+  "Date",
+  "Employee",
+  "Client",
+  "Job",
+  "Type",
+  "Start Time",
+  "End Time",
+  "Hours",
+  "Approved",
+  "Notes",
+];
 export const SAMPLE_ROWS: SampleRow[] = [
-  [new Date(Date.UTC(2026, 9, 12)), "Avery Reed", "Brookside Dental", "Job #101 - Spring cleanup", "General", "8:00 AM", "4:30 PM", 8.5, "Yes", null],
-  [new Date(Date.UTC(2026, 9, 13)), "Avery Reed", "Maple Grove HOA", "Job #102 - Total care", "General", "8:00 AM", "4:15 PM", 8.25, "Yes", "fake note"],
-  ["10/14/2026", "Jordan Ellis", null, null, "Custom", "07:30", "09:00", null, "No", null],
-  ["Oct 15, 2026", "Jordan Ellis", "Brookside Dental", "Job #101 - Spring cleanup", "General", null, null, 3.17, "Pending", null],
+  [
+    new Date(Date.UTC(2026, 9, 12)),
+    "Avery Reed",
+    "Brookside Dental",
+    "Job #101 - Spring cleanup",
+    "General",
+    "8:00 AM",
+    "4:30 PM",
+    8.5,
+    "Yes",
+    null,
+  ],
+  [
+    new Date(Date.UTC(2026, 9, 13)),
+    "Avery Reed",
+    "Maple Grove HOA",
+    "Job #102 - Total care",
+    "General",
+    "8:00 AM",
+    "4:15 PM",
+    8.25,
+    "Yes",
+    "fake note",
+  ],
+  [
+    "10/14/2026",
+    "Jordan Ellis",
+    null,
+    null,
+    "Custom",
+    "07:30",
+    "09:00",
+    null,
+    "No",
+    null,
+  ],
+  [
+    "Oct 15, 2026",
+    "Jordan Ellis",
+    "Brookside Dental",
+    "Job #101 - Spring cleanup",
+    "General",
+    null,
+    null,
+    3.17,
+    "Pending",
+    null,
+  ],
 ];
 
-export async function buildTimesheetsXlsx(rows: SampleRow[] = SAMPLE_ROWS, total: number | null = 21.42): Promise<ArrayBuffer> {
+export async function buildTimesheetsXlsx(
+  rows: SampleRow[] = SAMPLE_ROWS,
+  total: number | null = 21.42,
+): Promise<ArrayBuffer> {
   const wb = new ExcelJS.Workbook();
   wb.addWorksheet("Summary").addRow(["Timesheets report"]);
   const ws = wb.addWorksheet("Timesheets");
@@ -22,7 +80,8 @@ export async function buildTimesheetsXlsx(rows: SampleRow[] = SAMPLE_ROWS, total
   ws.addRow([]);
   ws.addRow(SAMPLE_HEADER);
   for (const r of rows) ws.addRow(r);
-  if (total !== null) ws.addRow(["Total", null, null, null, null, null, null, total, null, null]);
+  if (total !== null)
+    ws.addRow(["Total", null, null, null, null, null, null, total, null, null]);
   return (await wb.xlsx.writeBuffer()) as ArrayBuffer;
 }
 

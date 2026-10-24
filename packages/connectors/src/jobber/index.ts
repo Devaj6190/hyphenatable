@@ -3,8 +3,16 @@
 
 import { resolvePeriod, weekWindows } from "../time.ts";
 import type { SyncRun, TimeEntry, Worker } from "../types.ts";
-import { type JobberAuth, JobberClient, JOBBER_GRAPHQL_VERSION } from "./client.ts";
-import { type CompletenessResult, connectionCompleteness, timeEntryCompleteness } from "./completeness.ts";
+import {
+  JOBBER_GRAPHQL_VERSION,
+  type JobberAuth,
+  JobberClient,
+} from "./client.ts";
+import {
+  type CompletenessResult,
+  connectionCompleteness,
+  timeEntryCompleteness,
+} from "./completeness.ts";
 import { normalizeTimeSheetEntry, normalizeUser } from "./normalize.ts";
 import { type ObjectRecords, pullObjects } from "./objects.ts";
 import {
@@ -20,7 +28,13 @@ import {
   visibleFields,
 } from "./queries.ts";
 
-export { authFromEnv, fileTokenStore, JobberClient, type JobberAuth, type TokenStore } from "./client.ts";
+export {
+  authFromEnv,
+  fileTokenStore,
+  type JobberAuth,
+  JobberClient,
+  type TokenStore,
+} from "./client.ts";
 
 export interface PullOptions {
   /** Convex cycle id, if known; otherwise null and the caller sets it on insert. */
@@ -60,7 +74,12 @@ export async function pullCycle(
   const period = resolvePeriod(periodStart, periodEnd, opts.timezone ?? "UTC");
   const syncRuns: SyncRun[] = [];
 
-  const run = (object: string, method: string, startedAt: string, r: CompletenessResult): SyncRun => ({
+  const run = (
+    object: string,
+    method: string,
+    startedAt: string,
+    r: CompletenessResult,
+  ): SyncRun => ({
     id: `${companyId}:jobber:${object}:${startedAt}`,
     companyId,
     cycleId,
@@ -90,13 +109,40 @@ export async function pullCycle(
     try {
       type D = { users: Connection<RawUser> };
       const withRate = (await visibleFields(client, "User")).has("labourRate");
-      if (!withRate) method += "; User.labourRate hidden from this app (scope), labourRateCents null";
-      const page = await paginate<RawUser, D>(client, withRate ? USERS_QUERY : USERS_QUERY_NO_RATE, {}, (d) => d.users);
+      if (!withRate)
+        method +=
+          "; User.labourRate hidden from this app (scope), labourRateCents null";
+      const page = await paginate<RawUser, D>(
+        client,
+        withRate ? USERS_QUERY : USERS_QUERY_NO_RATE,
+        {},
+        (d) => d.users,
+      );
       const unique = new Map(page.nodes.map((u) => [u.id, u]));
       rawUsers = [...unique.values()];
-      const r = connectionCompleteness("users", page.nodes.length, page.totalCount, page.totalCountDrift);
+      const r = connectionCompleteness(
+        "users",
+        page.nodes.length,
+        page.totalCount,
+        page.totalCountDrift,
+      );
       const dup = page.nodes.length - unique.size;
-      syncRuns.push(run("users", method, startedAt, dup ? { ...r, complete: false, error: [r.error, `users: ${dup} duplicate ids across pages`].filter(Boolean).join("; ") } : r));
+      syncRuns.push(
+        run(
+          "users",
+          method,
+          startedAt,
+          dup
+            ? {
+                ...r,
+                complete: false,
+                error: [r.error, `users: ${dup} duplicate ids across pages`]
+                  .filter(Boolean)
+                  .join("; "),
+              }
+            : r,
+        ),
+      );
     } catch (e) {
       syncRuns.push(run("users", method, startedAt, failed(e)));
     }
@@ -108,17 +154,28 @@ export async function pullCycle(
     const startedAt = now().toISOString();
     const method = `${METHOD} timeSheetEntries(startAt ${period.startUtc}..${period.endUtc}, START_AT ASC) first:50 + User.timeSheetsByDay(${period.startDate}..${period.endDate})`;
     try {
-      const entries = await paginate<RawTimeSheetEntry, { timeSheetEntries: Connection<RawTimeSheetEntry> }>(
+      const entries = await paginate<
+        RawTimeSheetEntry,
+        { timeSheetEntries: Connection<RawTimeSheetEntry> }
+      >(
         client,
         TIME_SHEET_ENTRIES_QUERY,
         { startAfter: period.startUtc, startBefore: period.endUtc },
         (d) => d.timeSheetEntries,
       );
       rawEntries = entries.nodes;
-      if (rawUsers === null) throw new Error("timeSheetEntries pulled but users failed, so timeSheetsByDay totals are unavailable");
+      if (rawUsers === null)
+        throw new Error(
+          "timeSheetEntries pulled but users failed, so timeSheetsByDay totals are unavailable",
+        );
       const byDay = new Map<string, number>();
       for (const u of rawUsers) {
-        type D = { user: { id: string; timeSheetsByDay: Connection<RawTimeSheetUserDay> } | null };
+        type D = {
+          user: {
+            id: string;
+            timeSheetsByDay: Connection<RawTimeSheetUserDay>;
+          } | null;
+        };
         let count = 0;
         // Jobber rejects timeSheetsByDay ranges over 7 days (live, 2026-10-24): walk the period in 7-day windows.
         for (const w of weekWindows(period.startDate, period.endDate)) {
@@ -141,21 +198,55 @@ export async function pullCycle(
       syncRuns.push(run("timeSheetEntries", method, startedAt, result));
     } catch (e) {
       const r = failed(e);
-      syncRuns.push(run("timeSheetEntries", method, startedAt, { ...r, pulled: rawEntries.length }));
+      syncRuns.push(
+        run("timeSheetEntries", method, startedAt, {
+          ...r,
+          pulled: rawEntries.length,
+        }),
+      );
     }
   }
 
-  const timeEntries = rawEntries.map((e) => normalizeTimeSheetEntry(e, companyId, cycleId));
-  let objects: ObjectRecords = { jobs: [], visits: [], quotes: [], invoices: [], payments: [], expenses: [] };
+  const timeEntries = rawEntries.map((e) =>
+    normalizeTimeSheetEntry(e, companyId, cycleId),
+  );
+  let objects: ObjectRecords = {
+    jobs: [],
+    visits: [],
+    quotes: [],
+    invoices: [],
+    payments: [],
+    expenses: [],
+  };
   if (opts.objects !== false) {
-    const entryJobIds = timeEntries.flatMap((e) => (e.jobId ? [e.jobId.slice("jobber:".length)] : []));
-    const pulled = await pullObjects(client, companyId, period, entryJobIds, now);
+    const entryJobIds = timeEntries.flatMap((e) =>
+      e.jobId ? [e.jobId.slice("jobber:".length)] : [],
+    );
+    const pulled = await pullObjects(
+      client,
+      companyId,
+      period,
+      entryJobIds,
+      now,
+    );
     objects = pulled.records;
-    for (const r of pulled.runs) syncRuns.push(run(r.object, `${METHOD} ${r.method.replace(/^jobber-graphql /, "")}`, r.startedAt, r.result));
+    for (const r of pulled.runs)
+      syncRuns.push(
+        run(
+          r.object,
+          `${METHOD} ${r.method.replace(/^jobber-graphql /, "")}`,
+          r.startedAt,
+          r.result,
+        ),
+      );
   }
 
   return {
-    records: { workers: (rawUsers ?? []).map((u) => normalizeUser(u, companyId)), timeEntries, ...objects },
+    records: {
+      workers: (rawUsers ?? []).map((u) => normalizeUser(u, companyId)),
+      timeEntries,
+      ...objects,
+    },
     syncRuns,
   };
 }

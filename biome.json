@@ -7,12 +7,7 @@
   },
   "files": {
     "ignoreUnknown": true,
-    "includes": [
-      "**",
-      "!**/convex/_generated",
-      "!data/fixtures",
-      "!packages/connectors/src"
-    ]
+    "includes": ["**", "!**/convex/_generated", "!data/fixtures"]
   },
   "formatter": {
     "enabled": true,

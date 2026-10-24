@@ -1,12 +1,22 @@
 import { describe, expect, it } from "vitest";
 import entries from "../__fixtures__/timeSheetEntries.json";
 import users from "../__fixtures__/users.json";
-import { normalizeTimeSheetEntry, normalizeUser, toUtcIso } from "../normalize.ts";
+import {
+  normalizeTimeSheetEntry,
+  normalizeUser,
+  toUtcIso,
+} from "../normalize.ts";
 import type { RawTimeSheetEntry, RawUser } from "../queries.ts";
 
-const page1 = entries.pages.null.data.timeSheetEntries.nodes as RawTimeSheetEntry[];
-const page2 = entries.pages.Mw.data.timeSheetEntries.nodes as RawTimeSheetEntry[];
-const [e1, e2, e3] = page1 as [RawTimeSheetEntry, RawTimeSheetEntry, RawTimeSheetEntry];
+const page1 = entries.pages.null.data.timeSheetEntries
+  .nodes as RawTimeSheetEntry[];
+const page2 = entries.pages.Mw.data.timeSheetEntries
+  .nodes as RawTimeSheetEntry[];
+const [e1, e2, e3] = page1 as [
+  RawTimeSheetEntry,
+  RawTimeSheetEntry,
+  RawTimeSheetEntry,
+];
 const [e4] = page2 as [RawTimeSheetEntry];
 
 describe("normalizeTimeSheetEntry", () => {
@@ -49,7 +59,14 @@ describe("normalizeTimeSheetEntry", () => {
 
   it("keeps a no-job entry's label and category, with no job or visit invented", () => {
     const t = normalizeTimeSheetEntry(e3, "a", null);
-    expect([t.jobId, t.visitId, t.label, t.category, t.approved, t.approvedBy]).toEqual([null, null, "Shop cleanup", "CUSTOM", false, null]);
+    expect([
+      t.jobId,
+      t.visitId,
+      t.label,
+      t.category,
+      t.approved,
+      t.approvedBy,
+    ]).toEqual([null, null, "Shop cleanup", "CUSTOM", false, null]);
   });
 
   it("keeps an open timer open: ticking true, endAt null", () => {
@@ -58,7 +75,9 @@ describe("normalizeTimeSheetEntry", () => {
   });
 
   it("leaves workerId null when Jobber has no user", () => {
-    expect(normalizeTimeSheetEntry({ ...e1, user: null }, "a", null).workerId).toBeNull();
+    expect(
+      normalizeTimeSheetEntry({ ...e1, user: null }, "a", null).workerId,
+    ).toBeNull();
   });
 
   it("rejects an unparseable timestamp instead of guessing", () => {
@@ -67,7 +86,11 @@ describe("normalizeTimeSheetEntry", () => {
 });
 
 describe("normalizeUser", () => {
-  const [owner, avery, jordan] = users.ACTIVATED.data.users.nodes as [RawUser, RawUser, RawUser];
+  const [owner, avery, jordan] = users.ACTIVATED.data.users.nodes as [
+    RawUser,
+    RawUser,
+    RawUser,
+  ];
   const [sam] = users.DEACTIVATED.data.users.nodes as [RawUser];
 
   it("maps status, owner role, and labour rate to cents without float drift", () => {
@@ -80,7 +103,11 @@ describe("normalizeUser", () => {
       status: "active",
       managerId: null,
       contactRef: null,
-      jobber: { userId: "Z2lkOi8vSm9iYmVyL1VzZXIvMTAwMw==", labourRateCents: 3115, status: "ACTIVATED" },
+      jobber: {
+        userId: "Z2lkOi8vSm9iYmVyL1VzZXIvMTAwMw==",
+        labourRateCents: 3115,
+        status: "ACTIVATED",
+      },
       gusto: null,
       venmoRateCents: null,
     });

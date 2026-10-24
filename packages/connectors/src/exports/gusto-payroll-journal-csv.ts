@@ -6,7 +6,18 @@
 import { readFile } from "node:fs/promises";
 import { basename } from "node:path";
 import { parseScaled, toCents } from "../money.ts";
-import { type Cell, cellDate, type ExportResult, exportSyncRun, isBlank, isTotalRow, locateHeader, type Mapping, parseCsv, text } from "./common.ts";
+import {
+  type Cell,
+  cellDate,
+  type ExportResult,
+  exportSyncRun,
+  isBlank,
+  isTotalRow,
+  locateHeader,
+  type Mapping,
+  parseCsv,
+  text,
+} from "./common.ts";
 
 export const EARNING_COLUMNS = {
   "Regular Hours": ["Regular Earnings", "Regular Wages", "Regular"],
@@ -27,7 +38,17 @@ export const HOUR_COLUMNS = {
 
 type EarnKey = `earn:${keyof typeof EARNING_COLUMNS}`;
 type HourKey = `hours:${keyof typeof HOUR_COLUMNS}`;
-type Key = "employee" | "firstName" | "lastName" | "periodStart" | "periodEnd" | "checkDate" | "gross" | "net" | EarnKey | HourKey;
+type Key =
+  | "employee"
+  | "firstName"
+  | "lastName"
+  | "periodStart"
+  | "periodEnd"
+  | "checkDate"
+  | "gross"
+  | "net"
+  | EarnKey
+  | HourKey;
 
 export const JOURNAL_COLUMNS = {
   employee: ["Employee", "Employee Name", "Name"],
@@ -38,8 +59,12 @@ export const JOURNAL_COLUMNS = {
   checkDate: ["Check Date", "Pay Date", "Payday"],
   gross: ["Gross Earnings", "Gross Pay", "Gross"],
   net: ["Net Pay", "Net"],
-  ...Object.fromEntries(Object.entries(EARNING_COLUMNS).map(([k, v]) => [`earn:${k}`, [...v]])),
-  ...Object.fromEntries(Object.entries(HOUR_COLUMNS).map(([k, v]) => [`hours:${k}`, [...v]])),
+  ...Object.fromEntries(
+    Object.entries(EARNING_COLUMNS).map(([k, v]) => [`earn:${k}`, [...v]]),
+  ),
+  ...Object.fromEntries(
+    Object.entries(HOUR_COLUMNS).map(([k, v]) => [`hours:${k}`, [...v]]),
+  ),
 } as Mapping<Key>;
 
 /** One employee on one payroll. employeeName is real for Company R: anonymize before use. */
@@ -56,7 +81,8 @@ export interface PayrollJournalRow {
   hours: Record<string, number>;
 }
 
-const optDate = (c: Cell | undefined) => (text(c) === null ? null : cellDate(c ?? null));
+const optDate = (c: Cell | undefined) =>
+  text(c) === null ? null : cellDate(c ?? null);
 
 export async function readGustoPayrollJournalCsv(
   input: string | { text: string; fileName: string },
@@ -65,16 +91,35 @@ export async function readGustoPayrollJournalCsv(
   const now = opts.now ?? (() => new Date());
   const startedAt = now().toISOString();
   const fileName = typeof input === "string" ? basename(input) : input.fileName;
-  const grid: Cell[][] = parseCsv(typeof input === "string" ? await readFile(input, "utf8") : input.text);
+  const grid: Cell[][] = parseCsv(
+    typeof input === "string" ? await readFile(input, "utf8") : input.text,
+  );
   const method = `export gusto-payroll-journal-csv ${fileName}`;
   let header: ReturnType<typeof locateHeader<Key>>;
   try {
-    header = locateHeader<Key>(grid, JOURNAL_COLUMNS, [["employee", "lastName"], ["gross"]]);
+    header = locateHeader<Key>(grid, JOURNAL_COLUMNS, [
+      ["employee", "lastName"],
+      ["gross"],
+    ]);
   } catch (e) {
-    return { rows: [], namesAnonymized: false, syncRun: exportSyncRun(opts.companyId, "payrollJournal", method, startedAt, now().toISOString(), 0, 0, [(e as Error).message]) };
+    return {
+      rows: [],
+      namesAnonymized: false,
+      syncRun: exportSyncRun(
+        opts.companyId,
+        "payrollJournal",
+        method,
+        startedAt,
+        now().toISOString(),
+        0,
+        0,
+        [(e as Error).message],
+      ),
+    };
   }
   const { headerRow, cols } = header;
-  const at = (row: Cell[], k: Key) => (cols[k] === undefined ? null : (row[cols[k] as number] ?? null));
+  const at = (row: Cell[], k: Key) =>
+    cols[k] === undefined ? null : (row[cols[k] as number] ?? null);
 
   const rows: PayrollJournalRow[] = [];
   const problems: string[] = [];
@@ -90,7 +135,11 @@ export async function readGustoPayrollJournalCsv(
     dataRows++;
     let field = "employee";
     try {
-      const employeeName = text(at(row, "employee")) ?? [text(at(row, "firstName")), text(at(row, "lastName"))].filter(Boolean).join(" ");
+      const employeeName =
+        text(at(row, "employee")) ??
+        [text(at(row, "firstName")), text(at(row, "lastName"))]
+          .filter(Boolean)
+          .join(" ");
       if (!employeeName) throw new Error("empty");
       field = "dates";
       const periodStart = optDate(at(row, "periodStart"));
@@ -113,14 +162,38 @@ export async function readGustoPayrollJournalCsv(
         const v = parseScaled(text(at(row, `hours:${name}` as HourKey)), 3);
         if (v !== null) hours[name] = v / 1000;
       }
-      rows.push({ rowNumber: r + 1, employeeName, periodStart, periodEnd, checkDate, grossCents, netCents, earningsCents, hours });
+      rows.push({
+        rowNumber: r + 1,
+        employeeName,
+        periodStart,
+        periodEnd,
+        checkDate,
+        grossCents,
+        netCents,
+        earningsCents,
+        hours,
+      });
     } catch {
       problems.push(`row ${r + 1}: unreadable ${field}`);
     }
   }
   if (totalGross !== null) {
     const sum = rows.reduce((s, x) => s + x.grossCents, 0);
-    if (sum !== totalGross) problems.push(`gross sum ${sum}¢ vs report total ${totalGross}¢`);
+    if (sum !== totalGross)
+      problems.push(`gross sum ${sum}¢ vs report total ${totalGross}¢`);
   }
-  return { rows, namesAnonymized: false, syncRun: exportSyncRun(opts.companyId, "payrollJournal", method, startedAt, now().toISOString(), rows.length, dataRows, problems) };
+  return {
+    rows,
+    namesAnonymized: false,
+    syncRun: exportSyncRun(
+      opts.companyId,
+      "payrollJournal",
+      method,
+      startedAt,
+      now().toISOString(),
+      rows.length,
+      dataRows,
+      problems,
+    ),
+  };
 }
