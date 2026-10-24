@@ -2,6 +2,9 @@
 
 Format: `HH:MM PDT · who · what landed on main / what I'm on / what I need`. Decisions that change the plan go here too, with the file they changed.
 
+- Sat 02:40 · A2 · Merged #11 (1128795): `seed/push-qbo.ts`: dry run default (7 accounts, 12 vendors, 28 customers, 32 job sub-customers, 51 purchases, 2 bills), sandbox host only, SELECT-only queries, `payrollpilot:` markers in PrivateNote, re-seed deletes by API only. Not run live (no QBO credentials yet).
+  - **Note → Devaj (B), matching:** fixtures store `Expense.customerRef` as the job number ("101"); the live QBO connector returns `qbo:Customer:<id>`, whose DisplayName is the job number. Match Customer id → DisplayName → job.
+
 - Sat 02:35 · A1 · Merged #10 (cfd0cb2): export readers for the Jobber Timesheets xlsx and the Gusto Payroll Journal CSV (exceljs 4.4.0 pinned), `source: "export"` SyncRuns with row-count and report-total completeness; results flagged `namesAnonymized: false`. Column names unverified until a real export is seen. QBO Excel reader deferred (P1). A1 next: A-09 anonymizer + `ingest-r.ts` on synthetic input.
 
 - Sat 02:30 · A2 · Merged #9 (f87c052): Jobber pusher writes only to the account whose id equals `JOBBER_SEED_ACCOUNT_ID`, or to a Jobber tester account; no other fallback.
