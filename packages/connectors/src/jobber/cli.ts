@@ -13,6 +13,7 @@ import { dirname, resolve, sep } from "node:path";
 import { createInterface } from "node:readline";
 import { parseArgs } from "node:util";
 import {
+  compareFailed,
   compareJobber,
   formatCompare,
   loadFixtures,
@@ -242,7 +243,7 @@ async function pull() {
       resolvePeriod(from, to, values.tz ?? "UTC"),
     );
     console.log(`\n${formatCompare(rows)}`);
-    if (rows.some((r) => r.missing || r.extra)) process.exitCode = 1;
+    if (compareFailed(rows)) process.exitCode = 1;
   }
   if (result.syncRuns.some((r) => !r.complete)) process.exitCode = 1;
 }

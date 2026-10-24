@@ -6,6 +6,7 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import type { JobberRecords } from "./jobber/index.ts";
+import { JOBBER_INVOICE_ADJUSTMENT } from "./jobber/objects.ts";
 import type { Period } from "./time.ts";
 import { privatePath } from "./tokens.ts";
 import type { Expense, Worker } from "./types.ts";
@@ -35,6 +36,10 @@ export interface CompareRow {
   missing: number;
   /** pulled but not resolvable to an in-scope fixture record */
   extra: number;
+  /** the source cannot hold this object (pusher skipped it): its gaps are expected, never a failure */
+  fixtureOnly?: boolean;
+  /** short explanation printed after the row (counts and reasons only) */
+  note?: string;
 }
 
 export async function loadFixtures(dir: string): Promise<Fixtures> {
@@ -134,6 +139,8 @@ export function resolvePayments(
   return pulled.map((p) => {
     const mapped = byId.get(p.sourceId);
     if (mapped) return mapped;
+    // Jobber's own invoice records equal the invoice total; never let one stand in for a seed payment
+    if (p.paymentType === JOBBER_INVOICE_ADJUSTMENT) return null;
     const invoiceId = inv.get(strip(p.invoiceId) ?? "") ?? null;
     const quoteId = quo.get(strip(p.quoteId) ?? "") ?? null;
     const day = Date.parse(p.entryDate.slice(0, 10));
@@ -179,7 +186,10 @@ export function compareJobber(
   // jobs in scope = every job an in-window entry, visit, invoice or expense points at (the connector fetches
   // jobs by reference). Quotes do not widen it: a quote "sent" in the window can belong to a future job.
   const jobIds = new Set<string>();
-  for (const r of [...entries, ...visits, ...invoices])
+  // Entries the source cannot hold (fixture-only) pull no job in: the connector only follows real records.
+  const fixtureOnly = fixtureOnlyRows(map);
+  const entryRefs = fixtureOnly.has("timeSheetEntries") ? [] : entries;
+  for (const r of [...entryRefs, ...visits, ...invoices])
     if (typeof r.jobId === "string") jobIds.add(r.jobId);
   for (const x of expenses)
     if (typeof x.matchedJobId === "string") jobIds.add(x.matchedJobId);
@@ -191,7 +201,7 @@ export function compareJobber(
     (w) => w.jobber !== null && w.jobber !== undefined,
   );
   const src = (xs: { sourceId: string }[]) => xs.map((x) => x.sourceId);
-  return [
+  const rows: CompareRow[] = [
     compareIds(
       "users",
       workers.map((w) => w.id),
@@ -232,6 +242,20 @@ export function compareJobber(
     ),
     compareIds("jobs", [...jobIds], ours("jobs", src(pulled.jobs))),
   ];
+  const adjustments = pulled.payments.filter(
+    (p) => p.paymentType === JOBBER_INVOICE_ADJUSTMENT,
+  ).length;
+  for (const r of rows) {
+    const why = fixtureOnly.get(r.object);
+    if (why) {
+      r.fixtureOnly = true;
+      r.note = why;
+    }
+    if (r.object === "paymentRecords" && adjustments) {
+      r.note = `${r.note ? `${r.note}; ` : ""}${adjustments} pulled are Jobber invoice adjustments (kind unknown), not customer payments`;
+    }
+  }
+  return rows;
 }
 
 /** QBO pull vs fixtures: the seed marker in sourceId first, else the qbo map (purchases / bills). */
@@ -292,12 +316,43 @@ export function compareGustoEmployees(
 }
 
 export function formatCompare(rows: CompareRow[]): string {
-  const head = `${"compare".padEnd(18)}${"fixture".padStart(8)}${"pulled".padStart(8)}${"matched".padStart(9)}${"missing".padStart(9)}${"extra".padStart(7)}`;
+  const head = `${"compare".padEnd(18)}${"fixture".padStart(8)}${"pulled".padStart(8)}${"matched".padStart(9)}${"missing".padStart(9)}${"extra".padStart(7)}  status`;
   return [
     head,
-    ...rows.map(
-      (r) =>
-        `${r.object.padEnd(18)}${String(r.fixture).padStart(8)}${String(r.pulled).padStart(8)}${String(r.matched).padStart(9)}${String(r.missing).padStart(9)}${String(r.extra).padStart(7)}`,
-    ),
+    ...rows.map((r) => {
+      const status = r.fixtureOnly
+        ? "expected: fixture-only by design"
+        : r.missing || r.extra
+          ? "MISMATCH"
+          : "ok";
+      return `${r.object.padEnd(18)}${String(r.fixture).padStart(8)}${String(r.pulled).padStart(8)}${String(r.matched).padStart(9)}${String(r.missing).padStart(9)}${String(r.extra).padStart(7)}  ${status}${r.note ? ` (${r.note})` : ""}`;
+    }),
   ].join("\n");
+}
+
+/** A compare fails only on rows the source is meant to hold. */
+export const compareFailed = (rows: CompareRow[]): boolean =>
+  rows.some((r) => !r.fixtureOnly && (r.missing > 0 || r.extra > 0));
+
+/** The pusher's `skipped` record: objects whose create mutation this account / scope does not have. */
+const SKIPPED_TO_ROW: Record<string, string> = {
+  entries: "timeSheetEntries",
+  payments: "paymentRecords",
+};
+function fixtureOnlyRows(map: Record<string, unknown>): Map<string, string> {
+  const objects =
+    (
+      map.skipped as
+        | { objects?: Record<string, { mutations?: string[]; count?: number }> }
+        | undefined
+    )?.objects ?? {};
+  const out = new Map<string, string>();
+  for (const [kind, v] of Object.entries(objects)) {
+    const row = SKIPPED_TO_ROW[kind] ?? kind;
+    out.set(
+      row,
+      `no ${(v.mutations ?? []).join(" / ") || "create mutation"} for this app; ${v.count ?? "?"} fixture records stay fixture-only`,
+    );
+  }
+  return out;
 }

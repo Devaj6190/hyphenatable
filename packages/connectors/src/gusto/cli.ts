@@ -9,6 +9,7 @@ import { randomBytes } from "node:crypto";
 import { createServer } from "node:http";
 import { parseArgs } from "node:util";
 import {
+  compareFailed,
   compareGustoEmployees,
   formatCompare,
   loadFixtures,
@@ -116,7 +117,7 @@ async function read(cmd: string) {
         await loadIdMap(company, "gusto"),
       );
       console.log(`\n${formatCompare(rows)}`);
-      if (rows.some((x) => x.missing || x.extra)) process.exitCode = 1;
+      if (compareFailed(rows)) process.exitCode = 1;
     }
   } else if (cmd === "payrolls") {
     if (!values.from || !values.to)
