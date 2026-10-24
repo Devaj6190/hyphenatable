@@ -1,14 +1,16 @@
 #!/usr/bin/env bun
 // Jobber connector CLI (read-only).
-//   bun run packages/connectors/src/jobber/cli.ts auth [--redirect-uri http://localhost:3000/auth]
+//   bun run packages/connectors/src/jobber/cli.ts auth [--account r] [--redirect-uri http://localhost:3000/auth]
 //   bun run packages/connectors/src/jobber/cli.ts pull --company a --from 2026-10-11 --to 2026-10-24 [--tz America/Los_Angeles] [--cycle a-c05] [--out data/private/x.json]
-// Env: JOBBER_CLIENT_ID, JOBBER_CLIENT_SECRET. Tokens live in data/private/jobber-token.json. Never prints token values or names.
+// Env: JOBBER_CLIENT_ID, JOBBER_CLIENT_SECRET. Tokens: data/private/jobber-token.json (trial/tester account) or,
+// with --account r, data/private/r/jobber-token.json (Company R's real account). Company R data is pulled
+// only through ingest-r.ts (anonymized), so `pull` refuses --account r. Never prints token values or names.
 
 import { writeFile } from "node:fs/promises";
 import { createServer } from "node:http";
 import { resolve, sep } from "node:path";
 import { parseArgs } from "node:util";
-import { authFromEnv, DEFAULT_TOKEN_PATH, fileTokenStore } from "./client.ts";
+import { authFromEnv, fileTokenStore, type JobberAccount, jobberTokenPath } from "./client.ts";
 import { pullCycle } from "./index.ts";
 import { buildAuthorizeUrl, DEFAULT_REDIRECT_URI, exchangeCode } from "./oauth.ts";
 
@@ -22,8 +24,16 @@ const { positionals, values } = parseArgs({
     cycle: { type: "string" },
     out: { type: "string" },
     "redirect-uri": { type: "string" },
+    account: { type: "string" },
   },
 });
+
+const account = (values.account ?? "trial") as JobberAccount;
+if (account !== "trial" && account !== "r") {
+  console.error("--account must be trial or r");
+  process.exit(2);
+}
+const tokenPath = jobberTokenPath(account);
 
 async function auth() {
   const { clientId, clientSecret } = authFromEnv();
@@ -50,14 +60,15 @@ async function auth() {
     });
   });
   const tokens = await exchangeCode({ clientId, clientSecret, code, codeVerifier: req.codeVerifier, redirectUri });
-  await fileTokenStore().save(tokens);
-  console.log(`Stored Jobber tokens in ${DEFAULT_TOKEN_PATH} (gitignored).`);
+  await fileTokenStore(tokenPath).save(tokens);
+  console.log(`Stored Jobber tokens (${account} account) in ${tokenPath} (gitignored).`);
 }
 
 async function pull() {
   const { company, from, to } = values;
   if (!company || !from || !to) throw new Error("pull needs --company, --from and --to");
-  const result = await pullCycle({ ...authFromEnv(), log: (l) => console.error(l) }, company, from, to, {
+  if (account === "r") throw new Error("Company R is pulled only through ingest-r.ts --source jobber-api (anonymized)");
+  const result = await pullCycle({ ...authFromEnv(), tokenStore: fileTokenStore(tokenPath), log: (l) => console.error(l) }, company, from, to, {
     timezone: values.tz ?? "UTC",
     cycleId: values.cycle ?? null,
   });

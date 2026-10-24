@@ -10,6 +10,8 @@ import { chmod, mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname } from "node:path";
 import type { PayrollJournalRow } from "./exports/gusto-payroll-journal-csv.ts";
 import type { TimesheetRow } from "./exports/jobber-timesheets-xlsx.ts";
+import type { JobberRecords, PullResult } from "./jobber/index.ts";
+import type { Job, SyncRun } from "./types.ts";
 
 const FIRST = ["Avery", "Quinn", "Rowan", "Sage", "Emery", "Finley", "Harper", "Indigo", "Jules", "Kai", "Lane", "Marlow", "Nova", "Oakley", "Peyton", "Remy", "Shiloh", "Tatum", "Wren", "Zion", "Blair", "Corin", "Dallas", "Ellis"];
 const LAST = ["Ashby", "Brightwater", "Calloway", "Dunmore", "Ellery", "Fairbanks", "Galloway", "Hollis", "Ivers", "Juniper", "Kestrel", "Lindqvist", "Marchetti", "Northcott", "Okafor", "Pemberton", "Quayle", "Rosales", "Stavros", "Thorne"];
@@ -196,4 +198,40 @@ export function anonymizeExports(
     }
   }
   return { namesAnonymized: true, companyId, workers: [...workers.values()], clients: [...clients.values()], jobs: [...jobs.values()], timeEntries, paid };
+}
+
+// ---- Jobber API pull (Company R's real account) ----
+
+/** pullCycle output with every name replaced and every free-text field nulled. Jobber ids are kept (traceability). */
+export interface AnonymizedJobberPull {
+  namesAnonymized: true;
+  companyId: string;
+  records: JobberRecords;
+  syncRuns: SyncRun[];
+}
+
+/**
+ * Names: worker displayName -> pseudonym (same key as the exports, so one person = one pseudonym).
+ * Free text nulled: time-entry labels, job titles (-> "Job Jnnn", renumbered by job number), expense
+ * descriptions and vendors. Notes never existed (hasNote only). Clients are Jobber ids already.
+ */
+export function anonymizeJobberPull(a: Anonymizer, companyId: string, pull: PullResult): AnonymizedJobberPull {
+  const r = pull.records;
+  a.reserve(r.workers.map((w) => w.displayName));
+  const job = (j: Job) => a.job(`#${j.jobNumber}`);
+  return {
+    namesAnonymized: true,
+    companyId,
+    records: {
+      workers: r.workers.map((w) => ({ ...w, companyId, displayName: a.workerName(w.displayName) })),
+      timeEntries: r.timeEntries.map((e) => ({ ...e, companyId, label: null })),
+      jobs: r.jobs.map((j) => ({ ...j, companyId, jobNumber: job(j).number, title: job(j).label })),
+      visits: r.visits.map((v) => ({ ...v, companyId })),
+      quotes: r.quotes.map((q) => ({ ...q, companyId })),
+      invoices: r.invoices.map((i) => ({ ...i, companyId })),
+      payments: r.payments.map((p) => ({ ...p, companyId })),
+      expenses: r.expenses.map((x) => ({ ...x, companyId, description: null, vendor: null })),
+    },
+    syncRuns: pull.syncRuns.map((s) => ({ ...s, companyId })),
+  };
 }

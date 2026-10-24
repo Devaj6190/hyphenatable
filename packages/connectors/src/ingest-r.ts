@@ -1,10 +1,14 @@
 #!/usr/bin/env bun
-// Company R ingest (A-09): real exports in data/private/r/ -> anonymized, normalized JSON in
-// data/private/r/out/. Prints counts only. Writing into Convex is B's loader.
-//   bun run packages/connectors/src/ingest-r.ts --tz America/Los_Angeles \
-//     --timesheets data/private/r/<file>.xlsx [...] --journal data/private/r/<file>.csv [...] [--dry-run]
+// Company R ingest (A-09): real data -> anonymized, normalized JSON in data/private/r/out/. Prints counts only.
+// Writing into Convex is B's loader.
+//   exports:    bun run packages/connectors/src/ingest-r.ts --tz America/Los_Angeles \
+//                 --timesheets data/private/r/<file>.xlsx [...] --journal data/private/r/<file>.csv [...] [--dry-run]
+//   jobber-api: bun run packages/connectors/src/ingest-r.ts --source jobber-api --tz America/Los_Angeles \
+//                 --from 2026-09-27 --to 2026-10-10 [--dry-run]
+//               (needs `jobber/cli.ts auth --account r` once; token data/private/r/jobber-token.json)
 // Enforced in code, not by convention:
-//   - inputs must be inside data/private/r/; output goes only to data/private/r/out/
+//   - export inputs must be inside data/private/r/; output goes only to data/private/r/out/
+//   - the API mode uses Company R's own token file, never the trial account's
 //   - nothing is written unless it is stamped namesAnonymized: true AND contains no real token
 //   - file names (which can carry names) never reach the output: files are tagged by content hash
 //   - salt, pseudonym map and real-token list stay in data/private/r/ (0600); never printed
@@ -13,9 +17,11 @@ import { createHash } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { join, relative, resolve, sep } from "node:path";
 import { parseArgs } from "node:util";
-import { Anonymizer, anonymizeExports, findRealTokens, loadOrCreateSalt, type PseudonymMap } from "./anonymize.ts";
+import { Anonymizer, anonymizeExports, anonymizeJobberPull, findRealTokens, loadOrCreateSalt, type PseudonymMap } from "./anonymize.ts";
 import { readGustoPayrollJournalCsv } from "./exports/gusto-payroll-journal-csv.ts";
 import { readJobberTimesheetsXlsx } from "./exports/jobber-timesheets-xlsx.ts";
+import { authFromEnv, DEFAULT_TOKEN_PATH, fileTokenStore, JobberClient } from "./jobber/client.ts";
+import { pullCycle } from "./jobber/index.ts";
 import { privatePath } from "./tokens.ts";
 import type { SyncRun } from "./types.ts";
 
@@ -31,9 +37,10 @@ export interface IngestOptions {
   now?: () => Date;
 }
 
+type RunCount = { object: string; pulled: number; expected: number | null; complete: boolean };
 export interface IngestCounts {
   workers: number; clients: number; jobs: number; timeEntries: number; paidRows: number;
-  syncRuns: { object: string; pulled: number; expected: number | null; complete: boolean }[];
+  syncRuns: RunCount[];
   outPath: string | null;
 }
 
@@ -41,6 +48,7 @@ const inside = (dir: string, p: string) => {
   const rel = relative(resolve(dir), resolve(p));
   return rel !== "" && !rel.startsWith("..") && !rel.startsWith(sep);
 };
+const runCounts = (runs: SyncRun[]): RunCount[] => runs.map((s) => ({ object: s.object, pulled: s.pulled, expected: s.expected, complete: s.complete }));
 
 /** The only door to disk for Company R output. Refuses un-anonymized payloads and any real token. */
 export function assertSafeToWrite(payload: unknown, realTokens: string[]): string {
@@ -54,9 +62,32 @@ export function assertSafeToWrite(payload: unknown, realTokens: string[]): strin
   return json;
 }
 
-async function writePrivate(path: string, content: string) {
-  await writeFile(path, content, { mode: 0o600 });
+const writePrivate = (path: string, content: string) => writeFile(path, content, { mode: 0o600 });
+
+async function openAnonymizer(privateDir: string): Promise<Anonymizer> {
+  const salt = await loadOrCreateSalt(join(privateDir, "salt"));
+  let map: PseudonymMap | undefined;
+  try {
+    map = JSON.parse(await readFile(join(privateDir, "pseudonyms.json"), "utf8")) as PseudonymMap;
+  } catch (e) {
+    if ((e as NodeJS.ErrnoException).code !== "ENOENT") throw e;
+  }
+  return new Anonymizer(salt, map);
 }
+
+/** Check, then (unless dry run) persist map + token list and write the payload to out/. Returns the out path. */
+async function persist(privateDir: string, a: Anonymizer, payload: { namesAnonymized: true }, name: string, dryRun?: boolean): Promise<string | null> {
+  const json = assertSafeToWrite(payload, a.realTokens());
+  if (dryRun) return null;
+  await mkdir(join(privateDir, "out"), { recursive: true, mode: 0o700 });
+  const outPath = join(privateDir, "out", `${name}.json`);
+  await writePrivate(join(privateDir, "pseudonyms.json"), JSON.stringify(a.map, null, 2));
+  await writePrivate(join(privateDir, "real-tokens.txt"), `${a.realTokens().join("\n")}\n`);
+  await writePrivate(outPath, json);
+  return outPath;
+}
+
+const stamp = (d: Date) => d.toISOString().replace(/[:.]/g, "-");
 
 export async function ingestR(o: IngestOptions): Promise<IngestCounts> {
   const companyId = o.companyId ?? "r";
@@ -64,15 +95,7 @@ export async function ingestR(o: IngestOptions): Promise<IngestCounts> {
   for (const p of [...o.timesheets, ...o.journals]) {
     if (!inside(o.privateDir, p)) throw new Error(`input must be inside the private dir (${o.privateDir})`);
   }
-  const salt = await loadOrCreateSalt(join(o.privateDir, "salt"));
-  const mapPath = join(o.privateDir, "pseudonyms.json");
-  let map: PseudonymMap | undefined;
-  try {
-    map = JSON.parse(await readFile(mapPath, "utf8")) as PseudonymMap;
-  } catch (e) {
-    if ((e as NodeJS.ErrnoException).code !== "ENOENT") throw e;
-  }
-  const a = new Anonymizer(salt, map);
+  const a = await openAnonymizer(o.privateDir);
 
   const syncRuns: SyncRun[] = [];
   const tagged = async (p: string) => {
@@ -97,39 +120,75 @@ export async function ingestR(o: IngestOptions): Promise<IngestCounts> {
     journals.push({ fileTag, rows: r.rows });
   }
 
-  const bundle = { ...anonymizeExports(a, companyId, { timesheets, journals }), syncRuns, generatedAt: now().toISOString() };
-  const json = assertSafeToWrite(bundle, a.realTokens());
-
-  let outPath: string | null = null;
-  if (!o.dryRun) {
-    await mkdir(join(o.privateDir, "out"), { recursive: true, mode: 0o700 });
-    outPath = join(o.privateDir, "out", `${companyId}-${bundle.generatedAt.replace(/[:.]/g, "-")}.json`);
-    await writePrivate(mapPath, JSON.stringify(a.map, null, 2));
-    await writePrivate(join(o.privateDir, "real-tokens.txt"), `${a.realTokens().join("\n")}\n`);
-    await writePrivate(outPath, json);
-  }
+  const generatedAt = now();
+  const bundle = { ...anonymizeExports(a, companyId, { timesheets, journals }), syncRuns, generatedAt: generatedAt.toISOString() };
+  const outPath = await persist(o.privateDir, a, bundle, `${companyId}-exports-${stamp(generatedAt)}`, o.dryRun);
   return {
     workers: bundle.workers.length, clients: bundle.clients.length, jobs: bundle.jobs.length,
-    timeEntries: bundle.timeEntries.length, paidRows: bundle.paid.length,
-    syncRuns: syncRuns.map((s) => ({ object: s.object, pulled: s.pulled, expected: s.expected, complete: s.complete })),
-    outPath,
+    timeEntries: bundle.timeEntries.length, paidRows: bundle.paid.length, syncRuns: runCounts(syncRuns), outPath,
+  };
+}
+
+/** Company R's real Jobber account: its own token file under the private dir, never the trial token. */
+export function rJobberClient(privateDir: string, env: Record<string, string | undefined> = process.env): JobberClient {
+  const tokenPath = join(privateDir, "jobber-token.json");
+  if (resolve(tokenPath) === resolve(DEFAULT_TOKEN_PATH)) throw new Error("Company R must not use the trial account's token file");
+  return new JobberClient({ ...authFromEnv(env), tokenStore: fileTokenStore(tokenPath), log: (l) => console.error(l) });
+}
+
+export interface JobberIngestOptions {
+  privateDir: string;
+  companyId?: string;
+  timezone: string;
+  from: string;
+  to: string;
+  dryRun?: boolean;
+  /** Injectable for tests; default rJobberClient(privateDir). */
+  client?: JobberClient;
+  now?: () => Date;
+}
+
+export async function ingestRFromJobber(o: JobberIngestOptions): Promise<{ workers: number; timeEntries: number; jobs: number; visits: number; quotes: number; invoices: number; payments: number; expenses: number; syncRuns: RunCount[]; outPath: string | null }> {
+  const companyId = o.companyId ?? "r";
+  const now = o.now ?? (() => new Date());
+  const a = await openAnonymizer(o.privateDir);
+  const client = o.client ?? rJobberClient(o.privateDir);
+  // auth is unused when a client is given; credentials never reach the output
+  const pull = await pullCycle({ clientId: "", clientSecret: "" }, companyId, o.from, o.to, { client, timezone: o.timezone, now });
+  const generatedAt = now();
+  const payload = { ...anonymizeJobberPull(a, companyId, pull), period: { from: o.from, to: o.to, timezone: o.timezone }, generatedAt: generatedAt.toISOString() };
+  const outPath = await persist(o.privateDir, a, payload, `${companyId}-jobber-${o.from}-${o.to}-${stamp(generatedAt)}`, o.dryRun);
+  const r = payload.records;
+  return {
+    workers: r.workers.length, timeEntries: r.timeEntries.length, jobs: r.jobs.length, visits: r.visits.length, quotes: r.quotes.length,
+    invoices: r.invoices.length, payments: r.payments.length, expenses: r.expenses.length, syncRuns: runCounts(payload.syncRuns), outPath,
   };
 }
 
 if (import.meta.main) {
   const { values } = parseArgs({
-    options: { tz: { type: "string" }, timesheets: { type: "string", multiple: true }, journal: { type: "string", multiple: true }, "dry-run": { type: "boolean" } },
+    options: {
+      source: { type: "string" }, tz: { type: "string" }, from: { type: "string" }, to: { type: "string" },
+      timesheets: { type: "string", multiple: true }, journal: { type: "string", multiple: true }, "dry-run": { type: "boolean" },
+    },
   });
-  if (!values.tz) {
+  const source = values.source ?? "exports";
+  if (!values.tz || !["exports", "jobber-api"].includes(source) || (source === "jobber-api" && (!values.from || !values.to))) {
     console.error("usage: ingest-r.ts --tz <IANA> [--timesheets data/private/r/x.xlsx ...] [--journal data/private/r/y.csv ...] [--dry-run]");
+    console.error("       ingest-r.ts --source jobber-api --tz <IANA> --from YYYY-MM-DD --to YYYY-MM-DD [--dry-run]");
     process.exit(2);
   }
-  ingestR({ privateDir: R_PRIVATE_DIR, timezone: values.tz, timesheets: values.timesheets ?? [], journals: values.journal ?? [], dryRun: values["dry-run"] })
+  const job =
+    source === "jobber-api"
+      ? ingestRFromJobber({ privateDir: R_PRIVATE_DIR, timezone: values.tz, from: values.from as string, to: values.to as string, dryRun: values["dry-run"] })
+      : ingestR({ privateDir: R_PRIVATE_DIR, timezone: values.tz, timesheets: values.timesheets ?? [], journals: values.journal ?? [], dryRun: values["dry-run"] });
+  job
     .then((c) => {
-      console.log(`workers ${c.workers}, clients ${c.clients}, jobs ${c.jobs}, time entries ${c.timeEntries}, paid rows ${c.paidRows}`);
-      for (const s of c.syncRuns) console.log(`  ${s.object}: pulled ${s.pulled} of ${s.expected ?? "?"}, complete ${s.complete}`);
-      console.log(c.outPath ? `wrote ${relative(process.cwd(), c.outPath)}` : "dry run: nothing written");
-      if (c.syncRuns.some((s) => !s.complete)) process.exitCode = 1;
+      const { syncRuns, outPath, ...counts } = c;
+      console.log(Object.entries(counts).map(([k, v]) => `${k} ${v}`).join(", "));
+      for (const s of syncRuns) console.log(`  ${s.object}: pulled ${s.pulled} of ${s.expected ?? "?"}, complete ${s.complete}`);
+      console.log(outPath ? `wrote ${relative(process.cwd(), outPath)}` : "dry run: nothing written");
+      if (syncRuns.some((s) => !s.complete)) process.exitCode = 1;
     })
     .catch((e: unknown) => {
       console.error(e instanceof Error ? e.message : e);
