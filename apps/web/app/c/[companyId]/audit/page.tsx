@@ -1,13 +1,12 @@
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import { AuditLog } from "@/components/AuditLog";
 import { companies } from "@/lib/companies";
 
-export default async function AuditPage({
+// Params are read inside Suspense so the shell stays instant (Next 16).
+export default function AuditPage({
   params,
 }: PageProps<"/c/[companyId]/audit">) {
-  const { companyId } = await params;
-  const company = companies[companyId];
-  if (!company) notFound();
   return (
     <div className="flex flex-col gap-4">
       <div>
@@ -17,7 +16,18 @@ export default async function AuditPage({
           after the fact.
         </p>
       </div>
-      <AuditLog companyId={companyId} dataKind={company.kind} />
+      <Suspense>
+        <Body params={params} />
+      </Suspense>
     </div>
   );
+}
+
+async function Body({
+  params,
+}: Pick<PageProps<"/c/[companyId]/audit">, "params">) {
+  const { companyId } = await params;
+  const company = companies[companyId];
+  if (!company) notFound();
+  return <AuditLog companyId={companyId} dataKind={company.kind} />;
 }
