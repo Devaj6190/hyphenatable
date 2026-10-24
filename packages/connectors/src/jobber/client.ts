@@ -21,6 +21,11 @@ export const DEFAULT_TOKEN_PATH = privatePath("jobber-token.json");
 
 export const fileTokenStore = (path: string = DEFAULT_TOKEN_PATH): TokenStore => fileStore(path);
 
+/** Company R's real account keeps its own token file; it never shares the trial/tester token. */
+export const R_ACCOUNT_TOKEN_PATH = privatePath("r/jobber-token.json");
+export type JobberAccount = "trial" | "r";
+export const jobberTokenPath = (account: JobberAccount): string => (account === "r" ? R_ACCOUNT_TOKEN_PATH : DEFAULT_TOKEN_PATH);
+
 export interface JobberAuth {
   clientId: string;
   clientSecret: string;
