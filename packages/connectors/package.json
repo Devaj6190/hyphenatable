@@ -10,6 +10,7 @@
     "./gusto": "./src/gusto/read.ts",
     "./exports/jobber-timesheets": "./src/exports/jobber-timesheets-xlsx.ts",
     "./exports/gusto-payroll-journal": "./src/exports/gusto-payroll-journal-csv.ts",
+    "./exports/qbo": "./src/exports/qbo-xlsx.ts",
     "./money": "./src/money.ts",
     "./types": "./src/types.ts"
   },
@@ -27,6 +28,7 @@
   },
   "dependencies": {
     "exceljs": "4.4.0",
-    "intuit-oauth": "4.2.5"
+    "intuit-oauth": "4.2.5",
+    "jszip": "3.10.2"
   }
 }

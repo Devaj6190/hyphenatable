@@ -18,6 +18,7 @@ import {
   type Mapping,
   text,
 } from "./common.ts";
+import { plain } from "./xlsx.ts";
 
 export const TIMESHEET_COLUMNS: Mapping<
   | "worker"
@@ -62,19 +63,6 @@ export interface TimesheetRow {
   category: string | null;
   approved: boolean | null;
   hasNote: boolean;
-}
-
-/** exceljs cell -> plain value (rich text, formulas and hyperlinks unwrapped). */
-function plain(v: ExcelJS.CellValue): Cell {
-  if (v === null || v === undefined) return null;
-  if (typeof v === "object" && !(v instanceof Date)) {
-    if ("richText" in v) return v.richText.map((t) => t.text).join("");
-    if ("result" in v) return plain(v.result as ExcelJS.CellValue);
-    if ("text" in v) return String(v.text);
-    if ("error" in v) return null;
-    return null;
-  }
-  return v as Cell;
 }
 
 function approvedOf(c: Cell | undefined): boolean | null {
