@@ -12,6 +12,8 @@ Status values: **tested** (ran here, evidence noted), **unverified** (docs read 
 | H6 | Claude: one structured-output call to `claude-opus-5-5` with `effort: "medium"`; billing confirmed | B | unverified | | OpenRouter route |
 | H7 | Embeddings: one Voyage or OpenAI call; one vector stored and searched with a company filter | B | unverified | | lexical match on structured rule fields |
 | H8 | Playwright `storageState` login to the Jobber tester account; one Timesheets report read | A (after G1) | unverified | | Browser Use Cloud |
+| H9 | Creao: account on Pro Plus; agent created by `cr_sk_` script; API Trigger run from Convex completes; webhook received and run re-fetched; schedule fires; one Auditor run under 5 min | B + Devaj | unverified | Sat 15:45 PDT: signup + booth email done (Devaj); no run yet | direct `complete()` adapter running the same prompts |
+| H10 | Jev (TypeSafe AI): one typed multiple-choice call with `JEV_API_KEY` from a Convex action; latency and probability recorded | B | unverified | | Haiku via `complete()`; numbered follow-up |
 
 ## Dated notes
 - Sat 2026-10-24 11:32 PDT · B · **H6 blocked:** `bunx convex run probeNode:claude` on the existing cloud dev deployment failed before a model response: no usable authentication method configured. Set ANTHROPIC_API_KEY in Convex environment, then rerun. No credential files read.
