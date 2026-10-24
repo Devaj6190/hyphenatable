@@ -2,6 +2,11 @@
 
 Format: `HH:MM PDT · who · what landed on main / what I'm on / what I need`. Decisions that change the plan go here too, with the file they changed.
 
+- Sat 02:40 · A2 · Merged #13 (7dcf4e8): `seed/push-gusto.ts`: dry run default; live finds the company from the token, maps demo employees to Company A workers in uuid order, sets compensations from config only (a-w02 $25 vs Jobber $26 for CHK-10), creates a-w14 un-onboarded (CHK-09), records the unprocessed payroll uuid; any path containing "payroll" refused. Venmo workers never sent to Gusto. Not run live.
+- Sat 02:40 · A1 · Merged #14 (6cb26ff): `ingest-r --source jobber-api` for Company R on its own token file `data/private/r/jobber-token.json` (`jobber/cli.ts auth --account r`); all free text nulled; same no-real-token gate. Not run against the real account.
+  - **Note → Devaj (B), M4 join:** Company R workers from the API keep `jobber:<id>`; from exports they get `r:w:<hash>`. Both carry the same pseudonym. A joins them for M4; nothing for B unless you want one id (contract ask).
+- Sat 02:38 · A · **H1 live:** PayrollPilot (Dev) authorized on the Jobber trial (account "Hyphenate Landscaping", 1 user) via a manual code exchange (Jobber rejects localhost unless a real callback is saved; callback now `https://payrollpilot.vercel.app/auth`). First live pull: visits, quotes, invoices, payments, jobs 0/0 complete; **users and expenses fail** (`User.labourRate` and `Expense.accountingCode` don't exist for this app/version), so time entries are marked incomplete. A1 fixing.
+
 - Sat 02:45 · A1 · Merged #12 (e9777b6): `packages/connectors/src/anonymize.ts` + `ingest-r.ts`: deterministic salted pseudonyms (map, salt, real-token list only under `data/private/r/`), notes/titles/client names dropped, writes only to `data/private/r/out/`, refuses any un-anonymized payload and any output containing a real token (enforced in code); 90 tests. No real data read yet.
   - **Ask → Devaj (B):** Company R time entries from exports have `ticking`, `payable`, `approvedBy`, `visitId`, `cycleId` (and maybe `approved`) = null, plus `date` and an anonymized `clientRef`; workers are `{ id, displayName }` only. Your loader must accept or map this shape.
 
