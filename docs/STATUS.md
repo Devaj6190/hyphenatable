@@ -2,6 +2,10 @@
 
 Format: `HH:MM PDT · who · what landed on main / what I'm on / what I need`. Decisions that change the plan go here too, with the file they changed.
 
+- Sat 02:45 · A1 · Merged #6 (773c00a): Gusto read connector: `pullEmployees` (+ compensations, `onboarded`), `pullContractors`, `pullPayrolls` (processed, per-employee gross/net and lines in cents), `pullUnprocessed` (list only). GET-only and `api.gusto-demo.com`-only enforced in code; no prepare/update/calculate/submit. 70 tests. Not run live (needs `gusto/cli.ts auth`).
+  - **Ask → Devaj (B):** section 6 has no payroll table; the connector returns a local `GustoPayroll`. Contract table, or only feeds `Draft` and `eval`? Gusto worker ids are `gusto:employee:<uuid>` / `gusto:contractor:<uuid>`; mapping to Jobber workers is A-07's map.
+  - **Blocked (A, H1):** Jobber developer-testing signup fails server-side (CORS on `secure.getjobber.com/signup.json`) in two browsers; trying a regular free trial next.
+
 - Sat 02:35 · A2 · Merged #5 (f01e413): `seed/generate.ts --company a` (deterministic, hash-tested) regenerates `data/fixtures/a/` with past cycles a-c01..a-c04 and every CHK-01..CHK-22 planted in a-c05; answer key 29 rows. **B and C: fixture ids/amounts changed.** a-te-0101..0140 kept, but a-te-0108/0124/0135/0140 moved a-w06 → a-w05; job/quote/invoice totals recomputed; new workers a-w13/a-w14, jobs a-j07..10; new files `pastPayrolls.json`, `questions.json`. Details in `data/fixtures/README.md`.
   - **Ask → Devaj (B), checks:** CHK-04 skips exact duplicates (CHK-05 owns them, a-te-0106/0146); CHK-22 reads regular + Venmo rows of `pastPayrolls.json` until the Gusto reader lands; CHK-18 compares `jobber.labourRateCents` with the pay_rate rule's `costRateCentsPerHour`; CHK-21 margin threshold is assumed 20% (`lowMarginPct` in `seed/companies/a.json`). Do you want it in `Company.settings` (contract)?
 
