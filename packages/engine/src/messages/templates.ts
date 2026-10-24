@@ -1,4 +1,4 @@
-import type { InterpretationResult } from "./schema";
+import type { Interpretation } from "@payrollpilot/engine/schemas";
 
 // Text templates for every PayrollPilot message (C-03). One short question per text, numbered options,
 // never a dollar amount, at most MAX_LEN characters. Placeholders are in braces.
@@ -68,6 +68,32 @@ export function isStop(text: string): boolean {
   return /^\s*stop\s*$/i.test(text);
 }
 
+// Texts number options from 1; the contract's optionIndex is 0-based, so a reply of "1" is index 0.
+export const MAX_OPTIONS = 4;
+
+export function optionNumber(optionIndex: number): number {
+  return optionIndex + 1;
+}
+
+export function numberedOptions(options: readonly string[]): string {
+  return options
+    .map((option, index) => `${optionNumber(index)} ${option}`)
+    .join(" ");
+}
+
+// A bare number reply ("2", "2.") becomes its 0-based optionIndex; anything else is left to the Messenger.
+export function optionIndexFromReply(
+  text: string,
+  optionCount: number,
+): Interpretation["result"]["optionIndex"] {
+  const match = text.match(/^\s*(\d)\s*[.)]?\s*$/);
+  if (!match) return null;
+  const index = Number(match[1]) - 1;
+  return index >= 0 && index < Math.min(optionCount, MAX_OPTIONS)
+    ? index
+    : null;
+}
+
 // One bounded follow-up: an unclear or low-confidence reply gets one followUp text, then the item is held.
 export const MAX_FOLLOW_UPS = 1;
 export const FOLLOW_UP_BELOW = 0.8;
@@ -75,7 +101,10 @@ export const FOLLOW_UP_BELOW = 0.8;
 export type NextStep = "apply" | "follow_up" | "hold" | "stop" | "escalate";
 
 export function nextStep(
-  reply: { kind: InterpretationResult["kind"]; confidence: number },
+  reply: {
+    kind: Interpretation["result"]["kind"];
+    confidence: Interpretation["confidence"];
+  },
   followUpsSent: number,
 ): NextStep {
   if (reply.kind === "stop") return "stop";
