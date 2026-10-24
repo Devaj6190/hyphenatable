@@ -1,5 +1,7 @@
 # Creao AI research (2026-10-24, 13:40 PDT)
 
+> **Corrected 15:10:** several claims below were rechecked against the full docs; see [../../plans/creao-plan.md](../../plans/creao-plan.md) section 2 (custom MCP setup is undocumented, agents can be created by the CLI API, agent memory is per agent, Haiku 5.5 is not offered, webhooks are unsigned, Pro Plus upgrade happens at the booth).
+
 Legend: **VERIFIED** = read in an official page or doc (URL given). **UNVERIFIED** = inferred or not found.
 
 Sources:
