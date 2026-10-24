@@ -1,11 +1,21 @@
 // Gusto "Payroll Journal Report" CSV, sectioned layout (Company R's real export; tested only on synthetic
 // replicas). Preamble lines, then per payroll:
 //   <title>  /  Pay period, MM/DD/YYYY - MM/DD/YYYY  /  Pay day, MM/DD/YYYY  /  30-column header  /
-//   employee rows (first row: Last, First, ..., Employee Type; continuation rows: blank names, one Pay Type each,
-//   including a "Gross" line)  /  Payroll Totals ...
-// Read ONLY: names, employee type, pay type, hours, rate, amount; period, pay day, section kind. Tax columns,
-// Work Address, Net Pay, Check Amount, Employer Cost and Donations are never read (only mapped columns are).
-// Completeness: every employee has a Gross line; per section, sum of employee Gross == Payroll Totals gross.
+//   employee rows  /  Payroll Totals block
+// Employee rows: the first row has Last, First, Employee Type; then one line per (Job, Pay Type). A blank Job
+// INHERITS the previous non-blank Job (live finding), so lines after a "Totals" line belong to the subtotal block.
+// Order: itemized lines per job (Job = a role such as "Landscaper", each with its own Rate; blank-Job lines
+// such as Overtime belong to that job), then SUBTOTAL lines per pay type starting with Job = "Totals" (blank-Job
+// lines after it are subtotals too), then often a "Gross" line.
+// Read ONLY: names, employee type, job, pay type, hours, rate, amount; period, pay day, section kind. Payment
+// (the payment METHOD), tax columns, Work Address, Net Pay, Check Amount, Employer Cost and Donations are never
+// read (only mapped columns are indexed).
+// Rules (per employee and for the Payroll Totals block alike):
+//   itemized = lines whose Job is not "Totals" and Pay Type is not "Gross"; "Totals" lines are never added,
+//   only checked: per pay type, the Totals line == the sum of that pay type's itemized lines;
+//   gross = the Gross line if present, else the itemized sum; when both exist they must agree.
+// An employee with no pay lines at all is gross 0 from the source (a note). The Payroll Totals gross must equal
+// the sum of employee gross. "Owner's Draw" lines / "Owner’s draw" employees are owner draws.
 
 import { readFile } from "node:fs/promises";
 import { basename } from "node:path";
@@ -27,21 +37,20 @@ type Key =
   | "last"
   | "first"
   | "employeeType"
+  | "job"
   | "payType"
   | "hours"
   | "rate"
-  | "amount"
-  | "payment";
+  | "amount";
 export const SECTIONED_COLUMNS: Mapping<Key> = {
   last: ["Last Name"],
   first: ["First Name"],
   employeeType: ["Employee Type"],
+  job: ["Job"],
   payType: ["Pay Type"],
   hours: ["Hours"],
   rate: ["Rate"],
   amount: ["Amount"],
-  // only for the Payroll Totals row when it has no Gross line of its own
-  payment: ["Payment"],
 };
 
 export type SectionKind = "regular" | "off_cycle" | "other";
@@ -53,6 +62,103 @@ export const sectionKind = (title: string): SectionKind =>
       : "other";
 
 const US_DATE = /(\d{1,2}\/\d{1,2}\/\d{4})/g;
+const isOwnerDraw = (s: string | null) =>
+  !!s && /owner.?s\s*draw/i.test(s.replace(/[’']/g, "'"));
+const dateAfter = (row: Cell[], i: number): string | undefined =>
+  row
+    .slice(i)
+    .map((c) => text(c) ?? "")
+    .join(" ")
+    .match(US_DATE)?.[0];
+const isTotalsJob = (job: string | null) => !!job && /^totals?$/i.test(job);
+
+/** One employee's (or the Payroll Totals block's) lines: itemized, per-type subtotals, the Gross line. */
+class LineBlock {
+  itemized = 0;
+  items = 0;
+  gross: number | null = null;
+  readonly byType = new Map<string, number>();
+  readonly subtotals = new Map<string, number>();
+
+  /** returns true when the line was itemized (so the caller records its earnings detail) */
+  /** the job group a blank-Job line belongs to: the last non-blank Job ("Totals" opens the subtotal block) */
+  private group: string | null = null;
+  /** the effective job of the last added line (for jobLines) */
+  lastJob: string | null = null;
+
+  add(rawJob: string | null, type: string, amount: number | null): boolean {
+    if (/^gross$/i.test(type)) {
+      this.gross = amount;
+      return false;
+    }
+    // live finding: blank-Job lines INHERIT the previous Job, so an Overtime line after "Totals" is a subtotal
+    if (rawJob) this.group = rawJob;
+    const job = rawJob ?? this.group;
+    this.lastJob = job;
+    if (amount === null) return false;
+    if (isTotalsJob(job)) {
+      this.subtotals.set(type, (this.subtotals.get(type) ?? 0) + amount);
+      return false;
+    }
+    this.itemized += amount;
+    this.items++;
+    this.byType.set(type, (this.byType.get(type) ?? 0) + amount);
+    return true;
+  }
+
+  /** pay types given only as a Totals line (live: Owner's Draw), promoted to itemized by finalize() */
+  readonly promoted = new Map<string, number>();
+  private finalized = false;
+
+  /** A pay type with a Totals line but no itemized lines: the Totals line IS its itemized amount. */
+  finalize(): void {
+    if (this.finalized) return;
+    this.finalized = true;
+    for (const [type, sub] of this.subtotals) {
+      if (this.byType.has(type)) continue;
+      this.promoted.set(type, sub);
+      this.byType.set(type, sub);
+      this.itemized += sub;
+      this.items++;
+    }
+  }
+
+  /** Owner draws among the itemized amounts (Gusto's Gross line excludes them). */
+  ownerDraw(): number {
+    this.finalize();
+    let d = 0;
+    for (const [type, amount] of this.byType)
+      if (isOwnerDraw(type)) d += amount;
+    return d;
+  }
+
+  /** cross-checks; problems are pushed with `where` (row / section numbers only) */
+  check(where: string, problems: string[]): void {
+    this.finalize();
+    for (const [type, sub] of this.subtotals) {
+      if (this.promoted.has(type)) continue;
+      const items = this.byType.get(type) ?? 0;
+      if (sub !== items)
+        problems.push(
+          `${where}: "${type}" Totals line ${sub}¢ vs its itemized lines ${items}¢`,
+        );
+    }
+    const wages = this.itemized - this.ownerDraw();
+    if (this.gross !== null && this.items > 0 && this.gross !== wages) {
+      problems.push(
+        `${where}: Gross line ${this.gross}¢ vs itemized lines excluding owner draws ${wages}¢`,
+      );
+    }
+  }
+
+  /** wage gross (owner draws excluded): the Gross line, else itemized minus owner draws; null with no lines */
+  value(): number | null {
+    this.finalize();
+    return (
+      this.gross ?? (this.items > 0 ? this.itemized - this.ownerDraw() : null)
+    );
+  }
+}
 
 export async function readGustoPayrollJournalSectionedCsv(
   input: string | { text: string; fileName: string },
@@ -69,16 +175,18 @@ export async function readGustoPayrollJournalSectionedCsv(
   const rows: PayrollJournalRow[] = [];
   let expected = 0;
   let sections = 0;
+  let zeroGross = 0;
+  let promotedLines = 0;
 
-  let r = 0;
   const lastTitle = (before: number): string => {
     for (let i = before - 1; i >= 0; i--) {
       const row = grid[i] ?? [];
-      if (isBlank(row)) continue;
-      return text(row[0]) ?? "";
+      if (!isBlank(row)) return text(row[0]) ?? "";
     }
     return "";
   };
+
+  let r = 0;
   while (r < grid.length) {
     const row = grid[r] ?? [];
     if (!/^pay period$/i.test(text(row[0]) ?? "")) {
@@ -91,12 +199,11 @@ export async function readGustoPayrollJournalSectionedCsv(
     const kind = sectionKind(lastTitle(r));
     const where = `section ${section}`;
     const period =
-      String(
-        row
-          .slice(1)
-          .map((c) => text(c) ?? "")
-          .join(" "),
-      ).match(US_DATE) ?? [];
+      row
+        .slice(1)
+        .map((c) => text(c) ?? "")
+        .join(" ")
+        .match(US_DATE) ?? [];
     let periodStart: string | null = null;
     let periodEnd: string | null = null;
     try {
@@ -109,12 +216,7 @@ export async function readGustoPayrollJournalSectionedCsv(
     let payDay: string | null = null;
     while (r < grid.length && isBlank(grid[r])) r++;
     if (/^pay day$/i.test(text(grid[r]?.[0]) ?? "")) {
-      const d = String(
-        (grid[r] ?? [])
-          .slice(1)
-          .map((c) => text(c) ?? "")
-          .join(" "),
-      ).match(US_DATE)?.[0];
+      const d = dateAfter(grid[r] ?? [], 1);
       try {
         payDay = d ? cellDate(d) : null;
       } catch {
@@ -140,20 +242,34 @@ export async function readGustoPayrollJournalSectionedCsv(
     r += header.headerRow + 1;
 
     let current: PayrollJournalRow | null = null;
-    let currentHasGross = false;
+    let block = new LineBlock();
+    let totalsBlock: LineBlock | null = null;
     let sectionGross = 0;
-    let totalsGross: number | null = null;
-    let inTotals = false;
+    let sectionDraws = 0;
     const finish = () => {
       if (current) {
-        if (!currentHasGross)
-          problems.push(
-            `${where} row ${current.rowNumber}: employee without a Gross line`,
-          );
-        else rows.push(current);
+        block.check(`${where} row ${current.rowNumber}`, problems);
+        const gross = block.value();
+        const draw = block.ownerDraw();
+        if (gross === null) zeroGross++;
+        // pay types that came only as a Totals line count as earnings too
+        for (const [type, amount] of block.promoted) {
+          current.earningsCents[type] =
+            (current.earningsCents[type] ?? 0) + amount;
+          promotedLines++;
+        }
+        // grossCents is WAGE gross (Gusto's Gross excludes owner draws); draws are reported apart
+        current.grossCents = gross ?? 0;
+        current.ownerDrawCents = draw;
+        if (draw > 0 && current.grossCents === 0)
+          current.payKind = "owner_draw";
+        else if (current.grossCents > 0) current.payKind = "wage";
+        sectionGross += current.grossCents;
+        sectionDraws += draw;
+        rows.push(current);
       }
       current = null;
-      currentHasGross = false;
+      block = new LineBlock();
     };
     for (; r < grid.length; r++) {
       const x = grid[r] ?? [];
@@ -162,36 +278,32 @@ export async function readGustoPayrollJournalSectionedCsv(
       if (first0 && /^pay period$/i.test(first0)) break; // next section without a totals row
       const last = text(at(x, "last"));
       const firstName = text(at(x, "first"));
-      if (last && /^payroll totals?$/i.test(last)) {
-        finish();
-        inTotals = true;
-        // a Payment value on the totals row is the fallback total gross
-        const pay = text(at(x, "payment"));
-        const type = text(at(x, "payType"));
-        try {
-          if (type && /^gross$/i.test(type))
-            totalsGross = toCents(text(at(x, "amount")));
-          else if (pay !== null) totalsGross = toCents(pay);
-        } catch {
-          problems.push(`${where}: unreadable Payroll Totals`);
-        }
+      const type = text(at(x, "payType"));
+      const job = text(at(x, "job"));
+      let amount: number | null = null;
+      try {
+        amount = toCents(text(at(x, "amount")));
+      } catch {
+        problems.push(`${where} row ${r + 1}: unreadable amount`);
         continue;
       }
-      if (inTotals) {
-        // continuation lines of the totals block; a Gross line wins over the Payment fallback
-        const type = text(at(x, "payType"));
+      if (last && /^payroll totals?$/i.test(last)) {
+        finish();
+        totalsBlock = new LineBlock();
+        // an Amount with no pay type on the totals row itself is the section's gross
+        if (type) totalsBlock.add(job, type, amount);
+        else if (amount !== null) totalsBlock.gross = amount;
+        continue;
+      }
+      if (totalsBlock) {
         if (last || firstName || (!type && first0)) break; // something else began: the section is over
-        try {
-          if (type && /^gross$/i.test(type))
-            totalsGross = toCents(text(at(x, "amount")));
-        } catch {
-          problems.push(`${where}: unreadable Payroll Totals gross`);
-        }
+        if (type) totalsBlock.add(job, type, amount);
         continue;
       }
       if (last || firstName) {
         finish();
         expected++;
+        const employeeType = text(at(x, "employeeType"));
         current = {
           rowNumber: r + 1,
           employeeName: [firstName, last].filter(Boolean).join(" "),
@@ -204,11 +316,12 @@ export async function readGustoPayrollJournalSectionedCsv(
           hours: {},
           sectionKind: kind,
           section,
-          employeeType: text(at(x, "employeeType")),
+          employeeType,
+          payKind: isOwnerDraw(employeeType) ? "owner_draw" : "wage",
           ratesCents: {},
+          jobLines: [],
         };
       }
-      const type = text(at(x, "payType"));
       if (!type) continue;
       if (!current) {
         problems.push(`${where} row ${r + 1}: pay line before any employee`);
@@ -216,33 +329,61 @@ export async function readGustoPayrollJournalSectionedCsv(
       }
       const cur = current as PayrollJournalRow;
       try {
-        const amount = toCents(text(at(x, "amount")));
-        if (/^gross$/i.test(type)) {
-          if (amount === null) throw new Error("no gross");
-          cur.grossCents = amount;
-          currentHasGross = true;
-          sectionGross += amount;
-          continue;
-        }
-        if (amount !== null)
-          cur.earningsCents[type] = (cur.earningsCents[type] ?? 0) + amount;
-        const h = parseScaled(text(at(x, "hours")), 3);
-        if (h !== null) cur.hours[type] = (cur.hours[type] ?? 0) + h / 1000;
+        if (!block.add(job, type, amount)) continue; // Gross line or a Totals subtotal: checked, not added
+        if (isOwnerDraw(type)) cur.payKind = "owner_draw";
+        const hours = parseScaled(text(at(x, "hours")), 3);
         const rate = toCents(text(at(x, "rate")));
-        if (rate !== null && cur.ratesCents) cur.ratesCents[type] = rate;
+        cur.earningsCents[type] =
+          (cur.earningsCents[type] ?? 0) + (amount ?? 0);
+        if (hours !== null)
+          cur.hours[type] = (cur.hours[type] ?? 0) + hours / 1000;
+        // per-pay-type rate only when unambiguous; per-job rates are in jobLines (M4 needs them)
+        if (rate !== null && cur.ratesCents) {
+          if (cur.ratesCents[type] === undefined) cur.ratesCents[type] = rate;
+          else if (cur.ratesCents[type] !== rate) delete cur.ratesCents[type];
+        }
+        cur.jobLines?.push({
+          job: block.lastJob,
+          payType: type,
+          hours: hours === null ? null : hours / 1000,
+          rateCents: rate,
+          amountCents: amount ?? 0,
+        });
       } catch {
         problems.push(`${where} row ${r + 1}: unreadable pay line`);
       }
     }
     finish();
-    if (totalsGross === null)
-      problems.push(`${where}: no Payroll Totals gross`);
-    else if (totalsGross !== sectionGross)
+    const tb = totalsBlock as LineBlock | null;
+    if (tb) tb.check(`${where} Payroll Totals`, problems);
+    const totals = tb?.value() ?? null;
+    if (totals === null) problems.push(`${where}: no Payroll Totals amount`);
+    else if (totals !== sectionGross)
       problems.push(
-        `${where}: employee Gross sum ${sectionGross}¢ vs Payroll Totals ${totalsGross}¢`,
+        `${where}: employee gross sum ${sectionGross}¢ vs Payroll Totals ${totals}¢`,
       );
+    // owner draws reconcile on their own, when the totals block carries them
+    const totalsDraws = tb?.ownerDraw() ?? 0;
+    if (tb && (totalsDraws || sectionDraws) && totalsDraws !== sectionDraws) {
+      problems.push(
+        `${where}: employee owner draws ${sectionDraws}¢ vs Payroll Totals owner draws ${totalsDraws}¢`,
+      );
+    }
+    promotedLines += tb?.promoted.size ?? 0;
   }
   if (!sections) problems.push("no payroll sections (no 'Pay period' line)");
+  const notes = [
+    ...(zeroGross
+      ? [
+          `${zeroGross} employee row(s) with no pay lines: gross 0 from the source`,
+        ]
+      : []),
+    ...(promotedLines
+      ? [
+          `${promotedLines} pay type(s) given only as a Totals line (e.g. Owner's Draw): used as the itemized amount`,
+        ]
+      : []),
+  ];
   return {
     rows,
     namesAnonymized: false,
@@ -255,6 +396,7 @@ export async function readGustoPayrollJournalSectionedCsv(
       rows.length,
       expected,
       problems,
+      notes,
     ),
   };
 }

@@ -1,0 +1,21 @@
+[
+  {
+    "id": "a-co-01",
+    "companyId": "a",
+    "cycleId": "a-c05",
+    "flagId": "a-flag-02",
+    "target": {
+      "table": "timeEntries",
+      "id": "a-te-0177",
+      "field": "jobId"
+    },
+    "before": null,
+    "after": "a-j01",
+    "effectPayCents": 12350,
+    "effectProfitCents": 4200,
+    "status": "approved",
+    "source": "reply",
+    "approvedBy": "a-w12",
+    "approvedAt": "2026-10-24T08:45:00.000Z"
+  }
+]

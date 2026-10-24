@@ -1,10 +1,14 @@
 import { notFound } from "next/navigation";
 import { FlagDetail } from "@/components/FlagDetail";
 import { companies } from "@/lib/companies";
-import { fixtureFlags } from "@/lib/fixtures";
+import {
+  allFlagParams,
+  currentViewer,
+  flagDetail,
+} from "@/lib/server/fixtures";
 
 export function generateStaticParams() {
-  return fixtureFlags.map((f) => ({ companyId: f.companyId, flagId: f.id }));
+  return allFlagParams();
 }
 
 export default async function FlagPage({
@@ -13,7 +17,14 @@ export default async function FlagPage({
   const { companyId, flagId } = await params;
   const company = companies[companyId];
   if (!company) notFound();
+  // Like Convex flags.get({ flagId, viewerId }) in #15: null when the flag is missing or not this viewer's.
+  const viewer = await currentViewer(companyId);
   return (
-    <FlagDetail companyId={companyId} flagId={flagId} dataKind={company.kind} />
+    <FlagDetail
+      companyId={companyId}
+      data={flagDetail(viewer, companyId, flagId)}
+      dataKind={company.kind}
+      timezone={company.timezone}
+    />
   );
 }

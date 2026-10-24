@@ -14,33 +14,28 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { WorkerThread } from "@/components/WorkerThread";
 import { checkTitle } from "@/lib/checks";
-import {
-  FIXTURE_SOURCE,
-  fixtureEvents,
-  fixtureFlags,
-  fixtureQuestions,
-  workerName,
-} from "@/lib/fixtures";
 import { forViewer } from "@/lib/role";
+import { FIXTURE_SOURCE } from "@/lib/sources";
 import type { ViewerRole } from "@/lib/types";
+import type { FlagDetailData } from "@/lib/view-types";
 
+// `data` is what the server decided this viewer may see: null for a flag that is missing or not theirs.
 export function FlagDetail({
   companyId,
-  flagId,
+  data,
   dataKind,
+  timezone,
   viewerRole,
 }: {
   companyId: string;
-  flagId: string;
+  data: FlagDetailData | null;
   dataKind: DataKind;
+  timezone: string;
   viewerRole?: ViewerRole;
 }) {
   const [markedFixed, setMarkedFixed] = useState(false);
   const { role } = useRole();
   const viewer = viewerRole ?? role;
-  const found = fixtureFlags.find(
-    (f) => f.id === flagId && f.companyId === companyId,
-  );
   const back = (
     <Link
       href={`/c/${companyId}`}
@@ -49,7 +44,7 @@ export function FlagDetail({
       ← Back to what we need from you
     </Link>
   );
-  if (!found) {
+  if (!data) {
     return (
       <div className="flex flex-col gap-3">
         {back}
@@ -57,11 +52,9 @@ export function FlagDetail({
       </div>
     );
   }
-  const flag = forViewer(found, viewer);
-  const question = fixtureQuestions.find((q) => q.id === flag.questionId);
-  const events = fixtureEvents
-    .filter((e) => e.flagId === flag.id)
-    .sort((a, b) => a.at.localeCompare(b.at));
+  // The server already removed pay for a manager; this only covers the moment after an owner switches role.
+  const flag = forViewer(data.flag, viewer);
+  const { question, events } = data;
   const dollars = flag.affects.dollarsCents;
   const hasJobber = flag.where.some((w) => w.system === "Jobber");
 
@@ -116,11 +109,7 @@ export function FlagDetail({
         <ApprovalSheet
           key={question.id}
           question={question}
-          recipientName={
-            question.toRole === "employee"
-              ? workerName(question.toWorkerId)
-              : undefined
-          }
+          recipientName={data.recipientName ?? undefined}
         />
       ) : (
         <p className="text-sm text-muted-foreground">
@@ -128,11 +117,12 @@ export function FlagDetail({
         </p>
       )}
 
-      {question && (
+      {data.thread && (
         <WorkerThread
-          questionId={question.id}
+          thread={data.thread}
           title="Replies"
           dataKind={dataKind}
+          timezone={timezone}
         />
       )}
 
@@ -156,7 +146,11 @@ export function FlagDetail({
       <Card>
         <CardContent className="flex flex-col gap-3">
           <h2 className="text-lg font-semibold">What happened so far</h2>
-          <FlagTimeline events={events} dataKind={dataKind} />
+          <FlagTimeline
+            events={events}
+            dataKind={dataKind}
+            timezone={timezone}
+          />
         </CardContent>
       </Card>
     </div>

@@ -10,35 +10,18 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
   AUDIT_PREFIXES,
   cycleLabel,
   eventSource,
   forViewerEvents,
   isSimulated,
+  NO_CYCLE,
   typePrefix,
 } from "@/lib/audit";
-import {
-  AUDIT_FIXTURE_SOURCE,
-  fixtureAudit,
-  fixtureFlags,
-} from "@/lib/fixtures";
+import { AUDIT_FIXTURE_SOURCE } from "@/lib/sources";
+import { formatWhen } from "@/lib/time";
 import type { AuditEvent } from "@/lib/types";
-
-const when = new Intl.DateTimeFormat("en-US", {
-  month: "short",
-  day: "numeric",
-  hour: "numeric",
-  minute: "2-digit",
-  timeZone: "America/Los_Angeles",
-});
+import type { AuditViewData } from "@/lib/view-types";
 
 const refLabel: Record<string, string> = {
   flagId: "flag",
@@ -51,8 +34,13 @@ const refLabel: Record<string, string> = {
   ruleId: "rule",
 };
 
-function Refs({ event }: { event: AuditEvent }) {
-  const knownFlags = new Set(fixtureFlags.map((f) => f.id));
+function Refs({
+  event,
+  knownFlags,
+}: {
+  event: AuditEvent;
+  knownFlags: ReadonlySet<string>;
+}) {
   return (
     <div className="flex flex-wrap gap-1">
       {Object.entries(event.refs).map(([k, v]) =>
@@ -76,11 +64,13 @@ function Refs({ event }: { event: AuditEvent }) {
 
 // Everything shown comes from the events passed through forViewerEvents, so manager mode never holds pay.
 export function AuditLog({
-  companyId,
+  data,
   dataKind,
+  timezone,
 }: {
-  companyId: string;
+  data: AuditViewData;
   dataKind: DataKind;
+  timezone: string;
 }) {
   const { role } = useRole();
   const [prefix, setPrefix] = useState<string>("all");
@@ -89,25 +79,28 @@ export function AuditLog({
   const [simulatedOnly, setSimulatedOnly] = useState(false);
   const [newestFirst, setNewestFirst] = useState(false);
 
-  const visible = useMemo(
-    () =>
-      forViewerEvents(
-        fixtureAudit.filter((e) => e.companyId === companyId),
-        role,
-      ),
-    [companyId, role],
+  const knownFlags = useMemo(
+    () => new Set(data.linkableFlagIds),
+    [data.linkableFlagIds],
   );
+  // The server already redacted for this viewer; forViewerEvents re-applies the same policy for the moment
+  // after an owner switches to manager, before the refreshed data arrives.
+  const visible = useMemo(
+    () => forViewerEvents(data.events, role, knownFlags),
+    [data.events, role, knownFlags],
+  );
+  // Options come from the events themselves: each real cycle, plus Onboarding for events outside any cycle.
   const cycles = useMemo(
-    () => [...new Set(visible.map((e) => e.cycleId).filter(Boolean))].sort(),
+    () => [...new Set(visible.map((e) => e.cycleId ?? NO_CYCLE))].sort(),
     [visible],
-  ) as string[];
+  );
 
   const shown = useMemo(() => {
     const q = query.trim().toLowerCase();
     const rows = visible.filter(
       (e) =>
         (prefix === "all" || typePrefix(e) === prefix) &&
-        (cycle === "all" || e.cycleId === cycle) &&
+        (cycle === "all" || (e.cycleId ?? NO_CYCLE) === cycle) &&
         (!simulatedOnly || isSimulated(e)) &&
         (q === "" ||
           `${e.summary} ${e.type} ${eventSource(e)}`.toLowerCase().includes(q)),
@@ -148,7 +141,7 @@ export function AuditLog({
           <option value="all">All cycles</option>
           {cycles.map((c) => (
             <option key={c} value={c}>
-              {cycleLabel(c)}
+              {cycleLabel(c === NO_CYCLE ? null : c)}
             </option>
           ))}
         </select>
@@ -177,38 +170,31 @@ export function AuditLog({
       {shown.length === 0 ? (
         <p>No events match.</p>
       ) : (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Time</TableHead>
-              <TableHead>Who</TableHead>
-              <TableHead>Source</TableHead>
-              <TableHead>What happened</TableHead>
-              <TableHead>Links</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
+        <div>
+          <div className="hidden grid-cols-[8rem_8rem_1fr_9rem] gap-4 border-b px-2 pb-2 text-sm font-medium text-muted-foreground lg:grid">
+            <span>Time</span>
+            <span>Who</span>
+            <span>What happened</span>
+            <span>Links</span>
+          </div>
+          {/* One layout for every width: stacked on a phone, a four-column grid from lg. */}
+          <ol>
             {shown.map((e) => (
-              <TableRow key={e.id}>
-                <TableCell className="whitespace-nowrap align-top text-muted-foreground">
-                  {when.format(new Date(e.at))}
-                  <div className="text-xs">{cycleLabel(e.cycleId)}</div>
-                </TableCell>
-                <TableCell className="align-top">
-                  <AgentChip actor={e.actor} />
-                </TableCell>
-                <TableCell className="align-top whitespace-normal">
-                  <Badge
-                    variant="secondary"
-                    className="h-auto rounded-lg text-left whitespace-normal"
-                  >
-                    {eventSource(e)}
-                  </Badge>
-                  <div className="mt-1">
-                    <DataLabel kind={dataKind} />
+              <li
+                key={e.id}
+                data-audit-row
+                className="grid gap-2 border-b px-2 py-3 lg:grid-cols-[8rem_8rem_1fr_9rem] lg:gap-4"
+              >
+                <div className="flex items-center justify-between gap-2 lg:contents">
+                  <div className="text-sm text-muted-foreground lg:col-start-1 lg:row-start-1">
+                    {formatWhen(e.at, timezone)}
+                    <div className="text-xs">{cycleLabel(e.cycleId)}</div>
                   </div>
-                </TableCell>
-                <TableCell className="align-top whitespace-normal">
+                  <div className="lg:col-start-2 lg:row-start-1">
+                    <AgentChip actor={e.actor} />
+                  </div>
+                </div>
+                <div className="flex min-w-0 flex-col gap-1 lg:col-start-3 lg:row-start-1">
                   <div className="flex flex-wrap items-center gap-2">
                     <span>{e.summary}</span>
                     {isSimulated(e) && (
@@ -221,6 +207,15 @@ export function AuditLog({
                     )}
                   </div>
                   <div className="text-xs text-muted-foreground">{e.type}</div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Badge
+                      variant="secondary"
+                      className="h-auto rounded-lg text-left whitespace-normal"
+                    >
+                      {eventSource(e)}
+                    </Badge>
+                    <DataLabel kind={dataKind} />
+                  </div>
                   {role === "owner" && e.data?.effectPayCents != null && (
                     <div className="text-sm">
                       Effect on pay: <Money cents={e.data.effectPayCents} />{" "}
@@ -229,14 +224,14 @@ export function AuditLog({
                       </span>
                     </div>
                   )}
-                </TableCell>
-                <TableCell className="align-top whitespace-normal">
-                  <Refs event={e} />
-                </TableCell>
-              </TableRow>
+                </div>
+                <div className="min-w-0 lg:col-start-4 lg:row-start-1">
+                  <Refs event={e} knownFlags={knownFlags} />
+                </div>
+              </li>
             ))}
-          </TableBody>
-        </Table>
+          </ol>
+        </div>
       )}
     </div>
   );

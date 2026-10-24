@@ -94,5 +94,17 @@
     },
     "type": "message.sent",
     "summary": "Question sent to the manager. Waiting for a reply."
+  },
+  {
+    "id": "a-ev-09",
+    "flagId": "a-flag-10",
+    "at": "2026-10-24T08:12:40.000Z",
+    "actor": {
+      "kind": "system",
+      "id": "controller",
+      "agent": null
+    },
+    "type": "check.fired",
+    "summary": "CHK-10 found a rate that differs between Jobber and Gusto."
   }
 ]
