@@ -22,12 +22,20 @@ const longest: Record<TemplateKey, Record<string, string>> = {
   managerPage: {
     n: "12",
     day: "Wednesday",
-    link: "https://payrollpilot.app/c/a/manager",
+    link: "https://rollpay.app/c/a/manager",
+  },
+  managerSummary: {
+    count: "12 items",
+    need: "need",
+    range: "Sep 26–Oct 9",
+    categories:
+      "4 hour mix-ups, 2 entries with no job, 2 workers with no hours…",
+    link: "https://rollpay.app/c/a/manager",
   },
   ownerPage: {
     n: "12",
     day: "Wednesday",
-    link: "https://payrollpilot.app/c/a",
+    link: "https://rollpay.app/c/a",
   },
   entryNoJob: {
     who: "Casey Lindqvist",
