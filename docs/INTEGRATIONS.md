@@ -34,6 +34,8 @@ Status values: **tested** (ran here, evidence noted), **unverified** (docs read 
 
 - Sat 03:35 · A2 · **Gusto demo seeded (live):** compensation PUTs and employee + job creation all accepted in demo; 11 existing employees mapped, 1 new hire created un-onboarded; read-back 14/14 complete. No payroll endpoint written. **tested**.
 
+- Sat 11:30 · A · **H3 tested** (own Intuit developer account, not Devaj's): app "PayrollPilot Demo", sandbox QuickBooks Online Plus US created (new accounts have no sandbox until one is added; the Playground otherwise fails with "no sandbox companies found"). Tokens via OAuth Playground (Accounting scope). Live read with our connector: Purchase 3/3, Bill 0/0 complete for 2026-10-10..23 (sandbox sample data). First seed push refused: the sample chart has two accounts named "Equipment Rental"; fixing to use our own suffixed accounts.
+
 ## Live proofs (fill in as they happen)
 - First real text round trip (G1):
 - First Gusto draft filled in demo (G2):
