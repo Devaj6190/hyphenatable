@@ -20,6 +20,8 @@ type WorkerCfg = {
   n: number; name: string; role: string; payType: string; status?: string; jobberStatus?: string;
   jobberRate: number | null; gustoRate?: number; venmoRate?: number | null; onboarded?: boolean;
   rates?: Record<string, number>; jobberRates?: Record<string, number>; firstCycle?: string;
+  /** Real Gusto demo uuids, written by `seed/push-gusto.ts --apply-map`; fake placeholders until then. */
+  gustoIds?: { employeeUuid: string; jobUuid: string | null };
 };
 type CycleCfg = { id: string; number: number; start: string; end: string; current?: boolean };
 export type Config = {
@@ -38,7 +40,7 @@ export type Config = {
     questions: { cycle: string; to: string; day: number; text: string; options: string[] | null }[];
   };
   current: {
-    cycle: string; snapshot: string;
+    cycle: string; snapshot: string; gustoPayrollId?: string | null;
     schedule: Record<string, { days: number[]; extendedDays?: number[]; extendedEnd?: string }>;
     jobByDay: string[];
     jobs: {
@@ -106,9 +108,9 @@ function buildWorkers(cfg: Config): Rec[] {
       w.payType === "contractor_venmo"
         ? null
         : {
-            employeeUuid: fakeUuid(w.n, "a000"),
+            employeeUuid: w.gustoIds?.employeeUuid ?? fakeUuid(w.n, "a000"),
             contractorUuid: null,
-            jobUuid: fakeUuid(w.n, "b000"),
+            jobUuid: w.gustoIds ? w.gustoIds.jobUuid : fakeUuid(w.n, "b000"),
             rateCents: w.gustoRate ?? null,
             paymentUnit: unit,
             flsaStatus: w.payType === "salary" ? "Exempt" : "Nonexempt",
@@ -139,7 +141,7 @@ function buildCycles(cfg: Config): Rec[] {
     periodEnd: new Date(Date.parse(local(addDays(c.end, 1), "00:00")) - 1).toISOString(),
     cutoffAt: local(addDays(c.end, -1), "18:00"), // Friday 18:00 local
     stage: c.current ? "setup" : "closed",
-    gustoPayrollId: null,
+    gustoPayrollId: c.current ? (cfg.current.gustoPayrollId ?? null) : null,
     gustoOffCyclePayrollId: null,
     questionsAsked: c.current ? 0 : cfg.past.questions.filter((q) => q.cycle === c.id).length,
   }));
