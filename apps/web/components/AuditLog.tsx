@@ -25,7 +25,7 @@ import { cn } from "@/lib/utils";
 import type { AuditViewData } from "@/lib/view-types";
 
 const selectClass =
-  "h-10 rounded-control border border-input bg-card px-3 text-sm text-foreground outline-none focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ring";
+  "h-10 rounded-control border border-input bg-card px-3 text-sm text-foreground outline-none focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-1 focus-visible:outline-ring";
 
 const actorWord: Record<string, string> = { simulated: "Simulated manager" };
 const word = (k: string) => actorWord[k] ?? k[0].toUpperCase() + k.slice(1);
@@ -45,7 +45,7 @@ function Chip({
       aria-pressed={on}
       onClick={onClick}
       className={cn(
-        "pressable inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full px-3.5 text-sm font-medium whitespace-nowrap transition-colors duration-(--dur-hover) outline-none focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ring",
+        "pressable inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full px-3.5 text-sm font-medium whitespace-nowrap transition-colors duration-(--dur-hover) outline-none focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-1 focus-visible:outline-ring",
         on
           ? "bg-foreground text-background"
           : "bg-muted text-foreground hover:bg-accent",
@@ -279,7 +279,7 @@ export function AuditLog({
                 type="button"
                 aria-label={`Stop filtering by ${item}`}
                 onClick={() => setItem(null)}
-                className="rounded-full p-0.5 outline-none hover:bg-background/20 focus-visible:outline-2 focus-visible:outline-ring"
+                className="rounded-full p-0.5 outline-none hover:bg-background/20 focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-ring"
               >
                 <X aria-hidden className="size-4" />
               </button>

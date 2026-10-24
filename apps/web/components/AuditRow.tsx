@@ -48,7 +48,7 @@ function Refs({
             title={item === v ? "Show every event" : "Show only this item"}
             onClick={() => onItem(item === v ? null : v)}
             className={cn(
-              "rounded-full border px-2 py-0.5 text-xs whitespace-nowrap transition-colors duration-(--dur-hover) outline-none focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ring",
+              "rounded-full border px-2 py-0.5 text-xs whitespace-nowrap transition-colors duration-(--dur-hover) outline-none focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-1 focus-visible:outline-ring",
               item === v
                 ? "border-foreground bg-foreground text-background"
                 : "border-input bg-card text-foreground hover:bg-muted",
@@ -67,7 +67,7 @@ function Refs({
             <Link
               href={`/c/${event.companyId}/flags/${v}`}
               aria-label={`Open flag ${v}`}
-              className="rounded-full p-0.5 text-link outline-none hover:bg-accent focus-visible:outline-2 focus-visible:outline-ring"
+              className="rounded-full p-0.5 text-link outline-none hover:bg-accent focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-ring"
             >
               <ArrowUpRight aria-hidden className="size-4" />
             </Link>
@@ -144,7 +144,7 @@ export function AuditRow({
               <button
                 type="button"
                 onClick={() => onItem(e.refs.flagId)}
-                className="font-medium text-link underline-offset-4 outline-none hover:underline focus-visible:outline-2 focus-visible:outline-ring"
+                className="font-medium text-link underline-offset-4 outline-none hover:underline focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-ring"
               >
                 Trace this number
               </button>

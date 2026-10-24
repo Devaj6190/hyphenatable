@@ -76,7 +76,7 @@ function Pill({
       aria-pressed={on}
       onClick={onClick}
       className={cn(
-        "pressable inline-flex min-h-9 items-center gap-1.5 rounded-full px-3.5 text-left text-sm font-medium transition-colors duration-(--dur-hover) outline-none focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ring",
+        "pressable inline-flex min-h-9 items-center gap-1.5 rounded-full px-3.5 text-left text-sm font-medium transition-colors duration-(--dur-hover) outline-none focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-1 focus-visible:outline-ring",
         on
           ? "bg-foreground text-background"
           : "bg-muted text-foreground hover:bg-accent",
@@ -200,7 +200,7 @@ function ResetCard({
             aria-pressed={toCycle === n}
             onClick={() => setToCycle(n)}
             className={cn(
-              "pressable flex flex-col gap-0.5 rounded-control border p-4 text-left transition-colors duration-(--dur-hover) outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+              "pressable flex flex-col gap-0.5 rounded-control border p-4 text-left transition-colors duration-(--dur-hover) outline-none focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-ring",
               toCycle === n
                 ? "border-foreground bg-accent"
                 : "border-input bg-card hover:bg-muted",
@@ -369,7 +369,7 @@ function SimulatedReplyCard({
           <label className="flex flex-col gap-1.5 text-sm font-medium">
             Open question
             <select
-              className="h-10 rounded-control border border-input bg-card px-3 font-normal outline-none focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ring"
+              className="h-10 rounded-control border border-input bg-card px-3 font-normal outline-none focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-1 focus-visible:outline-ring"
               value={q?.id}
               onChange={(e) => {
                 setQid(e.target.value);
