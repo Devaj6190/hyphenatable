@@ -33,6 +33,7 @@ export default defineSchema({
       otWeeklyHours: v.number(),
       grossChangePct: v.number(),
       employeesMayBeTexted: v.boolean(),
+      lowMarginPct: v.number(),
     }),
   }),
 
@@ -162,7 +163,7 @@ export default defineSchema({
     salespersonWorkerId: nul(v.id("workers")),
     sentAt: nul(v.string()),
     status: v.string(),
-    amountCents: v.number(),
+    amountCents: nul(v.number()),
   })
     .index("by_company", ["companyId"])
     .index("by_source", ["companyId", "sourceId"]),
@@ -174,7 +175,7 @@ export default defineSchema({
     issuedDate: nul(v.string()),
     dueDate: nul(v.string()),
     status: v.string(),
-    totalCents: v.number(),
+    totalCents: nul(v.number()),
   })
     .index("by_company", ["companyId"])
     .index("by_source", ["companyId", "sourceId"]),
@@ -185,8 +186,8 @@ export default defineSchema({
     invoiceId: nul(v.id("invoices")),
     quoteId: nul(v.id("quotes")),
     entryDate: v.string(),
-    amountCents: v.number(),
-    paymentType: v.string(),
+    amountCents: nul(v.number()),
+    paymentType: nul(v.string()),
     kind: lit("deposit", "final", "unknown"),
   })
     .index("by_company", ["companyId"])
@@ -197,7 +198,7 @@ export default defineSchema({
     source: lit("qbo", "jobber"),
     sourceId: v.string(),
     date: v.string(),
-    amountCents: v.number(),
+    amountCents: nul(v.number()),
     vendor: nul(v.string()),
     description: nul(v.string()),
     accountName: nul(v.string()),
@@ -206,6 +207,8 @@ export default defineSchema({
     kind: lit("job_cost", "overhead", "unknown"),
     matchedJobId: nul(v.id("jobs")),
     matchConfidence: nul(v.number()),
+    reimbursableToWorkerId: nul(v.id("workers")),
+    reimbursementStatus: nul(lit("PENDING_REIMBURSEMENT", "PAID")),
   })
     .index("by_company", ["companyId"])
     .index("by_source", ["companyId", "sourceId"]),
@@ -423,6 +426,7 @@ export default defineSchema({
         ),
         memo: nul(v.string()),
         heldFlagIds: v.array(v.id("flags")),
+        explain: v.array(v.string()),
       }),
     ),
     venmoList: v.array(
@@ -440,6 +444,26 @@ export default defineSchema({
   })
     .index("by_company", ["companyId"])
     .index("by_cycle", ["cycleId", "stage"]),
+
+  pastPayrolls: defineTable({
+    companyId: v.id("companies"),
+    cycleId: v.id("cycles"),
+    sourceId: v.string(),
+    workerId: v.id("workers"),
+    paidVia: lit("gusto_regular", "gusto_off_cycle", "venmo"),
+    earnings: v.array(
+      v.object({
+        name: v.string(),
+        hours: nul(v.number()),
+        rateCents: nul(v.number()),
+        amountCents: v.number(),
+      }),
+    ),
+    grossCents: v.number(),
+  })
+    .index("by_company", ["companyId", "workerId"])
+    .index("by_cycle", ["cycleId"])
+    .index("by_source", ["companyId", "sourceId"]),
 
   auditEvents: defineTable({
     companyId: v.id("companies"),

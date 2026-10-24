@@ -6,6 +6,7 @@ export const ORDER = [
   "companies",
   "workers",
   "cycles",
+  "pastPayrolls",
   "quotes",
   "jobs",
   "visits",
@@ -43,58 +44,39 @@ export const DEFER: Partial<Record<Table, string[]>> = {
   questions: ["interpretationId"],
 };
 
-/** String fields that hold source-system ids, keys or text: never treated as references. */
-const NOT_REFS = new Set([
-  "id",
-  "sourceId",
-  "recordId",
-  "providerId",
-  "conversationKey",
-  "contactRef",
-  "userId",
-  "approvedBy",
-  "answeredBy",
-  "text",
-  "seen",
-  "summary",
-  "memo",
-  "note",
-  "title",
-  "name",
-  "displayName",
-]);
+/** Keys that end in Id/Ids/By but hold upstream or provider values, not our records. */
+const SOURCE_KEYS = new Set(["sourceId", "recordId", "providerId", "checkId"]);
+
+/**
+ * Whether a string under `key` (inside `parent`) is a reference to one of our records.
+ * Allowlist, so free text that happens to equal an id ("a") is never rewritten:
+ * `*Id`, `*Ids`, `*By` (approvedBy, answeredBy: user ids are worker ids), userId,
+ * Rule.provenance.evidence, Correction.target.id and every AuditEvent.refs value.
+ */
+function isRef(key: string, parent: string): boolean {
+  if (parent === "refs" || key === "evidence" || key === "userId") return true;
+  if (parent === "target" && key === "id") return true;
+  return /(Id|Ids|By)$/.test(key) && !SOURCE_KEYS.has(key);
+}
 
 export type Fixture = Partial<Record<Table, Record<string, unknown>[]>>;
 
-/** Replaces every string that is a known fixture id with its Convex id, except under NOT_REFS keys. */
+/** Replaces known fixture ids with Convex ids wherever `isRef` says the field is a reference. */
 export function remap(
   value: unknown,
   ids: Map<string, string>,
   key = "",
+  parent = "",
 ): unknown {
   if (typeof value === "string")
-    return !NOT_REFS.has(key) && ids.has(value) ? ids.get(value) : value;
-  if (Array.isArray(value)) return value.map((x) => remap(x, ids, key));
+    return isRef(key, parent) && ids.has(value) ? ids.get(value) : value;
+  if (Array.isArray(value)) return value.map((x) => remap(x, ids, key, parent));
   if (value && typeof value === "object") {
     return Object.fromEntries(
-      Object.entries(value).map(([k, x]) => [
-        k,
-        k === "refs" ? remapRefs(x, ids) : remap(x, ids, k),
-      ]),
+      Object.entries(value).map(([k, x]) => [k, remap(x, ids, k, key)]),
     );
   }
   return value;
-}
-
-/** AuditEvent.refs values are ids by definition (record<string, id>). */
-function remapRefs(refs: unknown, ids: Map<string, string>) {
-  if (!refs || typeof refs !== "object") return refs;
-  return Object.fromEntries(
-    Object.entries(refs).map(([k, x]) => [
-      k,
-      typeof x === "string" ? (ids.get(x) ?? x) : x,
-    ]),
-  );
 }
 
 export function getPath(obj: Record<string, unknown>, path: string): unknown {

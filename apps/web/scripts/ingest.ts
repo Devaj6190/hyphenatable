@@ -1,6 +1,6 @@
 // Loads a company into Convex through sync.ingestFixture.
 //   bun run scripts/ingest.ts            → the engine's sample company
-//   bun run scripts/ingest.ts ../../data/fixtures/a   → A's fixture folder (one <table>.json per table)
+//   bun run scripts/ingest.ts ../../data/fixtures/a   → A's fixture folder (<table>.json, plus company.json)
 // Needs NEXT_PUBLIC_CONVEX_URL (written by `convex dev` to .env.local) and INGEST_KEY (same value as in Convex env).
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
@@ -13,10 +13,12 @@ const fixture: Record<string, unknown[]> = dir
   ? Object.fromEntries(
       readdirSync(dir)
         .filter((f) => f.endsWith(".json") && f !== "answer-key.json")
-        .map((f) => [
-          f.slice(0, -5),
-          JSON.parse(readFileSync(join(dir, f), "utf8")),
-        ]),
+        .map((f) => {
+          const rows = JSON.parse(readFileSync(join(dir, f), "utf8"));
+          // A's files are named by table, except company.json (one object).
+          const table = f === "company.json" ? "companies" : f.slice(0, -5);
+          return [table, Array.isArray(rows) ? rows : [rows]];
+        }),
     )
   : (sample as unknown as Record<string, unknown[]>);
 

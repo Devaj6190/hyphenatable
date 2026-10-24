@@ -152,6 +152,8 @@ export const Company = z.object({
     otWeeklyHours: z.number(),
     grossChangePct: z.number(),
     employeesMayBeTexted: z.boolean(),
+    /** CHK-21: a job margin below this percent is low. */
+    lowMarginPct: z.number(),
   }),
 });
 
@@ -271,7 +273,8 @@ export const Quote = z.object({
   salespersonWorkerId: nul(Id),
   sentAt: nul(Instant),
   status: z.string(),
-  amountCents: Cents,
+  /** null when the source omits it; never defaulted to 0. */
+  amountCents: nul(Cents),
 });
 
 export const Invoice = z.object({
@@ -282,7 +285,8 @@ export const Invoice = z.object({
   issuedDate: nul(Day),
   dueDate: nul(Day),
   status: z.string(),
-  totalCents: Cents,
+  /** null when the source omits it; never defaulted to 0. */
+  totalCents: nul(Cents),
 });
 
 export const Payment = z.object({
@@ -292,8 +296,8 @@ export const Payment = z.object({
   invoiceId: nul(Id),
   quoteId: nul(Id),
   entryDate: Day,
-  amountCents: Cents,
-  paymentType: z.string(),
+  amountCents: nul(Cents),
+  paymentType: nul(z.string()),
   kind: z.enum(["deposit", "final", "unknown"]),
 });
 
@@ -303,7 +307,7 @@ export const Expense = z.object({
   source: z.enum(["qbo", "jobber"]),
   sourceId: z.string(),
   date: Day,
-  amountCents: Cents,
+  amountCents: nul(Cents),
   vendor: nul(z.string()),
   description: nul(z.string()),
   accountName: nul(z.string()),
@@ -312,6 +316,9 @@ export const Expense = z.object({
   kind: z.enum(["job_cost", "overhead", "unknown"]),
   matchedJobId: nul(Id),
   matchConfidence: nul(z.number().min(0).max(1)),
+  /** Jobber only (A-10 Reimbursement lines); null for QuickBooks. */
+  reimbursableToWorkerId: nul(Id),
+  reimbursementStatus: nul(z.enum(["PENDING_REIMBURSEMENT", "PAID"])),
 });
 
 export const Flag = z.object({
@@ -472,6 +479,8 @@ export const DraftLine = z.object({
   fixed: z.array(z.object({ name: FixedName, amountCents: Cents })),
   memo: nul(z.string()),
   heldFlagIds: z.array(Id),
+  /** The arithmetic behind the line, one step per entry (A-10); shown on the workbook. */
+  explain: z.array(z.string()),
 });
 
 export const Draft = z.object({
@@ -492,6 +501,28 @@ export const Draft = z.object({
   gustoPayrollId: nul(z.string()),
   status: DraftStatus,
   totals: z.object({ grossCents: Cents, hours: z.number().min(0) }),
+});
+
+/** What was actually paid to one worker in one past cycle (Gusto regular, Gusto off-cycle or Venmo).
+ * Feeds onboarding, CHK-22 (regular + Venmo rows) and the M4 backtest. Not in section 6; added by B-02. */
+export const PastPayroll = z.object({
+  id: Id,
+  companyId: Id,
+  cycleId: Id,
+  /** Gusto payroll uuid, or the Venmo export row id. */
+  sourceId: z.string(),
+  workerId: Id,
+  paidVia: z.enum(["gusto_regular", "gusto_off_cycle", "venmo"]),
+  earnings: z.array(
+    z.object({
+      /** Gusto earning name ("Regular Hours", "Salary", "Bonus", ...) or "Hours" for Venmo. */
+      name: z.string(),
+      hours: nul(z.number().min(0)),
+      rateCents: nul(Cents),
+      amountCents: Cents,
+    }),
+  ),
+  grossCents: Cents,
 });
 
 /** Append-only, never edited. */
@@ -640,6 +671,7 @@ export type RuleType = z.infer<typeof RuleType>;
 export type Lesson = z.infer<typeof Lesson>;
 export type DraftLine = z.infer<typeof DraftLine>;
 export type Draft = z.infer<typeof Draft>;
+export type PastPayroll = z.infer<typeof PastPayroll>;
 export type AuditEvent = z.infer<typeof AuditEvent>;
 export type AccessEvent = z.infer<typeof AccessEvent>;
 export type CheckId = z.infer<typeof CheckId>;

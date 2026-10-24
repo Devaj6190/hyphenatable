@@ -26,6 +26,7 @@ const MIRRORS: Record<string, z.ZodObject> = {
   rules: zs.Rule,
   lessons: zs.Lesson,
   drafts: zs.Draft,
+  pastPayrolls: zs.PastPayroll,
   auditEvents: zs.AuditEvent,
   accessEvents: zs.AccessEvent,
 };

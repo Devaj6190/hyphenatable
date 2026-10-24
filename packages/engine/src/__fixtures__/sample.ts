@@ -17,6 +17,7 @@ export const sample = {
         otWeeklyHours: 40,
         grossChangePct: 25,
         employeesMayBeTexted: true,
+        lowMarginPct: 20,
       },
     },
   ],
@@ -89,6 +90,25 @@ export const sample = {
       gustoPayrollId: null,
       gustoOffCyclePayrollId: null,
       questionsAsked: 0,
+    },
+  ],
+  pastPayrolls: [
+    {
+      id: "pp_1",
+      companyId: "co_a",
+      cycleId: "cy_1",
+      sourceId: "g_payroll_1",
+      workerId: "w_07",
+      paidVia: "gusto_regular",
+      earnings: [
+        {
+          name: "Regular Hours",
+          hours: 80,
+          rateCents: 2400,
+          amountCents: 192000,
+        },
+      ],
+      grossCents: 192000,
     },
   ],
   quotes: [
@@ -188,6 +208,8 @@ export const sample = {
       kind: "job_cost",
       matchedJobId: null,
       matchConfidence: null,
+      reimbursableToWorkerId: null,
+      reimbursementStatus: null,
     },
   ],
   timeEntries: [
@@ -429,6 +451,7 @@ export const sample = {
           fixed: [],
           memo: "PayrollPilot draft dr_1 v1",
           heldFlagIds: ["fl_2"],
+          explain: ["10.00 h Regular Hours (te_15 8.00 h + te_16 2.00 h held)"],
         },
       ],
       venmoList: [],

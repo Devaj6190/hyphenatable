@@ -23,6 +23,7 @@ const RECORDS: Record<keyof typeof sample, z.ZodType> = {
   rules: s.Rule,
   lessons: s.Lesson,
   drafts: s.Draft,
+  pastPayrolls: s.PastPayroll,
   auditEvents: s.AuditEvent,
   accessEvents: s.AccessEvent,
 };
