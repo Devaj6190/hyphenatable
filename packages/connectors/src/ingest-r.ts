@@ -27,6 +27,11 @@ import {
   type PseudonymMap,
 } from "./anonymize.ts";
 import { readGustoPayrollJournalCsv } from "./exports/gusto-payroll-journal-csv.ts";
+import {
+  isSectionedJournal,
+  readGustoPayrollJournalSectionedCsv,
+} from "./exports/gusto-payroll-journal-sectioned.ts";
+import { readJobberTimesheetsCsv } from "./exports/jobber-timesheets-csv.ts";
 import { readJobberTimesheetsXlsx } from "./exports/jobber-timesheets-xlsx.ts";
 import { readQboXlsx } from "./exports/qbo-xlsx.ts";
 import {
@@ -65,6 +70,10 @@ export interface IngestCounts {
   jobs: number;
   timeEntries: number;
   paidRows: number;
+  /** worker x pay period rows for M4 (regular gross; off-cycle apart) */
+  paidPeriods: number;
+  /** of those, how many carry off-cycle gross */
+  paidPeriodsWithOffCycle: number;
   expenses: number;
   syncRuns: RunCount[];
   outPath: string | null;
@@ -174,23 +183,52 @@ export async function ingestR(o: IngestOptions): Promise<IngestCounts> {
   const timesheets = [];
   for (const p of o.timesheets) {
     const { bytes, fileTag } = await tagged(p);
-    const r = await readJobberTimesheetsXlsx(bytes, {
-      companyId,
-      timezone: o.timezone,
-      fileName: fileTag,
-      now,
-    });
-    syncRuns.push(scrub(r.syncRun, "jobber-timesheets-xlsx", fileTag));
+    // xlsx is a zip ("PK"); anything else is the CSV export
+    const isXlsx = bytes[0] === 0x50 && bytes[1] === 0x4b;
+    const r = isXlsx
+      ? await readJobberTimesheetsXlsx(bytes, {
+          companyId,
+          timezone: o.timezone,
+          fileName: fileTag,
+          now,
+        })
+      : await readJobberTimesheetsCsv(
+          { text: bytes.toString("utf8"), fileName: fileTag },
+          { companyId, timezone: o.timezone, now },
+        );
+    syncRuns.push(
+      scrub(
+        r.syncRun,
+        isXlsx ? "jobber-timesheets-xlsx" : "jobber-timesheets-csv",
+        fileTag,
+      ),
+    );
     timesheets.push({ fileTag, rows: r.rows });
   }
   const journals = [];
   for (const p of o.journals) {
     const { bytes, fileTag } = await tagged(p);
-    const r = await readGustoPayrollJournalCsv(
-      { text: bytes.toString("utf8"), fileName: fileTag },
-      { companyId, now },
+    const csv = bytes.toString("utf8");
+    // the sectioned "Payroll Journal Report" has "Pay period" lines; the flat journal does not
+    const sectioned = isSectionedJournal(csv);
+    const r = sectioned
+      ? await readGustoPayrollJournalSectionedCsv(
+          { text: csv, fileName: fileTag },
+          { companyId, now },
+        )
+      : await readGustoPayrollJournalCsv(
+          { text: csv, fileName: fileTag },
+          { companyId, now },
+        );
+    syncRuns.push(
+      scrub(
+        r.syncRun,
+        sectioned
+          ? "gusto-payroll-journal-sectioned"
+          : "gusto-payroll-journal-csv",
+        fileTag,
+      ),
     );
-    syncRuns.push(scrub(r.syncRun, "gusto-payroll-journal-csv", fileTag));
     journals.push({ fileTag, rows: r.rows });
   }
 
@@ -226,6 +264,10 @@ export async function ingestR(o: IngestOptions): Promise<IngestCounts> {
     jobs: bundle.jobs.length,
     timeEntries: bundle.timeEntries.length,
     paidRows: bundle.paid.length,
+    paidPeriods: bundle.paidByPeriod.length,
+    paidPeriodsWithOffCycle: bundle.paidByPeriod.filter(
+      (p) => p.offCycleGrossCents !== 0,
+    ).length,
     expenses: bundle.expenses.length,
     syncRuns: runCounts(syncRuns),
     outPath,
