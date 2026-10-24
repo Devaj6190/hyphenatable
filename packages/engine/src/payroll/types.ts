@@ -212,3 +212,55 @@ export type Stage1Result = {
   explain: Record<string, string[]>;
   pay: Record<string, WorkerPay>;
 };
+
+// ── Stage 2 inputs (section 6 mirrors) ───────────────────────────────────────
+
+export type Job = {
+  id: string;
+  companyId: string;
+  sourceId: string;
+  jobNumber: number;
+  title: string;
+  clientRef: string;
+  status: string;
+  salespersonWorkerId: string | null;
+  quoteId: string | null;
+  parentJobId: string | null;
+  startAt: string | null;
+  endAt: string | null;
+  totalCents: number | null;
+};
+
+export type Quote = {
+  id: string;
+  companyId: string;
+  sourceId: string;
+  jobId: string | null;
+  salespersonWorkerId: string | null;
+  sentAt: string | null;
+  status: string;
+  amountCents: number;
+};
+
+export type Invoice = {
+  id: string;
+  companyId: string;
+  sourceId: string;
+  jobId: string | null;
+  issuedDate: string | null;
+  dueDate: string | null;
+  status: string;
+  totalCents: number | null;
+};
+
+export type Payment = {
+  id: string;
+  companyId: string;
+  sourceId: string;
+  invoiceId: string | null;
+  quoteId: string | null;
+  entryDate: string;
+  amountCents: number;
+  paymentType: string;
+  kind: "deposit" | "final" | "unknown";
+};

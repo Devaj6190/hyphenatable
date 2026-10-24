@@ -1,0 +1,133 @@
+{
+  "note": "Computed by computeStage2 on data/fixtures/a a-c05 with every rule active; a-j01 and a-j05 labor re-derived independently with jq (entries x pay_rate costRateCentsPerHour, else Jobber rate). Re-pin with PIN_GOLDEN=1 and review the diff by hand.",
+  "jobs": [
+    {
+      "jobId": "a-j01",
+      "revenueCents": 814000,
+      "laborCents": 424350,
+      "jobCostCents": 68250,
+      "profitCents": 321400,
+      "marginPct": 39.48,
+      "low": false,
+      "hints": [],
+      "depositCents": 0,
+      "finalCents": 814000,
+      "misclassifiedPaymentIds": [],
+      "provisional": false
+    },
+    {
+      "jobId": "a-j02",
+      "revenueCents": 524000,
+      "laborCents": 301258,
+      "jobCostCents": 41500,
+      "profitCents": 181242,
+      "marginPct": 34.59,
+      "low": false,
+      "hints": [],
+      "depositCents": 50000,
+      "finalCents": 0,
+      "misclassifiedPaymentIds": [],
+      "provisional": true
+    },
+    {
+      "jobId": "a-j03",
+      "revenueCents": 587000,
+      "laborCents": 318525,
+      "jobCostCents": 6420,
+      "profitCents": 262055,
+      "marginPct": 44.64,
+      "low": false,
+      "hints": [],
+      "depositCents": 0,
+      "finalCents": 0,
+      "misclassifiedPaymentIds": [],
+      "provisional": false
+    },
+    {
+      "jobId": "a-j04",
+      "revenueCents": 711000,
+      "laborCents": 356350,
+      "jobCostCents": 131540,
+      "profitCents": 223110,
+      "marginPct": 31.38,
+      "low": false,
+      "hints": [],
+      "depositCents": 0,
+      "finalCents": 0,
+      "misclassifiedPaymentIds": [],
+      "provisional": true
+    },
+    {
+      "jobId": "a-j05",
+      "revenueCents": 405000,
+      "laborCents": 345800,
+      "jobCostCents": 31172,
+      "profitCents": 28028,
+      "marginPct": 6.92,
+      "low": true,
+      "hints": [
+        "unmatched job-cost expense a-ex-0003 on 2026-10-21",
+        "stale Jobber rate for a-w08: 3000¢/h vs 3250¢/h (a-rule-23)"
+      ],
+      "depositCents": 0,
+      "finalCents": 0,
+      "misclassifiedPaymentIds": [],
+      "provisional": true
+    },
+    {
+      "jobId": "a-j07",
+      "revenueCents": 48000,
+      "laborCents": 0,
+      "jobCostCents": 0,
+      "profitCents": 48000,
+      "marginPct": 100,
+      "low": false,
+      "hints": [],
+      "depositCents": 0,
+      "finalCents": 0,
+      "misclassifiedPaymentIds": [],
+      "provisional": false
+    },
+    {
+      "jobId": "a-j08",
+      "revenueCents": null,
+      "laborCents": 0,
+      "jobCostCents": 14250,
+      "profitCents": null,
+      "marginPct": null,
+      "low": false,
+      "hints": [],
+      "depositCents": 0,
+      "finalCents": 0,
+      "misclassifiedPaymentIds": [],
+      "provisional": false
+    },
+    {
+      "jobId": "a-j09",
+      "revenueCents": 400000,
+      "laborCents": 0,
+      "jobCostCents": 0,
+      "profitCents": 400000,
+      "marginPct": 100,
+      "low": false,
+      "hints": [],
+      "depositCents": 120000,
+      "finalCents": 0,
+      "misclassifiedPaymentIds": ["a-pay03"],
+      "provisional": false
+    }
+  ],
+  "overheadCents": 4999,
+  "unmatchedJobCostExpenseIds": ["a-ex-0003"],
+  "unknownKindExpenseIds": ["a-ex-0011"],
+  "staleRates": [
+    {
+      "workerId": "a-w08",
+      "jobberRateCents": 3000,
+      "ruleRateCents": 3250,
+      "ruleId": "a-rule-23",
+      "seconds": 244800,
+      "overstatementCents": 17000
+    }
+  ]
+}
