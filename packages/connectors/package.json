@@ -8,6 +8,8 @@
     "./jobber": "./src/jobber/index.ts",
     "./qbo": "./src/qbo/index.ts",
     "./gusto": "./src/gusto/read.ts",
+    "./exports/jobber-timesheets": "./src/exports/jobber-timesheets-xlsx.ts",
+    "./exports/gusto-payroll-journal": "./src/exports/gusto-payroll-journal-csv.ts",
     "./money": "./src/money.ts",
     "./types": "./src/types.ts"
   },
@@ -24,6 +26,7 @@
     "vitest": "3.2.4"
   },
   "dependencies": {
+    "exceljs": "4.4.0",
     "intuit-oauth": "4.2.5"
   }
 }
