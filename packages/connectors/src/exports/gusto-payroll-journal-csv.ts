@@ -87,6 +87,14 @@ export interface PayrollJournalRow {
   payKind?: "wage" | "owner_draw";
   /** per pay-type rate in cents, when the report gives one */
   ratesCents?: Record<string, number>;
+  /** itemized pay lines with their job (a role such as "Landscaper", not a person) and rate: M4 needs per-job rates */
+  jobLines?: {
+    job: string | null;
+    payType: string;
+    hours: number | null;
+    rateCents: number | null;
+    amountCents: number;
+  }[];
 }
 
 const optDate = (c: Cell | undefined) =>

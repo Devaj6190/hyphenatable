@@ -180,7 +180,7 @@ describe("Gusto Payroll Journal Report (sectioned)", () => {
     ]).toEqual(["regular", "regular", "off_cycle", "other"]);
   });
 
-  it("gross = the sum of pay-type Amounts; a no-pay-line employee is gross 0 with a note; totals reconcile", async () => {
+  it("gross = Gross line or the itemized sum; Totals subtotals are never added; totals reconcile", async () => {
     const r = await gj();
     expect(r.syncRun).toMatchObject({
       object: "payrollJournal",
@@ -201,7 +201,7 @@ describe("Gusto Payroll Journal Report (sectioned)", () => {
         x.payKind,
       ]),
     ).toEqual([
-      [1, "regular", "Avery Reed", "2026-08-29", "2026-09-16", 111250, "wage"],
+      [1, "regular", "Avery Reed", "2026-08-29", "2026-09-16", 116250, "wage"],
       [
         1,
         "regular",
@@ -216,21 +216,53 @@ describe("Gusto Payroll Journal Report (sectioned)", () => {
       [3, "regular", "Jordan Ellis", "2026-09-12", "2026-09-30", 66000, "wage"],
       [3, "regular", "Pat Quinlan", "2026-09-12", "2026-09-30", 0, "wage"],
     ]);
-    expect(r.rows[0]).toMatchObject({
-      employeeType: "Paid by the hour",
-      netCents: null,
-      earningsCents: {
-        Regular: 100000,
-        Overtime: 7500,
-        "Overtime (adjustment 08/15/26 - 08/28/26)": 3750,
-      },
-      hours: {
-        Regular: 40,
-        Overtime: 2,
-        "Overtime (adjustment 08/15/26 - 08/28/26)": 1,
-      },
-      ratesCents: { Regular: 2500, Overtime: 3750 },
+    const [a] = r.rows;
+    // Regular appears on two jobs: earnings summed per pay type, the subtotal line not added
+    expect(a?.earningsCents).toEqual({
+      Regular: 105000,
+      Overtime: 7500,
+      "Overtime (adjustment 08/15/26 - 08/28/26)": 3750,
     });
+    expect(a?.hours).toEqual({
+      Regular: 40,
+      Overtime: 2,
+      "Overtime (adjustment 08/15/26 - 08/28/26)": 1,
+    });
+    // two different Regular rates: no single per-type rate; per-job rates live in jobLines
+    expect(a?.ratesCents).toEqual({
+      Overtime: 3750,
+      "Overtime (adjustment 08/15/26 - 08/28/26)": 3750,
+    });
+    expect(a?.jobLines).toEqual([
+      {
+        job: "Landscaper",
+        payType: "Regular",
+        hours: 30,
+        rateCents: 2500,
+        amountCents: 75000,
+      },
+      {
+        job: "Team Leader",
+        payType: "Regular",
+        hours: 10,
+        rateCents: 3000,
+        amountCents: 30000,
+      },
+      {
+        job: null,
+        payType: "Overtime",
+        hours: 2,
+        rateCents: 3750,
+        amountCents: 7500,
+      },
+      {
+        job: null,
+        payType: "Overtime (adjustment 08/15/26 - 08/28/26)",
+        hours: 1,
+        rateCents: 3750,
+        amountCents: 3750,
+      },
+    ]);
     expect(r.rows[1]).toMatchObject({
       employeeType: "Owner’s draw",
       earningsCents: { "Owner's Draw": 200000 },
@@ -239,6 +271,15 @@ describe("Gusto Payroll Journal Report (sectioned)", () => {
       Commission: 15000,
       "Additional Earnings": 5000,
     });
+    expect(r.rows[4]?.jobLines).toEqual([
+      {
+        job: "Truck Hauling",
+        payType: "Regular",
+        hours: 30,
+        rateCents: 2200,
+        amountCents: 66000,
+      },
+    ]);
   });
 
   it("never reads Payment (the payment method), taxes, addresses, net pay, check amount, employer cost or donations", async () => {
@@ -263,35 +304,54 @@ describe("Gusto Payroll Journal Report (sectioned)", () => {
       expect(json).not.toContain(String(n));
   });
 
-  it("a Gross line that disagrees with the pay lines is a problem", async () => {
+  it("a Gross line that disagrees with the itemized lines is a problem", async () => {
     const r = await gj(
       GUSTO_JOURNAL_SECTIONED_CSV.replace(
-        ',Gross,,,"1,112.50"',
-        ',Gross,,,"1,100.00"',
+        ",Gross,,,1162.50",
+        ",Gross,,,1100.00",
       ),
     );
     expect(r.syncRun.complete).toBe(false);
     expect(r.syncRun.error).toMatch(
-      /section 1 row \d+: Gross line 110000¢ vs pay lines 111250¢/,
+      /section 1 row \d+: Gross line 110000¢ vs itemized lines 116250¢/,
     );
   });
 
-  it("employee gross not adding up to the Payroll Totals amount is incomplete", async () => {
+  it("a Totals subtotal that disagrees with its pay type's itemized lines is a problem", async () => {
     const r = await gj(
       GUSTO_JOURNAL_SECTIONED_CSV.replace(
-        'Gross,,,"3,112.50"',
-        'Gross,,,"3,200.00"',
+        "Totals,Regular,40.000,,1050.00",
+        "Totals,Regular,40.000,,1000.00",
+      ),
+    );
+    expect(r.syncRun.complete).toBe(false);
+    expect(r.syncRun.error).toMatch(
+      /section 1 row \d+: "Regular" Totals line 100000¢ vs its itemized lines 105000¢/,
+    );
+  });
+
+  it("employee gross not adding up to the Payroll Totals is incomplete; the totals block is checked the same way", async () => {
+    const r = await gj(
+      GUSTO_JOURNAL_SECTIONED_CSV.replace(
+        "Totals,Gross,,,3162.50",
+        "Totals,Gross,,,3200.00",
       ),
     );
     expect(r.syncRun.complete).toBe(false);
     expect(r.syncRun.error).toContain(
-      "section 1: employee gross sum 311250¢ vs Payroll Totals 320000¢",
+      "section 1 Payroll Totals: Gross line 320000¢ vs itemized lines 316250¢",
+    );
+    expect(r.syncRun.error).toContain(
+      "section 1: employee gross sum 316250¢ vs Payroll Totals 320000¢",
     );
   });
 
   it("a section without any totals amount is incomplete", async () => {
     const r = await gj(
-      GUSTO_JOURNAL_SECTIONED_CSV.replace(/\n[^\n]*,Gross,,,"1,660\.00"/, ""),
+      GUSTO_JOURNAL_SECTIONED_CSV.replace(
+        /\n[^\n]*,Totals,Gross,,,1660\.00/,
+        "",
+      ),
     );
     expect(r.syncRun.complete).toBe(false);
     expect(r.syncRun.error).toContain("section 3: no Payroll Totals amount");
