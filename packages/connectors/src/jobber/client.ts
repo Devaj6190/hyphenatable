@@ -2,9 +2,9 @@
 // READ-ONLY by construction: `query()` refuses any document that contains a mutation.
 // Never logs token values.
 
-import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
-import { dirname } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileTokenStore as fileStore, privatePath, type StoredTokens, type TokenStore } from "../tokens.ts";
+
+export type { StoredTokens, TokenStore };
 
 export const JOBBER_GRAPHQL_URL = "https://api.getjobber.com/api/graphql";
 export const JOBBER_TOKEN_URL = "https://api.getjobber.com/api/oauth/token";
@@ -16,39 +16,10 @@ export const THROTTLE_FLOOR = 1500;
 const MAX_ATTEMPTS = 6;
 const EXPIRY_SKEW_MS = 60_000;
 
-export interface StoredTokens {
-  accessToken: string | null;
-  /** epoch ms */
-  accessTokenExpiresAt: number | null;
-  refreshToken: string;
-}
-
-export interface TokenStore {
-  load(): Promise<StoredTokens | null>;
-  save(tokens: StoredTokens): Promise<void>;
-}
-
 /** Default token file. data/private/ is gitignored; it is the only runtime write outside the package. */
-export const DEFAULT_TOKEN_PATH = fileURLToPath(new URL("../../../../data/private/jobber-token.json", import.meta.url));
+export const DEFAULT_TOKEN_PATH = privatePath("jobber-token.json");
 
-export function fileTokenStore(path: string = DEFAULT_TOKEN_PATH): TokenStore {
-  return {
-    async load() {
-      try {
-        return JSON.parse(await readFile(path, "utf8")) as StoredTokens;
-      } catch (e) {
-        if ((e as NodeJS.ErrnoException).code === "ENOENT") return null;
-        throw e;
-      }
-    },
-    async save(tokens) {
-      await mkdir(dirname(path), { recursive: true });
-      const tmp = `${path}.${process.pid}.tmp`;
-      await writeFile(tmp, JSON.stringify(tokens), { mode: 0o600 });
-      await rename(tmp, path);
-    },
-  };
-}
+export const fileTokenStore = (path: string = DEFAULT_TOKEN_PATH): TokenStore => fileStore(path);
 
 export interface JobberAuth {
   clientId: string;

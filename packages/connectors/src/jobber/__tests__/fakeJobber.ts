@@ -74,6 +74,11 @@ export function fakeJobberFetch(fx: Fixtures, opts: { rotate?: boolean } = {}): 
         const totalCount = (fx.objects.totalCounts as Record<string, number>)[object] ?? nodes.length;
         return json({ data: { [object]: { totalCount, pageInfo: { hasNextPage: false, endCursor: null }, nodes } } });
       }
+      case "PayrollPilot_expenseStatus": {
+        const nodes = (fx.objects.expenseStatus as Record<string, { id: string }[]>)[String(v.status)];
+        if (!nodes) return json({ errors: [{ message: "status unavailable" }] });
+        return json({ data: { expenses: { totalCount: nodes.length, pageInfo: { hasNextPage: false, endCursor: null }, nodes } } });
+      }
       default:
         return json({ errors: [{ message: `unexpected operation ${operation}` }] });
     }

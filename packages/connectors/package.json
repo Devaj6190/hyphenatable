@@ -6,17 +6,22 @@
   "description": "Read-only connectors (Jobber, QuickBooks, Gusto read, exports) returning shared-context section 6 shapes with completeness SyncRuns.",
   "exports": {
     "./jobber": "./src/jobber/index.ts",
+    "./qbo": "./src/qbo/index.ts",
     "./money": "./src/money.ts",
     "./types": "./src/types.ts"
   },
   "scripts": {
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "jobber": "bun run src/jobber/cli.ts"
+    "jobber": "bun run src/jobber/cli.ts",
+    "qbo": "bun run src/qbo/cli.ts"
   },
   "devDependencies": {
     "@types/bun": "1.3.1",
     "typescript": "5.9.3",
     "vitest": "3.2.4"
+  },
+  "dependencies": {
+    "intuit-oauth": "4.2.5"
   }
 }

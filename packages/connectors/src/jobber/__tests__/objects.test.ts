@@ -68,6 +68,22 @@ describe("pullCycle objects (recorded fixtures)", () => {
     expect(dump).toMatchObject({ amountCents: null, matchedJobId: null, accountName: null, description: "Dump fee - transfer station" });
   });
 
+  it("expenses: reimbursable-to worker and status from the paymentStatus filter, null when absent", async () => {
+    const { records } = await pull();
+    const [mulch, dump] = records.expenses;
+    expect(mulch).toMatchObject({ reimbursableToWorkerId: "jobber:Z2lkOi8vSm9iYmVyL1VzZXIvMTAwMg==", reimbursementStatus: "PENDING_REIMBURSEMENT" });
+    expect(dump).toMatchObject({ reimbursableToWorkerId: null, reimbursementStatus: null });
+  });
+
+  it("expenses: unknown reimbursement status leaves nulls and marks the run incomplete", async () => {
+    const fx = fixtures();
+    (fx.objects.expenseStatus as Record<string, unknown>).PAID = undefined;
+    const r = await pull(fx);
+    expect(r.records.expenses[0]?.reimbursementStatus).toBeNull();
+    expect(runOf(r, "expenses")?.complete).toBe(false);
+    expect(runOf(r, "expenses")?.error).toContain("reimbursement status unavailable");
+  });
+
   it("a quote on several jobs gets no jobId (never picks one)", async () => {
     const fx = fixtures();
     const q = fx.objects.quotes[0];

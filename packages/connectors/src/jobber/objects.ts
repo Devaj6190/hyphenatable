@@ -29,7 +29,18 @@ export const VISITS_QUERY = conn("visits", range("startAt"), `id job { id } star
 export const QUOTES_QUERY = conn("quotes", range("sentAt"), `id quoteStatus salesperson { id } sentAt amounts { total } ${nestedIds("jobs")}`);
 export const INVOICES_QUERY = conn("invoices", range("issuedDate"), `id invoiceStatus issuedDate dueDate amounts { total } ${nestedIds("jobs")}`);
 export const PAYMENT_RECORDS_QUERY = conn("paymentRecords", range("entryDate"), "id amount entryDate paymentType invoice { id } quote { id }");
-export const EXPENSES_QUERY = conn("expenses", range("date"), "id title description date total linkedJob { id } accountingCode { code }");
+export const EXPENSES_QUERY = conn("expenses", range("date"), "id title description date total linkedJob { id } accountingCode { code } reimbursableTo { id }");
+/** Expense has no status field; the status exists only as a filter, so ids are pulled per status. */
+export const EXPENSE_STATUS_QUERY = /* GraphQL */ `
+  query PayrollPilot_expenseStatus($after: String, $first: Int!, $from: ISO8601DateTime!, $to: ISO8601DateTime!, $status: ExpensePaymentStatus!) {
+    expenses(filter: { date: { after: $from, before: $to }, paymentStatus: $status }, first: $first, after: $after) {
+      totalCount
+      pageInfo { hasNextPage endCursor }
+      nodes { id }
+    }
+  }
+`;
+export type ReimbursementStatus = "PENDING_REIMBURSEMENT" | "PAID";
 export const JOBS_BY_ID_QUERY = conn(
   "jobs",
   "{ ids: $ids }",
@@ -43,7 +54,7 @@ export interface RawVisit { id: string; job: { id: string }; startAt: string | n
 export interface RawQuote { id: string; quoteStatus: string; salesperson: Id; sentAt: string | null; amounts: { total: number }; jobs: Nested }
 export interface RawInvoice { id: string; invoiceStatus: string; issuedDate: string | null; dueDate: string | null; amounts: { total: number } | null; jobs: Nested }
 export interface RawPayment { id: string; amount: number; entryDate: string; paymentType: string | null; invoice: Id; quote: Id }
-export interface RawExpense { id: string; title: string; description: string | null; date: string; total: number | null; linkedJob: Id; accountingCode: { code: string } | null }
+export interface RawExpense { id: string; title: string; description: string | null; date: string; total: number | null; linkedJob: Id; accountingCode: { code: string } | null; reimbursableTo: Id }
 export interface RawJob {
   id: string; jobNumber: number; title: string | null; jobStatus: string; client: { id: string }; salesperson: Id; quote: Id;
   startAt: string | null; endAt: string | null; total: number;
@@ -83,11 +94,12 @@ export const normalizePayment = (r: RawPayment, companyId: string): Payment => (
 
 // linkedJob is a link the person made in Jobber, not a scored match: matchedJobId is set, matchConfidence stays null.
 // kind is B's classification (expense_account_kind rules), so "unknown" here.
-export const normalizeExpense = (r: RawExpense, companyId: string): Expense => ({
+export const normalizeExpense = (r: RawExpense, companyId: string, status: Map<string, ReimbursementStatus> = new Map()): Expense => ({
   id: jobberRef(r.id), companyId, source: "jobber", sourceId: r.id, date: toUtcIso(r.date), amountCents: toCents(r.total),
   vendor: null, description: [r.title, r.description].filter((s) => s?.trim()).join(" - ") || null,
   accountName: r.accountingCode?.code ?? null, customerRef: null, paymentType: null, kind: "unknown",
   matchedJobId: ref(r.linkedJob), matchConfidence: null,
+  reimbursableToWorkerId: ref(r.reimbursableTo), reimbursementStatus: status.get(r.id) ?? null,
 });
 
 export const normalizeJob = (r: RawJob, companyId: string): Job => ({
@@ -145,6 +157,20 @@ export async function pullObjects(
   const invoices = await one<RawInvoice>("invoices", INVOICES_QUERY, "issuedDate", (r) => r.jobs);
   const payments = await one<RawPayment>("paymentRecords", PAYMENT_RECORDS_QUERY, "entryDate");
   const expenses = await one<RawExpense>("expenses", EXPENSES_QUERY, "date");
+  const reimbursement = new Map<string, ReimbursementStatus>();
+  if (expenses.some((x) => x.reimbursableTo?.id)) {
+    try {
+      for (const status of ["PENDING_REIMBURSEMENT", "PAID"] as const) {
+        const page = await paginate<{ id: string }, { expenses: Connection<{ id: string }> }>(client, EXPENSE_STATUS_QUERY, { ...vars, status }, (d) => d.expenses);
+        for (const n of page.nodes) reimbursement.set(n.id, status);
+      }
+    } catch (e) {
+      // Statuses unknown -> every reimbursementStatus stays null and the expenses run cannot claim completeness.
+      reimbursement.clear();
+      const run = runs.find((r) => r.object === "expenses");
+      if (run) run.result = withExtra(run.result, `expenses: reimbursement status unavailable (${e instanceof Error ? e.message : String(e)})`);
+    }
+  }
 
   // Jobs: every job referenced by the period's entries, visits, quotes, invoices and expenses, fetched by id.
   const wanted = new Set<string>(entryJobIds);
@@ -181,7 +207,7 @@ export async function pullObjects(
       quotes: quotes.map((r) => normalizeQuote(r, companyId)),
       invoices: invoices.map((r) => normalizeInvoice(r, companyId)),
       payments: payments.map((r) => normalizePayment(r, companyId)),
-      expenses: expenses.map((r) => normalizeExpense(r, companyId)),
+      expenses: expenses.map((r) => normalizeExpense(r, companyId, reimbursement)),
     },
     runs,
   };
