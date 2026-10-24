@@ -30,7 +30,7 @@ export function RoleNotice() {
   const { role } = useRole();
   if (role !== "manager") return null;
   return (
-    <p className="text-sm font-medium text-hold">
+    <p className="text-sm font-medium text-muted-foreground">
       Manager view. Pay amounts are never shown here.
     </p>
   );
