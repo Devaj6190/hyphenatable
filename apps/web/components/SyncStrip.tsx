@@ -2,8 +2,9 @@ import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { SourceChip } from "@/components/SourceChip";
 import { StatusBadge } from "@/components/StatusBadge";
-import { clock, objectWord, SOURCES, type SyncRun } from "@/lib/home";
+import { clock, objectWord, SOURCES } from "@/lib/home";
 import { cn } from "@/lib/utils";
+import type { SyncRun } from "@/lib/view-types";
 
 // Pulled vs expected for every SyncRun of the cycle, per source. An incomplete run is red and says what
 // it blocks. `detailed` adds the method, sync time and error (the Inputs page).

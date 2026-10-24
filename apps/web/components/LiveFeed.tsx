@@ -124,7 +124,7 @@ function Feed({
             aria-hidden
             className={cn(
               "size-1.5 rounded-full",
-              live ? "bg-ok" : "bg-muted-foreground/50",
+              live ? "bg-foreground" : "bg-muted-foreground/50",
             )}
           />
           {live ? "Live" : "Fixture"}

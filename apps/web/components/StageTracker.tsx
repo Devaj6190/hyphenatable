@@ -1,6 +1,7 @@
 import { Check } from "lucide-react";
-import { type Cycle, STAGES, stageIndex } from "@/lib/home";
+import { STAGES, stageIndex } from "@/lib/home";
 import { cn } from "@/lib/utils";
+import type { Cycle } from "@/lib/view-types";
 
 // Where the cycle is, from Cycle.stage. The current step is navigation chrome (charcoal), never a
 // status color: a finished step is not "verified", and gates are marked as the owner's approvals.

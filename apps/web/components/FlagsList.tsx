@@ -6,14 +6,16 @@ import Link from "next/link";
 import { type ReactNode, useState } from "react";
 import { AgentChip } from "@/components/AgentChip";
 import { ConfidenceBadge } from "@/components/ConfidenceBadge";
+import { type DataKind, DataLabel } from "@/components/DataLabel";
 import { LiveBoundary } from "@/components/LiveBoundary";
 import { PrecedentBadge } from "@/components/PrecedentBadge";
 import { Segmented } from "@/components/Segmented";
 import { flagStatus, StatusBadge } from "@/components/StatusBadge";
 import { checkTitle } from "@/lib/checks";
-import { affectsLabel, type FlagInfo, infoFor } from "@/lib/home";
+import { affectsLabel, infoFor } from "@/lib/home";
 import { FIXTURE_SOURCE } from "@/lib/sources";
 import type { Flag } from "@/lib/types";
+import type { FlagInfo } from "@/lib/view-types";
 
 // Function refs by name so this builds before B's generated api exists.
 const cyclesList = makeFunctionReference<
@@ -112,8 +114,10 @@ export function FlagsList({
   companyId,
   flags: fixtureFlags,
   info,
+  dataKind,
 }: {
   companyId: string;
+  dataKind: DataKind;
   /** Fixture flags, already filtered and redacted on the server for this viewer. */
   flags: Flag[];
   info: Record<string, FlagInfo>;
@@ -157,7 +161,9 @@ export function FlagsList({
                 ))}
               </ul>
             )}
-            <p className="text-xs text-muted-foreground">Source: {source}.</p>
+            <p className="text-xs text-muted-foreground">
+              Source: {source}. <DataLabel kind={dataKind} />
+            </p>
           </div>
         );
       }}

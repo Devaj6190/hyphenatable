@@ -6,8 +6,8 @@ import { Money } from "@/components/Money";
 import { useRole } from "@/components/RoleProvider";
 import { SourceChip } from "@/components/SourceChip";
 import { flagStatus, StatusBadge } from "@/components/StatusBadge";
-import type { RosterWorker } from "@/lib/home";
 import type { Flag } from "@/lib/types";
+import type { RosterWorker } from "@/lib/view-types";
 
 const paidBy: Record<RosterWorker["payType"], string> = {
   hourly: "Gusto, hourly",

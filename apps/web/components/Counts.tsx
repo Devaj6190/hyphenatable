@@ -1,3 +1,4 @@
+import { type DataKind, DataLabel } from "@/components/DataLabel";
 import type { countFlags } from "@/lib/home";
 import { cn } from "@/lib/utils";
 
@@ -5,9 +6,11 @@ import { cn } from "@/lib/utils";
 export function Counts({
   counts,
   source,
+  dataKind,
 }: {
   counts: ReturnType<typeof countFlags>;
   source: string;
+  dataKind: DataKind;
 }) {
   const tiles = [
     {
@@ -58,7 +61,7 @@ export function Counts({
       </dl>
       <p className="text-xs text-muted-foreground">
         Clean = records pulled this cycle that no check flagged. Source:{" "}
-        {source}.
+        {source}. <DataLabel kind={dataKind} />
       </p>
     </section>
   );

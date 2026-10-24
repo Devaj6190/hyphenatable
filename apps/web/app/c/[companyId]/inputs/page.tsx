@@ -2,13 +2,13 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { DataLabel } from "@/components/DataLabel";
 import { FlagsList } from "@/components/FlagsList";
 import { PageHeader } from "@/components/PageHeader";
 import { SyncStrip } from "@/components/SyncStrip";
 import { WorkersTable } from "@/components/WorkersTable";
 import { companies } from "@/lib/companies";
-import { currentViewer } from "@/lib/server/fixtures";
-import { homeView, rosterView } from "@/lib/server/home";
+import { currentViewer, homeView, rosterView } from "@/lib/server/fixtures";
 
 // Board 2, reached from the home's sync strip ("See every input") and "See all problems".
 export default function InputsPage({
@@ -62,8 +62,11 @@ async function Inputs({
           detailed
         />
         <p className="text-xs text-muted-foreground">
-          Source: placeholder fixture, data/fixtures/a/syncRuns.json,{" "}
-          {company.kind}.
+          Source:{" "}
+          {fx.sources.records
+            ? `placeholder fixture, ${fx.sources.records}`
+            : `no sync fixture for ${company.label} yet`}
+          . <DataLabel kind={company.kind} />
         </p>
       </section>
 
@@ -75,6 +78,7 @@ async function Inputs({
           companyId={companyId}
           flags={fx.flags}
           info={fx.info}
+          dataKind={company.kind}
           viewerId={viewer.workerId}
         />
       </section>
@@ -98,8 +102,10 @@ async function Inputs({
           flags={fx.flags}
         />
         <p className="text-xs text-muted-foreground">
-          Source: data/fixtures/a/workers.json, {company.kind}. Rates are shown
-          as each system holds them, side by side.
+          Source:{" "}
+          {fx.sources.roster ?? `no worker fixture for ${company.label} yet`}.{" "}
+          <DataLabel kind={company.kind} /> Rates are shown as each system holds
+          them, side by side.
         </p>
       </section>
     </div>

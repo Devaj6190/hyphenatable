@@ -1,6 +1,12 @@
 "use client";
 
-import { ArrowRight, CircleCheck, CirclePause, Undo2 } from "lucide-react";
+import {
+  ArrowRight,
+  CircleCheck,
+  CirclePause,
+  Flag as GateIcon,
+  Undo2,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -8,11 +14,19 @@ import type { DataKind } from "@/components/DataLabel";
 import { FlagCard } from "@/components/FlagCard";
 import { Button } from "@/components/ui/button";
 import { checkTitle } from "@/lib/checks";
-import { affectsLabel, type FlagInfo, infoFor } from "@/lib/home";
+import { affectsLabel, infoFor } from "@/lib/home";
 import type { Flag } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import type { FlagInfo } from "@/lib/view-types";
 
-export type Decision = "approved" | "denied";
+/** A choice made on this screen. `saved` is false in fixture mode: nothing reaches Convex. */
+export type Decision = {
+  kind: "approved" | "denied";
+  /** Pick a match: the job the owner linked, or null when they chose to ask instead. */
+  job?: string | null;
+  saved: boolean;
+};
+
 const LIMIT = 3;
 
 // "What we need from you": one card per item with one primary action. A decided card folds into a
@@ -22,22 +36,31 @@ export function NeedsYouList({
   info,
   decisions,
   onDecide,
+  pendingIds,
+  errors,
   dataKind,
   companyId,
   total,
+  gate,
 }: {
   /** Items that need the owner, plus the ones decided on this screen (kept in place). */
   items: Flag[];
   info: Record<string, FlagInfo>;
   decisions: Record<string, Decision>;
-  onDecide: (flag: Flag, decision: Decision | null) => void;
+  onDecide: (flag: Flag, decision: Omit<Decision, "saved"> | null) => void;
+  /** Flags with a save in flight, and the error from a save that failed. */
+  pendingIds: ReadonlySet<string>;
+  errors: Record<string, string>;
   dataKind: DataKind;
   companyId: string;
   /** Every problem this cycle, for the "see all" link. */
   total: number;
+  /** The gate the cycle waits at, if any. Shown first: nothing moves until the owner approves it. */
+  gate: { label: string; hint: string } | null;
 }) {
   const [expanded, setExpanded] = useState(false);
   const pending = items.filter((f) => !decisions[f.id]);
+  const things = pending.length + (gate ? 1 : 0);
   const hidden = new Set(expanded ? [] : pending.slice(LIMIT).map((f) => f.id));
 
   return (
@@ -47,9 +70,9 @@ export function NeedsYouList({
           What we need from you
         </h2>
         <span className="text-muted-foreground">
-          {pending.length === 0
+          {things === 0
             ? "all done"
-            : `${pending.length} ${pending.length === 1 ? "thing" : "things"}`}
+            : `${things} ${things === 1 ? "thing" : "things"}`}
         </span>
         <Link
           href={`/c/${companyId}/inputs`}
@@ -60,8 +83,9 @@ export function NeedsYouList({
         </Link>
       </div>
 
+      {gate && <GateCard gate={gate} companyId={companyId} />}
       {items.length === 0 ? (
-        <AllClear />
+        !gate && <AllClear />
       ) : (
         <ul className="flex flex-col">
           {items
@@ -73,12 +97,14 @@ export function NeedsYouList({
                 info={infoFor(info, f.id)}
                 decision={decisions[f.id]}
                 onDecide={(d) => onDecide(f, d)}
+                pending={pendingIds.has(f.id)}
+                error={errors[f.id]}
                 dataKind={dataKind}
               />
             ))}
         </ul>
       )}
-      {pending.length === 0 && items.length > 0 && <AllClear />}
+      {things === 0 && items.length > 0 && <AllClear />}
       {hidden.size > 0 && (
         <Button
           variant="secondary"
@@ -89,6 +115,33 @@ export function NeedsYouList({
         </Button>
       )}
     </section>
+  );
+}
+
+function GateCard({
+  gate,
+  companyId,
+}: {
+  gate: { label: string; hint: string };
+  companyId: string;
+}) {
+  return (
+    <div className="mb-4 flex flex-wrap items-center gap-x-4 gap-y-2 rounded-card border border-hold bg-hold-soft p-5">
+      <GateIcon aria-hidden className="size-5 shrink-0 text-hold" />
+      <div className="min-w-0 flex-1">
+        <p className="text-lg font-semibold">{gate.label} is waiting on you</p>
+        <p className="text-muted-foreground">
+          {gate.hint}. Nothing moves past it until you approve.
+        </p>
+      </div>
+      <Link
+        href={`/c/${companyId}/workbook`}
+        className="inline-flex items-center gap-1 font-medium text-link underline-offset-4 hover:underline"
+      >
+        Review in the workbook
+        <ArrowRight aria-hidden className="size-4" />
+      </Link>
+    </div>
   );
 }
 
@@ -104,30 +157,41 @@ function AllClear() {
   );
 }
 
+const ASK = "ask";
+
 function Item({
   flag,
   info,
   decision,
   onDecide,
+  pending,
+  error,
   dataKind,
 }: {
   flag: Flag;
   info: FlagInfo;
   decision: Decision | undefined;
-  onDecide: (d: Decision | null) => void;
+  onDecide: (d: Omit<Decision, "saved"> | null) => void;
+  pending: boolean;
+  error: string | undefined;
   dataKind: DataKind;
 }) {
   const router = useRouter();
   const undo = useRef<HTMLButtonElement>(null);
   const { question: q, recipient: who, reply } = info;
   const detail = `/c/${flag.companyId}/flags/${flag.id}`;
-  // A reply came in (the flag is answered) or a drafted text waits for approval. `flag` keeps its
-  // status from the source; this screen's decision lives in `decision`.
-  const kind: "reply" | "draft" | "decide" = reply
+  // A reply came in (the flag is answered), a purchase needs a job (pick a match), or a drafted text waits
+  // for approval. `flag` keeps its status from the source; this screen's decision lives in `decision`.
+  const jobs = (q?.options ?? []).filter((o) => o !== "not sure");
+  const kind: "reply" | "match" | "draft" | "decide" = reply
     ? "reply"
-    : q?.status === "draft"
-      ? "draft"
-      : "decide";
+    : flag.checkId === "CHK-14" && q?.status === "draft" && jobs.length > 0
+      ? "match"
+      : q?.status === "draft"
+        ? "draft"
+        : "decide";
+  const [pick, setPick] = useState<string | null>(null);
+  const [nudge, setNudge] = useState(false);
 
   // Keep keyboard focus on the item: the folded side goes inert, so focus moves to Undo and,
   // after Undo, back to the card's first visible button (source chips in the closed details are hidden).
@@ -147,6 +211,32 @@ function Item({
   const fold =
     "grid transition-[grid-template-rows,opacity] duration-(--dur-archive) ease-out-soft";
 
+  function approve() {
+    if (kind === "decide") return router.push(detail);
+    if (kind === "match") {
+      if (!pick) return setNudge(true);
+      return onDecide({ kind: "approved", job: pick === ASK ? null : pick });
+    }
+    onDecide({ kind: "approved" });
+  }
+
+  // Saved decisions say what happens next; fixture ones only say what was chosen on this screen.
+  const here = decision?.saved ? "" : " on this screen";
+  const confirm =
+    decision?.kind === "denied"
+      ? kind === "reply"
+        ? `Correction not approved${here}.`
+        : `Held${here}. Only this item waits until you decide.`
+      : decision?.job
+        ? `Linked to job ${decision.job}${here}.`
+        : kind === "reply"
+          ? decision?.saved
+            ? "Correction approved. It goes into the workbook."
+            : "Correction approved on this screen."
+          : decision?.saved
+            ? `Approved. Goes to ${who} next.`
+            : "Approved on this screen.";
+
   return (
     <li className="flex flex-col">
       <div
@@ -162,30 +252,79 @@ function Item({
               flag={flag}
               dataKind={dataKind}
               headline={
-                kind === "draft"
-                  ? `Send this question to ${who}?`
-                  : kind === "reply"
-                    ? `${who} replied. Approve the fix?`
-                    : checkTitle(flag.checkId)
+                kind === "match"
+                  ? "Pick a match: which job is this purchase for?"
+                  : kind === "draft"
+                    ? `Send this question to ${who}?`
+                    : kind === "reply"
+                      ? `${who} replied. Approve the fix?`
+                      : checkTitle(flag.checkId)
               }
               affectsLabel={affectsLabel(flag.checkId)}
               agents={info.agents}
               approveLabel={
-                kind === "draft"
-                  ? "Approve and send"
-                  : kind === "reply"
-                    ? "Approve correction"
-                    : "Open and decide"
+                kind === "match"
+                  ? pick === ASK
+                    ? "Approve and send"
+                    : pick
+                      ? `Link to job ${pick}`
+                      : "Link to the job"
+                  : kind === "draft"
+                    ? "Approve and send"
+                    : kind === "reply"
+                      ? "Approve correction"
+                      : "Open and decide"
               }
-              onApprove={
-                kind === "decide"
-                  ? () => router.push(detail)
-                  : () => onDecide("approved")
-              }
+              onApprove={approve}
               onEdit={kind === "draft" ? () => router.push(detail) : undefined}
-              onDeny={kind === "decide" ? undefined : () => onDecide("denied")}
+              onDeny={
+                kind === "decide"
+                  ? undefined
+                  : () => onDecide({ kind: "denied" })
+              }
+              pending={pending}
               href={kind === "decide" ? null : detail}
             >
+              {kind === "match" && q && (
+                <fieldset className="flex flex-col gap-2">
+                  <legend className="mb-2 text-sm text-muted-foreground">
+                    Pick the job, or ask {who}. QuickBooks is not changed.
+                  </legend>
+                  {[...jobs, ASK].map((o) => (
+                    <label
+                      key={o}
+                      className="flex cursor-pointer items-center gap-3 rounded-control border px-3 py-2 has-checked:border-foreground has-focus-visible:outline-2 has-focus-visible:outline-ring"
+                    >
+                      <input
+                        type="radio"
+                        name={`match-${flag.id}`}
+                        value={o}
+                        checked={pick === o}
+                        onChange={() => {
+                          setPick(o);
+                          setNudge(false);
+                        }}
+                        className="accent-foreground"
+                      />
+                      {o === ASK
+                        ? `Not sure. Ask ${who} instead`
+                        : o === "overhead"
+                          ? "Overhead, no job"
+                          : `Job ${o}`}
+                    </label>
+                  ))}
+                  {pick === ASK && (
+                    <blockquote className="rounded-card rounded-tl-sm bg-muted px-4 py-3 leading-snug">
+                      {q.text}
+                    </blockquote>
+                  )}
+                  {nudge && (
+                    <p className="text-sm font-medium text-hold">
+                      Pick one first.
+                    </p>
+                  )}
+                </fieldset>
+              )}
               {kind === "draft" && q && (
                 <figure className="flex flex-col gap-2">
                   <figcaption className="text-sm text-muted-foreground">
@@ -218,6 +357,14 @@ function Item({
                   )}
                 </figure>
               )}
+              {error && (
+                <p
+                  role="alert"
+                  className="mt-3 text-sm font-medium text-destructive"
+                >
+                  {error}
+                </p>
+              )}
             </FlagCard>
           </div>
         </div>
@@ -234,41 +381,39 @@ function Item({
           <output
             className={cn(
               "mb-4 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-card border px-4 py-3",
-              decision === "denied" ? "border-hold bg-hold-soft" : "bg-card",
+              decision?.kind === "denied"
+                ? "border-hold bg-hold-soft"
+                : "bg-card",
             )}
           >
-            {decision === "denied" ? (
+            {decision?.kind === "denied" ? (
               <CirclePause aria-hidden className="size-5 shrink-0 text-hold" />
             ) : (
-              <CircleCheck aria-hidden className="size-5 shrink-0 text-ok" />
+              <CircleCheck
+                aria-hidden
+                className="size-5 shrink-0 text-muted-foreground"
+              />
             )}
             <span className="min-w-0 flex-1">
-              <span className="font-medium">
-                {decision === "denied"
-                  ? kind === "draft"
-                    ? "Not sent."
-                    : "Correction not approved."
-                  : kind === "draft"
-                    ? `Approved. Goes to ${who} next.`
-                    : "Correction approved."}
-              </span>{" "}
-              <span className="text-muted-foreground">
-                {decision === "denied"
-                  ? "Only this item is held until you decide."
-                  : kind === "draft"
-                    ? "We'll show the reply here."
-                    : "It goes into the workbook."}
-              </span>
+              <span className="font-medium">{confirm}</span>
+              {decision && !decision.saved && (
+                <span className="text-muted-foreground">
+                  {" "}
+                  Not saved (fixture mode): nothing was sent or changed.
+                </span>
+              )}
             </span>
-            <Button
-              ref={undo}
-              variant="quiet"
-              size="sm"
-              onClick={() => onDecide(null)}
-            >
-              <Undo2 aria-hidden />
-              Undo
-            </Button>
+            {decision && !decision.saved && (
+              <Button
+                ref={undo}
+                variant="quiet"
+                size="sm"
+                onClick={() => onDecide(null)}
+              >
+                <Undo2 aria-hidden />
+                Undo
+              </Button>
+            )}
           </output>
         </div>
       </div>
