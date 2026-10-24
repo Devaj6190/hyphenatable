@@ -11,16 +11,32 @@
       "entryIds": ["a-te-0141", "a-te-0152"],
       "expenseIds": []
     },
-    "seen": "Two entries overlap on Thu: 7:30 to 15:30 on job 118 and 12:00 to 16:00 on job 121.",
+    "seen": "Two entries overlap on Thu Oct 15: 7:30 to 15:30 on job a-j01 and 12:00 to 16:00 on job a-j02.",
     "where": [
-      { "system": "Jobber", "recordId": "a-te-0141", "url": null },
-      { "system": "Jobber", "recordId": "a-te-0152", "url": null }
+      {
+        "system": "Jobber",
+        "recordId": "a-te-0141",
+        "url": null
+      },
+      {
+        "system": "Jobber",
+        "recordId": "a-te-0152",
+        "url": null
+      }
     ],
     "confidence": "certain",
-    "precedent": { "ruleId": null, "flagId": null, "note": "no precedent" },
+    "precedent": {
+      "ruleId": null,
+      "flagId": null,
+      "note": "no precedent"
+    },
     "routeTo": "manager",
-    "affects": { "workerId": "a-w05", "jobId": "a-j01", "dollarsCents": 18400 },
-    "questionId": null,
+    "affects": {
+      "workerId": "a-w05",
+      "jobId": "a-j01",
+      "dollarsCents": 18400
+    },
+    "questionId": "a-q-01",
     "correctionId": null
   },
   {
@@ -37,13 +53,25 @@
     },
     "seen": "A Harlan Supply purchase on Oct 9 has no job. Best guess is job 121, not sure.",
     "where": [
-      { "system": "QuickBooks", "recordId": "a-exp-0231", "url": null }
+      {
+        "system": "QuickBooks",
+        "recordId": "a-exp-0231",
+        "url": null
+      }
     ],
     "confidence": 0.72,
-    "precedent": { "ruleId": null, "flagId": null, "note": "no precedent" },
+    "precedent": {
+      "ruleId": null,
+      "flagId": null,
+      "note": "no precedent"
+    },
     "routeTo": "manager",
-    "affects": { "workerId": null, "jobId": "a-j02", "dollarsCents": 41250 },
-    "questionId": null,
+    "affects": {
+      "workerId": null,
+      "jobId": "a-j02",
+      "dollarsCents": 41250
+    },
+    "questionId": "a-q-03",
     "correctionId": null
   },
   {
@@ -59,7 +87,13 @@
       "expenseIds": []
     },
     "seen": "A 6.5h entry on Oct 8 has no job.",
-    "where": [{ "system": "Jobber", "recordId": "a-te-0177", "url": null }],
+    "where": [
+      {
+        "system": "Jobber",
+        "recordId": "a-te-0177",
+        "url": null
+      }
+    ],
     "confidence": "certain",
     "precedent": {
       "ruleId": "R-14",
@@ -67,7 +101,11 @@
       "note": "precedent: rule R-14, Sep 20"
     },
     "routeTo": "manager",
-    "affects": { "workerId": "a-w08", "jobId": null, "dollarsCents": 12350 },
+    "affects": {
+      "workerId": "a-w08",
+      "jobId": null,
+      "dollarsCents": 12350
+    },
     "questionId": "a-q-02",
     "correctionId": null
   }

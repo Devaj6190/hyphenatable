@@ -1,0 +1,61 @@
+[
+  {
+    "id": "a-q-01",
+    "companyId": "a",
+    "cycleId": "a-c05",
+    "flagIds": ["a-flag-04"],
+    "toWorkerId": "a-w11",
+    "toRole": "manager",
+    "text": "Manager, on Thu Oct 15 two entries overlap for a-w05 (7:30am to 3:30pm and 12:00pm to 4:00pm). Which one is right? 1 7:30 to 3:30 2 12:00 to 4:00 3 both, different jobs 4 neither",
+    "options": [
+      "7:30 to 3:30",
+      "12:00 to 4:00",
+      "both, different jobs",
+      "neither"
+    ],
+    "kind": "poll",
+    "status": "draft",
+    "approvedBy": null,
+    "approvedAt": null,
+    "sentAt": null,
+    "remindAt": null,
+    "expiresAt": null,
+    "interpretationId": null
+  },
+  {
+    "id": "a-q-02",
+    "companyId": "a",
+    "cycleId": "a-c05",
+    "flagIds": ["a-flag-02"],
+    "toWorkerId": "a-w11",
+    "toRole": "manager",
+    "text": "Manager, on Oct 8 a 6.5h entry for a-w08 has no job. Which job was it? 1 a-j01 2 a-j02 3 something else",
+    "options": ["a-j01", "a-j02", "something else"],
+    "kind": "text",
+    "status": "sent",
+    "approvedBy": "a-w12",
+    "approvedAt": "2026-10-24T08:30:00.000Z",
+    "sentAt": "2026-10-24T08:31:00.000Z",
+    "remindAt": null,
+    "expiresAt": null,
+    "interpretationId": null
+  },
+  {
+    "id": "a-q-03",
+    "companyId": "a",
+    "cycleId": "a-c05",
+    "flagIds": ["a-flag-09"],
+    "toWorkerId": "a-w11",
+    "toRole": "manager",
+    "text": "Manager, a Harlan Supply purchase on Oct 9 has no job. Which job? 1 a-j02 2 a-j01 3 overhead 4 not sure",
+    "options": ["a-j02", "a-j01", "overhead", "not sure"],
+    "kind": "text",
+    "status": "draft",
+    "approvedBy": null,
+    "approvedAt": null,
+    "sentAt": null,
+    "remindAt": null,
+    "expiresAt": null,
+    "interpretationId": null
+  }
+]

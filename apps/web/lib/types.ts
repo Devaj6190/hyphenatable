@@ -32,3 +32,44 @@ export type Flag = {
 };
 
 export type ViewerRole = "owner" | "manager";
+
+// Mirrors Question in docs/plans/00-shared-context.md section 6.
+export type Question = {
+  id: string;
+  companyId: string;
+  cycleId: string;
+  flagIds: string[];
+  toWorkerId: string;
+  toRole: "owner" | "manager" | "employee";
+  text: string;
+  options: string[] | null;
+  kind: "text" | "poll";
+  status:
+    | "draft"
+    | "approved"
+    | "sent"
+    | "reminded"
+    | "answered"
+    | "expired"
+    | "denied";
+  approvedBy: string | null;
+  approvedAt: string | null;
+  sentAt: string | null;
+  remindAt: string | null;
+  expiresAt: string | null;
+  interpretationId: string | null;
+};
+
+// The slice of AuditEvent the flag timeline needs. B's audit.list replaces it.
+export type FlagEvent = {
+  id: string;
+  flagId: string;
+  at: string;
+  actor: {
+    kind: "system" | "agent" | "user";
+    id: string;
+    agent: "analyst" | "auditor" | "messenger" | null;
+  };
+  type: string;
+  summary: string;
+};
