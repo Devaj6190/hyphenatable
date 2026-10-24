@@ -13,14 +13,21 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import {
+  DEFAULT_ADOPT_IDS,
+  type JobberEntry,
+  matchEntries,
+} from "./lib/jobber-adopt";
+import {
   buildPlan,
   type Fixtures,
   type IdMap,
   MUTATIONS,
   OBJECTS,
   type PlanResult,
+  partitionSupported,
   QUERIES,
   resolveRefs,
+  retitlePlan,
   type Step,
 } from "./lib/jobber-mutations";
 import {
@@ -216,11 +223,10 @@ export async function requireAllowedAccount(
   );
 }
 
-/** Mutations the steps need that the live schema does not have. Live mode writes nothing if any are missing. */
-export async function missingMutations(
+/** Mutation names in the token's schema (read-only introspection). */
+export async function availableMutations(
   client: Pick<SeedClient, "gql">,
-  steps: Step[],
-): Promise<string[]> {
+): Promise<Set<string>> {
   const r = await client.gql(QUERIES.mutationNames);
   const fields = (
     (r.data?.__type as { fields?: { name: string }[] } | undefined)?.fields ??
@@ -230,9 +236,28 @@ export async function missingMutations(
     throw new Error(
       `could not read the Mutation type: ${r.errors.map((e) => e.message).join("; ")}`,
     );
-  return [...new Set(steps.map((s) => s.mutation))]
-    .filter((m) => !fields.includes(m))
-    .sort();
+  return new Set(fields);
+}
+
+/** The --one target: the earliest record of the first supported kind (entries, then visits, then jobs). */
+export function oneTarget(steps: Step[]): Step | undefined {
+  const when = (s: Step): string => {
+    const input = s.variables.input as Record<string, unknown> | undefined;
+    if (s.object === "entries") return String(input?.startAt);
+    if (s.object === "visits") {
+      const v = (input?.visits as Record<string, unknown>[])[0]
+        .schedule as Record<string, Record<string, string>>;
+      return `${v.startAt.date}T${v.startAt.time}`;
+    }
+    return s.ourId;
+  };
+  for (const kind of ["entries", "visits", "jobs"]) {
+    const list = steps
+      .filter((s) => s.object === kind)
+      .sort((a, b) => when(a).localeCompare(when(b)));
+    if (list.length) return list[0];
+  }
+  return undefined;
 }
 
 async function live(company: string, opts: { one: boolean }) {
@@ -273,7 +298,23 @@ async function live(company: string, opts: { one: boolean }) {
     process.exit(4);
   }
 
-  // discover markers already in the account (a lost map file never causes duplicates)
+  // what this token can create; the rest is skipped and recorded, never refused silently
+  const available = await availableMutations(client);
+  const first = partitionSupported(plan(company, map).steps, available);
+  const pushing = new Set(first.run.map((s) => s.object as string));
+  map.skipped = {
+    checkedAt: new Date().toISOString(),
+    accountId: account.id,
+    objects: first.skipped,
+  };
+  save();
+  for (const [object, r] of Object.entries(first.skipped)) {
+    console.log(
+      `SKIPPED ${object}: ${r.count} record(s); ${r.reason} (${r.mutations.join(", ")})`,
+    );
+  }
+
+  // discover markers already in the account for what we push (a lost map file never causes duplicates)
   const discover = (
     kind: keyof IdMap,
     nodes: Record<string, unknown>[],
@@ -284,55 +325,58 @@ async function live(company: string, opts: { one: boolean }) {
       if (m) bucket(map, kind)[m[1]] = n.id as string;
     }
   };
-  const starts = fx.timeEntries.map((e) => e.startAt as string).sort();
-  discover(
-    "entries",
-    await paginate(client, QUERIES.entries, "timeSheetEntries", {
-      from: starts[0],
-      to: new Date(Date.parse(must(starts.at(-1))) + 86_400_000).toISOString(),
-    }),
-    "note",
-  );
-  discover("jobs", await paginate(client, QUERIES.jobs, "jobs"), "title");
-  discover(
-    "expenses",
-    await paginate(client, QUERIES.expenses, "expenses"),
-    "title",
-  );
-  discover(
-    "clients",
-    await paginate(client, QUERIES.clients, "clients"),
-    "companyName",
-  );
-  discover("quotes", await paginate(client, QUERIES.quotes, "quotes"), "title");
+  if (pushing.has("entries")) {
+    const starts = fx.timeEntries.map((e) => e.startAt as string).sort();
+    discover(
+      "entries",
+      await paginate(client, QUERIES.entries, "timeSheetEntries", {
+        from: starts[0],
+        to: new Date(
+          Date.parse(must(starts.at(-1))) + 86_400_000,
+        ).toISOString(),
+      }),
+      "note",
+    );
+  }
+  if (pushing.has("jobs"))
+    discover("jobs", await paginate(client, QUERIES.jobs, "jobs"), "title");
+  if (pushing.has("expenses"))
+    discover(
+      "expenses",
+      await paginate(client, QUERIES.expenses, "expenses"),
+      "title",
+    );
+  if (pushing.has("clients"))
+    discover(
+      "clients",
+      await paginate(client, QUERIES.clients, "clients"),
+      "companyName",
+    );
+  if (pushing.has("quotes"))
+    discover(
+      "quotes",
+      await paginate(client, QUERIES.quotes, "quotes"),
+      "title",
+    );
+  if (pushing.has("invoices"))
+    discover(
+      "invoices",
+      await paginate(client, QUERIES.invoices, "invoices"),
+      "subject",
+    );
   save();
 
   const p = plan(company, map);
-  let steps = p.steps;
+  let steps = partitionSupported(p.steps, available).run;
   if (opts.one) {
-    const earliest = steps
-      .filter((s) => s.object === "entries")
-      .sort((a, b) =>
-        String(
-          (a.variables.input as Record<string, unknown>).startAt,
-        ).localeCompare(
-          String((b.variables.input as Record<string, unknown>).startAt),
-        ),
-      )[0];
-    if (!earliest) {
-      console.log("--one: every entry already exists; nothing to do");
+    const target = oneTarget(steps);
+    if (!target) {
+      console.log("--one: nothing left to create");
       return;
     }
-    steps = closure(steps, earliest, map);
+    steps = closure(steps, target, map);
     console.log(
-      `--one: creating ${earliest.ourId} (${(earliest.variables.input as Record<string, unknown>).startAt}) and ${steps.length - 1} record(s) it needs`,
-    );
-  }
-
-  const absent = await missingMutations(client, steps);
-  if (absent.length) {
-    throw new Error(
-      `STOP before any write: the live schema has no ${absent.join(", ")}. Nothing was created. (see the NOT IN THE LIVE SCHEMA notes in seed/lib/jobber-mutations.ts)`,
+      `--one: creating ${target.object} ${target.ourId} and ${steps.length - 1} record(s) it needs`,
     );
   }
 
@@ -372,6 +416,99 @@ async function live(company: string, opts: { one: boolean }) {
     console.log("\nManual steps AFTER the push:");
     for (const l of p.manual.after) console.log(l);
   }
+}
+
+/**
+ * --live --adopt-entries [--ids a,b]: read-only against Jobber. Finds hand-entered time entries (morning
+ * checklist) by user, job and start time, and writes their Jobber ids into the id map (`entries` and
+ * `adopted`). Never creates or edits anything in Jobber.
+ */
+/**
+ * --live --retitle: renames mapped jobs and Jobber expenses whose title differs from the fixtures (the
+ * "undefined" street fix). Only titles change; nothing is created. Allowlisted account only.
+ */
+async function retitle(company: string) {
+  const client = new SeedClient(seedAuthFromEnv());
+  const account = await requireAllowedAccount(client);
+  console.log(
+    `account ${account.id} "${account.name}" allowed (JOBBER_SEED_ACCOUNT_ID); retitling`,
+  );
+  const available = await availableMutations(client);
+  for (const m of ["jobEdit", "expenseEdit"])
+    if (!available.has(m))
+      throw new Error(`${m} is not in this token's schema`);
+  const map: IdMap = readJsonOrNull<IdMap>(mapPath(company)) ?? {};
+  const current = new Map<string, string>();
+  for (const n of await paginate(client, QUERIES.jobs, "jobs"))
+    current.set(n.id as string, String(n.title));
+  for (const n of await paginate(client, QUERIES.expenses, "expenses"))
+    current.set(n.id as string, String(n.title));
+  const todo = retitlePlan(plan(company, {}).steps, map, current);
+  for (const r of todo) {
+    const doc = r.kind === "jobs" ? MUTATIONS.jobEdit : MUTATIONS.expenseEdit;
+    const vars =
+      r.kind === "jobs"
+        ? { jobId: r.jobberId, input: { title: r.to } }
+        : { expenseId: r.jobberId, input: { title: r.to } };
+    const res = await client.gql(doc, vars);
+    const payload = res.data?.[r.kind === "jobs" ? "jobEdit" : "expenseEdit"] as
+      | { userErrors?: { message: string }[] }
+      | undefined;
+    const errs = [
+      ...res.errors.map((e) => e.message),
+      ...(payload?.userErrors ?? []).map((e) => e.message),
+    ];
+    if (errs.length) throw new Error(`retitle ${r.ourId}: ${errs.join("; ")}`);
+    console.log(`RETITLED ${r.kind} ${r.ourId}: "${r.from}" -> "${r.to}"`);
+  }
+  console.log(`${todo.length} title(s) changed`);
+}
+
+async function adopt(company: string, ids: string[]) {
+  const client = new SeedClient(seedAuthFromEnv());
+  const account = await requireAllowedAccount(client);
+  console.log(
+    `account ${account.id} "${account.name}" allowed (JOBBER_SEED_ACCOUNT_ID); adopting ${ids.join(", ")}`,
+  );
+  const map: IdMap & {
+    adopted?: Record<
+      string,
+      { jobberId: string; matchedBy: string; at: string }
+    >;
+  } = readJsonOrNull<IdMap>(mapPath(company)) ?? {};
+  const { fx } = loadFixtures(company);
+  const targets = fx.timeEntries.filter((e) => ids.includes(e.id as string));
+  const starts = targets.map((e) => Date.parse(e.startAt as string));
+  const from = new Date(Math.min(...starts) - 86_400_000).toISOString();
+  // an open timer is started on the morning of the demo, so the window reaches to now
+  const to = new Date(
+    Math.max(Date.now(), ...starts) + 86_400_000,
+  ).toISOString();
+  const nodes = (await paginate(
+    client,
+    QUERIES.entriesForAdopt,
+    "timeSheetEntries",
+    { from, to },
+  )) as unknown as JobberEntry[];
+  const r = matchEntries(fx.timeEntries, nodes, map, ids);
+  const at = new Date().toISOString();
+  for (const [ourId, a] of Object.entries(r.adopted)) {
+    bucket(map, "entries")[ourId] = a.jobberId;
+    map.adopted = { ...(map.adopted ?? {}), [ourId]: { ...a, at } };
+    console.log(`ADOPTED ${ourId} -> ${a.jobberId} (${a.matchedBy})`);
+  }
+  for (const ourId of r.notFound)
+    console.log(
+      `NOT FOUND ${ourId}: no Jobber entry with that user, job and start time (see the morning checklist)`,
+    );
+  for (const [ourId, c] of Object.entries(r.ambiguous))
+    console.log(
+      `AMBIGUOUS ${ourId}: ${c.length} candidates (${c.join(", ")}); nothing written, delete the extra one in Jobber`,
+    );
+  writePrivateJson(mapPath(company), map);
+  console.log(
+    `scanned ${nodes.length} Jobber entries ${from} .. ${to}; map saved to ${mapPath(company)}`,
+  );
 }
 
 /** The redirected address for auth-code: argument, else PASTED_URL, else stdin. */
@@ -416,7 +553,13 @@ if (import.meta.main) {
         throw new Error(
           "usage: bun run seed/push-jobber.ts --company <a|b> [--live [--one]] [--verbose]",
         );
-      if (flag("live")) await live(company, { one: flag("one") });
+      if (flag("live") && flag("retitle")) await retitle(company);
+      else if (flag("live") && flag("adopt-entries"))
+        await adopt(
+          company,
+          (val("ids") ?? DEFAULT_ADOPT_IDS.join(",")).split(","),
+        );
+      else if (flag("live")) await live(company, { one: flag("one") });
       else {
         const map = readJsonOrNull<IdMap>(mapPath(company)) ?? {};
         printDryRun(company, plan(company, map), map, {

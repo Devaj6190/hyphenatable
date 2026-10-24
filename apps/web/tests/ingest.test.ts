@@ -62,6 +62,17 @@ describe("remap", () => {
     });
   });
 
+  test("rewrites a correction's before/after when they are record ids, keeps plain values", () => {
+    expect(remap({ before: null, after: "a-w05" }, ids)).toEqual({
+      before: null,
+      after: "C_w05",
+    });
+    expect(remap({ before: 28800, after: 14400 }, ids)).toEqual({
+      before: 28800,
+      after: 14400,
+    });
+  });
+
   test("leaves unknown ids alone (Convex validation then rejects a dangling v.id)", () => {
     expect(remap({ workerId: "a-w99" }, ids)).toEqual({ workerId: "a-w99" });
   });

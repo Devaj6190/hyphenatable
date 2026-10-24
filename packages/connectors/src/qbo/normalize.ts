@@ -41,8 +41,16 @@ export const seedMarker = (note: string | undefined): string | null =>
 
 const detail = (l: RawLine) =>
   l.AccountBasedExpenseLineDetail ?? l.ItemBasedExpenseLineDetail;
+/**
+ * The seed pusher names the accounts and vendors it creates "<name> (payrollpilot)" (marker in the record).
+ * Strip exactly that trailing suffix so rules and fixtures keyed by the bare name still match.
+ */
+export const stripSeedSuffix = (
+  name: string | null | undefined,
+): string | null =>
+  name == null ? null : name.replace(/ \(payrollpilot\)$/, "");
 const accountOf = (l: RawLine) =>
-  l.AccountBasedExpenseLineDetail?.AccountRef?.name ?? null;
+  stripSeedSuffix(l.AccountBasedExpenseLineDetail?.AccountRef?.name);
 const customerOf = (l: RawLine) => {
   const v = detail(l)?.CustomerRef?.value;
   return v ? `qbo:Customer:${v}` : null;
@@ -120,10 +128,17 @@ export const normalizePurchase = (
     "Purchase",
     p,
     companyId,
-    p.EntityRef?.type === "Vendor" ? (p.EntityRef.name ?? null) : null,
+    p.EntityRef?.type === "Vendor" ? stripSeedSuffix(p.EntityRef.name) : null,
     p.PaymentType ?? null,
     p.Credit === true,
   );
 
 export const normalizeBill = (b: RawBill, companyId: string): Expense[] =>
-  toExpenses("Bill", b, companyId, b.VendorRef?.name ?? null, null, false);
+  toExpenses(
+    "Bill",
+    b,
+    companyId,
+    stripSeedSuffix(b.VendorRef?.name),
+    null,
+    false,
+  );

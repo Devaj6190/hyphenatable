@@ -1,0 +1,39 @@
+{
+  "source": "owner_stated",
+  "timezone": "America/Los_Angeles",
+  "payFrequency": "biweekly",
+  "workers": [
+    {
+      "id": "r:w:s0001",
+      "payType": "hourly",
+      "rateCents": 2500,
+      "paymentUnit": "Hour"
+    },
+    {
+      "id": "r:w:s0002",
+      "payType": "hourly",
+      "rateCents": 2000,
+      "paymentUnit": "Hour"
+    },
+    {
+      "id": "r:w:s0003",
+      "payType": "salary",
+      "rateCents": 5200000,
+      "paymentUnit": "Year"
+    }
+  ],
+  "rules": [
+    {
+      "id": "r-rule-s01",
+      "companyId": "r",
+      "type": "overtime_policy",
+      "params": {
+        "weeklyHours": 40,
+        "multiplier": 1.5,
+        "dailyHours": null,
+        "workweek": "Sunday-Saturday"
+      },
+      "status": "active"
+    }
+  ]
+}

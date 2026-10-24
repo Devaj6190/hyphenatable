@@ -29,6 +29,7 @@ export const Company = z.strictObject({
     otWeeklyHours: z.number(),
     grossChangePct: z.number(),
     employeesMayBeTexted: z.boolean(),
+    lowMarginPct: z.number(), // B-02 contract: CHK-21 threshold
   }),
 });
 
@@ -197,6 +198,9 @@ export const Expense = z.strictObject({
   kind: z.enum(["job_cost", "overhead", "unknown"]),
   matchedJobId: nid,
   matchConfidence: z.number().min(0).max(1).nullable(),
+  // B-02 contract: Jobber reimbursement fields, null when not reimbursable
+  reimbursableToWorkerId: nid,
+  reimbursementStatus: z.enum(["PENDING_REIMBURSEMENT", "PAID"]).nullable(),
 });
 
 export const RuleType = z.enum([
@@ -275,6 +279,7 @@ export const PastPayroll = z.strictObject({
   id,
   companyId: id,
   cycleId: id,
+  sourceId: z.string(), // B-02 contract: Gusto payroll uuid / Venmo row id; seeded rows use their own id
   workerId: id,
   paidVia: z.enum(["gusto_regular", "gusto_off_cycle", "venmo"]),
   earnings: z.array(
@@ -314,9 +319,58 @@ export const AnswerKeyRow = z.strictObject({
     values: z.record(z.string(), z.union([z.string(), z.number()])),
   }),
   registerCategory: z.string().min(1),
+  // cycle extensions (data/fixtures/<co>/cycles/<cycle>/): rows say their cycle, and whether a rule learned
+  // from an earlier cycle's answers resolves them without a question (the RuleType, or null)
+  cycleId: id.optional(),
+  resolvableByRuleType: RuleType.nullable().optional(),
 });
 
 // ---- file map ---------------------------------------------------------------
+
+// Section 6 Flag. flags.json in fixtures holds EXPECTED flags derived from the answer key (seed/lib/flags.ts).
+export const Flag = z.strictObject({
+  id,
+  companyId: id,
+  cycleId: id,
+  checkId: CheckId,
+  status: z.enum([
+    "open",
+    "asked",
+    "answered",
+    "corrected",
+    "dismissed",
+    "held",
+  ]),
+  subject: z.strictObject({
+    workerId: nid,
+    jobId: nid,
+    entryIds: z.array(id),
+    expenseIds: z.array(id),
+  }),
+  seen: z.string().min(1),
+  where: z.array(
+    z.strictObject({
+      system: z.string(),
+      recordId: z.string(),
+      url: z.string().nullable(),
+    }),
+  ),
+  confidence: z.union([z.literal("certain"), z.number().min(0).max(1)]),
+  precedent: z
+    .strictObject({ ruleId: nid, flagId: nid, note: z.string() })
+    .nullable(),
+  routeTo: z.enum(["owner", "manager", "none"]),
+  affects: z.strictObject({
+    workerId: nid,
+    jobId: nid,
+    dollarsCents: cents.nullable(),
+  }),
+  questionId: nid,
+  correctionId: nid,
+});
+
+/** Files a fixture folder may have but need not (validated when present). */
+const OPTIONAL = new Set(["flags.json"]);
 
 const FILES: Record<string, { schema: z.ZodType; array: boolean }> = {
   "company.json": { schema: Company, array: false },
@@ -334,19 +388,28 @@ const FILES: Record<string, { schema: z.ZodType; array: boolean }> = {
   "pastPayrolls.json": { schema: PastPayroll, array: true },
   "questions.json": { schema: Question, array: true },
   "answer-key.json": { schema: AnswerKeyRow, array: true },
+  "flags.json": { schema: Flag, array: true },
 };
 
 // ---- run ----------------------------------------------------------------------
 
 type Rec = Record<string, unknown>;
 
-export function validateDir(dir: string): string[] {
+/**
+ * Validates a fixture folder; with `extDirs`, each extension folder's files (any subset) are validated and
+ * appended to the base before the cross-reference checks, so a cycle extension must resolve against the base.
+ */
+export function validateDir(dir: string, extDirs: string[] = []): string[] {
   const errors: string[] = [];
   const data: Record<string, Rec[]> = {};
 
   for (const [file, { schema, array }] of Object.entries(FILES)) {
     const path = join(dir, file);
     if (!existsSync(path)) {
+      if (OPTIONAL.has(file)) {
+        data[file] = [];
+        continue;
+      }
       errors.push(`${file}: missing`);
       continue;
     }
@@ -367,6 +430,20 @@ export function validateDir(dir: string): string[] {
       continue;
     }
     data[file] = (array ? json : [json]) as Rec[];
+    for (const ext of extDirs) {
+      const ep = join(ext, file);
+      if (!existsSync(ep)) continue;
+      const ej = JSON.parse(readFileSync(ep, "utf8"));
+      const er = z.array(schema).safeParse(ej);
+      if (!er.success) {
+        for (const issue of er.error.issues)
+          errors.push(
+            `${ep}: ${issue.path.join(".") || "(root)"}: ${issue.message}`,
+          );
+        continue;
+      }
+      data[file].push(...(ej as Rec[]));
+    }
   }
   if (errors.length) return errors;
 
@@ -491,7 +568,7 @@ if (import.meta.main) {
     console.error("usage: bun run seed/validate.ts <fixture dir>");
     process.exit(2);
   }
-  const errors = validateDir(dir);
+  const errors = validateDir(dir, process.argv.slice(3));
   if (errors.length) {
     for (const e of errors) console.error(`FAIL ${e}`);
     console.error(`${errors.length} error(s) in ${dir}`);

@@ -1,0 +1,14 @@
+[
+  {
+    "id": "a-c06",
+    "companyId": "a",
+    "number": 6,
+    "periodStart": "2026-10-24T04:00:00.000Z",
+    "periodEnd": "2026-11-07T04:59:59.999Z",
+    "cutoffAt": "2026-11-06T23:00:00.000Z",
+    "stage": "setup",
+    "gustoPayrollId": "749072b9-abc7-4a30-aa64-6e8bd5811a08",
+    "gustoOffCyclePayrollId": null,
+    "questionsAsked": 0
+  }
+]

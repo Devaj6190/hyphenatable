@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { pullCycle } from "../index.ts";
-import { paymentKind } from "../objects.ts";
+import {
+  JOBBER_INVOICE_ADJUSTMENT,
+  normalizePayment,
+  paymentKind,
+} from "../objects.ts";
 import { fakeJobberFetch, fixtures, memoryTokenStore } from "./fakeJobber.ts";
 
 const J1 = "jobber:Z2lkOi8vSm9iYmVyL0pvYi8yMDAx";
@@ -36,7 +40,7 @@ describe("pullCycle objects (recorded fixtures)", () => {
       ["users", 4, 4, true],
       ["timeSheetEntries", 5, 5, true],
       ["visits", 1, 1, true],
-      ["quotes", 1, 1, true],
+      ["quotes", 2, 2, true], // 1 sent in the period + 1 never sent, brought by its job,
       ["invoices", 1, 1, true],
       ["paymentRecords", 2, 2, true],
       ["expenses", 2, 2, true],
@@ -162,6 +166,29 @@ describe("pullCycle objects (recorded fixtures)", () => {
     );
   });
 
+  it("a converted quote that was never sent comes in through its job (sentAt alone would miss it)", async () => {
+    const r = await pull();
+    const unsent = r.records.quotes.find(
+      (q) => q.sourceId === "Z2lkOi8vSm9iYmVyL1F1b3RlLzQwMDI=",
+    );
+    expect(unsent).toMatchObject({
+      jobId: J2,
+      sentAt: null,
+      status: "converted",
+      amountCents: 98015,
+      salespersonWorkerId: "jobber:Z2lkOi8vSm9iYmVyL1VzZXIvMTAwMg==",
+    });
+    // the sent one is not duplicated by its job's inline quote
+    expect(
+      r.records.quotes.filter(
+        (q) => q.sourceId === "Z2lkOi8vSm9iYmVyL1F1b3RlLzQwMDE=",
+      ),
+    ).toHaveLength(1);
+    expect(runOf(r, "quotes")?.method).toContain(
+      "+ quotes of 1 in-scope job(s)",
+    );
+  });
+
   it("a quote on several jobs gets no jobId (never picks one)", async () => {
     const fx = fixtures();
     const q = fx.objects.quotes[0];
@@ -247,5 +274,45 @@ describe("fields hidden from the app (live trial account, 2026-10-24)", () => {
       r.records.workers.find((w) => w.jobber?.labourRateCents === 3115),
     ).toBeDefined();
     expect(r.records.expenses[0]?.accountName).toBe("Materials");
+  });
+});
+
+describe("Jobber's own invoice records (live trial, 2026-10-24)", () => {
+  const auto = {
+    __typename: "OtherPaymentRecord",
+    id: "P-auto",
+    amount: 8140,
+    entryDate: "2026-10-14T04:00:00Z",
+    paymentType: null,
+    adjustmentType: "INVOICE",
+    paymentOrigin: "UNKNOWN_ORIGIN",
+    invoice: { id: "I1" },
+    quote: null,
+  };
+  it("are kept and traceable but never a final payment", () => {
+    expect(normalizePayment(auto, "a")).toEqual({
+      id: "jobber:P-auto",
+      companyId: "a",
+      sourceId: "P-auto",
+      invoiceId: "jobber:I1",
+      quoteId: null,
+      entryDate: "2026-10-14T04:00:00.000Z",
+      amountCents: 814000,
+      paymentType: JOBBER_INVOICE_ADJUSTMENT,
+      kind: "unknown",
+    });
+  });
+  it("only that exact shape: a real 'Other' payment or a known origin stays a final", () => {
+    expect(paymentKind({ ...auto, paymentOrigin: "MANUAL" })).toBe("final");
+    expect(paymentKind({ ...auto, __typename: "CashPaymentRecord" })).toBe(
+      "final",
+    );
+    expect(paymentKind({ ...auto, adjustmentType: "PAYMENT" })).toBe("final");
+    expect(
+      normalizePayment(
+        { ...auto, __typename: "CheckPaymentRecord", paymentType: "CHEQUE" },
+        "a",
+      ).paymentType,
+    ).toBe("CHEQUE");
   });
 });

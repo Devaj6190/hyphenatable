@@ -1,0 +1,110 @@
+[
+  {
+    "id": "a-ev-01",
+    "flagId": "a-flag-04",
+    "at": "2026-10-24T08:12:00.000Z",
+    "actor": {
+      "kind": "system",
+      "id": "controller",
+      "agent": null
+    },
+    "type": "check.fired",
+    "summary": "CHK-04 found two overlapping entries for the same worker."
+  },
+  {
+    "id": "a-ev-02",
+    "flagId": "a-flag-04",
+    "at": "2026-10-24T08:13:00.000Z",
+    "actor": {
+      "kind": "agent",
+      "id": "messenger",
+      "agent": "messenger"
+    },
+    "type": "message.drafted",
+    "summary": "Messenger drafted one question for the manager. Nothing is sent until a person approves."
+  },
+  {
+    "id": "a-ev-03",
+    "flagId": "a-flag-09",
+    "at": "2026-10-24T08:12:00.000Z",
+    "actor": {
+      "kind": "system",
+      "id": "controller",
+      "agent": null
+    },
+    "type": "check.fired",
+    "summary": "CHK-14 found a purchase with no job."
+  },
+  {
+    "id": "a-ev-04",
+    "flagId": "a-flag-09",
+    "at": "2026-10-24T08:12:30.000Z",
+    "actor": {
+      "kind": "agent",
+      "id": "auditor",
+      "agent": "auditor"
+    },
+    "type": "match.scored",
+    "summary": "Auditor's best match is job a-j02 at 72%, below the 85% bar, so it asks."
+  },
+  {
+    "id": "a-ev-05",
+    "flagId": "a-flag-09",
+    "at": "2026-10-24T08:13:00.000Z",
+    "actor": {
+      "kind": "agent",
+      "id": "messenger",
+      "agent": "messenger"
+    },
+    "type": "message.drafted",
+    "summary": "Messenger drafted one question for the manager."
+  },
+  {
+    "id": "a-ev-06",
+    "flagId": "a-flag-02",
+    "at": "2026-10-24T08:12:00.000Z",
+    "actor": {
+      "kind": "system",
+      "id": "controller",
+      "agent": null
+    },
+    "type": "check.fired",
+    "summary": "CHK-01 found an entry with no job."
+  },
+  {
+    "id": "a-ev-07",
+    "flagId": "a-flag-02",
+    "at": "2026-10-24T08:30:00.000Z",
+    "actor": {
+      "kind": "user",
+      "id": "a-w12",
+      "agent": null
+    },
+    "type": "message.approved",
+    "summary": "Owner approved the question to the manager."
+  },
+  {
+    "id": "a-ev-08",
+    "flagId": "a-flag-02",
+    "at": "2026-10-24T08:31:00.000Z",
+    "actor": {
+      "kind": "system",
+      "id": "courier",
+      "agent": null
+    },
+    "type": "message.sent",
+    "summary": "Question sent to the manager. Waiting for a reply."
+  },
+  {
+    "id": "a-ev-09",
+    "flagId": "a-flag-10",
+    "at": "2026-10-24T08:12:40.000Z",
+    "actor": {
+      "kind": "system",
+      "id": "controller",
+      "agent": null
+    },
+    "type": "check.fired",
+    "summary": "CHK-10 found a rate that differs between Jobber and Gusto."
+  }
+]

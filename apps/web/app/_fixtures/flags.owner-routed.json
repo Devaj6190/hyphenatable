@@ -1,0 +1,42 @@
+[
+  {
+    "id": "a-flag-10",
+    "companyId": "a",
+    "cycleId": "a-c05",
+    "checkId": "CHK-10",
+    "status": "open",
+    "subject": {
+      "workerId": "a-w02",
+      "jobId": null,
+      "entryIds": [],
+      "expenseIds": []
+    },
+    "seen": "Jobber has a labor rate of $26.00 an hour for a-w02 and Gusto has $25.00.",
+    "where": [
+      {
+        "system": "Jobber",
+        "recordId": "a-w02",
+        "url": null
+      },
+      {
+        "system": "Gusto",
+        "recordId": "a-w02",
+        "url": null
+      }
+    ],
+    "confidence": "certain",
+    "precedent": {
+      "ruleId": null,
+      "flagId": null,
+      "note": "no precedent"
+    },
+    "routeTo": "owner",
+    "affects": {
+      "workerId": "a-w02",
+      "jobId": null,
+      "dollarsCents": 5200
+    },
+    "questionId": null,
+    "correctionId": null
+  }
+]

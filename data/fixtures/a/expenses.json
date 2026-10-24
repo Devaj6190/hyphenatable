@@ -13,7 +13,9 @@
     "paymentType": "CreditCard",
     "kind": "job_cost",
     "matchedJobId": "a-j01",
-    "matchConfidence": 1
+    "matchConfidence": 1,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-0002",
@@ -29,7 +31,9 @@
     "paymentType": "CreditCard",
     "kind": "job_cost",
     "matchedJobId": "a-j02",
-    "matchConfidence": 1
+    "matchConfidence": 1,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-0003",
@@ -45,7 +49,9 @@
     "paymentType": "CreditCard",
     "kind": "job_cost",
     "matchedJobId": null,
-    "matchConfidence": null
+    "matchConfidence": null,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-0004",
@@ -61,7 +67,9 @@
     "paymentType": "CreditCard",
     "kind": "job_cost",
     "matchedJobId": "a-j04",
-    "matchConfidence": 1
+    "matchConfidence": 1,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-0005",
@@ -77,7 +85,9 @@
     "paymentType": "CreditCard",
     "kind": "overhead",
     "matchedJobId": null,
-    "matchConfidence": null
+    "matchConfidence": null,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-0006",
@@ -93,7 +103,9 @@
     "paymentType": null,
     "kind": "job_cost",
     "matchedJobId": "a-j04",
-    "matchConfidence": 1
+    "matchConfidence": 1,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-0007",
@@ -109,7 +121,9 @@
     "paymentType": null,
     "kind": "job_cost",
     "matchedJobId": "a-j05",
-    "matchConfidence": 1
+    "matchConfidence": 1,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-0008",
@@ -125,7 +139,9 @@
     "paymentType": null,
     "kind": "job_cost",
     "matchedJobId": "a-j03",
-    "matchConfidence": 1
+    "matchConfidence": 1,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-0009",
@@ -141,7 +157,9 @@
     "paymentType": null,
     "kind": "job_cost",
     "matchedJobId": "a-j05",
-    "matchConfidence": 1
+    "matchConfidence": 1,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-0010",
@@ -157,7 +175,9 @@
     "paymentType": null,
     "kind": "job_cost",
     "matchedJobId": "a-j08",
-    "matchConfidence": 1
+    "matchConfidence": 1,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-0011",
@@ -173,7 +193,9 @@
     "paymentType": "CreditCard",
     "kind": "unknown",
     "matchedJobId": null,
-    "matchConfidence": null
+    "matchConfidence": null,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-1001",
@@ -189,7 +211,9 @@
     "paymentType": "CreditCard",
     "kind": "job_cost",
     "matchedJobId": "a-j11",
-    "matchConfidence": 1
+    "matchConfidence": 1,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-1002",
@@ -205,7 +229,9 @@
     "paymentType": "CreditCard",
     "kind": "job_cost",
     "matchedJobId": "a-j12",
-    "matchConfidence": 1
+    "matchConfidence": 1,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-1003",
@@ -221,7 +247,9 @@
     "paymentType": "CreditCard",
     "kind": "job_cost",
     "matchedJobId": "a-j13",
-    "matchConfidence": 1
+    "matchConfidence": 1,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-1004",
@@ -237,7 +265,9 @@
     "paymentType": "CreditCard",
     "kind": "job_cost",
     "matchedJobId": "a-j13",
-    "matchConfidence": 1
+    "matchConfidence": 1,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-1005",
@@ -253,7 +283,9 @@
     "paymentType": null,
     "kind": "job_cost",
     "matchedJobId": "a-j13",
-    "matchConfidence": 1
+    "matchConfidence": 1,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-1006",
@@ -269,7 +301,9 @@
     "paymentType": "CreditCard",
     "kind": "job_cost",
     "matchedJobId": "a-j14",
-    "matchConfidence": 1
+    "matchConfidence": 1,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-1007",
@@ -285,7 +319,9 @@
     "paymentType": "CreditCard",
     "kind": "job_cost",
     "matchedJobId": "a-j14",
-    "matchConfidence": 1
+    "matchConfidence": 1,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-1008",
@@ -301,7 +337,9 @@
     "paymentType": null,
     "kind": "job_cost",
     "matchedJobId": "a-j14",
-    "matchConfidence": 1
+    "matchConfidence": 1,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-1009",
@@ -317,7 +355,9 @@
     "paymentType": "CreditCard",
     "kind": "job_cost",
     "matchedJobId": "a-j15",
-    "matchConfidence": 1
+    "matchConfidence": 1,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-1010",
@@ -333,7 +373,9 @@
     "paymentType": "CreditCard",
     "kind": "overhead",
     "matchedJobId": null,
-    "matchConfidence": null
+    "matchConfidence": null,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-1011",
@@ -349,7 +391,9 @@
     "paymentType": "CreditCard",
     "kind": "overhead",
     "matchedJobId": null,
-    "matchConfidence": null
+    "matchConfidence": null,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-1012",
@@ -365,7 +409,9 @@
     "paymentType": "CreditCard",
     "kind": "unknown",
     "matchedJobId": "a-j12",
-    "matchConfidence": 1
+    "matchConfidence": 1,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-1013",
@@ -381,7 +427,9 @@
     "paymentType": "CreditCard",
     "kind": "unknown",
     "matchedJobId": null,
-    "matchConfidence": null
+    "matchConfidence": null,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-2001",
@@ -397,7 +445,9 @@
     "paymentType": "CreditCard",
     "kind": "job_cost",
     "matchedJobId": "a-j16",
-    "matchConfidence": 1
+    "matchConfidence": 1,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-2002",
@@ -413,7 +463,9 @@
     "paymentType": "CreditCard",
     "kind": "job_cost",
     "matchedJobId": "a-j16",
-    "matchConfidence": 1
+    "matchConfidence": 1,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-2003",
@@ -429,7 +481,9 @@
     "paymentType": null,
     "kind": "job_cost",
     "matchedJobId": "a-j16",
-    "matchConfidence": 1
+    "matchConfidence": 1,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-2004",
@@ -445,7 +499,9 @@
     "paymentType": "CreditCard",
     "kind": "job_cost",
     "matchedJobId": "a-j17",
-    "matchConfidence": 1
+    "matchConfidence": 1,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-2005",
@@ -461,7 +517,9 @@
     "paymentType": "CreditCard",
     "kind": "job_cost",
     "matchedJobId": "a-j17",
-    "matchConfidence": 1
+    "matchConfidence": 1,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-2006",
@@ -477,7 +535,9 @@
     "paymentType": "CreditCard",
     "kind": "job_cost",
     "matchedJobId": "a-j17",
-    "matchConfidence": 1
+    "matchConfidence": 1,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-2007",
@@ -493,7 +553,9 @@
     "paymentType": "CreditCard",
     "kind": "job_cost",
     "matchedJobId": "a-j18",
-    "matchConfidence": 1
+    "matchConfidence": 1,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-2008",
@@ -509,7 +571,9 @@
     "paymentType": null,
     "kind": "job_cost",
     "matchedJobId": "a-j18",
-    "matchConfidence": 1
+    "matchConfidence": 1,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-2009",
@@ -525,7 +589,9 @@
     "paymentType": "CreditCard",
     "kind": "job_cost",
     "matchedJobId": "a-j19",
-    "matchConfidence": 1
+    "matchConfidence": 1,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-2010",
@@ -541,7 +607,9 @@
     "paymentType": "CreditCard",
     "kind": "job_cost",
     "matchedJobId": "a-j19",
-    "matchConfidence": 1
+    "matchConfidence": 1,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-2011",
@@ -557,7 +625,9 @@
     "paymentType": "CreditCard",
     "kind": "job_cost",
     "matchedJobId": "a-j19",
-    "matchConfidence": 1
+    "matchConfidence": 1,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-2012",
@@ -573,7 +643,9 @@
     "paymentType": null,
     "kind": "job_cost",
     "matchedJobId": "a-j20",
-    "matchConfidence": 1
+    "matchConfidence": 1,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-2013",
@@ -589,7 +661,9 @@
     "paymentType": "CreditCard",
     "kind": "job_cost",
     "matchedJobId": "a-j21",
-    "matchConfidence": 1
+    "matchConfidence": 1,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-2014",
@@ -605,7 +679,9 @@
     "paymentType": "CreditCard",
     "kind": "job_cost",
     "matchedJobId": "a-j21",
-    "matchConfidence": 1
+    "matchConfidence": 1,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-2015",
@@ -621,7 +697,9 @@
     "paymentType": "CreditCard",
     "kind": "overhead",
     "matchedJobId": null,
-    "matchConfidence": null
+    "matchConfidence": null,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-2016",
@@ -637,7 +715,9 @@
     "paymentType": "CreditCard",
     "kind": "unknown",
     "matchedJobId": "a-j17",
-    "matchConfidence": 1
+    "matchConfidence": 1,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-2017",
@@ -653,7 +733,9 @@
     "paymentType": "CreditCard",
     "kind": "unknown",
     "matchedJobId": null,
-    "matchConfidence": null
+    "matchConfidence": null,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-3001",
@@ -669,7 +751,9 @@
     "paymentType": "CreditCard",
     "kind": "job_cost",
     "matchedJobId": "a-j22",
-    "matchConfidence": 1
+    "matchConfidence": 1,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-3002",
@@ -685,7 +769,9 @@
     "paymentType": "CreditCard",
     "kind": "job_cost",
     "matchedJobId": "a-j22",
-    "matchConfidence": 1
+    "matchConfidence": 1,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-3003",
@@ -701,7 +787,9 @@
     "paymentType": "CreditCard",
     "kind": "job_cost",
     "matchedJobId": "a-j23",
-    "matchConfidence": 1
+    "matchConfidence": 1,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-3004",
@@ -717,7 +805,9 @@
     "paymentType": "CreditCard",
     "kind": "job_cost",
     "matchedJobId": "a-j24",
-    "matchConfidence": 1
+    "matchConfidence": 1,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-3005",
@@ -733,7 +823,9 @@
     "paymentType": null,
     "kind": "job_cost",
     "matchedJobId": "a-j24",
-    "matchConfidence": 1
+    "matchConfidence": 1,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-3006",
@@ -749,7 +841,9 @@
     "paymentType": "CreditCard",
     "kind": "job_cost",
     "matchedJobId": "a-j25",
-    "matchConfidence": 1
+    "matchConfidence": 1,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-3007",
@@ -765,7 +859,9 @@
     "paymentType": "CreditCard",
     "kind": "job_cost",
     "matchedJobId": "a-j25",
-    "matchConfidence": 1
+    "matchConfidence": 1,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-3008",
@@ -781,7 +877,9 @@
     "paymentType": "CreditCard",
     "kind": "job_cost",
     "matchedJobId": "a-j26",
-    "matchConfidence": 1
+    "matchConfidence": 1,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-3009",
@@ -797,7 +895,9 @@
     "paymentType": "CreditCard",
     "kind": "job_cost",
     "matchedJobId": "a-j26",
-    "matchConfidence": 1
+    "matchConfidence": 1,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-3010",
@@ -813,7 +913,9 @@
     "paymentType": "CreditCard",
     "kind": "overhead",
     "matchedJobId": null,
-    "matchConfidence": null
+    "matchConfidence": null,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-3011",
@@ -829,7 +931,9 @@
     "paymentType": "CreditCard",
     "kind": "overhead",
     "matchedJobId": null,
-    "matchConfidence": null
+    "matchConfidence": null,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-3012",
@@ -845,7 +949,9 @@
     "paymentType": "CreditCard",
     "kind": "unknown",
     "matchedJobId": "a-j23",
-    "matchConfidence": 1
+    "matchConfidence": 1,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-3013",
@@ -861,7 +967,9 @@
     "paymentType": "CreditCard",
     "kind": "unknown",
     "matchedJobId": null,
-    "matchConfidence": null
+    "matchConfidence": null,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-4001",
@@ -877,7 +985,9 @@
     "paymentType": "CreditCard",
     "kind": "job_cost",
     "matchedJobId": "a-j27",
-    "matchConfidence": 1
+    "matchConfidence": 1,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-4002",
@@ -893,7 +1003,9 @@
     "paymentType": null,
     "kind": "job_cost",
     "matchedJobId": "a-j27",
-    "matchConfidence": 1
+    "matchConfidence": 1,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-4003",
@@ -909,7 +1021,9 @@
     "paymentType": "CreditCard",
     "kind": "job_cost",
     "matchedJobId": "a-j28",
-    "matchConfidence": 1
+    "matchConfidence": 1,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-4004",
@@ -925,7 +1039,9 @@
     "paymentType": "CreditCard",
     "kind": "job_cost",
     "matchedJobId": "a-j28",
-    "matchConfidence": 1
+    "matchConfidence": 1,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-4005",
@@ -941,7 +1057,9 @@
     "paymentType": "CreditCard",
     "kind": "job_cost",
     "matchedJobId": "a-j28",
-    "matchConfidence": 1
+    "matchConfidence": 1,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-4006",
@@ -951,13 +1069,15 @@
     "date": "2026-10-01",
     "amountCents": 17526,
     "vendor": null,
-    "description": "Dump fee - undefined",
+    "description": "Dump fee - Kingfisher Ln",
     "accountName": null,
     "customerRef": null,
     "paymentType": null,
     "kind": "job_cost",
     "matchedJobId": "a-j29",
-    "matchConfidence": 1
+    "matchConfidence": 1,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-4007",
@@ -973,7 +1093,9 @@
     "paymentType": "CreditCard",
     "kind": "job_cost",
     "matchedJobId": "a-j30",
-    "matchConfidence": 1
+    "matchConfidence": 1,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-4008",
@@ -989,7 +1111,9 @@
     "paymentType": "CreditCard",
     "kind": "job_cost",
     "matchedJobId": "a-j31",
-    "matchConfidence": 1
+    "matchConfidence": 1,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-4009",
@@ -1005,7 +1129,9 @@
     "paymentType": "CreditCard",
     "kind": "job_cost",
     "matchedJobId": "a-j32",
-    "matchConfidence": 1
+    "matchConfidence": 1,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-4010",
@@ -1021,7 +1147,9 @@
     "paymentType": "CreditCard",
     "kind": "overhead",
     "matchedJobId": null,
-    "matchConfidence": null
+    "matchConfidence": null,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-4011",
@@ -1037,7 +1165,9 @@
     "paymentType": "CreditCard",
     "kind": "unknown",
     "matchedJobId": "a-j28",
-    "matchConfidence": 1
+    "matchConfidence": 1,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   },
   {
     "id": "a-ex-4012",
@@ -1053,6 +1183,8 @@
     "paymentType": "CreditCard",
     "kind": "unknown",
     "matchedJobId": null,
-    "matchConfidence": null
+    "matchConfidence": null,
+    "reimbursableToWorkerId": null,
+    "reimbursementStatus": null
   }
 ]

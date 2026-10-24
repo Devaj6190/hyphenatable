@@ -5,7 +5,7 @@
 
 import type { Ctx, Draft, Rec } from "../generate";
 import { must } from "./must";
-import { local } from "./time";
+import { local as localIn } from "./time";
 
 type Subject = {
   workerId?: string | null;
@@ -200,6 +200,8 @@ export function plantCurrent(ctx: Ctx): void {
 }
 
 export function buildAnswerKey(ctx: Ctx): Rec[] {
+  const local = (date: string, hhmm: string) =>
+    localIn(date, hhmm, ctx.cfg.company.timezone);
   const one = (tag: string) => {
     const e = ctx.tagged(tag);
     if (e.length !== 1) throw new Error(`tag ${tag}: ${e.length} entries`);

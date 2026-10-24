@@ -3,11 +3,12 @@
   "name": "Company A (synthetic landscaping crew)",
   "kind": "synthetic",
   "payFrequency": "biweekly",
-  "timezone": "America/Los_Angeles",
+  "timezone": "America/New_York",
   "settings": {
     "longShiftHours": 11,
     "otWeeklyHours": 40,
     "grossChangePct": 25,
-    "employeesMayBeTexted": true
+    "employeesMayBeTexted": true,
+    "lowMarginPct": 20
   }
 }

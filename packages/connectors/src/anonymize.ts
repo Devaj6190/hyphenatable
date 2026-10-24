@@ -10,6 +10,7 @@ import { chmod, mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname } from "node:path";
 import type { PayrollJournalRow } from "./exports/gusto-payroll-journal-csv.ts";
 import type { TimesheetRow } from "./exports/jobber-timesheets-xlsx.ts";
+import type { QboExportRow } from "./exports/qbo-xlsx.ts";
 import type { JobberRecords, PullResult } from "./jobber/index.ts";
 import type { Job, SyncRun } from "./types.ts";
 
@@ -79,6 +80,8 @@ export interface PseudonymMap {
   workers: Record<string, string>;
   clients: Record<string, string>;
   jobs: Record<string, { label: string; number: number }>;
+  /** QBO payees that are not workers (added with the QBO export ingest; absent in older maps) */
+  vendors?: Record<string, string>;
 }
 
 /** "Park, Riley", "riley  PARK" and "Riley Park" are one person: the key is the sorted bag of name words. */
@@ -170,6 +173,22 @@ export class Anonymizer {
     throw new Error("pseudonym space exhausted");
   }
 
+  /** A payee that is not a known worker: "Vendor V07". Vendors can be sole traders (people), so never kept. */
+  vendorName(real: string): string {
+    const key = nameKey(real);
+    if (!key) throw new Error("empty vendor name");
+    this.map.vendors ??= {};
+    this.map.vendors[key] ??=
+      `Vendor V${String(Object.keys(this.map.vendors).length + 1).padStart(2, "0")}`;
+    return this.map.vendors[key];
+  }
+
+  /** Whether a name is a worker this map (or this run's reserved names) already knows. */
+  isKnownWorker(real: string, runWorkerKeys: Set<string>): boolean {
+    const key = nameKey(real);
+    return key !== "" && (key in this.map.workers || runWorkerKeys.has(key));
+  }
+
   clientName(real: string): string {
     const key = nameKey(real);
     if (!key) throw new Error("empty client name");
@@ -190,15 +209,23 @@ export class Anonymizer {
   }
 
   /** Strings that must never appear in output: name and client words (>= 3 letters, not filler). */
-  realTokens(): string[] {
+  /**
+   * `chartWords`: words of the chart-of-accounts names kept in the output ("Landscape Supplies"). A vendor
+   * word that is also an account word ("landscape") is not scanned for, or every such vendor would abort the
+   * ingest; person and client words are always scanned.
+   */
+  realTokens(chartWords: Set<string> = new Set()): string[] {
     const words = new Set<string>();
+    const add = (k: string, skip: Set<string>) => {
+      for (const w of k.split(" "))
+        if (w.length >= 3 && !STOP.has(w) && !skip.has(w)) words.add(w);
+    };
     for (const k of [
       ...Object.keys(this.map.workers),
       ...Object.keys(this.map.clients),
-    ]) {
-      for (const w of k.split(" "))
-        if (w.length >= 3 && !STOP.has(w)) words.add(w);
-    }
+    ])
+      add(k, new Set());
+    for (const k of Object.keys(this.map.vendors ?? {})) add(k, chartWords);
     return [...words].sort();
   }
 }
@@ -214,6 +241,8 @@ export function findRealTokens(output: string, tokens: string[]): string[] {
 export interface AnonWorker {
   id: string;
   displayName: string;
+  /** the Jobber export named them with a " Team Leader" suffix */
+  teamLeader?: boolean;
 }
 export interface AnonClient {
   id: string;
@@ -254,6 +283,72 @@ export interface AnonPaid {
   checkDate: string | null;
   grossCents: number;
   sourceId: string;
+  /** sectioned journal: regular vs off-cycle payroll (absent for the flat journal) */
+  sectionKind?: "regular" | "off_cycle" | "other";
+  /** owner draws ("Owner’s draw" employee type) are kept but are not wages */
+  payKind?: "wage" | "owner_draw";
+  /** owner draws on this row (sectioned journal); grossCents excludes them */
+  ownerDrawCents?: number;
+  employeeType?: string | null;
+  /** per pay-type amounts in cents (Regular, Overtime, Commission, ...); no taxes */
+  earningsCents?: Record<string, number>;
+  hours?: Record<string, number>;
+  /** itemized lines with job role and rate (job names are roles, e.g. "Landscaper", not people) */
+  jobLines?: {
+    job: string | null;
+    payType: string;
+    hours: number | null;
+    rateCents: number | null;
+    amountCents: number;
+  }[];
+}
+
+export interface AnonPaidPeriod {
+  workerId: string;
+  periodStart: string | null;
+  periodEnd: string | null;
+  /** regular payroll sections (or the flat journal, which has no sections): what M4 compares to */
+  regularGrossCents: number;
+  /** off-cycle sections, reported separately (bonuses, corrections) */
+  offCycleGrossCents: number;
+  /** sections whose title is neither regular nor off-cycle */
+  otherGrossCents: number;
+  /** owner draws, any section: never part of the wage comparison */
+  ownerDrawCents: number;
+}
+
+export function paidByPeriod(paid: AnonPaid[]): AnonPaidPeriod[] {
+  const by = new Map<string, AnonPaidPeriod>();
+  for (const p of paid) {
+    const k = `${p.workerId}|${p.periodStart}|${p.periodEnd}`;
+    const row = by.get(k) ?? {
+      workerId: p.workerId,
+      periodStart: p.periodStart,
+      periodEnd: p.periodEnd,
+      regularGrossCents: 0,
+      offCycleGrossCents: 0,
+      otherGrossCents: 0,
+      ownerDrawCents: 0,
+    };
+    const kind = p.sectionKind ?? "regular";
+    // grossCents is wage gross; owner draws come in ownerDrawCents (older rows: a draw row carries it in grossCents)
+    const legacyDraw =
+      p.payKind === "owner_draw" && p.ownerDrawCents === undefined;
+    row.ownerDrawCents += p.ownerDrawCents ?? (legacyDraw ? p.grossCents : 0);
+    if (legacyDraw) {
+      by.set(k, row);
+      continue;
+    }
+    if (kind === "regular") row.regularGrossCents += p.grossCents;
+    else if (kind === "off_cycle") row.offCycleGrossCents += p.grossCents;
+    else row.otherGrossCents += p.grossCents;
+    by.set(k, row);
+  }
+  return [...by.values()].sort((a, b) =>
+    `${a.periodStart}${a.workerId}`.localeCompare(
+      `${b.periodStart}${b.workerId}`,
+    ),
+  );
 }
 
 export interface AnonymizedBundle {
@@ -264,7 +359,36 @@ export interface AnonymizedBundle {
   jobs: AnonJob[];
   timeEntries: AnonTimeEntry[];
   paid: AnonPaid[];
+  /** M4 input: gross per pseudonymous worker per pay period, regular payrolls apart from off-cycle ones */
+  paidByPeriod: AnonPaidPeriod[];
+  expenses: AnonExpense[];
 }
+
+/** Section 6 Expense from a QBO export line. Payee -> worker (reimbursement) or "Vendor Vnn"; memo dropped. */
+export interface AnonExpense {
+  id: string;
+  companyId: string;
+  source: "qbo";
+  sourceId: string;
+  date: string;
+  amountCents: number;
+  vendor: string | null;
+  description: null;
+  accountName: string | null;
+  /** the job (r:j:…) when the QBO customer is "Client:Job", else the client (r:c:…) */
+  customerRef: string | null;
+  paymentType: string | null;
+  kind: "unknown";
+  matchedJobId: null;
+  matchConfidence: null;
+  /** set when the payee is a known worker */
+  reimbursableToWorkerId: string | null;
+  reimbursementStatus: null;
+}
+
+/** Lowercase words of names kept in output (account names), for Anonymizer.realTokens(chartWords). */
+export const chartWordsOf = (names: (string | null)[]): Set<string> =>
+  new Set(names.flatMap((n) => (n ? words(n) : [])));
 
 /** `fileTag` identifies the source file without its name (file names can carry names): a content hash prefix. */
 export function anonymizeExports(
@@ -273,13 +397,20 @@ export function anonymizeExports(
   input: {
     timesheets: { fileTag: string; rows: TimesheetRow[] }[];
     journals: { fileTag: string; rows: PayrollJournalRow[] }[];
+    qbo?: { fileTag: string; rows: QboExportRow[] }[];
   },
 ): AnonymizedBundle {
-  a.reserve([
-    ...input.timesheets.flatMap((f) =>
-      f.rows.flatMap((r) => [r.workerName, r.clientName ?? ""]),
-    ),
+  const runWorkerNames = [
+    ...input.timesheets.flatMap((f) => f.rows.map((r) => r.workerName)),
     ...input.journals.flatMap((f) => f.rows.map((r) => r.employeeName)),
+  ];
+  const runWorkerKeys = new Set(runWorkerNames.map(nameKey));
+  a.reserve([
+    ...runWorkerNames,
+    ...input.timesheets.flatMap((f) => f.rows.map((r) => r.clientName ?? "")),
+    ...(input.qbo ?? []).flatMap((f) =>
+      f.rows.flatMap((r) => [r.payeeName ?? "", r.customerName ?? ""]),
+    ),
   ]);
   const workers = new Map<string, AnonWorker>();
   const jobs = new Map<string, AnonJob>();
@@ -287,6 +418,11 @@ export function anonymizeExports(
     const id = a.id("w", real);
     if (!workers.has(id))
       workers.set(id, { id, displayName: a.workerName(real) });
+    return id;
+  };
+  const teamLead = (id: string, flag: boolean | undefined) => {
+    const w = workers.get(id);
+    if (flag && w) w.teamLeader = true;
     return id;
   };
   const clients = new Map<string, AnonClient>();
@@ -310,7 +446,7 @@ export function anonymizeExports(
         companyId,
         cycleId: null,
         sourceId: `xlsx:${f.fileTag}#row${r.rowNumber}`,
-        workerId: worker(r.workerName),
+        workerId: teamLead(worker(r.workerName), r.teamLeader),
         jobId,
         visitId: null,
         startAt: r.startAt,
@@ -338,6 +474,67 @@ export function anonymizeExports(
         checkDate: r.checkDate,
         grossCents: r.grossCents,
         sourceId: `csv:${f.fileTag}#row${r.rowNumber}`,
+        ...(r.sectionKind
+          ? {
+              sectionKind: r.sectionKind,
+              payKind: r.payKind ?? "wage",
+              employeeType: r.employeeType ?? null,
+              earningsCents: r.earningsCents,
+              hours: r.hours,
+              jobLines: r.jobLines ?? [],
+              ownerDrawCents: r.ownerDrawCents ?? 0,
+            }
+          : {}),
+      });
+    }
+  }
+  const job = (real: string) => {
+    const id = a.id("j", real);
+    const j = a.job(real);
+    if (!jobs.has(id))
+      jobs.set(id, { id, jobNumber: j.number, title: j.label });
+    return id;
+  };
+  const expenses: AnonExpense[] = [];
+  for (const f of input.qbo ?? []) {
+    // sheets are numbered by first appearance: workbook and sheet names can carry the company's name
+    const sheetIndex = new Map<string, number>();
+    for (const r of f.rows) {
+      const sheetKey = `${r.workbook}\u0000${r.sheet}`;
+      if (!sheetIndex.has(sheetKey))
+        sheetIndex.set(sheetKey, sheetIndex.size + 1);
+      const payee = r.payeeName;
+      const payeeIsWorker =
+        payee !== null && a.isKnownWorker(payee, runWorkerKeys);
+      // QBO customers are "Client" or "Client:Job" (sub-customer); a job part is keyed like Jobber job numbers
+      const parts = (r.customerName ?? "")
+        .split(":")
+        .map((s) => s.trim())
+        .filter(Boolean);
+      const clientPart = parts[0];
+      const jobPart = parts.length > 1 ? parts.at(-1) : undefined;
+      if (clientPart) client(clientPart);
+      expenses.push({
+        id: `export:qbo:${f.fileTag}:${sheetIndex.get(sheetKey)}:${r.rowNumber}`,
+        companyId,
+        source: "qbo",
+        sourceId: `xlsx:${f.fileTag}#s${sheetIndex.get(sheetKey)}row${r.rowNumber}`,
+        date: r.date,
+        amountCents: r.amountCents,
+        vendor: payee && !payeeIsWorker ? a.vendorName(payee) : null,
+        description: null,
+        accountName: r.accountName,
+        customerRef: jobPart
+          ? job(jobPart)
+          : clientPart
+            ? a.id("c", clientPart)
+            : null,
+        paymentType: r.txnType,
+        kind: "unknown",
+        matchedJobId: null,
+        matchConfidence: null,
+        reimbursableToWorkerId: payee && payeeIsWorker ? worker(payee) : null,
+        reimbursementStatus: null,
       });
     }
   }
@@ -349,6 +546,8 @@ export function anonymizeExports(
     jobs: [...jobs.values()],
     timeEntries,
     paid,
+    paidByPeriod: paidByPeriod(paid),
+    expenses,
   };
 }
 

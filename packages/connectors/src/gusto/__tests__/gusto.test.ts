@@ -52,6 +52,21 @@ function fakeGusto(fx = structuredClone(fixture), opts: Opts = {}) {
       });
     const forced = opts.status?.[url.pathname];
     if (forced) return new Response("x", { status: forced });
+    // like the live API: ranges over 1 year are rejected
+    const sd = url.searchParams.get("start_date");
+    const ed = url.searchParams.get("end_date");
+    if (sd && ed && (Date.parse(ed) - Date.parse(sd)) / 86400000 > 364)
+      return Response.json(
+        {
+          errors: [
+            {
+              error_key: "start_date",
+              message: "Date range too long, max 1 year",
+            },
+          ],
+        },
+        { status: 422 },
+      );
     const page = Number(url.searchParams.get("page") ?? 1);
     let body = (fx as Record<string, unknown>)[url.pathname];
     if (body === undefined) return new Response("not found", { status: 404 });
@@ -267,6 +282,36 @@ describe("contractors and payrolls", () => {
       status: "inactive",
       gusto: { rateCents: null, paymentUnit: null },
     });
+  });
+
+  it("ranges over 1 year are walked in 365-day windows; a payroll in two windows is kept once", async () => {
+    const f = fakeGusto();
+    const r = await pullPayrolls(
+      auth(f),
+      "a",
+      "fake-co-0001",
+      "2025-01-01",
+      "2026-10-10",
+      { now },
+    );
+    const lists = f.calls.filter(
+      (c) => c.url.pathname === "/v1/companies/fake-co-0001/payrolls",
+    );
+    expect(
+      lists.map((c) => [
+        c.url.searchParams.get("start_date"),
+        c.url.searchParams.get("end_date"),
+      ]),
+    ).toEqual([
+      ["2025-01-01", "2025-12-31"],
+      ["2026-01-01", "2026-10-10"],
+    ]);
+    // the fake returns the same payroll for both windows (Gusto matches by overlap)
+    expect(r.syncRun).toMatchObject({ pulled: 1, expected: 1, complete: true });
+    expect(r.records.payrolls).toHaveLength(1);
+    expect(
+      f.calls.filter((c) => c.url.pathname.endsWith("/payrolls/fake-pr-0001")),
+    ).toHaveLength(1);
   });
 
   it("processed payrolls are fetched in detail: per-employee gross and lines in cents", async () => {

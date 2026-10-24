@@ -1,0 +1,89 @@
+[
+  {
+    "id": "b-qn-01",
+    "companyId": "b",
+    "cycleId": "b-c01",
+    "flagIds": [],
+    "toWorkerId": "b-w02",
+    "toRole": "manager",
+    "text": "Install manager, on Sep 23 an install entry has no job. Which job was it? 1 #4001 2 #4003 3 something else",
+    "options": [
+      "#4001",
+      "#4003",
+      "something else"
+    ],
+    "kind": "text",
+    "status": "answered",
+    "approvedBy": "b-w01",
+    "approvedAt": "2026-09-23T23:00:00.000Z",
+    "sentAt": "2026-09-23T23:01:00.000Z",
+    "remindAt": null,
+    "expiresAt": null,
+    "interpretationId": null
+  },
+  {
+    "id": "b-qn-02",
+    "companyId": "b",
+    "cycleId": "b-c02",
+    "flagIds": [],
+    "toWorkerId": "b-w03",
+    "toRole": "manager",
+    "text": "Service manager, on Sep 29 a service call has no visit. Which job was it? 1 #4021 2 #4023 3 something else",
+    "options": [
+      "#4021",
+      "#4023",
+      "something else"
+    ],
+    "kind": "text",
+    "status": "answered",
+    "approvedBy": "b-w01",
+    "approvedAt": "2026-09-29T23:00:00.000Z",
+    "sentAt": "2026-09-29T23:01:00.000Z",
+    "remindAt": null,
+    "expiresAt": null,
+    "interpretationId": null
+  },
+  {
+    "id": "b-qn-03",
+    "companyId": "b",
+    "cycleId": "b-c03",
+    "flagIds": [],
+    "toWorkerId": "b-w01",
+    "toRole": "owner",
+    "text": "Owner, a payment came in on the quote for install #4042. Is it the 50% deposit? Reply 1 yes, 2 no",
+    "options": [
+      "yes",
+      "no"
+    ],
+    "kind": "text",
+    "status": "answered",
+    "approvedBy": "b-w01",
+    "approvedAt": "2026-10-08T23:00:00.000Z",
+    "sentAt": "2026-10-08T23:01:00.000Z",
+    "remindAt": null,
+    "expiresAt": null,
+    "interpretationId": null
+  },
+  {
+    "id": "b-qn-04",
+    "companyId": "b",
+    "cycleId": "b-c04",
+    "flagIds": [],
+    "toWorkerId": "b-w03",
+    "toRole": "manager",
+    "text": "Service manager, a Refrigerant purchase on Oct 16 has no job. Which job was it? 1 #4062 2 #4064 3 something else",
+    "options": [
+      "#4062",
+      "#4064",
+      "something else"
+    ],
+    "kind": "text",
+    "status": "answered",
+    "approvedBy": "b-w01",
+    "approvedAt": "2026-10-16T23:00:00.000Z",
+    "sentAt": "2026-10-16T23:01:00.000Z",
+    "remindAt": null,
+    "expiresAt": null,
+    "interpretationId": null
+  }
+]

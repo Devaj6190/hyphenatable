@@ -1,13 +1,12 @@
 {
-  "$comment": "Company A config for seed/generate.ts. Synthetic. Day indices count working days (Mon-Fri, holidays skipped) from the cycle's first Monday. Money in integer cents. See seed/README.md.",
+  "$comment": "Company A config for seed/generate.ts. Synthetic. Pennsylvania (America/New_York). Biweekly Sat-Fri cycles aligned with the Gusto demo pay schedule. Day indices count working days (Mon-Fri, holidays skipped) from the cycle's first Monday. Money in integer cents. See seed/README.md.",
   "seed": "payrollpilot-company-a-v2",
   "company": {
     "id": "a",
     "name": "Company A (synthetic landscaping crew)",
     "kind": "synthetic",
     "payFrequency": "biweekly",
-    "timezone": "America/Los_Angeles",
-    "utcOffset": "-07:00",
+    "timezone": "America/New_York",
     "settings": {
       "longShiftHours": 11,
       "otWeeklyHours": 40,
@@ -18,15 +17,35 @@
   "lowMarginPct": 20,
   "holidays": ["2026-09-07"],
   "cycles": [
-    { "id": "a-c01", "number": 1, "start": "2026-08-16", "end": "2026-08-29" },
-    { "id": "a-c02", "number": 2, "start": "2026-08-30", "end": "2026-09-12" },
-    { "id": "a-c03", "number": 3, "start": "2026-09-13", "end": "2026-09-26" },
-    { "id": "a-c04", "number": 4, "start": "2026-09-27", "end": "2026-10-10" },
+    {
+      "id": "a-c01",
+      "number": 1,
+      "start": "2026-08-15",
+      "end": "2026-08-28"
+    },
+    {
+      "id": "a-c02",
+      "number": 2,
+      "start": "2026-08-29",
+      "end": "2026-09-11"
+    },
+    {
+      "id": "a-c03",
+      "number": 3,
+      "start": "2026-09-12",
+      "end": "2026-09-25"
+    },
+    {
+      "id": "a-c04",
+      "number": 4,
+      "start": "2026-09-26",
+      "end": "2026-10-09"
+    },
     {
       "id": "a-c05",
       "number": 5,
-      "start": "2026-10-11",
-      "end": "2026-10-24",
+      "start": "2026-10-10",
+      "end": "2026-10-23",
       "current": true
     }
   ],
@@ -38,7 +57,13 @@
       "payType": "hourly",
       "jobberRate": 2800,
       "gustoRate": 2800,
-      "rates": { "a-c01": 2800 }
+      "rates": {
+        "a-c01": 2800
+      },
+      "gustoIds": {
+        "employeeUuid": "0985fa42-2d54-4007-a2a4-23ce47f7d4ac",
+        "jobUuid": "822b611e-bb34-4ebc-ab11-7fe9cd87ab4f"
+      }
     },
     {
       "n": 2,
@@ -47,8 +72,18 @@
       "payType": "hourly",
       "jobberRate": 2600,
       "gustoRate": 2500,
-      "rates": { "a-c01": 2500, "a-c04": 2600 },
-      "jobberRates": { "a-c01": 2500, "a-c04": 2600 }
+      "rates": {
+        "a-c01": 2500,
+        "a-c04": 2600
+      },
+      "jobberRates": {
+        "a-c01": 2500,
+        "a-c04": 2600
+      },
+      "gustoIds": {
+        "employeeUuid": "0d234834-fb33-466f-9da9-492ce095a960",
+        "jobUuid": "377add04-1326-4b58-806e-7326d85170a4"
+      }
     },
     {
       "n": 3,
@@ -57,7 +92,13 @@
       "payType": "hourly",
       "jobberRate": 2400,
       "gustoRate": 2400,
-      "rates": { "a-c01": 2400 }
+      "rates": {
+        "a-c01": 2400
+      },
+      "gustoIds": {
+        "employeeUuid": "28e0bbd0-36e2-4442-b621-652364e2b0e6",
+        "jobUuid": "65ba531f-134b-4ecf-aa5a-c1421b0191ef"
+      }
     },
     {
       "n": 4,
@@ -66,7 +107,13 @@
       "payType": "hourly",
       "jobberRate": 2400,
       "gustoRate": 2400,
-      "rates": { "a-c01": 2400 }
+      "rates": {
+        "a-c01": 2400
+      },
+      "gustoIds": {
+        "employeeUuid": "39cf112a-6ebf-455f-92e5-c2a8289131d3",
+        "jobUuid": "5e8df8c9-6d31-46c0-87fc-4ac1764dc880"
+      }
     },
     {
       "n": 5,
@@ -75,7 +122,13 @@
       "payType": "hourly",
       "jobberRate": 2200,
       "gustoRate": 2200,
-      "rates": { "a-c01": 2200 }
+      "rates": {
+        "a-c01": 2200
+      },
+      "gustoIds": {
+        "employeeUuid": "506c5c40-c47e-404f-85a1-56c491d4353a",
+        "jobUuid": "eb4e0cee-03e6-4a54-8a04-5706d9f6767f"
+      }
     },
     {
       "n": 6,
@@ -84,7 +137,13 @@
       "payType": "hourly",
       "jobberRate": 2200,
       "gustoRate": 2200,
-      "rates": { "a-c01": 2200 }
+      "rates": {
+        "a-c01": 2200
+      },
+      "gustoIds": {
+        "employeeUuid": "52d9cf68-59ed-4210-81d2-cd9969752889",
+        "jobUuid": "a02e8dcf-ef55-4772-a9e9-326ce355c67b"
+      }
     },
     {
       "n": 7,
@@ -93,7 +152,13 @@
       "payType": "hourly",
       "jobberRate": 2000,
       "gustoRate": 2000,
-      "rates": { "a-c01": 2000 }
+      "rates": {
+        "a-c01": 2000
+      },
+      "gustoIds": {
+        "employeeUuid": "693298ae-099c-493b-a5da-497573bdd30f",
+        "jobUuid": "b687b8c0-6694-4cde-a8db-03e5fdc4b203"
+      }
     },
     {
       "n": 8,
@@ -102,7 +167,14 @@
       "payType": "salary",
       "jobberRate": 3000,
       "gustoRate": 6760000,
-      "rates": { "a-c01": 6240000, "a-c04": 6760000 }
+      "rates": {
+        "a-c01": 6240000,
+        "a-c04": 6760000
+      },
+      "gustoIds": {
+        "employeeUuid": "9ffa3abf-de40-4031-9991-388a12d9a643",
+        "jobUuid": "167390f8-d917-459a-95ec-ca73dd8c5357"
+      }
     },
     {
       "n": 9,
@@ -111,7 +183,9 @@
       "payType": "contractor_venmo",
       "jobberRate": 2500,
       "venmoRate": 2500,
-      "rates": { "a-c01": 2500 }
+      "rates": {
+        "a-c01": 2500
+      }
     },
     {
       "n": 10,
@@ -129,7 +203,13 @@
       "payType": "salary",
       "jobberRate": null,
       "gustoRate": 7280000,
-      "rates": { "a-c01": 7280000 }
+      "rates": {
+        "a-c01": 7280000
+      },
+      "gustoIds": {
+        "employeeUuid": "a5fe7b57-4060-4beb-9c43-661bf33bfe7b",
+        "jobUuid": "7a05bb15-3ed3-4aa2-a595-b73f7cea5193"
+      }
     },
     {
       "n": 12,
@@ -138,7 +218,13 @@
       "payType": "salary",
       "jobberRate": null,
       "gustoRate": 9100000,
-      "rates": { "a-c01": 9100000 }
+      "rates": {
+        "a-c01": 9100000
+      },
+      "gustoIds": {
+        "employeeUuid": "ca2ac4b6-a91a-4931-90ae-c2c0846f0f3b",
+        "jobUuid": "00aeb254-d996-4760-9fde-016e0374b1fa"
+      }
     },
     {
       "n": 13,
@@ -149,7 +235,13 @@
       "jobberStatus": "DEACTIVATED",
       "jobberRate": 2200,
       "gustoRate": 2200,
-      "rates": { "a-c01": 2200 }
+      "rates": {
+        "a-c01": 2200
+      },
+      "gustoIds": {
+        "employeeUuid": "d9f87244-2263-457b-9b17-36eb55609270",
+        "jobUuid": "6c40488d-9ee2-46bc-b597-fae1bc9bc94f"
+      }
     },
     {
       "n": 14,
@@ -159,10 +251,17 @@
       "jobberRate": 2000,
       "gustoRate": 2000,
       "onboarded": false,
-      "firstCycle": "a-c05"
+      "firstCycle": "a-c05",
+      "gustoIds": {
+        "employeeUuid": "7d6cf9cc-6463-4487-ace0-ffc646a10269",
+        "jobUuid": "4e76083a-c88f-4c9f-a439-945fca1df73b"
+      }
     }
   ],
-  "shift": { "start": "07:00", "end": "15:30" },
+  "shift": {
+    "start": "07:00",
+    "end": "15:30"
+  },
   "past": {
     "daysPerCycle": {
       "a-w01": 10,
@@ -176,12 +275,24 @@
       "a-w09": 6,
       "a-w13": 2
     },
-    "shiftEnd": { "a-w04": "16:15" },
+    "shiftEnd": {
+      "a-w04": "16:15"
+    },
     "jobsPerCycle": 5,
     "marginRange": [30, 45],
-    "lightingJob": { "a-c01": 2, "a-c03": 1 },
-    "disposalSubJob": { "a-c02": 3, "a-c04": 1 },
-    "tip": { "cycle": "a-c03", "job": 3, "amountCents": 15000 },
+    "lightingJob": {
+      "a-c01": 2,
+      "a-c03": 1
+    },
+    "disposalSubJob": {
+      "a-c02": 3,
+      "a-c04": 1
+    },
+    "tip": {
+      "cycle": "a-c03",
+      "job": 3,
+      "amountCents": 15000
+    },
     "firstJobNumber": 71,
     "salespeople": {
       "default": ["a-w12", "a-w12", "a-w11"],
@@ -236,21 +347,41 @@
     "cycle": "a-c05",
     "snapshot": "2026-10-23T18:05",
     "schedule": {
-      "a-w01": { "days": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] },
-      "a-w02": { "days": [0, 1, 2, 3, 4, 5, 6, 7, 8] },
-      "a-w03": { "days": [0, 1, 3, 4, 5, 6, 7, 9] },
+      "a-w01": {
+        "days": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+      },
+      "a-w02": {
+        "days": [0, 1, 2, 3, 4, 5, 6, 7, 8]
+      },
+      "a-w03": {
+        "days": [0, 1, 3, 4, 5, 6, 7, 9]
+      },
       "a-w04": {
         "days": [0, 1, 2, 3, 4, 5, 6, 7, 9],
         "extendedDays": [0, 2, 3, 5, 7, 9],
         "extendedEnd": "17:00"
       },
-      "a-w05": { "days": [0, 1, 2, 3, 5, 6, 7, 8] },
-      "a-w07": { "days": [0, 1, 2, 3, 4, 5, 6, 8] },
-      "a-w08": { "days": [0, 1, 2, 3, 5, 6, 7, 8] },
-      "a-w09": { "days": [0, 1, 3, 4, 8, 9] },
-      "a-w10": { "days": [1, 2, 4, 6, 7, 9] },
-      "a-w13": { "days": [0, 1] },
-      "a-w14": { "days": [5, 6, 7, 8] }
+      "a-w05": {
+        "days": [0, 1, 2, 3, 5, 6, 7, 8]
+      },
+      "a-w07": {
+        "days": [0, 1, 2, 3, 4, 5, 6, 8]
+      },
+      "a-w08": {
+        "days": [0, 1, 2, 3, 5, 6, 7, 8]
+      },
+      "a-w09": {
+        "days": [0, 1, 3, 4, 8, 9]
+      },
+      "a-w10": {
+        "days": [1, 2, 4, 6, 7, 9]
+      },
+      "a-w13": {
+        "days": [0, 1]
+      },
+      "a-w14": {
+        "days": [5, 6, 7, 8]
+      }
     },
     "jobByDay": [
       "a-j01",
@@ -387,10 +518,26 @@
       }
     ],
     "visits": [
-      { "id": "a-v01", "job": "a-j01", "day": 0 },
-      { "id": "a-v02", "job": "a-j03", "day": 3 },
-      { "id": "a-v03", "job": "a-j04", "day": 5 },
-      { "id": "a-v04", "job": "a-j05", "day": 7 },
+      {
+        "id": "a-v01",
+        "job": "a-j01",
+        "day": 0
+      },
+      {
+        "id": "a-v02",
+        "job": "a-j03",
+        "day": 3
+      },
+      {
+        "id": "a-v03",
+        "job": "a-j04",
+        "day": 5
+      },
+      {
+        "id": "a-v04",
+        "job": "a-j05",
+        "day": 7
+      },
       {
         "id": "a-v05",
         "job": "a-j07",
@@ -571,95 +718,120 @@
       }
     ],
     "pinnedEntryIds": {
-      "a-w01|2026-10-12T14:00:00.000Z": "a-te-0101",
-      "a-w03|2026-10-12T14:00:00.000Z": "a-te-0102",
-      "a-w05|2026-10-12T14:00:00.000Z": "a-te-0103",
-      "a-w07|2026-10-12T14:00:00.000Z": "a-te-0104",
-      "a-w08|2026-10-12T14:00:00.000Z": "a-te-0105",
-      "a-w02|2026-10-13T14:00:00.000Z": "a-te-0106",
-      "a-w04|2026-10-13T14:00:00.000Z": "a-te-0107",
-      "a-w05|2026-10-13T14:00:00.000Z": "a-te-0108",
-      "a-w10|2026-10-13T14:00:00.000Z": "a-te-0109",
-      "a-w01|2026-10-14T14:00:00.000Z": "a-te-0110",
-      "a-w03|2026-10-14T14:00:00.000Z": "a-te-0111",
-      "a-w08|2026-10-14T14:00:00.000Z": "a-te-0112",
-      "a-w03|2026-10-14T19:00:00.000Z": "a-te-0113",
-      "a-w02|2026-10-15T14:00:00.000Z": "a-te-0114",
-      "a-w05|2026-10-15T14:00:00.000Z": "a-te-0115",
-      "a-w09|2026-10-15T14:00:00.000Z": "a-te-0116",
-      "a-w04|2026-10-16T14:00:00.000Z": "a-te-0117",
-      "a-w07|2026-10-16T14:00:00.000Z": "a-te-0118",
-      "a-w09|2026-10-16T14:00:00.000Z": "a-te-0119",
-      "a-w10|2026-10-16T14:00:00.000Z": "a-te-0120",
-      "a-w05|2026-10-16T15:00:00.000Z": "a-te-0121",
-      "a-w01|2026-10-19T14:00:00.000Z": "a-te-0122",
-      "a-w03|2026-10-19T14:00:00.000Z": "a-te-0123",
-      "a-w05|2026-10-19T14:00:00.000Z": "a-te-0124",
-      "a-w08|2026-10-19T14:00:00.000Z": "a-te-0125",
-      "a-w02|2026-10-20T14:00:00.000Z": "a-te-0126",
-      "a-w04|2026-10-20T14:00:00.000Z": "a-te-0127",
-      "a-w07|2026-10-20T14:00:00.000Z": "a-te-0128",
-      "a-w10|2026-10-20T14:00:00.000Z": "a-te-0129",
-      "a-w07|2026-10-21T13:00:00.000Z": "a-te-0130",
-      "a-w01|2026-10-21T14:00:00.000Z": "a-te-0131",
-      "a-w05|2026-10-21T14:00:00.000Z": "a-te-0132",
-      "a-w08|2026-10-21T14:00:00.000Z": "a-te-0133",
-      "a-w02|2026-10-22T14:00:00.000Z": "a-te-0134",
-      "a-w05|2026-10-22T14:00:00.000Z": "a-te-0135",
-      "a-w09|2026-10-22T14:00:00.000Z": "a-te-0136",
-      "a-w04|2026-10-22T17:15:00.000Z": "a-te-0137",
-      "a-w09|2026-10-23T14:00:00.000Z": "a-te-0138",
-      "a-w10|2026-10-23T14:00:00.000Z": "a-te-0139",
-      "a-w05|2026-10-23T20:00:00.000Z": "a-te-0140"
-    }
+      "a-w01|2026-10-12T11:00:00.000Z": "a-te-0101",
+      "a-w03|2026-10-12T11:00:00.000Z": "a-te-0102",
+      "a-w05|2026-10-12T11:00:00.000Z": "a-te-0103",
+      "a-w07|2026-10-12T11:00:00.000Z": "a-te-0104",
+      "a-w08|2026-10-12T11:00:00.000Z": "a-te-0105",
+      "a-w02|2026-10-13T11:00:00.000Z": "a-te-0106",
+      "a-w04|2026-10-13T11:00:00.000Z": "a-te-0107",
+      "a-w05|2026-10-13T11:00:00.000Z": "a-te-0108",
+      "a-w10|2026-10-13T11:00:00.000Z": "a-te-0109",
+      "a-w01|2026-10-14T11:00:00.000Z": "a-te-0110",
+      "a-w03|2026-10-14T11:00:00.000Z": "a-te-0111",
+      "a-w08|2026-10-14T11:00:00.000Z": "a-te-0112",
+      "a-w03|2026-10-14T16:00:00.000Z": "a-te-0113",
+      "a-w02|2026-10-15T11:00:00.000Z": "a-te-0114",
+      "a-w05|2026-10-15T11:00:00.000Z": "a-te-0115",
+      "a-w09|2026-10-15T11:00:00.000Z": "a-te-0116",
+      "a-w04|2026-10-16T11:00:00.000Z": "a-te-0117",
+      "a-w07|2026-10-16T11:00:00.000Z": "a-te-0118",
+      "a-w09|2026-10-16T11:00:00.000Z": "a-te-0119",
+      "a-w10|2026-10-16T11:00:00.000Z": "a-te-0120",
+      "a-w05|2026-10-16T12:00:00.000Z": "a-te-0121",
+      "a-w01|2026-10-19T11:00:00.000Z": "a-te-0122",
+      "a-w03|2026-10-19T11:00:00.000Z": "a-te-0123",
+      "a-w05|2026-10-19T11:00:00.000Z": "a-te-0124",
+      "a-w08|2026-10-19T11:00:00.000Z": "a-te-0125",
+      "a-w02|2026-10-20T11:00:00.000Z": "a-te-0126",
+      "a-w04|2026-10-20T11:00:00.000Z": "a-te-0127",
+      "a-w07|2026-10-20T11:00:00.000Z": "a-te-0128",
+      "a-w10|2026-10-20T11:00:00.000Z": "a-te-0129",
+      "a-w07|2026-10-21T10:00:00.000Z": "a-te-0130",
+      "a-w01|2026-10-21T11:00:00.000Z": "a-te-0131",
+      "a-w05|2026-10-21T11:00:00.000Z": "a-te-0132",
+      "a-w08|2026-10-21T11:00:00.000Z": "a-te-0133",
+      "a-w02|2026-10-22T11:00:00.000Z": "a-te-0134",
+      "a-w05|2026-10-22T11:00:00.000Z": "a-te-0135",
+      "a-w09|2026-10-22T11:00:00.000Z": "a-te-0136",
+      "a-w04|2026-10-22T14:15:00.000Z": "a-te-0137",
+      "a-w09|2026-10-23T11:00:00.000Z": "a-te-0138",
+      "a-w10|2026-10-23T11:00:00.000Z": "a-te-0139",
+      "a-w05|2026-10-23T17:00:00.000Z": "a-te-0140"
+    },
+    "gustoPayrollId": "650734d5-e197-4b55-b2a2-03bcbff3882c"
   },
   "rules": [
     {
       "id": "a-rule-01",
       "type": "overtime_policy",
-      "params": { "weeklyHours": 40, "multiplier": 1.5, "dailyHours": null },
+      "params": {
+        "weeklyHours": 40,
+        "multiplier": 1.5,
+        "dailyHours": null
+      },
       "confidence": 0.95
     },
     {
       "id": "a-rule-02",
       "type": "long_shift_threshold",
-      "params": { "hours": 11 },
+      "params": {
+        "hours": 11
+      },
       "confidence": 0.9
     },
     {
       "id": "a-rule-03",
       "type": "expense_account_kind",
-      "params": { "accountName": "Materials", "kind": "job_cost" },
+      "params": {
+        "accountName": "Materials",
+        "kind": "job_cost"
+      },
       "confidence": 0.95
     },
     {
       "id": "a-rule-04",
       "type": "expense_account_kind",
-      "params": { "accountName": "Equipment Rental", "kind": "job_cost" },
+      "params": {
+        "accountName": "Equipment Rental",
+        "kind": "job_cost"
+      },
       "confidence": 0.9
     },
     {
       "id": "a-rule-05",
       "type": "expense_account_kind",
-      "params": { "accountName": "Disposal", "kind": "job_cost" },
+      "params": {
+        "accountName": "Disposal",
+        "kind": "job_cost"
+      },
       "confidence": 0.9
     },
     {
       "id": "a-rule-06",
       "type": "expense_account_kind",
-      "params": { "accountName": "Software", "kind": "overhead" },
+      "params": {
+        "accountName": "Software",
+        "kind": "overhead"
+      },
       "confidence": 0.95
     },
     {
       "id": "a-rule-07",
       "type": "expense_account_kind",
-      "params": { "accountName": "Insurance", "kind": "overhead" },
+      "params": {
+        "accountName": "Insurance",
+        "kind": "overhead"
+      },
       "confidence": 0.9
     },
     {
       "id": "a-rule-08",
       "type": "venmo_rate",
-      "params": { "workerId": "a-w09", "rateCents": 2500 },
+      "params": {
+        "workerId": "a-w09",
+        "rateCents": 2500
+      },
       "confidence": 0.95
     },
     {
@@ -675,25 +847,36 @@
     {
       "id": "a-rule-10",
       "type": "tip_policy",
-      "params": { "split": "by_hours_on_job" },
+      "params": {
+        "split": "by_hours_on_job"
+      },
       "confidence": 0.7
     },
     {
       "id": "a-rule-11",
       "type": "manager_split",
-      "params": { "workerId": "a-w11", "pctOfJobProfit": 10 },
+      "params": {
+        "workerId": "a-w11",
+        "pctOfJobProfit": 10
+      },
       "confidence": 0.7
     },
     {
       "id": "a-rule-12",
       "type": "routing",
-      "params": { "jobFacts": "a-w11", "money": "a-w12" },
+      "params": {
+        "jobFacts": "a-w11",
+        "money": "a-w12"
+      },
       "confidence": 0.85
     },
     {
       "id": "a-rule-13",
       "type": "deposit_vs_final",
-      "params": { "quotePayment": "deposit", "invoicePayment": "final" },
+      "params": {
+        "quotePayment": "deposit",
+        "invoicePayment": "final"
+      },
       "confidence": 0.85
     },
     {
@@ -708,7 +891,10 @@
     {
       "id": "a-rule-15",
       "type": "in_person_quoter",
-      "params": { "titleKeyword": "Landscape lighting", "workerId": "a-w05" },
+      "params": {
+        "titleKeyword": "Landscape lighting",
+        "workerId": "a-w05"
+      },
       "confidence": 0.75
     }
   ]

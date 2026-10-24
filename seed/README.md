@@ -18,7 +18,7 @@ bun test seed                               # determinism hash, committed fixtur
 | `lib/plant.ts` | planted errors in a-c05 and the answer-key rows (CHK-01..CHK-22) |
 | `lib/random.ts` | seeded RNG (mulberry32 over an FNV-1a hash of `seed:<cycle>`) |
 | `lib/names.ts` | fake streets, job kinds, vendors |
-| `lib/time.ts` | local wall time to UTC (PDT until 2026-11-01, PST after), working days |
+| `lib/time.ts` | local wall time to UTC per zone (A: America/New_York, EDT until 2026-11-01 then EST; B: America/Los_Angeles), working days, Friday cutoff |
 | `validate.ts` | the validator (replaced by `packages/engine/src/schemas.ts` once B-02 lands) |
 | `__tests__/generate.test.ts` | tests; `EXPECTED_SHA256_A` changes only when the config or generator changes on purpose |
 
@@ -66,7 +66,7 @@ bun run seed/push-jobber.ts --company a --live            # the rest; rerunnable
 - **Idempotent:** every record carries `payrollpilot:<id>` (entry note, title, company name, invoice subject, payment details). Before writing, live mode looks up existing markers in the account. The id map `data/private/<company>-jobber-map.json` is saved after every create. A rerun creates only what is missing.
 - **Not pushed:** the open timer (a-te-0140), which has to be started by hand just before the pull; tip payments (history only); QuickBooks purchases (A-06). `labourRate` is not sent per entry: Jobber costs entries at the user's labour rate, set by hand in Manage Team.
 - **Manual steps** (printed by the dry run): before the push, add every worker in Manage Team with the exact display name. After the push, approve all but the CHK-06 entries, start the CHK-02 timer, and deactivate a-w13.
-- **Live schema (read-app introspection, Oct 24):** clientCreate, propertyCreate, quoteCreate, jobCreate, visitCreate (schedule with local date/time/timezone), visitComplete, expenseCreate and invoiceMarkAsSent(id) are verified and match the plan. **timeSheetEntryCreate, invoiceCreateFromJob, invoiceCreatePaymentRecord and quoteCreatePaymentRecord are not in the live schema**, so time entries and payments cannot be pushed by API as written; live mode stops before writing. `User.labourRate` and `Expense.accountingCode` do not exist live; the pusher reads neither and sends no `labourRate`.
+- **Live schema (seed-token introspection, Oct 24):** clientCreate, propertyCreate, quoteCreate, jobCreate, visitCreate (returns `createdVisits`; schedule as local date/time/timezone), visitComplete, expenseCreate and invoiceCreate exist. **timeSheetEntryCreate, invoiceCreatePaymentRecord and quoteCreatePaymentRecord do not**, and Jobber has no timesheet write scope. Live mode reads the Mutation type first. It skips every object kind whose mutation is absent, plus anything that needs a skipped kind, and prints `SKIPPED <kind>: N record(s); <reason>`. It records the skips in the id map under `skipped` (checkedAt, accountId, per-kind mutations, count, reason). Today that means time entries (387) and payment records (43). Invoices use `invoiceCreate` (job linked, `markSent` unless draft, tax EXCLUSIVE). `--one` targets the earliest entry, else the earliest visit, else the earliest job, together with what it needs. `User.labourRate` and `Expense.accountingCode` do not exist live; the pusher reads neither and sends no `labourRate`.
 - **Formerly UNVERIFIED input shapes** (names are verified by introspection; see the comments in `lib/jobber-mutations.ts`): clientCreate, propertyCreate, quoteCreate line items, jobCreate `invoicing`, visitCreate argument placement, invoiceCreateFromJob, payment-record enums. Check them once in GraphiQL on the seed app, or let `--one` surface the error; the run stops on the first `userErrors`.
 
 ### QuickBooks (A-06): `push-qbo.ts`, `lib/qbo.ts`
@@ -81,7 +81,7 @@ bun run seed/push-qbo.ts --company a --live --reseed   # deletes OUR Purchases/B
 
 - **Host:** `sandbox-quickbooks.api.intuit.com` only. Every URL is built in one function that refuses any other host.
 - **What is created:**
-  - Accounts and vendors are looked up by name and created only if missing.
+  - Accounts and vendors are **ours only**: named with the suffix ` (payrollpilot)` (e.g. `Equipment Rental (payrollpilot)`, AccountType Expense, `Description: payrollpilot:account`; vendors with `Notes: payrollpilot:vendor`), looked up by FullyQualifiedName (vendors by DisplayName) among Active records, created if absent. The sandbox sample chart is never adopted or modified, and a bare name is never used for lookup. A mapping left by an older run that points at a non-suffixed record is dropped (printed as DROPPED) and ours is ensured instead. The read connector strips the suffix to recover the fixture names.
   - One parent customer per client, and one sub-customer per job (`Job: true`, `DisplayName` = job number, marker in `Notes`). A name match without our marker is refused, never adopted.
   - One Purchase per QuickBooks expense (CreditCard, from the "Company A Card (payrollpilot)" account), with the expense account on the line and `CustomerRef` only when the fixture is job-tagged. a-ex-0003 (CHK-14) has none.
   - Bills for two vendor invoices: the first two past-cycle Equipment Rental expenses. The current cycle's Purchase count therefore equals the fixtures (6).
@@ -104,3 +104,57 @@ bun run seed/generate.ts --company a                  # fixtures now carry the r
 - **Write allowlist:** `PUT /v1/compensations/{uuid}`, `POST /v1/companies/{c}/employees`, `POST /v1/employees/{uuid}/jobs`. Any path containing "payroll" is refused before a request. There is no prepare, update, calculate or submit. The payroll is only read, to record `gustoPayrollId`.
 - **Mapping:** the demo company comes from the token (`/v1/token_info`), never from its name. Onboarded, non-terminated demo employees are assigned in uuid order to a-w01..a-w08, a-w11, a-w12, a-w13. a-w14 is created (plus a job) with onboarding left unfinished (CHK-09); if that is refused, it falls back to an existing employee with unfinished onboarding. a-w09 and a-w10 (Venmo) are never sent to Gusto (`gusto: null`). Rates come from the config only; a null rate leaves the demo compensation alone. a-w02 is $25.00 against Jobber's $26.00 (CHK-10).
 - **Fixtures stay generated:** real uuids enter through the config (`--apply-map`), never by editing `data/fixtures`.
+
+## Company B (A-14): `companies/b.json`, `lib/company-b.ts`
+
+`bun run seed/generate.ts --company b` writes `data/fixtures/b/`. The config sets `"generator": "hvac-weekly"`, so `generate.ts` hands it to `lib/company-b.ts`; Company A's generator and hash are unchanged. B is a weekly, 30-person HVAC company in California with daily overtime (`caOvertime` in `lib/company-b.ts`, tested), two crews with separate managers, commission on install profit, no tips, and its own expense chart. It is fixtures only; the pushers are not run for B. `__tests__/company-b.test.ts` pins `EXPECTED_SHA256_B`. The 8 planted errors and their answer key are listed in `data/fixtures/README.md`.
+
+## Morning checklist (Shanin): hand steps in the Jobber trial
+
+Jobber has no API to create time entries. Every hour in Company A comes from the fixtures, **except** the few entries below, which are entered by hand so the demo-moment overlap (CHK-04) has real Jobber ids. The Jobber account is "Hyphenate Landscaping" (the allowlisted `JOBBER_SEED_ACCOUNT_ID`). Its 14 users and 32 jobs already exist from the seed push.
+
+0. **Time zone first.** Settings > Company settings: the company time zone must be **Eastern (America/New_York)**, because Company A is in Pennsylvania. If it is left on another zone, the times below land at the wrong instant and adopt reports NOT FOUND.
+1. **CHK-04 overlap pair, required.** Timesheets > select **Sam Okafor** > day **Wed Oct 14, 2026** > add two time entries, both on the job **"Backyard patio and drainage - Birchwood Ave [payrollpilot:a-j02]"** (no visit):
+   - **7:00 AM – 3:30 PM** (8 h 30 m) → becomes `a-te-0111`
+   - **12:00 PM – 4:00 PM** (4 h) → becomes `a-te-0113`
+
+   These intentionally overlap by 3 h 30 m. Enter each one once; a second copy makes adopt report AMBIGUOUS. Leave the notes empty.
+1b. **More planted entries, optional (each makes one more check fire on a real Jobber record).** Timesheets, Eastern times, one entry each unless noted, no notes needed:
+
+    | Fixture id | Check | User | Day | Job | Time (ET) |
+    |---|---|---|---|---|---|
+    | a-te-0121 | CHK-01 no job | **Casey Lindqvist** | Fri Oct 16, 2026 | **no job** (category General) | 8:00 AM – 12:00 PM (4 h) |
+    | a-te-0130 | CHK-03 long shift | **Quinn Takahashi** | Wed Oct 21, 2026 | Irrigation system install - Alder Run [payrollpilot:a-j05] | 6:00 AM – 7:00 PM (13 h) |
+    | a-te-0137 | CHK-05 zero minutes | **Riley Moreno** | Thu Oct 22, 2026 | Irrigation system install - Alder Run [payrollpilot:a-j05] | 10:15 AM – 10:15 AM (0 min) |
+    | a-te-0106 | CHK-05 duplicate (1st) | **Jordan Ellis** | Tue Oct 13, 2026 | Front yard sod install - Larkspur Ln [payrollpilot:a-j01] | 7:00 AM – 3:30 PM (8 h 30 m) |
+    | a-te-0146 | CHK-05 duplicate (2nd) | **Jordan Ellis** | Tue Oct 13, 2026 | same job | 7:00 AM – 3:30 PM, entered **again, after** the first |
+    | a-te-0183 | CHK-06 unapproved | **Avery Reed** | Fri Oct 23, 2026 | Backyard patio and drainage - Birchwood Ave [payrollpilot:a-j02] | 7:00 AM – 3:30 PM (8 h 30 m) |
+    | a-te-0184 | CHK-06 unapproved | **Sam Okafor** | Fri Oct 23, 2026 | Backyard patio and drainage - Birchwood Ave [payrollpilot:a-j02] | 7:00 AM – 3:30 PM (8 h 30 m) |
+    | a-te-0185 | CHK-06 unapproved | **Riley Moreno** | Fri Oct 23, 2026 | Backyard patio and drainage - Birchwood Ave [payrollpilot:a-j02] | 7:00 AM – 5:00 PM (10 h) |
+
+    - The duplicate pair must be two separate entries with the same times. Adopt maps the one created first to a-te-0106 and the second to a-te-0146.
+    - If the zero-minute entry can't be saved in the UI, skip it. CHK-05 then comes from the fixtures.
+2. **Approve.** Timesheets > Approve Timesheets: approve Sam Okafor's two Oct 14 entries and every entry in 1b, **except the three Fri Oct 23 entries** (Avery Reed, Sam Okafor, Riley Moreno). Those stay unapproved for CHK-06. In the fixtures, the approved ones are approved by Dakota Brennan, the manager.
+3. **CHK-02 open timer, optional.** Just before the demo pull, log in as **Casey Lindqvist** (or start it as admin for that user) and **start a timer** on the same job, "Backyard patio and drainage - Birchwood Ave [payrollpilot:a-j02]". Leave it running and don't approve it.
+   - A timer can't be back-dated. It starts "now", not on Fri Oct 23 at 1:00 PM ET as in the fixture, so it falls **outside** the a-c05 pull window (Oct 10–23). Only a pull window that reaches today will show it.
+   - Skip this step if CHK-02 should come from the fixtures.
+4. **Deactivate a-w13, optional.** Settings > Manage Team > **Parker Whitfield** > Deactivate. a-w13's two a-c05 entries exist only in the fixtures, so CHK-08 comes from the fixtures either way. Deactivating makes the Jobber user status match.
+5. **Adopt the entries into the id map.** This step is read-only against Jobber. From the main checkout:
+   ```bash
+   cd ~/Development/Hackathons/hyphenatable
+   bun run seed/push-jobber.ts --company a --live --adopt-entries                       # the default set: overlap pair, timer, and every 1b entry (missing ones print NOT FOUND)
+   bun run seed/push-jobber.ts --company a --live --adopt-entries --ids a-te-0111,a-te-0113   # without the timer
+   ```
+   - It matches by Jobber user, job and start time to the minute. A running timer is matched by user, job and `ticking`.
+   - Each match prints `ADOPTED <ours> -> <jobber id>` and is written into `data/private/a-jobber-map.json` (`entries` and `adopted`). Anything else prints `NOT FOUND` or `AMBIGUOUS` and is never guessed. Rerunning is safe.
+6. **Pull and compare:** `bun run packages/connectors/src/jobber/cli.ts pull --company a --from 2026-10-10 --to 2026-10-23 --tz America/New_York --compare data/fixtures/a`. timeSheetEntries should show as many pulled and matched as were adopted: 2 for the overlap pair, up to 10 with every 1b entry, plus the timer. Everything else stays fixture-only. The 3 Oct 23 entries should come back `approved=false`.
+
+**Gusto note for the demo:** the demo company has one employee of its own whose onboarding is not finished and who is **not** mapped to any Company A worker. Gusto shows it as not onboarded. Company A's CHK-09 is about **a-w14** (Reese Calloway) only. That extra employee is Gusto's sample data, not a Company A error.
+
+## Cycle extensions: `companies/a-c06.json`, `lib/cycle-a06.ts`
+
+`generate.ts --company a` also writes every `companies/<company>-cNN.json` extension to `data/fixtures/<company>/cycles/<cycle>/`. Today that is a-c06, demo cycle 2, with the same error mix and `resolvableByRuleType` on its answer-key rows. The base output is untouched; `__tests__/cycle-a06.test.ts` pins its own hash, `EXPECTED_SHA256_A06`. Details are in `data/fixtures/README.md`.
+
+### Retitle (street-name fix)
+
+Five a-c04 records used to have "undefined" as the street, because the past-street pool ran out: jobs a-j28..a-j32 and the Jobber expense a-ex-4006 ("Dump fee - …"). `lib/names.ts` now has `STREETS_OVERFLOW`, taken in order once the pool is empty, so only those titles changed and every id is the same. They are already in the Jobber trial, so `bun run seed/push-jobber.ts --company a --live --retitle`, run from the main checkout against the allowlisted account, renames them. It checks that `jobEdit`/`expenseEdit` exist and edits only the titles of mapped jobs and expenses that differ from the fixtures; nothing else changes and nothing is created.

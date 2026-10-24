@@ -4,21 +4,26 @@ import {
   type IdMap,
   marker,
   OBJECTS,
+  partitionSupported,
   QUERIES,
   resolveRefs,
+  retitlePlan,
 } from "../lib/jobber-mutations";
 import {
   codeFromRedirect,
   DEFAULT_REDIRECT_URI,
+  isMutation,
   JOBBER_GRAPHQL_URL,
   SEED_TOKEN_PATH,
+  SeedClient,
   seedAuthFromEnv,
 } from "../lib/jobber-seed-client";
 import { bucket, must } from "../lib/must";
 import {
+  availableMutations,
   closure,
   loadFixtures,
-  missingMutations,
+  oneTarget,
   pastedAddress,
   printDryRun,
   requireAllowedAccount,
@@ -28,7 +33,7 @@ const { fx, currentCycleId } = loadFixtures("a");
 const opts = {
   currentCycleId,
   companyName: "Company A",
-  timezone: "America/Los_Angeles",
+  timezone: "America/New_York",
 };
 const answerKey = (await Bun.file(
   new URL("../../data/fixtures/a/answer-key.json", import.meta.url),
@@ -227,34 +232,80 @@ describe("live safety", () => {
   test("account query asks only for fields the live schema has", () => {
     expect(QUERIES.account).not.toContain("tester");
   });
-  test("preflight lists mutations the live schema lacks (time entries, payment records, invoiceCreateFromJob)", async () => {
-    const live = [
-      "clientCreate",
-      "propertyCreate",
-      "quoteCreate",
-      "jobCreate",
-      "visitCreate",
-      "visitComplete",
-      "expenseCreate",
-      "invoiceMarkAsSent",
-      "invoiceCreate",
-    ];
+  // Mutations the seed token's schema has (read-only introspection, 2026-10-24).
+  const SEED_LIVE = [
+    "clientCreate",
+    "propertyCreate",
+    "quoteCreate",
+    "jobCreate",
+    "visitCreate",
+    "visitComplete",
+    "expenseCreate",
+    "invoiceCreate",
+    "invoiceMarkAsSent",
+  ];
+  test("unsupported kinds are skipped and recorded, not refused: entries and payments", () => {
+    const steps = buildPlan(fx, {}, opts).steps;
+    const { run, skipped } = partitionSupported(steps, new Set(SEED_LIVE));
+    expect(Object.keys(skipped).sort()).toEqual(["entries", "payments"]);
+    expect(skipped.entries.count).toBe(
+      steps.filter((s) => s.object === "entries").length,
+    );
+    expect(skipped.entries.mutations).toEqual(["timeSheetEntryCreate"]);
+    expect(skipped.payments.mutations.sort()).toEqual([
+      "invoiceCreatePaymentRecord",
+      "quoteCreatePaymentRecord",
+    ]);
+    expect(
+      run.some((s) => s.object === "entries" || s.object === "payments"),
+    ).toBe(false);
+    expect(new Set(run.map((s) => s.object))).toEqual(
+      new Set([
+        "clients",
+        "properties",
+        "quotes",
+        "jobs",
+        "visits",
+        "visitCompletes",
+        "expenses",
+        "invoices",
+      ]),
+    );
+  });
+  test("a step that needs a skipped kind is skipped too", () => {
+    const steps = buildPlan(fx, {}, opts).steps;
+    const { skipped } = partitionSupported(
+      steps,
+      new Set(SEED_LIVE.filter((m) => m !== "visitCreate")),
+    );
+    expect(skipped.visits.reason).toContain("visitCreate");
+    expect(skipped.visitCompletes.reason).toContain("needs visits");
+  });
+  test("availableMutations reads names from the schema", async () => {
     const fake = {
       gql: async () => ({
-        data: { __type: { fields: live.map((name) => ({ name })) } },
+        data: { __type: { fields: SEED_LIVE.map((name) => ({ name })) } },
         errors: [],
       }),
     };
-    expect(await missingMutations(fake, buildPlan(fx, {}, opts).steps)).toEqual(
-      [
-        "invoiceCreateFromJob",
-        "invoiceCreatePaymentRecord",
-        "quoteCreatePaymentRecord",
-        "timeSheetEntryCreate",
-      ],
-    );
+    expect((await availableMutations(fake)).has("invoiceCreate")).toBe(true);
   });
-  test("visits use the live schedule shape in the company's time zone; invoiceMarkAsSent takes id", () => {
+  test("--one targets the earliest visit when entries are unsupported", () => {
+    const { run } = partitionSupported(
+      buildPlan(fx, {}, opts).steps,
+      new Set(SEED_LIVE),
+    );
+    const t = must(oneTarget(run));
+    expect(t.object).toBe("visits");
+    const c = closure(run, t, {});
+    expect(c.map((s) => s.object)).toEqual(
+      ["clients", "properties", "quotes", "jobs", "visits"].filter((k) =>
+        c.some((s) => s.object === k),
+      ),
+    );
+    expect(c.at(-1)).toBe(t);
+  });
+  test("visits use the live schedule shape in the company's time zone; invoices use invoiceCreate", () => {
     const steps = buildPlan(fx, {}, opts).steps;
     const v = must(
       steps.find((s) => s.ourId === "a-v01" && s.object === "visits"),
@@ -268,14 +319,20 @@ describe("live safety", () => {
     expect(sched.startAt).toEqual({
       date: "2026-10-12",
       time: "07:00:00",
-      timezone: "America/Los_Angeles",
+      timezone: "America/New_York",
     });
     expect(Array.isArray(sched.teamMemberIdsToAssign)).toBe(true);
-    expect(
-      Object.keys(
-        must(steps.find((s) => s.object === "invoiceSends")).variables,
-      ),
-    ).toEqual(["id"]);
+    expect(v.idPath).toBe("visitCreate.createdVisits.0.id");
+    const inv = must(
+      steps.find((s) => s.object === "invoices" && s.ourId === "a-in03"),
+    );
+    const input = inv.variables.input as Record<string, unknown>;
+    expect(inv.mutation).toBe("invoiceCreate");
+    expect(input.markSent).toBe(false);
+    expect(input.tax).toEqual({ taxCalculationMethod: "EXCLUSIVE" });
+    expect(input.dueDetails).toEqual({});
+    expect(input.subject).toBe("payrollpilot:a-in03");
+    expect(input.propertyId).toBeUndefined();
   });
   test("refuses when the account query fails", async () => {
     const broken = {
@@ -341,5 +398,85 @@ describe("seed auth: paste-the-address code exchange", () => {
     await expect(
       pastedAddress(undefined, {}, async () => "  "),
     ).rejects.toThrow("no address");
+  });
+});
+
+describe("seed client: dropped connections", () => {
+  const fresh = {
+    accessToken: "t",
+    accessTokenExpiresAt: Date.now() + 3_600_000,
+    refreshToken: "r",
+  };
+  const flaky = (failures: number) => {
+    let n = 0;
+    return (async () => {
+      n++;
+      if (n <= failures) throw new Error("ECONNRESET");
+      return new Response(JSON.stringify({ data: { ok: true } }), {
+        status: 200,
+      });
+    }) as unknown as typeof fetch;
+  };
+  test("a read is retried after a dropped connection", async () => {
+    const c = new SeedClient(
+      { clientId: "a", clientSecret: "b" },
+      flaky(2),
+      async () => {},
+      () => {},
+      fresh,
+    );
+    expect((await c.gql("query { account { id } }")).data).toEqual({
+      ok: true,
+    });
+  });
+  test("a mutation is never retried blindly", async () => {
+    const c = new SeedClient(
+      { clientId: "a", clientSecret: "b" },
+      flaky(1),
+      async () => {},
+      () => {},
+      fresh,
+    );
+    await expect(
+      c.gql("mutation($i: X!) { clientCreate(input: $i) { client { id } } }"),
+    ).rejects.toThrow("may have been applied");
+    expect(isMutation("  mutation { a }")).toBe(true);
+    expect(isMutation("query { a }")).toBe(false);
+  });
+});
+
+describe("--retitle", () => {
+  test("lists only mapped jobs and expenses whose Jobber title differs from the fixtures", () => {
+    const steps = buildPlan(fx, {}, opts).steps;
+    const map: IdMap = {
+      jobs: { "a-j28": "J28", "a-j01": "J01" },
+      expenses: { "a-ex-4006": "E6" },
+    };
+    const current = new Map([
+      ["J28", "Backyard patio and drainage - undefined [payrollpilot:a-j28]"],
+      ["J01", "Front yard sod install - Larkspur Ln [payrollpilot:a-j01]"],
+      ["E6", "Dump fee - undefined [payrollpilot:a-ex-4006]"],
+    ]);
+    expect(retitlePlan(steps, map, current)).toEqual([
+      {
+        kind: "jobs",
+        ourId: "a-j28",
+        jobberId: "J28",
+        from: "Backyard patio and drainage - undefined [payrollpilot:a-j28]",
+        to: "Backyard patio and drainage - Kingfisher Ln [payrollpilot:a-j28]",
+      },
+      {
+        kind: "expenses",
+        ourId: "a-ex-4006",
+        jobberId: "E6",
+        from: "Dump fee - undefined [payrollpilot:a-ex-4006]",
+        to: "Dump fee - Kingfisher Ln [payrollpilot:a-ex-4006]",
+      },
+    ]);
+  });
+  test("no fixture title contains undefined any more", () => {
+    for (const j of fx.jobs) expect(String(j.title)).not.toContain("undefined");
+    for (const x of fx.expenses)
+      expect(String(x.description)).not.toContain("undefined");
   });
 });

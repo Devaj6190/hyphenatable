@@ -28,6 +28,18 @@ export const STREETS = [
   "Mossbank Way",
 ];
 
+// Used in order once STREETS is exhausted by the past cycles (none of these appear in a-c05 or a-c06).
+export const STREETS_OVERFLOW = [
+  "Kingfisher Ln",
+  "Briarwood Ct",
+  "Silverleaf Dr",
+  "Goldenrod Way",
+  "Cattail Rd",
+  "Larchmont Ave",
+  "Bittersweet Ln",
+  "Primrose Ct",
+];
+
 // Kinds of landscaping work for past-cycle jobs. `lighting` jobs are the ones quoted in person.
 export const WORK = [
   { title: "Front yard sod install", kind: "install" },
@@ -65,4 +77,58 @@ export const JOBBER_EXPENSE_TITLES = [
   "Hedge trimmer blades",
   "Edging stakes",
   "Fasteners",
+];
+
+// ---- Company B (HVAC). Distinct from Company A's streets and work.
+
+export const B_STREETS = [
+  "Granite Pass",
+  "Redwood Terrace",
+  "Kestrel Court",
+  "Mesa Verde Dr",
+  "Osprey Lane",
+  "Driftwood Ave",
+  "Canyon Wren Rd",
+  "Ironbark St",
+  "Sandpiper Way",
+  "Bluebell Ct",
+  "Larch Hollow",
+  "Saltgrass Rd",
+  "Copperleaf Dr",
+  "Wintergreen Pl",
+  "Tamarack Ave",
+  "Juniper Ridge Rd",
+  "Falcon Crest",
+  "Seabright Ln",
+  "Chaparral Way",
+  "Morningside Ct",
+  "Silverado Trl",
+  "Cypress Bend",
+  "Harrow Ln",
+  "Lupine Loop",
+  "Boulder Creek Rd",
+  "Starling St",
+  "Oakmont Ter",
+  "Pebble Beach Ct",
+  "Wildrye Ave",
+  "Coyote Run",
+];
+
+export const B_INSTALL_WORK = [
+  "Heat pump install",
+  "Furnace and AC replacement",
+  "Ductless mini-split install",
+  "Rooftop unit swap",
+  "Ductwork replacement",
+  "Air handler replacement",
+];
+
+export const B_SERVICE_WORK = [
+  "AC repair",
+  "Furnace tune-up",
+  "Maintenance agreement visit",
+  "Thermostat replacement",
+  "Refrigerant leak repair",
+  "No-heat call",
+  "Condenser fan motor repair",
 ];
