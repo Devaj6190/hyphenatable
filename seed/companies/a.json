@@ -59,6 +59,10 @@
       "gustoRate": 2800,
       "rates": {
         "a-c01": 2800
+      },
+      "gustoIds": {
+        "employeeUuid": "0985fa42-2d54-4007-a2a4-23ce47f7d4ac",
+        "jobUuid": "822b611e-bb34-4ebc-ab11-7fe9cd87ab4f"
       }
     },
     {
@@ -75,6 +79,10 @@
       "jobberRates": {
         "a-c01": 2500,
         "a-c04": 2600
+      },
+      "gustoIds": {
+        "employeeUuid": "0d234834-fb33-466f-9da9-492ce095a960",
+        "jobUuid": "377add04-1326-4b58-806e-7326d85170a4"
       }
     },
     {
@@ -86,6 +94,10 @@
       "gustoRate": 2400,
       "rates": {
         "a-c01": 2400
+      },
+      "gustoIds": {
+        "employeeUuid": "28e0bbd0-36e2-4442-b621-652364e2b0e6",
+        "jobUuid": "65ba531f-134b-4ecf-aa5a-c1421b0191ef"
       }
     },
     {
@@ -97,6 +109,10 @@
       "gustoRate": 2400,
       "rates": {
         "a-c01": 2400
+      },
+      "gustoIds": {
+        "employeeUuid": "39cf112a-6ebf-455f-92e5-c2a8289131d3",
+        "jobUuid": "5e8df8c9-6d31-46c0-87fc-4ac1764dc880"
       }
     },
     {
@@ -108,6 +124,10 @@
       "gustoRate": 2200,
       "rates": {
         "a-c01": 2200
+      },
+      "gustoIds": {
+        "employeeUuid": "506c5c40-c47e-404f-85a1-56c491d4353a",
+        "jobUuid": "eb4e0cee-03e6-4a54-8a04-5706d9f6767f"
       }
     },
     {
@@ -119,6 +139,10 @@
       "gustoRate": 2200,
       "rates": {
         "a-c01": 2200
+      },
+      "gustoIds": {
+        "employeeUuid": "52d9cf68-59ed-4210-81d2-cd9969752889",
+        "jobUuid": "a02e8dcf-ef55-4772-a9e9-326ce355c67b"
       }
     },
     {
@@ -130,6 +154,10 @@
       "gustoRate": 2000,
       "rates": {
         "a-c01": 2000
+      },
+      "gustoIds": {
+        "employeeUuid": "693298ae-099c-493b-a5da-497573bdd30f",
+        "jobUuid": "b687b8c0-6694-4cde-a8db-03e5fdc4b203"
       }
     },
     {
@@ -142,6 +170,10 @@
       "rates": {
         "a-c01": 6240000,
         "a-c04": 6760000
+      },
+      "gustoIds": {
+        "employeeUuid": "9ffa3abf-de40-4031-9991-388a12d9a643",
+        "jobUuid": "167390f8-d917-459a-95ec-ca73dd8c5357"
       }
     },
     {
@@ -173,6 +205,10 @@
       "gustoRate": 7280000,
       "rates": {
         "a-c01": 7280000
+      },
+      "gustoIds": {
+        "employeeUuid": "a5fe7b57-4060-4beb-9c43-661bf33bfe7b",
+        "jobUuid": "7a05bb15-3ed3-4aa2-a595-b73f7cea5193"
       }
     },
     {
@@ -184,6 +220,10 @@
       "gustoRate": 9100000,
       "rates": {
         "a-c01": 9100000
+      },
+      "gustoIds": {
+        "employeeUuid": "ca2ac4b6-a91a-4931-90ae-c2c0846f0f3b",
+        "jobUuid": "00aeb254-d996-4760-9fde-016e0374b1fa"
       }
     },
     {
@@ -197,6 +237,10 @@
       "gustoRate": 2200,
       "rates": {
         "a-c01": 2200
+      },
+      "gustoIds": {
+        "employeeUuid": "d9f87244-2263-457b-9b17-36eb55609270",
+        "jobUuid": "6c40488d-9ee2-46bc-b597-fae1bc9bc94f"
       }
     },
     {
@@ -207,7 +251,11 @@
       "jobberRate": 2000,
       "gustoRate": 2000,
       "onboarded": false,
-      "firstCycle": "a-c05"
+      "firstCycle": "a-c05",
+      "gustoIds": {
+        "employeeUuid": "7d6cf9cc-6463-4487-ace0-ffc646a10269",
+        "jobUuid": "4e76083a-c88f-4c9f-a439-945fca1df73b"
+      }
     }
   ],
   "shift": {
@@ -710,7 +758,8 @@
       "a-w09|2026-10-23T11:00:00.000Z": "a-te-0138",
       "a-w10|2026-10-23T11:00:00.000Z": "a-te-0139",
       "a-w05|2026-10-23T17:00:00.000Z": "a-te-0140"
-    }
+    },
+    "gustoPayrollId": "650734d5-e197-4b55-b2a2-03bcbff3882c"
   },
   "rules": [
     {
