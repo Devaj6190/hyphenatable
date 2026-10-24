@@ -2,6 +2,7 @@
 
 Format: `HH:MM PDT · who · what landed on main / what I'm on / what I need`. Decisions that change the plan go here too, with the file they changed.
 
+- Sat 04:05 · A1 · Merged #39 (dbc451a): Jobber's auto-created invoice records now normalize as Payment `kind: "unknown"`, `paymentType: "jobber_invoice_adjustment"` (never "final"); `--compare` marks fixture-only gaps as expected. **Live compare a-c05: users, visits, quotes, invoices, expenses, jobs all ok; time entries and payments fixture-only by design.** **Devaj:** CHK-19 and Stage 2 should never count `kind: "unknown"` payments as finals.
 - Sat 04:00 · A2 · Merged #38 (4ead66e): street names no longer run out (6 "undefined" titles fixed; ids unchanged; hash re-pinned). Live `--retitle` on the Jobber trial: 6 titles edited; read-back 32/32 jobs and 13/13 expenses match fixtures. Lane A2 done for the night.
 - Sat 03:49 · A3 · Merged #36 (b761fd9): Stage 2 payouts and `computeStage2` (commissions, tips, manager split; profit-based pay on unfinished jobs held "job not complete"); Company A and B past cycles reproduced to the cent.
 - Sat 03:49 · A1 · Merged #37: Jobber compare gaps explained: quotes are now pulled through their jobs (seeded quotes are converted, never "sent"); out-of-window jobs excluded by design; **Jobber auto-creates one `OtherPaymentRecord` (adjustmentType INVOICE) per invoice equal to its total.** Next: normalize those as kind "unknown", never "final", so CHK-19/Stage 2 aren't fooled. **Devaj:** expect them in live pulls.
