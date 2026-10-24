@@ -7,6 +7,7 @@
   "exports": {
     "./jobber": "./src/jobber/index.ts",
     "./qbo": "./src/qbo/index.ts",
+    "./gusto": "./src/gusto/read.ts",
     "./money": "./src/money.ts",
     "./types": "./src/types.ts"
   },
@@ -14,7 +15,8 @@
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "jobber": "bun run src/jobber/cli.ts",
-    "qbo": "bun run src/qbo/cli.ts"
+    "qbo": "bun run src/qbo/cli.ts",
+    "gusto": "bun run src/gusto/cli.ts"
   },
   "devDependencies": {
     "@types/bun": "1.3.1",

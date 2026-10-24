@@ -1,0 +1,55 @@
+{
+  "_comment": "Shaped from docs.gusto.com (API 2026-06-15, read 2026-10-24); synthetic, not recorded. Fake uuids and names. Keyed by request path; employees keyed by the terminated filter.",
+  "/v1/token_info": { "scope": "employees:read payrolls:read", "resource": { "type": "Company", "uuid": "fake-co-0001" }, "resource_owner": { "type": "CompanyAdmin", "uuid": "fake-admin-0001" } },
+  "/v1/companies/fake-co-0001/employees": {
+    "false": [
+      { "uuid": "fake-emp-0001", "first_name": "Riley", "last_name": "Park", "terminated": false, "onboarded": true, "onboarding_status": "onboarding_completed",
+        "jobs": [{ "uuid": "fake-job-0001", "title": "Crew", "primary": true, "current_compensation_uuid": "fake-comp-0001",
+          "compensations": [
+            { "uuid": "fake-comp-0000", "rate": "26.00", "payment_unit": "Hour", "flsa_status": "Nonexempt", "effective_date": "2026-01-01" },
+            { "uuid": "fake-comp-0001", "rate": "28.00", "payment_unit": "Hour", "flsa_status": "Nonexempt", "effective_date": "2026-07-01" }
+          ] }] },
+      { "uuid": "fake-emp-0002", "first_name": "Casey", "last_name": "Moore", "terminated": false, "onboarded": true,
+        "jobs": [{ "uuid": "fake-job-0002", "title": "Crew lead", "primary": true, "current_compensation_uuid": "fake-comp-0002",
+          "compensations": [{ "uuid": "fake-comp-0002", "rate": "62400.00", "payment_unit": "Year", "flsa_status": "Exempt" }] }] },
+      { "uuid": "fake-emp-0003", "first_name": "Drew", "last_name": "Lane", "terminated": false, "onboarded": false, "onboarding_status": "admin_onboarding_incomplete",
+        "jobs": [{ "uuid": "fake-job-0003", "title": "Crew", "primary": true, "current_compensation_uuid": "fake-comp-0003" }] }
+    ],
+    "true": [
+      { "uuid": "fake-emp-0004", "first_name": "Jamie", "last_name": "Fox", "terminated": true, "onboarded": true,
+        "jobs": [
+          { "uuid": "fake-job-0004", "title": "Crew", "primary": false, "compensations": [{ "uuid": "fake-comp-0004", "rate": "25.00", "payment_unit": "Hour", "flsa_status": "Nonexempt" }] },
+          { "uuid": "fake-job-0005", "title": "Office", "primary": false, "compensations": [{ "uuid": "fake-comp-0005", "rate": "30.00", "payment_unit": "Hour", "flsa_status": "Nonexempt" }] }
+        ] }
+    ]
+  },
+  "/v1/jobs/fake-job-0003/compensations": [{ "uuid": "fake-comp-0003", "rate": "31.15", "payment_unit": "Hour", "flsa_status": "Nonexempt", "effective_date": "2026-10-01" }],
+  "/v1/companies/fake-co-0001/contractors": [
+    { "uuid": "fake-con-0001", "type": "Individual", "wage_type": "Hourly", "hourly_rate": "22.50", "is_active": true, "first_name": "Sky", "last_name": "Rivera", "onboarded": true },
+    { "uuid": "fake-con-0002", "type": "Business", "wage_type": "Fixed", "hourly_rate": "0.00", "is_active": false, "business_name": "Fake Hauling LLC", "onboarded": true }
+  ],
+  "/v1/companies/fake-co-0001/payrolls": {
+    "processed": [
+      { "payroll_uuid": "fake-pr-0001", "processed": true, "off_cycle": false, "check_date": "2026-10-15", "pay_period": { "start_date": "2026-09-27", "end_date": "2026-10-10", "pay_schedule_uuid": "fake-ps-0001" } }
+    ],
+    "unprocessed": [
+      { "payroll_uuid": "fake-pr-0002", "processed": false, "off_cycle": false, "check_date": "2026-10-29", "pay_period": { "start_date": "2026-10-11", "end_date": "2026-10-24", "pay_schedule_uuid": "fake-ps-0001" } }
+    ]
+  },
+  "/v1/companies/fake-co-0001/payrolls/fake-pr-0001": {
+    "payroll_uuid": "fake-pr-0001", "processed": true, "off_cycle": false, "check_date": "2026-10-15",
+    "pay_period": { "start_date": "2026-09-27", "end_date": "2026-10-10", "pay_schedule_uuid": "fake-ps-0001" },
+    "totals": { "gross_pay": "4845.00", "net_pay": "3901.17" },
+    "employee_compensations": [
+      { "employee_uuid": "fake-emp-0001", "excluded": false, "gross_pay": "2345.00", "net_pay": "1890.42",
+        "hourly_compensations": [
+          { "name": "Regular Hours", "hours": "80.000", "amount": "2240.00", "job_uuid": "fake-job-0001", "compensation_multiplier": 1 },
+          { "name": "Overtime", "hours": "2.500", "amount": "105.00", "job_uuid": "fake-job-0001", "compensation_multiplier": 1.5 }
+        ],
+        "fixed_compensations": [] },
+      { "employee_uuid": "fake-emp-0002", "excluded": false, "gross_pay": "2500.00", "net_pay": "2010.75",
+        "hourly_compensations": [],
+        "fixed_compensations": [{ "name": "Bonus", "amount": "100.00", "job_uuid": null }] }
+    ]
+  }
+}
