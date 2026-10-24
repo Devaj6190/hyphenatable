@@ -3,6 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
+  compareFailed,
   compareGustoEmployees,
   compareIds,
   compareJobber,
@@ -239,6 +240,107 @@ describe("compareJobber scope rules (live trial findings, 2026-10-24)", () => {
       missing: 1,
       extra: 1,
     });
+  });
+});
+
+describe("fixture-only objects and Jobber's invoice adjustments", () => {
+  const empty = {
+    workers: [],
+    timeEntries: [],
+    jobs: [],
+    visits: [],
+    quotes: [],
+    invoices: [],
+    payments: [],
+    expenses: [],
+  };
+  const fx: Fixtures = {
+    timeEntries: [
+      { id: "a-te-0101", startAt: "2026-10-12T15:00:00.000Z", jobId: "a-j02" },
+    ],
+    payments: [
+      {
+        id: "a-pay02",
+        invoiceId: "a-in01",
+        quoteId: null,
+        amountCents: 814000,
+        entryDate: "2026-10-14",
+      },
+    ],
+  };
+  const map = {
+    invoices: { "a-in01": "I1" },
+    skipped: {
+      checkedAt: "2026-10-24T10:31:52.070Z",
+      objects: {
+        entries: {
+          mutations: ["timeSheetEntryCreate"],
+          count: 387,
+          reason: "not in schema",
+        },
+        payments: {
+          mutations: ["quoteCreatePaymentRecord", "invoiceCreatePaymentRecord"],
+          count: 43,
+          reason: "not in schema",
+        },
+      },
+    },
+  };
+  const adjustment = {
+    id: "jobber:P-auto",
+    companyId: "a",
+    sourceId: "P-auto",
+    invoiceId: "jobber:I1",
+    quoteId: null,
+    entryDate: "2026-10-14T04:00:00.000Z",
+    amountCents: 814000,
+    paymentType: "jobber_invoice_adjustment",
+    kind: "unknown" as const,
+  };
+  // a hand-entered overlap entry that the pusher never mapped
+  const handEntered = { sourceId: "TE-hand" } as never;
+
+  it("marks skipped objects as expected, explains adjustments, and does not fail the compare on them", () => {
+    const rows = compareJobber(
+      { ...empty, payments: [adjustment], timeEntries: [handEntered] } as never,
+      fx,
+      map,
+      period,
+    );
+    const byObject = Object.fromEntries(rows.map((r) => [r.object, r]));
+    expect(byObject.timeSheetEntries).toMatchObject({
+      fixtureOnly: true,
+      missing: 1,
+      extra: 1,
+    });
+    expect(byObject.paymentRecords).toMatchObject({
+      fixtureOnly: true,
+      matched: 0,
+      extra: 1,
+    });
+    expect(byObject.paymentRecords?.note).toContain(
+      "1 pulled are Jobber invoice adjustments (kind unknown)",
+    );
+    expect(byObject.users?.fixtureOnly).toBeUndefined();
+    // a job reached only through fixture-only entries is not expected from the source
+    expect(byObject.jobs).toMatchObject({ fixture: 0, missing: 0 });
+    expect(compareFailed(rows)).toBe(false);
+    const table = formatCompare(rows);
+    expect(table).toContain(
+      "expected: fixture-only by design (no timeSheetEntryCreate for this app; 387 fixture records stay fixture-only)",
+    );
+    expect(table).toMatch(/users\s+0\s+0\s+0\s+0\s+0\s+ok/);
+  });
+
+  it("without a skipped record the same gaps are a mismatch", () => {
+    const rows = compareJobber(
+      { ...empty, timeEntries: [handEntered] } as never,
+      fx,
+      { invoices: map.invoices },
+      period,
+    );
+    expect(compareFailed(rows)).toBe(true);
+    expect(formatCompare(rows)).toMatch(/timeSheetEntries.*MISMATCH/);
   });
 });
 

@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { pullCycle } from "../index.ts";
-import { paymentKind } from "../objects.ts";
+import {
+  JOBBER_INVOICE_ADJUSTMENT,
+  normalizePayment,
+  paymentKind,
+} from "../objects.ts";
 import { fakeJobberFetch, fixtures, memoryTokenStore } from "./fakeJobber.ts";
 
 const J1 = "jobber:Z2lkOi8vSm9iYmVyL0pvYi8yMDAx";
@@ -270,5 +274,45 @@ describe("fields hidden from the app (live trial account, 2026-10-24)", () => {
       r.records.workers.find((w) => w.jobber?.labourRateCents === 3115),
     ).toBeDefined();
     expect(r.records.expenses[0]?.accountName).toBe("Materials");
+  });
+});
+
+describe("Jobber's own invoice records (live trial, 2026-10-24)", () => {
+  const auto = {
+    __typename: "OtherPaymentRecord",
+    id: "P-auto",
+    amount: 8140,
+    entryDate: "2026-10-14T04:00:00Z",
+    paymentType: null,
+    adjustmentType: "INVOICE",
+    paymentOrigin: "UNKNOWN_ORIGIN",
+    invoice: { id: "I1" },
+    quote: null,
+  };
+  it("are kept and traceable but never a final payment", () => {
+    expect(normalizePayment(auto, "a")).toEqual({
+      id: "jobber:P-auto",
+      companyId: "a",
+      sourceId: "P-auto",
+      invoiceId: "jobber:I1",
+      quoteId: null,
+      entryDate: "2026-10-14T04:00:00.000Z",
+      amountCents: 814000,
+      paymentType: JOBBER_INVOICE_ADJUSTMENT,
+      kind: "unknown",
+    });
+  });
+  it("only that exact shape: a real 'Other' payment or a known origin stays a final", () => {
+    expect(paymentKind({ ...auto, paymentOrigin: "MANUAL" })).toBe("final");
+    expect(paymentKind({ ...auto, __typename: "CashPaymentRecord" })).toBe(
+      "final",
+    );
+    expect(paymentKind({ ...auto, adjustmentType: "PAYMENT" })).toBe("final");
+    expect(
+      normalizePayment(
+        { ...auto, __typename: "CheckPaymentRecord", paymentType: "CHEQUE" },
+        "a",
+      ).paymentType,
+    ).toBe("CHEQUE");
   });
 });

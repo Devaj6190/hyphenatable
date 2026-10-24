@@ -57,7 +57,7 @@ export const INVOICES_QUERY = conn(
 export const PAYMENT_RECORDS_QUERY = conn(
   "paymentRecords",
   range("entryDate"),
-  "id amount entryDate paymentType invoice { id } quote { id }",
+  "__typename id amount entryDate paymentType adjustmentType paymentOrigin invoice { id } quote { id }",
 );
 // Expense.accountingCode is hidden from an app without the matching scope (seen live 2026-10-24); requested only when visible.
 export const expensesQuery = (withAccountingCode: boolean) =>
@@ -119,6 +119,9 @@ export interface RawPayment {
   amount: number;
   entryDate: string;
   paymentType: string | null;
+  __typename?: string;
+  adjustmentType?: string | null;
+  paymentOrigin?: string | null;
   invoice: Id;
   quote: Id;
 }
@@ -187,9 +190,28 @@ export const normalizeInvoice = (
 });
 
 /** A payment recorded on a quote is a deposit (even once the quote is invoiced); on an invoice only, final. */
+/** paymentType given to Jobber's own invoice records (see isJobberInvoiceAdjustment). */
+export const JOBBER_INVOICE_ADJUSTMENT = "jobber_invoice_adjustment";
+
+/**
+ * Jobber creates an OtherPaymentRecord itself when an invoice is created or marked (seen live 2026-10-24:
+ * adjustmentType INVOICE, paymentOrigin UNKNOWN_ORIGIN, no payment type, amount = the invoice total, dated
+ * the issue date). That is not money a customer paid, so it must never read as a final payment.
+ */
+export const isJobberInvoiceAdjustment = (
+  r: Pick<RawPayment, "__typename" | "adjustmentType" | "paymentOrigin">,
+): boolean =>
+  r.__typename === "OtherPaymentRecord" &&
+  r.adjustmentType === "INVOICE" &&
+  r.paymentOrigin === "UNKNOWN_ORIGIN";
+
 export function paymentKind(
-  r: Pick<RawPayment, "invoice" | "quote">,
+  r: Pick<
+    RawPayment,
+    "invoice" | "quote" | "__typename" | "adjustmentType" | "paymentOrigin"
+  >,
 ): Payment["kind"] {
+  if (isJobberInvoiceAdjustment(r)) return "unknown";
   if (r.quote?.id) return "deposit";
   if (r.invoice?.id) return "final";
   return "unknown";
@@ -206,7 +228,10 @@ export const normalizePayment = (
   quoteId: ref(r.quote),
   entryDate: toUtcIso(r.entryDate),
   amountCents: toCents(r.amount),
-  paymentType: r.paymentType,
+  // kept, counted and traceable (sourceId), but flagged so CHK-19 and Stage 2 never take it as a final
+  paymentType: isJobberInvoiceAdjustment(r)
+    ? JOBBER_INVOICE_ADJUSTMENT
+    : r.paymentType,
   kind: paymentKind(r),
 });
 

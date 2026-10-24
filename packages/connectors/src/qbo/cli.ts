@@ -8,6 +8,7 @@ import { writeFile } from "node:fs/promises";
 import { resolve, sep } from "node:path";
 import { parseArgs } from "node:util";
 import {
+  compareFailed,
   compareQbo,
   formatCompare,
   loadFixtures,
@@ -84,7 +85,7 @@ async function pull() {
       to,
     );
     console.log(`\n${formatCompare(rows)}`);
-    if (rows.some((x) => x.missing || x.extra)) process.exitCode = 1;
+    if (compareFailed(rows)) process.exitCode = 1;
   }
   if (r.syncRuns.some((s) => !s.complete)) process.exitCode = 1;
 }
