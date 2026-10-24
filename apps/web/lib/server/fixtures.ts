@@ -7,6 +7,14 @@ import flags from "@/app/_fixtures/flags.json";
 import ownerRoutedFlags from "@/app/_fixtures/flags.owner-routed.json";
 import messages from "@/app/_fixtures/messages.json";
 import questions from "@/app/_fixtures/questions.json";
+import workbook from "@/app/_fixtures/workbook.json";
+import type { AgentKind } from "@/components/AgentChip";
+import {
+  type CycleWorkbook,
+  holdsOf,
+  type Readiness,
+  type WorkbookData,
+} from "@/components/workbook/data";
 import { formatCents } from "@/lib/money";
 import {
   canSeeAuditEvent,
@@ -20,11 +28,11 @@ import {
 } from "@/lib/policy";
 import { parseRole, ROLE_COOKIE } from "@/lib/role";
 import {
-  type Cycle,
   closedOf,
   cycleLabel,
   type Rule,
-  type SyncRun,
+  type Cycle as RuleCycle,
+  type SyncRun as RuleSyncRun,
 } from "@/lib/rules";
 import {
   MISSED_SOURCE,
@@ -42,13 +50,18 @@ import type {
 } from "@/lib/types";
 import type {
   AuditViewData,
+  Cycle,
   EvidenceItem,
   FlagDetailData,
+  FlagInfo,
+  HomeData,
   InboxItem,
   ManagerInboxData,
   PastQuestion,
+  RosterWorker,
   RulesViewData,
   RuleView,
+  SyncRun,
   ThreadView,
 } from "@/lib/view-types";
 import cyclesA from "../../../../data/fixtures/a/cycles.json";
@@ -183,9 +196,9 @@ export function auditView(viewer: Viewer, companyId: string): AuditViewData {
 
 type RuleFixture = {
   rules: Rule[];
-  cycles: Cycle[];
+  cycles: RuleCycle[];
   pastPayrolls: { id: string; cycleId: string }[];
-  syncRuns: SyncRun[];
+  syncRuns: RuleSyncRun[];
   questions: PastQuestion[];
 };
 
@@ -384,5 +397,186 @@ export function rulesView(viewer: Viewer, companyId: string): RulesViewData {
       : [],
     connected,
     sources: RULE_SOURCES,
+  };
+}
+
+const workbookFixture = workbook as unknown as {
+  source: string;
+  companies: Record<
+    string,
+    { workers: Record<string, { name: string }>; cycles: CycleWorkbook[] }
+  >;
+};
+
+/** Counts records, never money. Uses every flag (owner-routed too): only the owner gets here. */
+function readinessOf(wb: CycleWorkbook): Readiness {
+  const mine = allFlags.filter((f) => f.cycleId === wb.cycle.id);
+  const entries = wb.syncRuns.find((s) => s.object === "timeSheetEntries");
+  const flagged = new Set(mine.flatMap((f) => f.subject.entryIds)).size;
+  return {
+    clean: entries ? entries.pulled - flagged : null,
+    pulled: entries ?? null,
+    fixed: mine.filter((f) => f.status === "corrected").length,
+    open: mine.filter((f) => ["open", "asked", "answered"].includes(f.status))
+      .length,
+    // The engine already applies held flags, so its holds are the whole list.
+    held: holdsOf(wb).length,
+    incompleteSyncs: wb.syncRuns.filter((s) => !s.complete).length,
+  };
+}
+
+/** The workbook shows pay, so it is owner-only: null for a manager. Empty cycles when the company has none. */
+export function workbookView(
+  viewer: Viewer,
+  companyId: string,
+): WorkbookData | null {
+  if (viewer.role !== "owner") return null;
+  const company = workbookFixture.companies[companyId];
+  const cycles = company?.cycles ?? [];
+  return {
+    source: workbookFixture.source,
+    names: Object.fromEntries(
+      Object.entries(company?.workers ?? {}).map(([id, w]) => [id, w.name]),
+    ),
+    cycles: cycles.map((wb, i) => ({
+      ...wb,
+      readiness: readinessOf(wb),
+      lastQuestions: i > 0 ? cycles[i - 1].cycle.questionsAsked : null,
+    })),
+  };
+}
+
+// The generated per-company fixtures (data/fixtures/<id>) behind the home and inputs pages. Only Company A
+// has them so far; the roster holds pay rates, so it goes out only through rosterView below.
+const generated: Record<
+  string,
+  {
+    cycles: Cycle[];
+    syncRuns: SyncRun[];
+    ruleStatuses: string[];
+    roster: RosterWorker[];
+  }
+> = {
+  a: {
+    cycles: cyclesA as Cycle[],
+    syncRuns: syncRunsA as SyncRun[],
+    ruleStatuses: rulesA.map((r) => r.status),
+    roster: rosterA as RosterWorker[],
+  },
+};
+
+const generatedFile = (companyId: string, file: string) =>
+  generated[companyId] ? `data/fixtures/${companyId}/${file}` : null;
+
+// ponytail: audit.json runs past the moment flags.json shows (it goes on to Gate 1 and the Gusto draft),
+// so the fixture feed stops at the correction proposal. Live audit.list has no cutoff.
+const FIXTURE_NOW = "2026-10-24T08:41:00.000Z";
+
+function recipientLabel(companyId: string, q: Question | undefined): string {
+  if (!q) return "the right person";
+  const name =
+    generated[companyId]?.roster.find((w) => w.id === q.toWorkerId)
+      ?.displayName ?? nameOf(companyId, q.toWorkerId);
+  return q.toRole === "employee" ? name : `${name}, ${q.toRole}`;
+}
+
+/** The owner home and the inputs page: flags with what each card needs, the cycle, its pulls and feed. */
+export function homeView(viewer: Viewer, companyId: string): HomeData {
+  const flags = homeFlags(viewer, companyId);
+  const info: Record<string, FlagInfo> = {};
+  for (const f of flags) {
+    const question = allQuestions.find((q) => q.id === f.questionId);
+    const agents = allFlagEvents
+      .filter((e) => e.flagId === f.id && e.actor.agent)
+      .map((e) => e.actor.agent as AgentKind);
+    info[f.id] = {
+      question: question ?? null,
+      recipient: recipientLabel(companyId, question),
+      reply:
+        (f.status === "answered" &&
+          allMessages.find(
+            (m) => m.questionId === question?.id && m.direction === "in",
+          )) ||
+        null,
+      agents: agents.length ? [...new Set(agents)] : ["controller"],
+    };
+  }
+
+  const fx = generated[companyId];
+  const sorted = [...(fx?.cycles ?? [])].sort((a, b) => a.number - b.number);
+  const raw = sorted.at(-1);
+  // ponytail: cycles.json is the pre-run snapshot (stage "setup"); app/_fixtures show the same cycle mid-way
+  // with questions out, so the stage is overridden to "asking" and the screen says so. cycles.get replaces both.
+  const cycle: Cycle | null = raw ? { ...raw, stage: "asking" } : null;
+
+  return {
+    flags,
+    info,
+    audit: auditView(viewer, companyId).events.filter(
+      (e) => e.cycleId === cycle?.id && e.at <= FIXTURE_NOW,
+    ),
+    cycle,
+    previousQuestionsAsked: sorted.at(-2)?.questionsAsked ?? null,
+    questionsAsked: allQuestions.filter(
+      (q) =>
+        q.cycleId === cycle?.id &&
+        !["draft", "approved", "denied"].includes(q.status),
+    ).length,
+    syncRuns: (fx?.syncRuns ?? []).filter((r) => r.cycleId === cycle?.id),
+    rulesProposed: (fx?.ruleStatuses ?? []).filter((s) => s === "proposed")
+      .length,
+    stageNote: raw
+      ? `Fixture override: ${generatedFile(companyId, "cycles.json")} says "${raw.stage}"; the flags fixture has questions out`
+      : null,
+    sources: {
+      records: generatedFile(companyId, "syncRuns.json"),
+      roster: generatedFile(companyId, "workers.json"),
+      rules: generatedFile(companyId, "rules.json"),
+    },
+  };
+}
+
+/** Who is in this payroll. A manager gets their crew and no rates. */
+export function rosterView(viewer: Viewer, companyId: string): RosterWorker[] {
+  const all = generated[companyId]?.roster ?? [];
+  if (viewer.role === "owner") return all;
+  return all
+    .filter((w) => viewer.crew.has(w.id))
+    .map((w) => ({
+      ...w,
+      jobber: w.jobber && { ...w.jobber, labourRateCents: null },
+      gusto: w.gusto && { ...w.gusto, rateCents: null },
+      venmoRateCents: null,
+    }));
+}
+
+/** The manager and the names of their crew, so the inbox can say who a text is for. */
+export function managerCrew(companyId: string) {
+  const viewer = viewerForRole(companyId, "manager");
+  const crew = viewer.role === "manager" ? viewer.crew : new Set<string>();
+  const ws = workersOf(companyId).filter((w) => crew.has(w.id));
+  return {
+    manager: ws.find((w) => w.role === "manager") ?? null,
+    names: Object.fromEntries(ws.map((w) => [w.id, w.displayName])),
+  };
+}
+
+/** Users who are managers, so the audit log can chip them as Manager rather than Owner. */
+export const managerIds = (companyId: string) =>
+  workersOf(companyId)
+    .filter((w) => w.role === "manager")
+    .map((w) => w.id);
+
+/** Questions for the demo panel: only those about a flag this viewer may see, with the names they mention. */
+export function demoQuestions(viewer: Viewer, companyId: string) {
+  const visibleIds = new Set(visibleFlags(viewer, companyId).map((f) => f.id));
+  return {
+    questions: allQuestions.filter(
+      (q) =>
+        q.companyId === companyId && q.flagIds.some((id) => visibleIds.has(id)),
+    ),
+    names: Object.fromEntries(
+      workersOf(companyId).map((w) => [w.id, w.displayName]),
+    ),
   };
 }

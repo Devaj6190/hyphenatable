@@ -2,24 +2,17 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { ManagerInbox } from "@/components/ManagerInbox";
 import { companies } from "@/lib/companies";
-import { managerInbox } from "@/lib/server/fixtures";
+import { managerCrew, managerInbox } from "@/lib/server/fixtures";
 
-// Params are read inside Suspense so the shell stays instant (Next 16).
+// Params are read inside Suspense so the shell stays instant (Next 16). The title counts open items, so
+// ManagerInbox renders its own PageHeader.
 export default function ManagerPage({
   params,
 }: PageProps<"/c/[companyId]/manager">) {
   return (
-    <div className="flex flex-col gap-4">
-      <div>
-        <h1 className="text-2xl font-semibold">Your crew’s items</h1>
-        <p className="text-sm text-muted-foreground">
-          Hours and jobs only. Pay amounts are never shown here.
-        </p>
-      </div>
-      <Suspense>
-        <Body params={params} />
-      </Suspense>
-    </div>
+    <Suspense>
+      <Body params={params} />
+    </Suspense>
   );
 }
 
@@ -34,6 +27,8 @@ async function Body({
       data={managerInbox(companyId)}
       dataKind={company.kind}
       timezone={company.timezone}
+      companyLabel={`${company.label}${company.cycle ? `, cycle ${company.cycle.number}` : ""}`}
+      {...managerCrew(companyId)}
     />
   );
 }
