@@ -30,6 +30,7 @@ if (config.convexUrl) {
   const server = serveStubControl(stub, contacts, fake, config.stubPort, {
     fixturesDir: config.fixturesDir,
     dashboardUrl: config.dashboardUrl,
+    managerDisplayName: config.managerDisplayName,
   });
   stopStub = () => server.stop();
   backend = stub;

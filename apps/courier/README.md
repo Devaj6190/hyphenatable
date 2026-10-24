@@ -47,7 +47,7 @@ curl -s 127.0.0.1:3210/messages
 
 With Photon connected, `/reply` is off: reply from the real phone instead.
 
-The manager's summary text, built from `data/fixtures/<company>/flags.json` for the current cycle (template in `packages/engine/src/messages/summary.ts`; link from `DASHBOARD_URL`):
+The manager's summary text, built from `data/fixtures/<company>/flags.json` for the current cycle. Wording and issue phrases are at the top of `packages/engine/src/messages/templates.ts`; the greeting uses `MANAGER_DISPLAY_NAME` (else the fixture's fake name) and the link uses `DASHBOARD_URL` (unset: the text ends before the link):
 
 ```bash
 # see the text without sending it

@@ -1,5 +1,4 @@
 import { describe, expect, test } from "bun:test";
-import { DASHBOARD_URL_PLACEHOLDER } from "@payrollpilot/engine/messages/summary";
 import { getFunctionName } from "convex/server";
 import type { Message } from "spectrum-ts";
 import { api } from "../../web/convex/_generated/api";
@@ -315,19 +314,39 @@ describe("privacy: no phone number leaves the courier", () => {
 });
 
 describe("manager summary from the fixtures", () => {
-  test("Company A's current cycle, queued for the manager phone through the stub", async () => {
+  const base = {
+    fixturesDir: readConfig({}).fixturesDir,
+    companyId: "a",
+    contactRef: "contact:a-w11",
+  };
+
+  test("Company A's current cycle, greeting the fixture's fake name, queued for the manager phone", async () => {
     const { stub, fake } = setup();
     const { text, cycleId } = summaryFromFixtures({
-      fixturesDir: readConfig({}).fixturesDir,
-      companyId: "a",
-      dashboardUrl: null,
+      ...base,
+      managerDisplayName: null,
+      dashboardUrl: "https://rollpay.app",
     });
     expect(cycleId).toBe("a-c05");
     expect(text).toBe(
-      `Rollpay: 10 items need you before payroll (Oct 10–23): 3 hour mix-ups, 1 running timer, 1 long shift… Review: ${DASHBOARD_URL_PLACEHOLDER}/c/a/manager`,
+      "Hi Dakota, before we run payroll (Oct 10–23) there are 10 timesheet items to check, mostly duplicate or zero-hour entries. Details here: https://rollpay.app/c/a/manager",
     );
     stub.enqueue({ contactRef: "contact:a-w11", text: text as string });
     await settle();
     expect(fake.outbox.at(-1)).toMatchObject({ phone: MANAGER, text });
+  });
+
+  test("MANAGER_DISPLAY_NAME wins; no DASHBOARD_URL means no link and no placeholder", () => {
+    expect(
+      readConfig({ MANAGER_DISPLAY_NAME: " Alex " }).managerDisplayName,
+    ).toBe("Alex");
+    const { text } = summaryFromFixtures({
+      ...base,
+      managerDisplayName: "Alex",
+      dashboardUrl: null,
+    });
+    expect(text).toBe(
+      "Hi Alex, before we run payroll (Oct 10–23) there are 10 timesheet items to check, mostly duplicate or zero-hour entries.",
+    );
   });
 });

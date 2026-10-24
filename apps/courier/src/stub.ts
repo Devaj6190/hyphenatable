@@ -142,7 +142,11 @@ export function serveStubControl(
   contacts: Contacts,
   fake: FakeTransport | null,
   port: number,
-  summary: { fixturesDir: string; dashboardUrl: string | null } | null = null,
+  summary: {
+    fixturesDir: string;
+    dashboardUrl: string | null;
+    managerDisplayName: string | null;
+  } | null = null,
 ) {
   const server = Bun.serve({
     hostname: "127.0.0.1",
@@ -178,6 +182,7 @@ export function serveStubControl(
             });
           const { text, cycleId } = summaryFromFixtures({
             ...summary,
+            contactRef,
             companyId: body.companyId ?? "a",
             cycleId: body.cycleId,
           });
