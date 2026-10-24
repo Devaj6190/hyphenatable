@@ -12,12 +12,28 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import {
-  type Correction,
-  isMoneyField,
-  targetInWords,
-} from "@/lib/corrections";
-import type { ViewerRole } from "@/lib/types";
+import type { Correction, ViewerRole } from "@/lib/types";
+
+const tableWord: Record<string, string> = {
+  timeEntries: "Time entry",
+  expenses: "Purchase",
+  workers: "Worker",
+  jobs: "Job",
+};
+const fieldWord: Record<string, string> = {
+  jobId: "job",
+  hours: "hours",
+  startAt: "start",
+  endAt: "end",
+  rateCents: "pay rate",
+};
+
+/** "Time entry a-te-0177 · job" */
+const targetInWords = (t: Correction["target"]) =>
+  `${tableWord[t.table] ?? t.table} ${t.id} · ${fieldWord[t.field] ?? t.field}`;
+
+// Same test as redactCorrection in lib/policy: the server nulls these for a manager; this hides them on a role switch.
+const isMoneyField = (field: string) => /cents|rate/i.test(field);
 
 const sourceWord: Record<Correction["source"], string> = {
   reply: "From the reply",
@@ -264,7 +280,7 @@ function Effect({
   strong = false,
 }: {
   label: string;
-  cents: number;
+  cents: number | null;
   recordId: string;
   dataKind: DataKind;
   strong?: boolean;
@@ -279,7 +295,13 @@ function Effect({
             : "text-2xl font-semibold"
         }
       >
-        {cents === 0 ? "No change" : <Money cents={cents} signed />}
+        {cents === null ? (
+          "Not calculated yet"
+        ) : cents === 0 ? (
+          "No change"
+        ) : (
+          <Money cents={cents} signed />
+        )}
       </dd>
       <dd className="flex flex-wrap items-center gap-1.5">
         <SourceChip system="Workbook" recordId={recordId} />

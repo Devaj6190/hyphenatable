@@ -13,32 +13,30 @@ import { PageHeader } from "@/components/PageHeader";
 import { useRole } from "@/components/RoleProvider";
 import { Card } from "@/components/ui/card";
 import { checkTitle } from "@/lib/checks";
-import { companies } from "@/lib/companies";
-import { CORRECTIONS_FIXTURE_SOURCE, correctionFor } from "@/lib/corrections";
-import {
-  FIXTURE_SOURCE,
-  fixtureEvents,
-  fixtureFlags,
-  fixtureQuestions,
-  workerName,
-} from "@/lib/fixtures";
 import { forViewer } from "@/lib/role";
+import { FIXTURE_SOURCE } from "@/lib/sources";
 import type { FlagEvent, ViewerRole } from "@/lib/types";
+import type { FlagDetailData } from "@/lib/view-types";
 
 const linkClass =
   "inline-flex items-center gap-1.5 rounded-sm font-medium text-link underline-offset-4 hover:underline";
 
 // Board 7. One flag: what we saw (FlagCard, full width), the one proposed action (a correction, else the text),
-// the Jobber re-check, and the item's audit trail beside it.
+// the Jobber re-check, and the item's audit trail beside it. `data` is what the server decided this viewer may
+// see: null for a flag that is missing or not theirs. `flagIds` are the viewer's flags, for "Problem N of M".
 export function FlagDetail({
   companyId,
-  flagId,
+  data,
+  flagIds,
   dataKind,
+  timezone,
   viewerRole,
 }: {
   companyId: string;
-  flagId: string;
+  data: FlagDetailData | null;
+  flagIds: string[];
   dataKind: DataKind;
+  timezone: string;
   viewerRole?: ViewerRole;
 }) {
   const { role } = useRole();
@@ -48,17 +46,13 @@ export function FlagDetail({
   const [decided, setDecided] = useState(false);
   const [marked, setMarked] = useState(false);
 
-  const company = companies[companyId];
-  const companyFlags = fixtureFlags.filter((f) => f.companyId === companyId);
-  const index = companyFlags.findIndex((f) => f.id === flagId);
-  const found = companyFlags[index];
   const home = (
     <Link href={`/c/${companyId}`} className={`${linkClass} text-sm`}>
       <ArrowLeft aria-hidden className="size-4" />
       Home
     </Link>
   );
-  if (!found || !company) {
+  if (!data) {
     return (
       <div className="flex flex-col gap-3">
         {home}
@@ -67,17 +61,12 @@ export function FlagDetail({
     );
   }
 
-  const flag = forViewer(found, viewer);
-  const next = companyFlags[index + 1];
-  const timeZone = company.timezone;
-  const question = fixtureQuestions.find((q) => q.id === flag.questionId);
-  const correction = correctionFor(flag.id, flag.correctionId);
-  const events = [
-    ...fixtureEvents
-      .filter((e) => e.flagId === flag.id)
-      .sort((a, b) => a.at.localeCompare(b.at)),
-    ...local,
-  ];
+  // The server already removed pay for a manager; this only covers the moment after an owner switches role.
+  const flag = forViewer(data.flag, viewer);
+  const { question, correction } = data;
+  const index = flagIds.indexOf(flag.id);
+  const next = index >= 0 ? flagIds[index + 1] : undefined;
+  const events = [...data.events, ...local];
   const agents = [
     ...new Set(events.flatMap((e) => (e.actor.agent ? [e.actor.agent] : []))),
   ];
@@ -132,14 +121,13 @@ export function FlagDetail({
       >
         {home}
         <span className="flex items-center gap-4">
-          <span className="text-muted-foreground tabular-nums">
-            Problem {index + 1} of {companyFlags.length}
-          </span>
+          {index >= 0 && (
+            <span className="text-muted-foreground tabular-nums">
+              Problem {index + 1} of {flagIds.length}
+            </span>
+          )}
           {next && (
-            <Link
-              href={`/c/${companyId}/flags/${next.id}`}
-              className={linkClass}
-            >
+            <Link href={`/c/${companyId}/flags/${next}`} className={linkClass}>
               Next problem
               <ArrowRight aria-hidden className="size-4" />
             </Link>
@@ -180,7 +168,8 @@ export function FlagDetail({
             <ApprovalSheet
               key={question.id}
               question={question}
-              recipientName={workerName(question.toWorkerId)}
+              recipientName={data.recipientName ?? undefined}
+              thread={data.thread?.messages}
               canDecide={canDecideText}
               onDecided={(s) => {
                 setDecided(true);
@@ -198,7 +187,7 @@ export function FlagDetail({
             <JobberRecheck
               recordIds={jobberIds}
               checkId={flag.checkId}
-              timeZone={timeZone}
+              timeZone={timezone}
               onMarked={(m) => {
                 setMarked(m);
                 record(
@@ -225,7 +214,7 @@ export function FlagDetail({
           <div className="px-(--card-spacing)">
             <FlagTimeline
               events={events}
-              timeZone={timeZone}
+              timezone={timezone}
               now={now}
               next={nextStep}
               unsavedIds={local.map((e) => e.id)}
@@ -240,8 +229,7 @@ export function FlagDetail({
           Jobber, QuickBooks or Gusto records.
         </p>
         <p className="text-xs">
-          Source: {FIXTURE_SOURCE}
-          {correction && `; ${CORRECTIONS_FIXTURE_SOURCE}`} · {dataKind}
+          Source: {FIXTURE_SOURCE} · {dataKind}
         </p>
       </footer>
     </div>

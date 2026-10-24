@@ -1,32 +1,23 @@
 import type { DataKind } from "@/components/DataLabel";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { fixtureMessages, workerName } from "@/lib/fixtures";
+import { formatWhen } from "@/lib/time";
 import { cn } from "@/lib/utils";
-
-const when = new Intl.DateTimeFormat("en-US", {
-  month: "short",
-  day: "numeric",
-  hour: "numeric",
-  minute: "2-digit",
-  timeZone: "America/Los_Angeles",
-});
+import type { ThreadView } from "@/lib/view-types";
 
 // Texts only: worker, time, words. No pay, no phone numbers.
 export function WorkerThread({
-  questionId,
+  thread,
   title,
   dataKind,
+  timezone,
 }: {
-  questionId: string;
+  thread: ThreadView;
   title: string;
   dataKind: DataKind;
+  timezone: string;
 }) {
-  const messages = fixtureMessages
-    .filter((m) => m.questionId === questionId)
-    .sort((a, b) => a.at.localeCompare(b.at));
-  if (messages.length === 0) return null;
-  const who = workerName(messages[0].workerId);
+  const { workerName: who, messages } = thread;
   return (
     <Card>
       <CardContent className="flex flex-col gap-3">
@@ -47,7 +38,7 @@ export function WorkerThread({
               <span>{m.text}</span>
               <span className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                 {m.direction === "out" ? "PayrollPilot" : who} ·{" "}
-                {when.format(new Date(m.at))} · {dataKind}
+                {formatWhen(m.at, timezone)} · {dataKind}
                 {m.simulated && (
                   <Badge
                     variant="outline"

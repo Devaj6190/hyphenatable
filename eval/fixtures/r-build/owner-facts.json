@@ -1,0 +1,25 @@
+{
+  "source": "owner_stated",
+  "timezone": "America/Los_Angeles",
+  "payFrequency": "biweekly",
+  "overtime": {
+    "workweekStartsOn": "Monday",
+    "weeklyHours": 40,
+    "multiplier": 1.5,
+    "dailyOvertime": null
+  },
+  "longShiftReviewHours": 8,
+  "venmo": {
+    "latestCycle": ["Wren", "Pell"],
+    "earlierCycle": ["Jory Vance"],
+    "movedVenmoToGusto": ["Pell"]
+  },
+  "salaried": ["Ada"],
+  "commission": {
+    "plan": "a percentage of some jobs (synthetic)",
+    "recordedRecipients": ["Bo", "Sam"]
+  },
+  "managerProfitShare": {
+    "recipients": ["Zed"]
+  }
+}

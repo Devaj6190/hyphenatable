@@ -10,9 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { companies } from "@/lib/companies";
-import { fixtureMessages } from "@/lib/fixtures";
 import { MAX_QUESTION_LEN, questionTextError } from "@/lib/question";
-import type { Question } from "@/lib/types";
+import type { Question, ThreadMessage } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 const roleLabel: Record<Question["toRole"], string> = {
@@ -57,11 +56,14 @@ function Check({ ok, children }: { ok: boolean; children: ReactNode }) {
 export function ApprovalSheet({
   question,
   recipientName,
+  thread = [],
   canDecide = true,
   onDecided,
 }: {
   question: Question;
   recipientName?: string;
+  /** The question's messages from the server (data.thread); replies show in the phone preview. */
+  thread?: ThreadMessage[];
   /** False when this viewer may only read (a manager looking at a text addressed to themselves). */
   canDecide?: boolean;
   /** Called with a plain summary after a decision, for the inline timeline. */
@@ -76,9 +78,7 @@ export function ApprovalSheet({
   const who = recipientName ?? roleLabel[question.toRole];
   const shown = mode === "edit" ? draft : text;
   const error = questionTextError(shown);
-  const replies = fixtureMessages.filter(
-    (m) => m.questionId === question.id && m.direction === "in",
-  );
+  const replies = thread.filter((m) => m.direction === "in");
   const reading = replies.findLast((m) => m.interpretation)?.interpretation;
   const badge = statusBadge[status];
   const timeZone =

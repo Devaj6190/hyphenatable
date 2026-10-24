@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-10-24T10:52:45.040Z",
-  "gitSha": "b761fd96863bf18f06223acdd0448f748279fc71",
+  "generatedAt": "2026-10-24T19:04:39.016Z",
+  "gitSha": "9c15732cf3337ff4518c22c0d0a662d11a77a0f0",
   "company": "a",
   "cycle": "a-c05",
   "flagsSource": "naive-fixture-checker (stand-in, not B's checks engine)",
@@ -381,13 +381,123 @@
   },
   "m4": {
     "companyR": {
-      "status": "pending",
-      "reason": "Company R paid export not ingested yet (A-12)"
+      "status": "measured",
+      "measuredAt": "2026-10-24T19:04:33.237Z",
+      "rulesSource": "owner_stated",
+      "periods": 8,
+      "window": {
+        "from": "2026-08-04",
+        "to": "2026-10-22",
+        "source": "given"
+      },
+      "coverage": {
+        "full": 4,
+        "partial": 1,
+        "none": 3
+      },
+      "notes": [
+        "Stage 2 pay types (commission, bonus, profit share, tips), off-cycle sections and owner draws are left out of the Stage 1 comparison",
+        "payable is unknown in the export; entries counted as worked"
+      ],
+      "pre": {
+        "compared": 46,
+        "exact": 35,
+        "within100": 44,
+        "withinRounding": 7,
+        "maxDiffCents": 67120,
+        "unmatched": 2,
+        "perPeriod": [
+          {
+            "period": "2026-06-15..2026-06-28",
+            "coverage": "none",
+            "compared": 0,
+            "exact": 0,
+            "within100": 0,
+            "withinRounding": 0,
+            "maxDiffCents": 0
+          },
+          {
+            "period": "2026-06-29..2026-07-12",
+            "coverage": "none",
+            "compared": 0,
+            "exact": 0,
+            "within100": 0,
+            "withinRounding": 0,
+            "maxDiffCents": 0
+          },
+          {
+            "period": "2026-07-13..2026-07-26",
+            "coverage": "none",
+            "compared": 0,
+            "exact": 0,
+            "within100": 0,
+            "withinRounding": 0,
+            "maxDiffCents": 0
+          },
+          {
+            "period": "2026-07-27..2026-08-09",
+            "coverage": "partial",
+            "compared": 0,
+            "exact": 0,
+            "within100": 0,
+            "withinRounding": 0,
+            "maxDiffCents": 0
+          },
+          {
+            "period": "2026-08-10..2026-08-23",
+            "coverage": "full",
+            "compared": 11,
+            "exact": 6,
+            "within100": 9,
+            "withinRounding": 1,
+            "maxDiffCents": 67120
+          },
+          {
+            "period": "2026-08-24..2026-09-06",
+            "coverage": "full",
+            "compared": 11,
+            "exact": 11,
+            "within100": 11,
+            "withinRounding": 0,
+            "maxDiffCents": 0
+          },
+          {
+            "period": "2026-09-07..2026-09-20",
+            "coverage": "full",
+            "compared": 12,
+            "exact": 9,
+            "within100": 12,
+            "withinRounding": 3,
+            "maxDiffCents": 20
+          },
+          {
+            "period": "2026-09-21..2026-10-04",
+            "coverage": "full",
+            "compared": 12,
+            "exact": 9,
+            "within100": 12,
+            "withinRounding": 3,
+            "maxDiffCents": 21
+          }
+        ],
+        "separate": {
+          "outside the timesheet export window": 87,
+          "no regular rate in the journal": 25,
+          "paid outside Gusto": 1,
+          "rate depends on job role, not in timesheets": 4
+        }
+      },
+      "post": null
     },
     "syntheticSelfCheck": {
       "company": "b",
       "synthetic": true,
-      "cycles": ["b-c01", "b-c02", "b-c03", "b-c04"],
+      "cycles": [
+        "b-c01",
+        "b-c02",
+        "b-c03",
+        "b-c04"
+      ],
       "workers": 120,
       "exact": 120,
       "maxDiffCents": 0,

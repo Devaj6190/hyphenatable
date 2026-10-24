@@ -2,10 +2,15 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { FlagDetail } from "@/components/FlagDetail";
 import { companies } from "@/lib/companies";
-import { fixtureFlags } from "@/lib/fixtures";
+import {
+  allFlagParams,
+  currentViewer,
+  flagDetail,
+  homeFlags,
+} from "@/lib/server/fixtures";
 
 export function generateStaticParams() {
-  return fixtureFlags.map((f) => ({ companyId: f.companyId, flagId: f.id }));
+  return allFlagParams();
 }
 
 // Params are read inside Suspense so the shell stays instant (Next 16).
@@ -25,7 +30,15 @@ async function Flag({
   const { companyId, flagId } = await params;
   const company = companies[companyId];
   if (!company) notFound();
+  // Like Convex flags.get({ flagId, viewerId }) in #15: null when the flag is missing or not this viewer's.
+  const viewer = await currentViewer(companyId);
   return (
-    <FlagDetail companyId={companyId} flagId={flagId} dataKind={company.kind} />
+    <FlagDetail
+      companyId={companyId}
+      data={flagDetail(viewer, companyId, flagId)}
+      flagIds={homeFlags(viewer, companyId).map((f) => f.id)}
+      dataKind={company.kind}
+      timezone={company.timezone}
+    />
   );
 }

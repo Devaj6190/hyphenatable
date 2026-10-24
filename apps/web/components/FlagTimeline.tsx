@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import { AgentChip, agentFromActor } from "@/components/AgentChip";
+import { AgentChip } from "@/components/AgentChip";
+import { formatWhen } from "@/lib/time";
 import type { FlagEvent } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -10,24 +11,17 @@ export type TimelineStep = { who: string; when: string; text: string };
 // (hollow dot). Events added in this session but not saved are marked so.
 export function FlagTimeline({
   events,
-  timeZone,
+  timezone,
   now,
   next,
   unsavedIds = [],
 }: {
   events: FlagEvent[];
-  timeZone: string;
+  timezone: string;
   now?: TimelineStep | null;
   next?: TimelineStep | null;
   unsavedIds?: string[];
 }) {
-  const when = new Intl.DateTimeFormat("en-US", {
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-    timeZone,
-  });
   if (events.length === 0 && !now && !next)
     return <p className="text-sm text-muted-foreground">Nothing yet.</p>;
   const pending = [
@@ -52,11 +46,15 @@ export function FlagTimeline({
             }
           >
             <span className="flex flex-wrap items-center gap-2">
-              <AgentChip agent={unsaved ? "you" : agentFromActor(e.actor)} />
+              {unsaved ? (
+                <AgentChip agent="you" />
+              ) : (
+                <AgentChip actor={e.actor} />
+              )}
               <time dateTime={e.at} className="text-xs text-muted-foreground">
                 {unsaved
                   ? "Just now · not saved (fixture)"
-                  : when.format(new Date(e.at))}
+                  : formatWhen(e.at, timezone)}
               </time>
             </span>
             <span className="text-sm leading-snug">{e.summary}</span>
