@@ -1,12 +1,23 @@
 import { describe, expect, test } from "vitest";
-import { assertNoMoney, downgradeMatch, isStop, ScrubError, scrub } from "./scrub";
+import {
+  assertNoMoney,
+  downgradeMatch,
+  isStop,
+  ScrubError,
+  scrub,
+} from "./scrub";
 
 const flagFacts = {
   flagId: "flag_03",
   checkId: "CHK-07",
   cycleId: "cyc_2026_10_b",
   period: { start: "2026-10-12", end: "2026-10-25" },
-  worker: { id: "w_07", jobTitle: "Lead installer", payType: "hourly", rateCents: 3200 },
+  worker: {
+    id: "w_07",
+    jobTitle: "Lead installer",
+    payType: "hourly",
+    rateCents: 3200,
+  },
   entry: {
     id: "te_14",
     clockIn: "2026-10-14T15:02:00.000Z",
@@ -15,7 +26,12 @@ const flagFacts = {
     jobId: null,
   },
   candidates: [
-    { jobId: "job_12", score: 0.71, quoteStatus: "approved", amountCents: 1_250_000 },
+    {
+      jobId: "job_12",
+      score: 0.71,
+      quoteStatus: "approved",
+      amountCents: 1_250_000,
+    },
     { jobId: "job_15", score: 0.64, quoteStatus: "sent", amountCents: 98_000 },
   ],
   expense: { id: "exp_3", category: "materials", amountCents: 41_299 },
@@ -30,12 +46,16 @@ describe("scrub", () => {
   });
 
   test("throws on displayName", () => {
-    expect(() => scrub({ worker: { id: "w_07", displayName: "x" } })).toThrow(ScrubError);
+    expect(() => scrub({ worker: { id: "w_07", displayName: "x" } })).toThrow(
+      ScrubError,
+    );
   });
 
   test("throws on a nested contactRef and reports the path", () => {
     try {
-      scrub({ workers: [{ id: "w_01" }, { id: "w_02", meta: { contactRef: "c_9" } }] });
+      scrub({
+        workers: [{ id: "w_01" }, { id: "w_02", meta: { contactRef: "c_9" } }],
+      });
       expect.unreachable();
     } catch (e) {
       expect(e).toBeInstanceOf(ScrubError);
@@ -43,7 +63,12 @@ describe("scrub", () => {
     }
   });
 
-  test.each(["name", "firstName", "accountName", "USERNAME"])("throws on key %s", (key) => {
+  test.each([
+    "name",
+    "firstName",
+    "accountName",
+    "USERNAME",
+  ])("throws on key %s", (key) => {
     expect(() => scrub({ [key]: "x" })).toThrow(/forbidden key/);
   });
 
@@ -59,14 +84,19 @@ describe("scrub", () => {
     "+1 415 555 0123",
     "+44 20 7946 0958",
   ])("throws on a phone string inside an array: %s", (phone) => {
-    expect(() => scrub({ replies: ["ok", `call me ${phone}`] })).toThrow(/phone-like/);
+    expect(() => scrub({ replies: ["ok", `call me ${phone}`] })).toThrow(
+      /phone-like/,
+    );
   });
 
   test("throws on an SSN", () => {
     expect(() => scrub({ w: { tax: "123-45-6789" } })).toThrow(/SSN-like/);
   });
 
-  test.each(["021000021", "routing 026009593 acct 4400"])("throws on bank-like digits: %s", (s) => {
+  test.each([
+    "021000021",
+    "routing 026009593 acct 4400",
+  ])("throws on bank-like digits: %s", (s) => {
     expect(() => scrub({ s })).toThrow(ScrubError);
   });
 
@@ -77,7 +107,9 @@ describe("scrub", () => {
   });
 
   test("allows primitives, nulls and empty containers", () => {
-    expect(() => scrub([1, 2.5, true, null, undefined, {}, [], "te_14"])).not.toThrow();
+    expect(() =>
+      scrub([1, 2.5, true, null, undefined, {}, [], "te_14"]),
+    ).not.toThrow();
   });
 });
 
@@ -105,7 +137,13 @@ describe("isStop", () => {
   test.each(["STOP", "stop", "  Stop \n"])("true for %j", (s) => {
     expect(isStop(s)).toBe(true);
   });
-  test.each(["stop it", "don't stop", "STOP.", "", "2"])("false for %j", (s) => {
+  test.each([
+    "stop it",
+    "don't stop",
+    "STOP.",
+    "",
+    "2",
+  ])("false for %j", (s) => {
     expect(isStop(s)).toBe(false);
   });
 });
@@ -114,7 +152,9 @@ describe("downgradeMatch", () => {
   const base = { jobId: "job_12", reason: "same address and day" };
 
   test("match below 0.85 becomes ask", () => {
-    expect(downgradeMatch({ ...base, kind: "match", confidence: 0.84 })).toEqual({
+    expect(
+      downgradeMatch({ ...base, kind: "match", confidence: 0.84 }),
+    ).toEqual({
       ...base,
       kind: "ask",
       confidence: 0.84,
@@ -122,11 +162,16 @@ describe("downgradeMatch", () => {
   });
 
   test("match at 0.85 stays a match", () => {
-    expect(downgradeMatch({ ...base, kind: "match", confidence: 0.85 }).kind).toBe("match");
+    expect(
+      downgradeMatch({ ...base, kind: "match", confidence: 0.85 }).kind,
+    ).toBe("match");
   });
 
   test("match with no job id becomes ask", () => {
-    expect(downgradeMatch({ ...base, jobId: null, kind: "match", confidence: 0.99 }).kind).toBe("ask");
+    expect(
+      downgradeMatch({ ...base, jobId: null, kind: "match", confidence: 0.99 })
+        .kind,
+    ).toBe("ask");
   });
 
   test("no_match and ask are untouched", () => {
