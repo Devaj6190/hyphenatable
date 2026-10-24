@@ -83,6 +83,11 @@ describe("CHK-05 zero_or_duplicate", () => {
     expect(flags).toEqual([]);
   });
 
+  test("a ticking entry at 0 s is a just-started timer, not a zero entry", () => {
+    const started = { durationSec: 0, endAt: null, ticking: true };
+    expect(run(input([entry({ id: "te_1", ...started })]), [])).toEqual([]);
+  });
+
   test("a normal entry is not flagged", () => {
     expect(run(input([entry({ id: "te_1" })]), [])).toEqual([]);
   });

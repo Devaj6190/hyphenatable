@@ -12,6 +12,19 @@ export function cycleEntries(input: CheckInput): TimeEntry[] {
   return [...byId.values()];
 }
 
+/**
+ * Same worker, job, start instant and duration: an exact duplicate (CHK-05 owns these; CHK-04
+ * skips them). Start is compared as an instant, so "…:00Z" and "…:00.000Z" are the same start.
+ */
+export function duplicateKey(e: TimeEntry): string {
+  return JSON.stringify([
+    e.workerId,
+    e.jobId,
+    Date.parse(e.startAt),
+    e.durationSec,
+  ]);
+}
+
 /** Calendar day of an instant in the company's timezone, e.g. 2026-10-07. */
 export function day(input: CheckInput, at: string | number): string {
   return new Intl.DateTimeFormat("en-CA", {

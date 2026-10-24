@@ -1,6 +1,7 @@
 import { describe, expect, test } from "vitest";
 import { entry, input, valid } from "./__fixtures__/build";
 import { run } from "./CHK-04";
+import { run as chk05 } from "./CHK-05";
 
 const T0 = Date.parse("2026-10-07T15:00:00Z");
 const at = (sec: number) => new Date(T0 + sec * 1000).toISOString();
@@ -140,6 +141,41 @@ describe("CHK-04 overlap", () => {
     expect(run(input([open, span("te_2", 2 * 3600, 3 * 3600)]), [])).toEqual(
       [],
     );
+  });
+
+  test("an exact duplicate pair is CHK-05's, not an overlap", () => {
+    const dup = [span("te_1", 0, 4 * 3600), span("te_2", 0, 4 * 3600)];
+    expect(run(input(dup), [])).toEqual([]);
+    expect(chk05(input(dup), []).map((f) => f.subject.entryIds)).toEqual([
+      ["te_1", "te_2"],
+    ]);
+  });
+
+  test("a duplicate pair still overlaps a third entry", () => {
+    const es = [
+      span("te_1", 0, 4 * 3600),
+      span("te_2", 0, 4 * 3600),
+      span("te_3", 3600, 2 * 3600),
+    ];
+    expect(pairs(run(input(es), []))).toEqual([
+      ["te_1", "te_3"],
+      ["te_2", "te_3"],
+    ]);
+  });
+
+  test("a same-start pair with different durations is an overlap", () => {
+    const flags = run(
+      input([span("te_1", 0, 4 * 3600), span("te_2", 0, 3 * 3600)]),
+      [],
+    );
+    expect(pairs(flags)).toEqual([["te_1", "te_2"]]);
+  });
+
+  test("a same-start, same-duration pair on different jobs is an overlap", () => {
+    const other = { ...span("te_2", 0, 4 * 3600), jobId: "job_02" };
+    expect(pairs(run(input([span("te_1", 0, 4 * 3600), other]), []))).toEqual([
+      ["te_1", "te_2"],
+    ]);
   });
 
   test("ignores entries of another cycle", () => {
