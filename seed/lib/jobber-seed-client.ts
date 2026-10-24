@@ -10,7 +10,8 @@ export const JOBBER_GRAPHQL_URL = "https://api.getjobber.com/api/graphql";
 export const JOBBER_TOKEN_URL = "https://api.getjobber.com/api/oauth/token";
 export const JOBBER_AUTHORIZE_URL = "https://api.getjobber.com/api/oauth/authorize";
 export const JOBBER_GRAPHQL_VERSION = "2026-09-25";
-export const DEFAULT_REDIRECT_URI = "http://localhost:3000/auth";
+/** Saved as the seed app's callback in the Developer Center; Jobber rejects localhost without one. The page need not handle the code: the person pastes the address back. */
+export const DEFAULT_REDIRECT_URI = "https://payrollpilot.vercel.app/auth";
 
 export const PRIVATE_DIR = join(import.meta.dir, "..", "..", "data", "private");
 export const SEED_TOKEN_PATH = join(PRIVATE_DIR, "jobber-seed-tokens.json");
@@ -56,9 +57,32 @@ export function authorizeUrl(clientId: string, redirectUri = DEFAULT_REDIRECT_UR
   return `${JOBBER_AUTHORIZE_URL}?${q}`;
 }
 
-export async function exchangeCode(auth: { clientId: string; clientSecret: string }, code: string, fetchImpl: typeof fetch = fetch) {
-  const pkce = readJsonOrNull<{ codeVerifier: string; redirectUri: string }>(SEED_PKCE_PATH);
+/**
+ * Takes the full address the browser landed on after approving (the callback page need not do anything),
+ * checks it is our redirect URI and that `state` matches the one auth-url saved, and returns the code.
+ * A bare code is refused: without the address the state cannot be checked.
+ */
+export function codeFromRedirect(pasted: string, pkce: { state: string; redirectUri: string }): string {
+  let url: URL;
+  try {
+    url = new URL(pasted.trim());
+  } catch {
+    throw new Error("paste the full address from the browser bar (https://...?code=...&state=...), not just the code");
+  }
+  const expected = new URL(pkce.redirectUri);
+  if (url.origin !== expected.origin || url.pathname !== expected.pathname) throw new Error(`address is not the seed app's redirect (${pkce.redirectUri})`);
+  const err = url.searchParams.get("error");
+  if (err) throw new Error(`Jobber returned error=${err}${url.searchParams.get("error_description") ? `: ${url.searchParams.get("error_description")}` : ""}`);
+  if (url.searchParams.get("state") !== pkce.state) throw new Error("state does not match the last auth-url; run auth-url again and use that link");
+  const code = url.searchParams.get("code");
+  if (!code) throw new Error("address has no code parameter");
+  return code;
+}
+
+export async function exchangeCode(auth: { clientId: string; clientSecret: string }, pastedAddress: string, fetchImpl: typeof fetch = fetch) {
+  const pkce = readJsonOrNull<{ state: string; codeVerifier: string; redirectUri: string }>(SEED_PKCE_PATH);
   if (!pkce) throw new Error("run `auth-url` first");
+  const code = codeFromRedirect(pastedAddress, pkce);
   const res = await fetchImpl(JOBBER_TOKEN_URL, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded", Accept: "application/json" },

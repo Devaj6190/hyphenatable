@@ -39,33 +39,42 @@ const dollars = (cents: number) => Math.round(cents) / 100;
 
 // ---------------------------------------------------------------- documents
 
+// Live introspection (read app, version 2026-09-25, Sat 2026-10-24 ~03:00) VERIFIED the argument and input
+// shapes of the mutations marked LIVE below. NOT IN THE LIVE SCHEMA: timeSheetEntryCreate, invoiceCreateFromJob,
+// invoiceCreatePaymentRecord, quoteCreatePaymentRecord (the earlier names came from an unauthenticated schema
+// dump that included internal fields). Live mode checks every mutation it needs before writing anything.
 export const MUTATIONS = {
-  // UNVERIFIED input shape: ClientCreateInput fields beyond companyName.
+  // LIVE: clientCreate(input: ClientCreateInput!) { companyName, isCompany, ... }
   clientCreate: `mutation($input: ClientCreateInput!) { clientCreate(input: $input) { client { id } userErrors { message path } } }`,
-  // UNVERIFIED input shape: PropertyCreateInput { properties: [{ address }] }.
+  // LIVE: propertyCreate(clientId!, input: { properties: [{ address: { street1, ... }! }] })
   propertyCreate: `mutation($clientId: EncodedId!, $input: PropertyCreateInput!) { propertyCreate(clientId: $clientId, input: $input) { properties { id } userErrors { message path } } }`,
-  // Verified: requires clientId, propertyId, lineItems; optional salespersonId. UNVERIFIED: lineItem field names.
+  // LIVE: quoteCreate(attributes: { clientId!, propertyId!, lineItems! [{ name!, saveToProductsAndServices!, unitPrice, quantity }], salespersonId, title })
   quoteCreate: `mutation($attributes: QuoteCreateAttributes!) { quoteCreate(attributes: $attributes) { quote { id quoteNumber } userErrors { message path } } }`,
-  // Verified: requires propertyId, invoicing; optional title, salespersonId, quoteId. UNVERIFIED: invoicing enum values.
+  // LIVE: jobCreate(input: { propertyId!, invoicing! { invoicingType: FIXED_PRICE|VISIT_BASED, invoicingSchedule: ON_COMPLETION|... }, quoteId, salespersonId, title, lineItems [{ name!, saveToProductsAndServices!, unitPrice!, quantity! }] })
   jobCreate: `mutation($input: JobCreateAttributes!) { jobCreate(input: $input) { job { id jobNumber } userErrors { message path } } }`,
-  // Verified name "visitCreate(input: { visits: [...] })". UNVERIFIED: jobId argument placement.
+  // LIVE: visitCreate(jobId!, input: { visits: [{ title, schedule: { startAt/endAt: { date!, time, timezone! }, teamMemberIdsToAssign } }] })
   visitCreate: `mutation($jobId: EncodedId!, $input: VisitCreateInput!) { visitCreate(jobId: $jobId, input: $input) { visits { id } userErrors { message path } } }`,
+  // LIVE: visitComplete(visitId!, input: { completedAt })
   visitComplete: `mutation($visitId: EncodedId!) { visitComplete(visitId: $visitId) { visit { id isComplete } userErrors { message path } } }`,
-  // Verified input: { startAt!, duration, note, userId, jobId | visitId | label, labourRate }.
+  // NOT IN THE LIVE SCHEMA. Kept so the plan shows what time entries need; live mode stops before any write.
   timeSheetEntryCreate: `mutation($input: TimeSheetEntryCreateInput!) { timeSheetEntryCreate(input: $input) { timeSheetEntry { id } userErrors { message path } } }`,
-  // Verified input: { title!, date!, total, description, reimbursableToId, linkedJobId }.
+  // LIVE: expenseCreate(input: { title!, date!, total, description, reimbursableToId, linkedJobId, accountingCodeId })
   expenseCreate: `mutation($input: ExpenseCreateInput!) { expenseCreate(input: $input) { expense { id } userErrors { message path } } }`,
-  // UNVERIFIED input shape for invoiceCreateFromJob.
+  // NOT IN THE LIVE SCHEMA (invoiceCreate exists: clientId!, dueDetails!, tax!, lineItems!, jobIds; not wired yet).
   invoiceCreateFromJob: `mutation($input: InvoiceCreateFromJobInput!) { invoiceCreateFromJob(input: $input) { invoice { id invoiceNumber } userErrors { message path } } }`,
-  invoiceMarkAsSent: `mutation($invoiceId: EncodedId!) { invoiceMarkAsSent(invoiceId: $invoiceId) { invoice { id } userErrors { message path } } }`,
-  // Verified input: { invoiceId, amount, adjustmentType!, entryDate!, paymentOrigin!, paymentDetails! }. UNVERIFIED enum values.
+  // LIVE: invoiceMarkAsSent(id!)
+  invoiceMarkAsSent: `mutation($id: EncodedId!) { invoiceMarkAsSent(id: $id) { invoice { id } userErrors { message path } } }`,
+  // NOT IN THE LIVE SCHEMA.
   invoiceCreatePaymentRecord: `mutation($input: InvoiceCreatePaymentRecordInput!) { invoiceCreatePaymentRecord(input: $input) { paymentRecord { id } userErrors { message path } } }`,
+  // NOT IN THE LIVE SCHEMA.
   quoteCreatePaymentRecord: `mutation($input: QuoteCreatePaymentRecordInput!) { quoteCreatePaymentRecord(input: $input) { paymentRecord { id } userErrors { message path } } }`,
 } as const;
 
 /** Read-only lookups used before writing (idempotency and safety). */
 export const QUERIES = {
-  account: `query { account { id name tester } }`,
+  // LIVE: Account has no `tester` field (and User has no labourRate, Expense no accountingCode).
+  account: `query { account { id name } }`,
+  mutationNames: `query { __type(name: "Mutation") { fields { name } } }`,
   users: `query($status: UsersStatusFilterEnum!, $after: String) { users(filter: { status: $status }, first: 50, after: $after) { nodes { id name { full } status } pageInfo { hasNextPage endCursor } } }`,
   // note is read only to find our marker; it is never stored.
   entries: `query($after: String, $from: ISO8601DateTime!, $to: ISO8601DateTime!) { timeSheetEntries(filter: { startAt: { after: $from, before: $to } }, first: 50, after: $after) { nodes { id note } pageInfo { hasNextPage endCursor } } }`,
@@ -86,7 +95,16 @@ export type PlanResult = {
 };
 
 /** Builds the ordered step list. Steps whose ourId is already in `map` are left out (idempotent rerun). */
-export function buildPlan(fx: Fixtures, map: IdMap, opts: { currentCycleId: string; companyName: string }): PlanResult {
+/** ISO UTC -> Jobber LocalDateTimeAttributes { date, time, timezone } in the company's zone. */
+export function localDateTime(iso: string, timezone: string): { date: string; time: string; timezone: string } {
+  const parts = Object.fromEntries(
+    new Intl.DateTimeFormat("en-CA", { timeZone: timezone, year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23" })
+      .formatToParts(new Date(iso)).map((p) => [p.type, p.value]),
+  );
+  return { date: `${parts.year}-${parts.month}-${parts.day}`, time: `${parts.hour}:${parts.minute}:${parts.second}`, timezone };
+}
+
+export function buildPlan(fx: Fixtures, map: IdMap, opts: { currentCycleId: string; companyName: string; timezone: string }): PlanResult {
   const steps: Step[] = [];
   const skipped: PlanResult["skipped"] = [];
   const have = (k: ObjectKind, id: string) => !!map[k]?.[id];
@@ -117,7 +135,7 @@ export function buildPlan(fx: Fixtures, map: IdMap, opts: { currentCycleId: stri
       variables: { attributes: {
         clientId: ref("clients", clientRef), propertyId: ref("properties", clientRef), title: `${job ? job.title : "Quote"} [${marker(q.id as string)}]`,
         salespersonId: q.salespersonWorkerId ? ref("users", q.salespersonWorkerId as string) : null,
-        lineItems: [{ name: job ? String(job.title) : "Landscape work", quantity: 1, unitPrice: dollars(q.amountCents as number) }],
+        lineItems: [{ name: job ? String(job.title) : "Landscape work", saveToProductsAndServices: false, quantity: 1, unitPrice: dollars(q.amountCents as number) }],
       } },
       note: q.status === "converted" ? undefined : `status ${q.status}: left as created (no transition)`,
     });
@@ -131,7 +149,7 @@ export function buildPlan(fx: Fixtures, map: IdMap, opts: { currentCycleId: stri
         salespersonId: j.salespersonWorkerId ? ref("users", j.salespersonWorkerId as string) : null,
         quoteId: j.quoteId ? ref("quotes", j.quoteId as string) : null,
         invoicing: { invoicingType: "FIXED_PRICE", invoicingSchedule: "ON_COMPLETION" },
-        lineItems: j.totalCents == null ? [] : [{ name: String(j.title), quantity: 1, unitPrice: dollars(j.totalCents as number) }],
+        lineItems: j.totalCents == null ? [] : [{ name: String(j.title), saveToProductsAndServices: false, quantity: 1, unitPrice: dollars(j.totalCents as number) }],
       } },
       note: j.parentJobId ? `sub-job of ${j.parentJobId} (Jobber has no parent link; the street in the title is the hint)` : undefined,
     });
@@ -140,7 +158,7 @@ export function buildPlan(fx: Fixtures, map: IdMap, opts: { currentCycleId: stri
   for (const v of fx.visits) {
     push({
       object: "visits", ourId: v.id as string, mutation: "visitCreate", idPath: "visitCreate.visits.0.id",
-      variables: { jobId: ref("jobs", v.jobId as string), input: { visits: [{ title: marker(v.id as string), startAt: v.startAt, endAt: v.endAt, assignedUserIds: (v.assignedWorkerIds as string[]).map((w) => ref("users", w)) }] } },
+      variables: { jobId: ref("jobs", v.jobId as string), input: { visits: [{ title: marker(v.id as string), schedule: { startAt: localDateTime(v.startAt as string, opts.timezone), endAt: v.endAt ? localDateTime(v.endAt as string, opts.timezone) : null, teamMemberIdsToAssign: (v.assignedWorkerIds as string[]).map((w) => ref("users", w)) } }] } },
     });
   }
   for (const v of fx.visits) {
@@ -182,7 +200,7 @@ export function buildPlan(fx: Fixtures, map: IdMap, opts: { currentCycleId: stri
   }
   for (const i of fx.invoices) {
     if (i.status === "draft") continue;
-    push({ object: "invoiceSends", ourId: i.id as string, mutation: "invoiceMarkAsSent", idPath: "invoiceMarkAsSent.invoice.id", variables: { invoiceId: ref("invoices", i.id as string) } });
+    push({ object: "invoiceSends", ourId: i.id as string, mutation: "invoiceMarkAsSent", idPath: "invoiceMarkAsSent.invoice.id", variables: { id: ref("invoices", i.id as string) } });
   }
 
   for (const p of fx.payments) {
