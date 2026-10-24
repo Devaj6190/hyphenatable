@@ -1,7 +1,6 @@
 "use client";
 
 import { Check, Send } from "lucide-react";
-import { useParams } from "next/navigation";
 import { type ReactNode, useState } from "react";
 import { AgentChip, type AgentKind } from "@/components/AgentChip";
 import { ConfidenceBadge } from "@/components/ConfidenceBadge";
@@ -311,6 +310,7 @@ function Panel({
           viewerRole="owner"
           headline="W05 clocked in twice on Fri, Oct 17. Ask the manager which is right?"
           affectsLabel="Wages"
+          amountSource={{ system: "Workbook", recordId: "line-W05" }}
           agents={["auditor", "messenger"]}
           approveLabel="Approve and send"
           onApprove={() => setDecided("approved")}
@@ -400,9 +400,10 @@ function Panel({
 }
 
 export function Styleguide() {
-  const { companyId } = useParams<{ companyId: string }>();
+  // Sample links point at Company A (synthetic).
+  const companyId = "a";
   return (
-    <>
+    <main className="mx-auto max-w-7xl px-4 py-8 lg:px-8">
       <PageHeader
         title="Styleguide"
         description="Every shared component in both themes. Dev only, not in the nav. Sample data is synthetic."
@@ -411,6 +412,6 @@ export function Styleguide() {
         <Panel theme="light" companyId={companyId} />
         <Panel theme="dark" companyId={companyId} />
       </div>
-    </>
+    </main>
   );
 }
