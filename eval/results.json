@@ -1,0 +1,437 @@
+{
+  "generatedAt": "2026-10-24T10:52:45.040Z",
+  "gitSha": "b761fd96863bf18f06223acdd0448f748279fc71",
+  "company": "a",
+  "cycle": "a-c05",
+  "flagsSource": "naive-fixture-checker (stand-in, not B's checks engine)",
+  "synthetic": true,
+  "m1": {
+    "keyRows": 29,
+    "flags": 30,
+    "recall": {
+      "num": 29,
+      "den": 29,
+      "value": 1
+    },
+    "precision": {
+      "num": 29,
+      "den": 30,
+      "value": 0.9667
+    },
+    "perCheck": {
+      "CHK-01": {
+        "recall": {
+          "num": 1,
+          "den": 1,
+          "value": 1
+        },
+        "precision": {
+          "num": 1,
+          "den": 1,
+          "value": 1
+        }
+      },
+      "CHK-02": {
+        "recall": {
+          "num": 1,
+          "den": 1,
+          "value": 1
+        },
+        "precision": {
+          "num": 1,
+          "den": 1,
+          "value": 1
+        }
+      },
+      "CHK-03": {
+        "recall": {
+          "num": 1,
+          "den": 1,
+          "value": 1
+        },
+        "precision": {
+          "num": 1,
+          "den": 1,
+          "value": 1
+        }
+      },
+      "CHK-04": {
+        "recall": {
+          "num": 1,
+          "den": 1,
+          "value": 1
+        },
+        "precision": {
+          "num": 1,
+          "den": 1,
+          "value": 1
+        }
+      },
+      "CHK-05": {
+        "recall": {
+          "num": 2,
+          "den": 2,
+          "value": 1
+        },
+        "precision": {
+          "num": 2,
+          "den": 2,
+          "value": 1
+        }
+      },
+      "CHK-06": {
+        "recall": {
+          "num": 4,
+          "den": 4,
+          "value": 1
+        },
+        "precision": {
+          "num": 4,
+          "den": 4,
+          "value": 1
+        }
+      },
+      "CHK-07": {
+        "recall": {
+          "num": 1,
+          "den": 1,
+          "value": 1
+        },
+        "precision": {
+          "num": 1,
+          "den": 1,
+          "value": 1
+        }
+      },
+      "CHK-08": {
+        "recall": {
+          "num": 1,
+          "den": 1,
+          "value": 1
+        },
+        "precision": {
+          "num": 1,
+          "den": 1,
+          "value": 1
+        }
+      },
+      "CHK-09": {
+        "recall": {
+          "num": 1,
+          "den": 1,
+          "value": 1
+        },
+        "precision": {
+          "num": 1,
+          "den": 1,
+          "value": 1
+        }
+      },
+      "CHK-10": {
+        "recall": {
+          "num": 1,
+          "den": 1,
+          "value": 1
+        },
+        "precision": {
+          "num": 1,
+          "den": 1,
+          "value": 1
+        }
+      },
+      "CHK-11": {
+        "recall": {
+          "num": 1,
+          "den": 1,
+          "value": 1
+        },
+        "precision": {
+          "num": 1,
+          "den": 1,
+          "value": 1
+        }
+      },
+      "CHK-12": {
+        "recall": {
+          "num": 3,
+          "den": 3,
+          "value": 1
+        },
+        "precision": {
+          "num": 3,
+          "den": 3,
+          "value": 1
+        }
+      },
+      "CHK-13": {
+        "recall": {
+          "num": 1,
+          "den": 1,
+          "value": 1
+        },
+        "precision": {
+          "num": 1,
+          "den": 1,
+          "value": 1
+        }
+      },
+      "CHK-14": {
+        "recall": {
+          "num": 1,
+          "den": 1,
+          "value": 1
+        },
+        "precision": {
+          "num": 1,
+          "den": 1,
+          "value": 1
+        }
+      },
+      "CHK-15": {
+        "recall": {
+          "num": 1,
+          "den": 1,
+          "value": 1
+        },
+        "precision": {
+          "num": 1,
+          "den": 1,
+          "value": 1
+        }
+      },
+      "CHK-16": {
+        "recall": {
+          "num": 1,
+          "den": 1,
+          "value": 1
+        },
+        "precision": {
+          "num": 1,
+          "den": 1,
+          "value": 1
+        }
+      },
+      "CHK-17": {
+        "recall": {
+          "num": 1,
+          "den": 1,
+          "value": 1
+        },
+        "precision": {
+          "num": 1,
+          "den": 1,
+          "value": 1
+        }
+      },
+      "CHK-18": {
+        "recall": {
+          "num": 1,
+          "den": 1,
+          "value": 1
+        },
+        "precision": {
+          "num": 1,
+          "den": 1,
+          "value": 1
+        }
+      },
+      "CHK-19": {
+        "recall": {
+          "num": 1,
+          "den": 1,
+          "value": 1
+        },
+        "precision": {
+          "num": 1,
+          "den": 1,
+          "value": 1
+        }
+      },
+      "CHK-20": {
+        "recall": {
+          "num": 1,
+          "den": 1,
+          "value": 1
+        },
+        "precision": {
+          "num": 1,
+          "den": 1,
+          "value": 1
+        }
+      },
+      "CHK-21": {
+        "recall": {
+          "num": 1,
+          "den": 1,
+          "value": 1
+        },
+        "precision": {
+          "num": 1,
+          "den": 1,
+          "value": 1
+        }
+      },
+      "CHK-22": {
+        "recall": {
+          "num": 2,
+          "den": 2,
+          "value": 1
+        },
+        "precision": {
+          "num": 2,
+          "den": 2,
+          "value": 1
+        }
+      },
+      "CHK-23": {
+        "recall": {
+          "num": 0,
+          "den": 0,
+          "value": null
+        },
+        "precision": {
+          "num": 0,
+          "den": 1,
+          "value": 0
+        }
+      }
+    },
+    "missedKeyRowIds": [],
+    "unmatchedFlags": [
+      {
+        "id": "naive-a-c05-030",
+        "checkId": "CHK-23",
+        "seen": "a-sr-04 jobber timeSheetEntries pulled 75 of 76"
+      }
+    ]
+  },
+  "m2": {
+    "status": "pending",
+    "reason": "no data/private/r/rule-grading.json yet (Company R onboarding not graded)"
+  },
+  "m3": {
+    "measured": [
+      {
+        "cycleId": "a-c05",
+        "questionsAsked": 0
+      },
+      {
+        "cycleId": "a-c06",
+        "questionsAsked": 0
+      }
+    ],
+    "pastAnswered": {
+      "a-c01": 1,
+      "a-c02": 2,
+      "a-c03": 2,
+      "a-c04": 1
+    },
+    "expectedFromAnswerKey": [
+      {
+        "cycleId": "a-c05",
+        "planted": 29,
+        "needAnswer": 26,
+        "resolvedByRule": 0,
+        "perCheck": {
+          "CHK-01": 1,
+          "CHK-02": 1,
+          "CHK-03": 1,
+          "CHK-04": 1,
+          "CHK-05": 2,
+          "CHK-10": 1,
+          "CHK-11": 1,
+          "CHK-14": 1,
+          "CHK-06": 4,
+          "CHK-07": 1,
+          "CHK-08": 1,
+          "CHK-09": 1,
+          "CHK-13": 1,
+          "CHK-15": 1,
+          "CHK-16": 1,
+          "CHK-17": 1,
+          "CHK-18": 1,
+          "CHK-19": 1,
+          "CHK-20": 1,
+          "CHK-21": 1,
+          "CHK-22": 2
+        }
+      },
+      {
+        "cycleId": "a-c06",
+        "planted": 31,
+        "needAnswer": 19,
+        "resolvedByRule": 9,
+        "perCheck": {
+          "CHK-01": 1,
+          "CHK-02": 1,
+          "CHK-03": 1,
+          "CHK-04": 1,
+          "CHK-05": 2,
+          "CHK-06": 4,
+          "CHK-07": 1,
+          "CHK-08": 1,
+          "CHK-09": 1,
+          "CHK-13": 1,
+          "CHK-15": 1,
+          "CHK-21": 1,
+          "CHK-22": 3
+        }
+      }
+    ]
+  },
+  "m4": {
+    "companyR": {
+      "status": "pending",
+      "reason": "Company R paid export not ingested yet (A-12)"
+    },
+    "syntheticSelfCheck": {
+      "company": "b",
+      "synthetic": true,
+      "cycles": ["b-c01", "b-c02", "b-c03", "b-c04"],
+      "workers": 120,
+      "exact": 120,
+      "maxDiffCents": 0,
+      "diffs": []
+    }
+  },
+  "m5": {
+    "runs": {
+      "num": 13,
+      "den": 14,
+      "value": 0.9286
+    },
+    "blocked": [
+      {
+        "id": "a-sr-04",
+        "cycleId": "a-c04",
+        "source": "jobber",
+        "object": "timeSheetEntries",
+        "pulled": 75,
+        "expected": 76,
+        "error": "pulled 75 of totalCount 76; timeSheetsByDay sum differs by 30600 s"
+      }
+    ]
+  },
+  "m6": {
+    "traceable": {
+      "num": 27,
+      "den": 30,
+      "value": 0.9
+    },
+    "withWhere": {
+      "num": 30,
+      "den": 30,
+      "value": 1
+    },
+    "withRuleOrModel": {
+      "num": 27,
+      "den": 30,
+      "value": 0.9
+    },
+    "untraceableFlagIds": [
+      "naive-a-c05-020",
+      "naive-a-c05-021",
+      "naive-a-c05-027"
+    ]
+  }
+}
