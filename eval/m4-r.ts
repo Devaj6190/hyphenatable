@@ -40,10 +40,39 @@ export const AnonBundle = z.object({
       periodEnd: Day.nullable(),
       grossCents: z.number().int(),
       sourceId: z.string(),
+      /** sectioned journal only: regular vs off-cycle, wage vs owner draw, per pay-type amounts and hours */
+      sectionKind: z.enum(["regular", "off_cycle", "other"]).optional(),
+      payKind: z.enum(["wage", "owner_draw"]).optional(),
+      earningsCents: z.record(z.string(), z.number().int()).optional(),
+      hours: z.record(z.string(), z.number()).optional(),
+      ratesCents: z.record(z.string(), z.number().int()).optional(),
     }),
   ),
 });
 export type AnonBundle = z.infer<typeof AnonBundle>;
+
+/** Pay types that are Stage 2 money (commission, bonus, profit share, tips) or not wages: never part of M4. */
+export const STAGE2_PAY_TYPE =
+  /commission|bonus|profit|tip|reimburs|correction/i;
+
+/** What a paid row contributes to the Stage 1 comparison: regular sections, wages, Stage 1 pay types only. */
+export function stage1PaidCents(p: AnonBundle["paid"][number]): {
+  cents: number;
+  leftOutCents: number;
+} {
+  if (
+    p.payKind === "owner_draw" ||
+    (p.sectionKind && p.sectionKind !== "regular")
+  )
+    return { cents: 0, leftOutCents: p.grossCents };
+  if (!p.earningsCents) return { cents: p.grossCents, leftOutCents: 0 };
+  let cents = 0;
+  let leftOutCents = 0;
+  for (const [name, v] of Object.entries(p.earningsCents))
+    if (STAGE2_PAY_TYPE.test(name)) leftOutCents += v;
+    else cents += v;
+  return { cents, leftOutCents };
+}
 
 /** data/private/r/m4-rules.json: how Company R pays, as stated by the owner or proposed by onboarding. */
 export const RSetup = z.object({
@@ -58,8 +87,13 @@ export const RSetup = z.object({
       paymentUnit: z
         .enum(["Hour", "Year", "Month", "Week", "Paycheck"])
         .nullable(),
+      /** Several regular rates in the journal (rate depends on the job role, which timesheets don't carry). */
+      multiRate: z.boolean().optional(),
+      rates: z.array(z.number().int().positive()).optional(),
     }),
   ),
+  /** Workers M4 does not compare, each with a reason (e.g. "paid outside Gusto"). */
+  excluded: z.array(z.object({ id: Id, reason: z.string() })).optional(),
   /** Section 6 rules; at least an active overtime_policy. */
   rules: z.array(
     z.object({
@@ -101,6 +135,8 @@ export type Pass = {
   maxDiffCents: number;
   /** Worker-periods paid with no engine line, or computed with nothing paid. */
   unmatched: number;
+  /** Worker-periods not compared, by reason. */
+  separate: Record<string, number>;
 };
 export type Trail = {
   workerId: string;
@@ -111,28 +147,27 @@ export type Trail = {
   explain: string[];
 };
 /** Counts only: what leaves data/private/ (summary.json, results.json m4.companyR). */
+/** Reported separately: the journal shows several rates for the worker and timesheets don't say which applies. */
+export const MULTI_RATE = "rate depends on job role, not in timesheets";
+
+const PassSchema = z.object({
+  compared: z.number().int(),
+  exact: z.number().int(),
+  within100: z.number().int(),
+  maxDiffCents: z.number().int(),
+  unmatched: z.number().int(),
+  /** Worker-periods not compared, by reason (paid outside Gusto, rate depends on job role, ...). */
+  separate: z.record(z.string(), z.number().int()),
+});
+
 export const M4Summary = z.object({
   status: z.literal("measured"),
   measuredAt: z.iso.datetime(),
   rulesSource: z.enum(["owner_stated", "onboarding"]),
   periods: z.number().int(),
   notes: z.array(z.string()),
-  pre: z.object({
-    compared: z.number().int(),
-    exact: z.number().int(),
-    within100: z.number().int(),
-    maxDiffCents: z.number().int(),
-    unmatched: z.number().int(),
-  }),
-  post: z
-    .object({
-      compared: z.number().int(),
-      exact: z.number().int(),
-      within100: z.number().int(),
-      maxDiffCents: z.number().int(),
-      unmatched: z.number().int(),
-    })
-    .nullable(),
+  pre: PassSchema,
+  post: PassSchema.nullable(),
 });
 export type M4Summary = z.infer<typeof M4Summary>;
 
@@ -292,13 +327,26 @@ function pass(
       notes.add("some paid rows have no pay period and are left out");
       continue;
     }
+    const { cents, leftOutCents } = stage1PaidCents(p);
+    if (leftOutCents > 0)
+      notes.add(
+        "Stage 2 pay types (commission, bonus, profit share, tips), off-cycle sections and owner draws are left out of the Stage 1 comparison",
+      );
+    if (
+      p.payKind === "owner_draw" ||
+      (p.sectionKind && p.sectionKind !== "regular")
+    )
+      continue;
     const key = `${p.periodStart}..${p.periodEnd}`;
     periods.add(key);
     paidBy.set(
       `${p.workerId}|${key}`,
-      (paidBy.get(`${p.workerId}|${key}`) ?? 0) + p.grossCents,
+      (paidBy.get(`${p.workerId}|${key}`) ?? 0) + cents,
     );
   }
+  const excluded = new Map((setup.excluded ?? []).map((x) => [x.id, x.reason]));
+  for (const w of setup.workers)
+    if (w.multiRate) excluded.set(w.id, MULTI_RATE);
   const trails: Trail[] = [];
   const out: Pass = {
     compared: 0,
@@ -306,6 +354,7 @@ function pass(
     within100: 0,
     maxDiffCents: 0,
     unmatched: 0,
+    separate: {},
   };
   for (const period of [...periods].sort()) {
     const [from, to] = period.split("..");
@@ -343,6 +392,11 @@ function pass(
         .map((p) => p.workerId),
     ]);
     for (const workerId of [...ids].sort()) {
+      const why = excluded.get(workerId);
+      if (why) {
+        out.separate[why] = (out.separate[why] ?? 0) + 1;
+        continue;
+      }
       const paid = paidBy.get(`${workerId}|${period}`) ?? null;
       const p = r.pay[workerId];
       const engine = p && !p.excluded ? p.grossCents : null;
