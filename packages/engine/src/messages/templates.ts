@@ -7,7 +7,7 @@ import { PRODUCT_NAME } from "./brand";
 export const managerSummaryWording = {
   many: "Hi {name}, before we run payroll ({range}) there are {count} timesheet items to check, mostly {issue}.",
   one: "Hi {name}, before we run payroll ({range}) there is 1 timesheet item to check, about {issue}.",
-  link: " Details here: {link}",
+  link: "\nDetails here: {link}",
   linkPlaceholder: "[dashboard link coming soon]",
 } as const;
 

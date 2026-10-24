@@ -41,13 +41,13 @@ const timer = flags.find(
 describe("manager summary", () => {
   test("many items: count, range and the most common flag type, then the link", () => {
     expect(summary({})).toBe(
-      "Hi Dakota, before we run payroll (Oct 10–23) there are 10 timesheet items to check, mostly duplicate or zero-hour entries. Details here: https://rollpay.app/c/a/manager",
+      "Hi Dakota, before we run payroll (Oct 10–23) there are 10 timesheet items to check, mostly duplicate or zero-hour entries.\nDetails here: https://rollpay.app/c/a/manager",
     );
   });
 
   test("one item: 'there is 1 timesheet item', and 'about' instead of 'mostly'", () => {
     expect(summary({ flags: [timer] })).toBe(
-      "Hi Dakota, before we run payroll (Oct 10–23) there is 1 timesheet item to check, about a timer left running. Details here: https://rollpay.app/c/a/manager",
+      "Hi Dakota, before we run payroll (Oct 10–23) there is 1 timesheet item to check, about a timer left running.\nDetails here: https://rollpay.app/c/a/manager",
     );
   });
 
@@ -55,10 +55,10 @@ describe("manager summary", () => {
     const placeholder = managerSummaryWording.linkPlaceholder;
     for (const dashboardUrl of [undefined, null, "", "  "]) {
       expect(summary({ dashboardUrl })).toBe(
-        `Hi Dakota, before we run payroll (Oct 10–23) there are 10 timesheet items to check, mostly duplicate or zero-hour entries. Details here: ${placeholder}`,
+        `Hi Dakota, before we run payroll (Oct 10–23) there are 10 timesheet items to check, mostly duplicate or zero-hour entries.\nDetails here: ${placeholder}`,
       );
       expect(summary({ flags: [timer], dashboardUrl })).toBe(
-        `Hi Dakota, before we run payroll (Oct 10–23) there is 1 timesheet item to check, about a timer left running. Details here: ${placeholder}`,
+        `Hi Dakota, before we run payroll (Oct 10–23) there is 1 timesheet item to check, about a timer left running.\nDetails here: ${placeholder}`,
       );
     }
     expect(managerLink(undefined, "a")).toBe(placeholder);
