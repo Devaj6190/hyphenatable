@@ -98,12 +98,22 @@ The backtest takes three inputs:
 
 For each pay period, it runs `computeStage1` and compares gross per worker with what was paid. Venmo is excluded, because it is not in the Gusto journal. The report gives exact matches, matches within $1, the max difference and the unmatched worker-periods, **before and after corrections**.
 
+**Which periods are compared.** Only pay periods that lie fully inside the timesheet export window are compared.
+
+- **Where the window comes from:** `--from` / `--to`, taken from the export's SyncRun or metadata. Without them it falls back to the earliest and latest entry date.
+  - The fallback is narrower when the export's first or last days have no entries, for example a Saturday off, so pass `--from` / `--to` when you know them.
+- **Periods the window misses:** periods only partly inside it, or not at all, are counted as "not compared (outside the timesheet export window)". The summary gives how many periods were fully covered, partly covered and not covered.
+
+**Per period.** Every compared period gets its own exact, within-$1 and max-difference counts.
+
+**The within-$1 split.** "Within $1" is split out as **rounding** when the difference is at most 0.005 h × the worker's entries in the period × rate × the highest multiplier they earned. That is what Jobber's 2-decimal rounding of each entry can explain.
+
 Explain trails go only to `data/private/r/m4/trails-<time>.json`. The counts go to `data/private/r/m4/summary.json`, which `run.ts` copies into `results.json` as `m4.companyR`. The runner refuses any directory outside `data/private/`.
 
 Export entries without a start time are placed at local noon of their date. An unknown `payable` is counted as worked. Both are listed in `notes`. Hours are never trimmed.
 
 ```bash
-bun run m4-r-run.ts   # [--private data/private/r] [--rules …] [--corrections …]
+bun run m4-r-run.ts   # [--private data/private/r] [--rules …] [--corrections …] [--from YYYY-MM-DD --to YYYY-MM-DD]
 ```
 
 Synthetic sample: `fixtures/r-sample/`. It has 3 workers and one duplicate entry that the register's correction deletes: 2 of 3 exact before the correction, 3 of 3 after.
