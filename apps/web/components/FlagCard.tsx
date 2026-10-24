@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { checkTitle } from "@/lib/checks";
 import { forViewer } from "@/lib/role";
-import type { Flag, ViewerRole } from "@/lib/types";
+import type { Flag, SourceSystem, ViewerRole } from "@/lib/types";
 
 export type FlagCardProps = {
   flag: Flag;
@@ -25,6 +25,15 @@ export type FlagCardProps = {
   headline?: string;
   /** What the money touches, e.g. "Wages", "Job cost", "Commission". */
   affectsLabel?: string;
+  /**
+   * Where the dollar amount was computed, e.g. { system: "Workbook", recordId: "line-W05" }.
+   * Not the evidence records in `flag.where`. Without it the amount is not shown at all.
+   */
+  amountSource?: {
+    system: SourceSystem;
+    recordId: string;
+    url?: string | null;
+  };
   /** Agents that handled it, shown as chips (e.g. ["auditor", "messenger"]). */
   agents?: AgentKind[];
   /** Body slot: the proposed text, a match picker, a diff. */
@@ -42,13 +51,14 @@ export type FlagCardProps = {
   href?: string | null;
 };
 
-// Shannin's eight elements: status tag, headline, Where, Precedent, Affects, Check, Approve / Edit / Deny.
+// The mockup's eight elements: status tag, headline, Where, Precedent, Affects, Check, Approve / Edit / Deny.
 export function FlagCard({
   flag: rawFlag,
   dataKind,
   viewerRole,
   headline,
   affectsLabel,
+  amountSource,
   agents = [],
   children,
   onApprove,
@@ -124,13 +134,16 @@ export function FlagCard({
             {[affectsLabel, flag.affects.workerId, flag.affects.jobId]
               .filter(Boolean)
               .join(" · ") || "Nothing on pay"}
-            {dollars !== null && (
+            {dollars !== null && amountSource && (
               <>
                 {" · "}
                 <Money cents={dollars} className="font-medium" />{" "}
-                <span className="text-muted-foreground">
-                  ({dataKind}, from {flag.where[0]?.system ?? "the workbook"})
-                </span>
+                <SourceChip
+                  system={amountSource.system}
+                  recordId={amountSource.recordId}
+                  url={amountSource.url}
+                />{" "}
+                <span className="text-muted-foreground">{dataKind}</span>
               </>
             )}
           </dd>
@@ -154,7 +167,7 @@ export function FlagCard({
             </Button>
           )}
           {onDeny && (
-            <Button variant="quiet" onClick={onDeny} disabled={pending}>
+            <Button variant="secondary" onClick={onDeny} disabled={pending}>
               Deny
             </Button>
           )}
