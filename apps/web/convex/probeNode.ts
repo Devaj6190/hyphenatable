@@ -83,9 +83,15 @@ async function embed(texts: string[]): Promise<number[][]> {
   throw new Error("set VOYAGE_API_KEY or OPENAI_API_KEY in Convex env");
 }
 
+type VectorProbe = {
+  dims: number;
+  provider: string;
+  hits: { score: number; companyId?: string; text?: string }[];
+};
+
 export const vectors = action({
   args: {},
-  handler: async (ctx) => {
+  handler: async (ctx): Promise<VectorProbe> => {
     const rows = [
       {
         companyId: "co_a",
@@ -109,9 +115,10 @@ export const vectors = action({
       limit: 5,
       filter: (q) => q.eq("companyId", "co_a"),
     });
-    const found = await ctx.runQuery(internal.probe.vectorRows, {
-      ids: hits.map((h) => h._id),
-    });
+    const found: ({ companyId: string; text: string } | null)[] =
+      await ctx.runQuery(internal.probe.vectorRows, {
+        ids: hits.map((h) => h._id),
+      });
     return {
       dims: embeddings[0].length,
       provider: process.env.VOYAGE_API_KEY
@@ -119,7 +126,7 @@ export const vectors = action({
         : "text-embedding-3-small",
       hits: hits.map((h, i) => ({
         score: Number(h._score.toFixed(3)),
-        ...found[i],
+        ...(found[i] ?? {}),
       })),
     };
   },
