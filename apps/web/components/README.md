@@ -16,8 +16,8 @@ sections 4 and 5. Where the style brief and C plan 4.1/4.2 disagree on tokens or
 - Every status carries a word, and usually an icon. Never color alone.
 - Every page header area and every Company R card shows a `DataLabel`. Every number says where it came from
   (`SourceChip`) and whether it is synthetic.
-- Money: integer cents through `<Money cents />`. Never on manager or employee surfaces; `FlagCard` strips
-  `affects.dollarsCents` unless the viewer is the owner.
+- Money: integer cents through `<Money cents />`. Never on manager or employee surfaces. The server redacts pay
+  (see "Data access"), and `FlagCard` also strips `affects.dollarsCents` unless the viewer is the owner.
 - Never the word "submit" near Gusto. Use "Fill Gusto draft" and "Draft only. PayrollPilot never submits payroll."
 - No real names. Ids or fake display names only.
 - Next 16 instant navigation: don't `await params` at the top of a page or layout. Read them in a child inside
@@ -53,10 +53,54 @@ so the phone tab bar keeps Shannin's five slots: Home, Rules, Workbook, Audit, M
 company name, cycle period, `DataLabel`, seats line, company switcher, theme toggle and, in demo mode, the
 Owner / Manager switch. Company and cycle come from `lib/companies.ts` (fixture copy until `cycles.get` is live).
 
-Role: `useRole()` from `RoleProvider` (cookie `pp_role`, taken from the `c/role-switch` branch unchanged).
+Role: `useRole()` from `RoleProvider` (cookie `pp_role`). `RoleScope` in the layout reads the cookie on the
+server, so the first HTML matches the role. `RoleSwitch` calls `router.refresh()` after a change, so the
+server sends the data again, redacted for the new role.
 Theme: `data-theme="light|dark"` on `<html>`, set before paint by `THEME_SCRIPT` (`lib/theme.ts`). No stored
 value means "system", and the script follows system changes live. An explicit choice lives in
 `localStorage["pp-theme"]`. Wrap any subtree in `data-theme="dark"` or `data-theme="light"` to force a theme.
+
+## Data access (server-side redaction)
+
+Pay never reaches a manager's browser. The server redacts data for the viewer, and client components only
+render what they're given. The single source of truth is `lib/server/fixtures.ts` (fixture mode until
+Convex is live). It imports `server-only`, so importing it from a `"use client"` file fails the build. Never
+import the `app/_fixtures/*.json` files anywhere else.
+
+Pattern for a page: a server child inside `<Suspense>` resolves `params`, gets the viewer, calls one loader
+and passes the redacted result down as props.
+
+```tsx
+// app/c/[companyId]/<route>/page.tsx
+export default function Page({ params }: PageProps<"/c/[companyId]/<route>">) {
+  return <Suspense><Body params={params} /></Suspense>;
+}
+async function Body({ params }: Pick<PageProps<"/c/[companyId]/<route>">, "params">) {
+  const { companyId } = await params;
+  const company = companies[companyId];
+  if (!company) notFound();
+  const viewer = await currentViewer(companyId); // role cookie → Viewer
+  return <Screen data={auditView(viewer, companyId)} dataKind={company.kind} timezone={company.timezone} />;
+}
+```
+
+| Loader (`@/lib/server/fixtures`) | Returns (`@/lib/view-types`) | Used by |
+|---|---|---|
+| `currentViewer(companyId)` (async) | `Viewer` (`@/lib/policy`) from the role cookie | every page |
+| `viewerForRole(companyId, role)` | `Viewer` for an explicit role | tests, the manager page |
+| `homeFlags(viewer, companyId)` | `Flag[]`, filtered and redacted | home, inputs |
+| `flagDetail(viewer, companyId, flagId)` | `FlagDetailData \| null` (`flag`, `question`, `correction`, `events`, `thread`, `recipientName`) | problem detail |
+| `managerInbox(companyId)` | `ManagerInboxData` (`needsOk`, `rest`: `InboxItem[]`), always the manager's view | manager inbox |
+| `auditView(viewer, companyId)` | `AuditViewData` (`events`, `linkableFlagIds`) | audit log |
+| `allFlagParams()` | `{ companyId, flagId }[]` | `generateStaticParams` |
+
+Policy (`@/lib/policy`): `canSeeFlag`, `redactFlag`, `redactCorrection`, `canSeeAuditEvent`, `redactAuditEvent`.
+It matches Convex `lib/viewer.ts` from #15. A screen that needs new data, such as the workbook, rules or
+onboarding, adds a loader to `lib/server/fixtures.ts` that takes a `Viewer` and returns a view type. It
+never passes raw rows to a client component. Times: `formatWhen(iso, company.timezone)` from `@/lib/time`. It
+names the zone and is safe to hydrate.
+
+`FlagCard`'s client-side `forViewer` strip stays in place as a second guard. It is not the boundary.
 
 ## Component APIs
 

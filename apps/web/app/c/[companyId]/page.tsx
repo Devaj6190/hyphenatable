@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { FlagsList } from "@/components/FlagsList";
 import { PageHeader } from "@/components/PageHeader";
 import { companies } from "@/lib/companies";
+import { currentViewer, homeFlags } from "@/lib/server/fixtures";
 
 // Next 16 instant navigation: the page shell must not await params; read them inside a Suspense child.
 export default function OwnerHome({ params }: PageProps<"/c/[companyId]">) {
@@ -25,5 +26,14 @@ async function HomeFlags({
   const { companyId } = await params;
   const company = companies[companyId];
   if (!company) notFound();
-  return <FlagsList companyId={companyId} dataKind={company.kind} />;
+  // Fixture mode: the server picks the viewer from the role cookie and strips pay before anything is sent.
+  const viewer = await currentViewer(companyId);
+  return (
+    <FlagsList
+      companyId={companyId}
+      dataKind={company.kind}
+      flags={homeFlags(viewer, companyId)}
+      viewerId={viewer.workerId}
+    />
+  );
 }

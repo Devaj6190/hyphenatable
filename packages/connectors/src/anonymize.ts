@@ -241,6 +241,8 @@ export function findRealTokens(output: string, tokens: string[]): string[] {
 export interface AnonWorker {
   id: string;
   displayName: string;
+  /** the Jobber export named them with a " Team Leader" suffix */
+  teamLeader?: boolean;
 }
 export interface AnonClient {
   id: string;
@@ -281,6 +283,72 @@ export interface AnonPaid {
   checkDate: string | null;
   grossCents: number;
   sourceId: string;
+  /** sectioned journal: regular vs off-cycle payroll (absent for the flat journal) */
+  sectionKind?: "regular" | "off_cycle" | "other";
+  /** owner draws ("Owner’s draw" employee type) are kept but are not wages */
+  payKind?: "wage" | "owner_draw";
+  /** owner draws on this row (sectioned journal); grossCents excludes them */
+  ownerDrawCents?: number;
+  employeeType?: string | null;
+  /** per pay-type amounts in cents (Regular, Overtime, Commission, ...); no taxes */
+  earningsCents?: Record<string, number>;
+  hours?: Record<string, number>;
+  /** itemized lines with job role and rate (job names are roles, e.g. "Landscaper", not people) */
+  jobLines?: {
+    job: string | null;
+    payType: string;
+    hours: number | null;
+    rateCents: number | null;
+    amountCents: number;
+  }[];
+}
+
+export interface AnonPaidPeriod {
+  workerId: string;
+  periodStart: string | null;
+  periodEnd: string | null;
+  /** regular payroll sections (or the flat journal, which has no sections): what M4 compares to */
+  regularGrossCents: number;
+  /** off-cycle sections, reported separately (bonuses, corrections) */
+  offCycleGrossCents: number;
+  /** sections whose title is neither regular nor off-cycle */
+  otherGrossCents: number;
+  /** owner draws, any section: never part of the wage comparison */
+  ownerDrawCents: number;
+}
+
+export function paidByPeriod(paid: AnonPaid[]): AnonPaidPeriod[] {
+  const by = new Map<string, AnonPaidPeriod>();
+  for (const p of paid) {
+    const k = `${p.workerId}|${p.periodStart}|${p.periodEnd}`;
+    const row = by.get(k) ?? {
+      workerId: p.workerId,
+      periodStart: p.periodStart,
+      periodEnd: p.periodEnd,
+      regularGrossCents: 0,
+      offCycleGrossCents: 0,
+      otherGrossCents: 0,
+      ownerDrawCents: 0,
+    };
+    const kind = p.sectionKind ?? "regular";
+    // grossCents is wage gross; owner draws come in ownerDrawCents (older rows: a draw row carries it in grossCents)
+    const legacyDraw =
+      p.payKind === "owner_draw" && p.ownerDrawCents === undefined;
+    row.ownerDrawCents += p.ownerDrawCents ?? (legacyDraw ? p.grossCents : 0);
+    if (legacyDraw) {
+      by.set(k, row);
+      continue;
+    }
+    if (kind === "regular") row.regularGrossCents += p.grossCents;
+    else if (kind === "off_cycle") row.offCycleGrossCents += p.grossCents;
+    else row.otherGrossCents += p.grossCents;
+    by.set(k, row);
+  }
+  return [...by.values()].sort((a, b) =>
+    `${a.periodStart}${a.workerId}`.localeCompare(
+      `${b.periodStart}${b.workerId}`,
+    ),
+  );
 }
 
 export interface AnonymizedBundle {
@@ -291,6 +359,8 @@ export interface AnonymizedBundle {
   jobs: AnonJob[];
   timeEntries: AnonTimeEntry[];
   paid: AnonPaid[];
+  /** M4 input: gross per pseudonymous worker per pay period, regular payrolls apart from off-cycle ones */
+  paidByPeriod: AnonPaidPeriod[];
   expenses: AnonExpense[];
 }
 
@@ -350,6 +420,11 @@ export function anonymizeExports(
       workers.set(id, { id, displayName: a.workerName(real) });
     return id;
   };
+  const teamLead = (id: string, flag: boolean | undefined) => {
+    const w = workers.get(id);
+    if (flag && w) w.teamLeader = true;
+    return id;
+  };
   const clients = new Map<string, AnonClient>();
   const client = (real: string) => {
     const id = a.id("c", real);
@@ -371,7 +446,7 @@ export function anonymizeExports(
         companyId,
         cycleId: null,
         sourceId: `xlsx:${f.fileTag}#row${r.rowNumber}`,
-        workerId: worker(r.workerName),
+        workerId: teamLead(worker(r.workerName), r.teamLeader),
         jobId,
         visitId: null,
         startAt: r.startAt,
@@ -399,6 +474,17 @@ export function anonymizeExports(
         checkDate: r.checkDate,
         grossCents: r.grossCents,
         sourceId: `csv:${f.fileTag}#row${r.rowNumber}`,
+        ...(r.sectionKind
+          ? {
+              sectionKind: r.sectionKind,
+              payKind: r.payKind ?? "wage",
+              employeeType: r.employeeType ?? null,
+              earningsCents: r.earningsCents,
+              hours: r.hours,
+              jobLines: r.jobLines ?? [],
+              ownerDrawCents: r.ownerDrawCents ?? 0,
+            }
+          : {}),
       });
     }
   }
@@ -460,6 +546,7 @@ export function anonymizeExports(
     jobs: [...jobs.values()],
     timeEntries,
     paid,
+    paidByPeriod: paidByPeriod(paid),
     expenses,
   };
 }
