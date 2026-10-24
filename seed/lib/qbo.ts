@@ -21,7 +21,16 @@ export const PRIVATE_DIR = join(import.meta.dir, "..", "..", "data", "private");
 export const QBO_SEED_TOKEN_PATH = join(PRIVATE_DIR, "qbo-seed-token.json");
 
 export const ACCOUNT_KIND = "Expense"; // AccountType for the expense accounts we may create
-export const CARD_ACCOUNT_NAME = "Company A Card (payrollpilot)";
+/**
+ * Accounts and vendors we create carry this suffix, so they can never collide with (or be confused for) the
+ * sandbox's own sample chart and vendor list: the pusher only ever adopts records that are unmistakably ours.
+ * The read connector should strip it to recover the fixture name (e.g. "Materials (payrollpilot)" -> "Materials").
+ */
+export const OURS_SUFFIX = " (payrollpilot)";
+export const ours = (name: string) => `${name}${OURS_SUFFIX}`;
+export const ACCOUNT_MARKER = "payrollpilot:account";
+export const VENDOR_MARKER = "payrollpilot:vendor";
+export const CARD_ACCOUNT_NAME = ours("Company A Card");
 
 // ---------------------------------------------------------------- plan
 
@@ -35,9 +44,10 @@ export type QboStep = {
   /** "ensure" = look up by name, create only if missing; "create" = always ours (marked). */
   mode: "ensure" | "create";
   entity: "Account" | "Vendor" | "Customer" | "Purchase" | "Bill";
-  lookup?: { field: string; value: string };
-  /** For records that must be ours: a name match is adopted only if Notes carries this marker. */
-  requireMarker?: string;
+  /** Exact lookup among ACTIVE records; FullyQualifiedName where the entity has one, never a bare Name. */
+  lookup?: { field: "FullyQualifiedName" | "DisplayName"; value: string };
+  /** A lookup match is adopted only if this field carries our marker; otherwise the run stops. */
+  requireMarker?: { field: "Notes" | "Description"; value: string };
   body: Rec;
   note?: string;
 };
@@ -94,8 +104,13 @@ export function buildQboPlan(
       key: name,
       mode: "ensure",
       entity: "Account",
-      lookup: { field: "Name", value: name },
-      body: { Name: name, AccountType: ACCOUNT_KIND },
+      lookup: { field: "FullyQualifiedName", value: ours(name) },
+      requireMarker: { field: "Description", value: ACCOUNT_MARKER },
+      body: {
+        Name: ours(name),
+        AccountType: ACCOUNT_KIND,
+        Description: ACCOUNT_MARKER,
+      },
     });
   }
   add({
@@ -103,8 +118,13 @@ export function buildQboPlan(
     key: CARD_ACCOUNT_NAME,
     mode: "ensure",
     entity: "Account",
-    lookup: { field: "Name", value: CARD_ACCOUNT_NAME },
-    body: { Name: CARD_ACCOUNT_NAME, AccountType: "Credit Card" },
+    lookup: { field: "FullyQualifiedName", value: CARD_ACCOUNT_NAME },
+    requireMarker: { field: "Description", value: ACCOUNT_MARKER },
+    body: {
+      Name: CARD_ACCOUNT_NAME,
+      AccountType: "Credit Card",
+      Description: ACCOUNT_MARKER,
+    },
   });
 
   // vendors (fake business names)
@@ -116,8 +136,9 @@ export function buildQboPlan(
       key: v,
       mode: "ensure",
       entity: "Vendor",
-      lookup: { field: "DisplayName", value: v },
-      body: { DisplayName: v, Notes: "payrollpilot:vendor" },
+      lookup: { field: "DisplayName", value: ours(v) },
+      requireMarker: { field: "Notes", value: VENDOR_MARKER },
+      body: { DisplayName: ours(v), Notes: VENDOR_MARKER },
     });
   }
 
@@ -132,20 +153,22 @@ export function buildQboPlan(
       key: c,
       mode: "ensure",
       entity: "Customer",
-      lookup: { field: "DisplayName", value: name },
-      requireMarker: marker(c),
+      lookup: { field: "FullyQualifiedName", value: name },
+      requireMarker: { field: "Notes", value: marker(c) },
       body: { DisplayName: name, Notes: marker(c) },
     });
   }
   for (const j of fx.jobs) {
     const num = String(j.jobNumber);
+    const parentName = `${opts.companyName} client ${j.clientRef}`;
     add({
       object: "jobs",
       key: j.id as string,
       mode: "ensure",
       entity: "Customer",
-      lookup: { field: "DisplayName", value: num },
-      requireMarker: marker(j.id as string),
+      // sub-customer: FullyQualifiedName is "<parent>:<job number>", unique even if a sample customer is "101"
+      lookup: { field: "FullyQualifiedName", value: `${parentName}:${num}` },
+      requireMarker: { field: "Notes", value: marker(j.id as string) },
       body: {
         DisplayName: num,
         Job: true,

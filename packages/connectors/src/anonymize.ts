@@ -285,10 +285,22 @@ export interface AnonPaid {
   sourceId: string;
   /** sectioned journal: regular vs off-cycle payroll (absent for the flat journal) */
   sectionKind?: "regular" | "off_cycle" | "other";
+  /** owner draws ("Owner’s draw" employee type) are kept but are not wages */
+  payKind?: "wage" | "owner_draw";
+  /** owner draws on this row (sectioned journal); grossCents excludes them */
+  ownerDrawCents?: number;
   employeeType?: string | null;
   /** per pay-type amounts in cents (Regular, Overtime, Commission, ...); no taxes */
   earningsCents?: Record<string, number>;
   hours?: Record<string, number>;
+  /** itemized lines with job role and rate (job names are roles, e.g. "Landscaper", not people) */
+  jobLines?: {
+    job: string | null;
+    payType: string;
+    hours: number | null;
+    rateCents: number | null;
+    amountCents: number;
+  }[];
 }
 
 export interface AnonPaidPeriod {
@@ -301,6 +313,8 @@ export interface AnonPaidPeriod {
   offCycleGrossCents: number;
   /** sections whose title is neither regular nor off-cycle */
   otherGrossCents: number;
+  /** owner draws, any section: never part of the wage comparison */
+  ownerDrawCents: number;
 }
 
 export function paidByPeriod(paid: AnonPaid[]): AnonPaidPeriod[] {
@@ -314,8 +328,17 @@ export function paidByPeriod(paid: AnonPaid[]): AnonPaidPeriod[] {
       regularGrossCents: 0,
       offCycleGrossCents: 0,
       otherGrossCents: 0,
+      ownerDrawCents: 0,
     };
     const kind = p.sectionKind ?? "regular";
+    // grossCents is wage gross; owner draws come in ownerDrawCents (older rows: a draw row carries it in grossCents)
+    const legacyDraw =
+      p.payKind === "owner_draw" && p.ownerDrawCents === undefined;
+    row.ownerDrawCents += p.ownerDrawCents ?? (legacyDraw ? p.grossCents : 0);
+    if (legacyDraw) {
+      by.set(k, row);
+      continue;
+    }
     if (kind === "regular") row.regularGrossCents += p.grossCents;
     else if (kind === "off_cycle") row.offCycleGrossCents += p.grossCents;
     else row.otherGrossCents += p.grossCents;
@@ -454,9 +477,12 @@ export function anonymizeExports(
         ...(r.sectionKind
           ? {
               sectionKind: r.sectionKind,
+              payKind: r.payKind ?? "wage",
               employeeType: r.employeeType ?? null,
               earningsCents: r.earningsCents,
               hours: r.hours,
+              jobLines: r.jobLines ?? [],
+              ownerDrawCents: r.ownerDrawCents ?? 0,
             }
           : {}),
       });

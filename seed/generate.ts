@@ -9,7 +9,13 @@
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { type ConfigB, generateB } from "./lib/company-b";
+import {
+  withLowMargin,
+  withPayrollSourceId,
+  withReimbursement,
+} from "./lib/contract";
 import { type CycleExtConfig, generateCycleA06 } from "./lib/cycle-a06";
+import { flagsFromAnswerKey } from "./lib/flags";
 import { must } from "./lib/must";
 import {
   JOBBER_EXPENSE_TITLES,
@@ -1343,8 +1349,35 @@ export function generate(cfg: Config): Record<string, unknown> {
     utcOffset?: string;
   };
   delete (rest as Rec).utcOffset;
+  const flagInputs = (cycleId: string) => ({
+    companyId: C,
+    cycleId,
+    settings: cfg.company.settings,
+    entries: ctx.entries,
+    expenses: ctx.expenses,
+    jobs: ctx.jobs,
+    workers: ctx.workers,
+    rules,
+    payments: ctx.payments,
+    invoices: ctx.invoices,
+    quotes: ctx.quotes,
+    syncRuns: ctx.syncRuns,
+    lowMarginPct: cfg.lowMarginPct,
+  });
+  // expected flags: one per answer-key row, plus the documented expected extra (CHK-23 on the a-c04 sync run)
+  const incomplete = ctx.syncRuns.filter((r) => r.complete === false);
+  const flags = flagsFromAnswerKey(
+    answerKey,
+    { ...flagInputs(cfg.current.cycle), idPrefix: `${C}-fl-` },
+    incomplete.map((r) => ({
+      checkId: "CHK-23",
+      cycleId: r.cycleId,
+      syncRunId: r.id,
+      subject: { workerId: null, jobId: null, entryIds: [], expenseIds: [] },
+    })),
+  );
   return {
-    "company.json": { ...rest, settings },
+    "company.json": withLowMargin({ ...rest, settings }, cfg.lowMarginPct),
     "workers.json": ctx.workers,
     "cycles.json": ctx.cycles,
     "syncRuns.json": ctx.syncRuns,
@@ -1354,11 +1387,12 @@ export function generate(cfg: Config): Record<string, unknown> {
     "quotes.json": byId(ctx.quotes),
     "invoices.json": byId(ctx.invoices),
     "payments.json": byId(ctx.payments),
-    "expenses.json": byId(ctx.expenses),
+    "expenses.json": withReimbursement(byId(ctx.expenses)),
     "rules.json": rules,
-    "pastPayrolls.json": ctx.pastPayrolls,
+    "pastPayrolls.json": withPayrollSourceId(ctx.pastPayrolls),
     "questions.json": ctx.questions,
     "answer-key.json": answerKey,
+    "flags.json": flags,
   };
 }
 

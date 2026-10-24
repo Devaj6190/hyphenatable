@@ -8,6 +8,11 @@
 //   per workweek (Sun-Sat): regular hours over 40 at 1.5x (daily-OT hours do not count toward the 40);
 //   seventh consecutive day: NOT modeled (no one in the data works 7 consecutive days).
 
+import {
+  withLowMargin,
+  withPayrollSourceId,
+  withReimbursement,
+} from "./contract";
 import { must } from "./must";
 import { B_INSTALL_WORK, B_SERVICE_WORK, B_STREETS } from "./names";
 import { rng } from "./random";
@@ -715,7 +720,7 @@ export function generateB(cfg: ConfigB): Record<string, unknown> {
       String(a.id).localeCompare(String(b.id), "en", { numeric: true }),
     );
   return {
-    "company.json": cfg.company,
+    "company.json": withLowMargin(cfg.company, cfg.lowMarginPct),
     "workers.json": workers,
     "cycles.json": cycles,
     "syncRuns.json": syncRuns,
@@ -725,9 +730,9 @@ export function generateB(cfg: ConfigB): Record<string, unknown> {
     "quotes.json": byId(ctx.quotes),
     "invoices.json": byId(ctx.invoices),
     "payments.json": byId(ctx.payments),
-    "expenses.json": byId(ctx.expenses),
+    "expenses.json": withReimbursement(byId(ctx.expenses)),
     "rules.json": rules,
-    "pastPayrolls.json": ctx.pastPayrolls,
+    "pastPayrolls.json": withPayrollSourceId(ctx.pastPayrolls),
     "questions.json": ctx.questions,
     "answer-key.json": answerKey,
   };

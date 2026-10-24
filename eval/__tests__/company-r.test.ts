@@ -26,6 +26,8 @@ const bundle = AnonBundle.parse(
   readJson(join(SAMPLE, "out/r-exports-sample.json")),
 );
 const setup = RSetup.parse(readJson(join(SAMPLE, "m4-rules.json")));
+/** The sample timesheet export covers its one pay period (Sun 2026-09-13 .. Sat 2026-09-26). */
+const WIN = { from: "2026-09-13", to: "2026-09-26" };
 const corrections = RCorrections.parse(
   readJson(join(SAMPLE, "corrections.json")),
 );
@@ -61,23 +63,25 @@ describe("M2 rule grading (counts only)", () => {
 
 describe("M4 Company R backtest on a synthetic sample", () => {
   test("pre-correction: the duplicate entry inflates one worker; post-correction: all exact", () => {
-    const r = backtestR(bundle, setup, corrections);
+    const r = backtestR(bundle, setup, corrections, WIN);
     expect(r.periods).toEqual(["2026-09-13..2026-09-26"]);
     // s0001: 45 h + 32 h → 72 regular + 5 OT at $25 = 198750¢ (paid 198750); s0003 salary 5200000/26 = 200000¢.
     // s0002: 48 h in week 2 with the duplicate → 8 h OT, 184000¢ vs paid 160000¢.
-    expect(r.pre).toEqual({
+    expect(r.pre).toMatchObject({
       compared: 3,
       exact: 2,
       within100: 2,
       maxDiffCents: 24000,
       unmatched: 0,
+      separate: {},
     });
-    expect(r.post).toEqual({
+    expect(r.post).toMatchObject({
       compared: 3,
       exact: 3,
       within100: 3,
       maxDiffCents: 0,
       unmatched: 0,
+      separate: {},
     });
     const t = r.trails.pre.find((x) => x.workerId === "r:w:s0002");
     expect(t?.diffCents).toBe(24000);
@@ -88,8 +92,8 @@ describe("M4 Company R backtest on a synthetic sample", () => {
     ]);
   });
   test("without corrections there is no post pass; without an overtime rule hourly workers are excluded", () => {
-    expect(backtestR(bundle, setup, null).post).toBeNull();
-    const r = backtestR(bundle, { ...setup, rules: [] }, null);
+    expect(backtestR(bundle, setup, null, WIN).post).toBeNull();
+    const r = backtestR(bundle, { ...setup, rules: [] }, null, WIN);
     expect(r.pre.unmatched).toBe(2);
     expect(r.notes[0]).toContain("no active overtime_policy");
   });
@@ -128,6 +132,7 @@ describe("M4 runner: data/private/ only", () => {
       join(tmp, "m4-rules.json"),
       join(tmp, "corrections.json"),
       new Date("2026-10-24T12:00:00.000Z"),
+      WIN,
     );
     expect(M4Summary.parse(s).post?.exact).toBe(3);
     const files = readdirSync(join(tmp, "m4")).sort();
@@ -141,6 +146,7 @@ describe("M4 runner: data/private/ only", () => {
       ).sort(),
     ).toEqual(
       [
+        "coverage",
         "measuredAt",
         "notes",
         "periods",
@@ -148,6 +154,7 @@ describe("M4 runner: data/private/ only", () => {
         "pre",
         "rulesSource",
         "status",
+        "window",
       ].sort(),
     );
     expect(existsSync(join(SAMPLE, "m4"))).toBe(false);

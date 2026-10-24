@@ -29,17 +29,18 @@ describe("ingest-r with the real-layout CSVs (replicas)", () => {
       now: () => new Date("2026-10-24T12:00:00Z"),
     });
     expect(c).toMatchObject({
-      workers: 3,
-      timeEntries: 6,
-      paidRows: 5,
-      paidPeriods: 4,
+      workers: 4,
+      timeEntries: 7,
+      paidRows: 6,
+      paidPeriods: 5,
       paidPeriodsWithOffCycle: 1,
+      ownerDrawRows: 1,
       jobs: 2,
       clients: 2,
     });
     expect(c.syncRuns).toEqual([
-      { object: "timeSheetEntries", pulled: 6, expected: 6, complete: true },
-      { object: "payrollJournal", pulled: 5, expected: 5, complete: true },
+      { object: "timeSheetEntries", pulled: 7, expected: 7, complete: true }, // drift, merged and unlisted accounts are notes
+      { object: "payrollJournal", pulled: 6, expected: 6, complete: true },
     ]);
 
     const out = await readFile(c.outPath as string, "utf8");
@@ -48,6 +49,13 @@ describe("ingest-r with the real-layout CSVs (replicas)", () => {
     expect(
       b.workers.find((w: { id: string }) => w.id === avery)?.teamLeader,
     ).toBe(true);
+    // an owner draw is kept but never counted as regular wage gross
+    const sam = b.paid.find(
+      (p: { payKind: string }) => p.payKind === "owner_draw",
+    )?.workerId;
+    expect(
+      b.paidByPeriod.find((p: { workerId: string }) => p.workerId === sam),
+    ).toMatchObject({ regularGrossCents: 0, ownerDrawCents: 200000 });
     // the same person in both files is one worker
     const averyPeriods = b.paidByPeriod.filter(
       (p: { workerId: string }) => p.workerId === avery,
@@ -57,9 +65,10 @@ describe("ingest-r with the real-layout CSVs (replicas)", () => {
         workerId: avery,
         periodStart: "2026-08-29",
         periodEnd: "2026-09-11",
-        regularGrossCents: 111250,
+        regularGrossCents: 116250,
         offCycleGrossCents: 20000,
         otherGrossCents: 0,
+        ownerDrawCents: 0,
       },
       {
         workerId: avery,
@@ -68,6 +77,7 @@ describe("ingest-r with the real-layout CSVs (replicas)", () => {
         regularGrossCents: 100000,
         offCycleGrossCents: 0,
         otherGrossCents: 0,
+        ownerDrawCents: 0,
       },
     ]);
     expect(
@@ -107,12 +117,25 @@ describe("ingest-r with the real-layout CSVs (replicas)", () => {
       "gate code",
       "Fake Street",
       "Fake Landscaping",
-      "Team Leader",
+      // (a job role named "Team Leader" in the Gusto lines is a role, not a name: checked on workers below)
       "1234.56",
       "777.77",
+      "Direct Deposit",
+      "Quinlan",
     ]) {
       expect(out).not.toContain(s);
     }
+    expect(
+      b.workers.some((w: { displayName: string }) =>
+        /team leader/i.test(w.displayName),
+      ),
+    ).toBe(false);
+    expect(b.paid[0].jobLines.map((l: { job: string }) => l.job)).toEqual([
+      "Landscaper",
+      "Team Leader",
+      "Team Leader",
+      "Team Leader",
+    ]);
     const tokens = (await readFile(join(dir, "real-tokens.txt"), "utf8"))
       .trim()
       .split("\n");

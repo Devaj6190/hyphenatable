@@ -2,7 +2,7 @@
   {
     "id": "a-au-01",
     "companyId": "a",
-    "cycleId": "a-c04",
+    "cycleId": null,
     "at": "2026-10-10T15:00:00.000Z",
     "actor": {
       "kind": "agent",
@@ -21,7 +21,7 @@
   {
     "id": "a-au-02",
     "companyId": "a",
-    "cycleId": "a-c04",
+    "cycleId": null,
     "at": "2026-10-10T16:10:00.000Z",
     "actor": {
       "kind": "user",
@@ -376,6 +376,65 @@
     "data": {
       "source": "Messenger agent (Claude Haiku), from a simulated reply",
       "simulated": true
+    }
+  },
+  {
+    "id": "a-au-20",
+    "companyId": "a",
+    "cycleId": "a-c06",
+    "at": "2026-11-07T14:00:00.000Z",
+    "actor": {
+      "kind": "system",
+      "id": "controller",
+      "agent": null
+    },
+    "type": "check.fired",
+    "summary": "CHK-01 found an entry with no job. Rule R-14 gives it a precedent.",
+    "refs": {
+      "ruleId": "R-14",
+      "entryId": "a-te-0301"
+    },
+    "data": {
+      "source": "Checks engine (rule: certain)"
+    }
+  },
+  {
+    "id": "a-au-21",
+    "companyId": "a",
+    "cycleId": "a-c06",
+    "at": "2026-11-07T14:00:30.000Z",
+    "actor": {
+      "kind": "system",
+      "id": "controller",
+      "agent": null
+    },
+    "type": "rule.applied",
+    "summary": "Rule R-14, learned in cycle 1, settled that entry. No question was sent.",
+    "refs": {
+      "ruleId": "R-14",
+      "entryId": "a-te-0301"
+    },
+    "data": {
+      "source": "Rules (learned in cycle 1)"
+    }
+  },
+  {
+    "id": "a-au-22",
+    "companyId": "a",
+    "cycleId": "a-c05",
+    "at": "2026-10-24T08:12:40.000Z",
+    "actor": {
+      "kind": "system",
+      "id": "controller",
+      "agent": null
+    },
+    "type": "check.fired",
+    "summary": "CHK-10 found a labor rate that differs between Jobber and Gusto.",
+    "refs": {
+      "flagId": "a-flag-10"
+    },
+    "data": {
+      "source": "Checks engine (rule: certain)"
     }
   }
 ]

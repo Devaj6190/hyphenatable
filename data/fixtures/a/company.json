@@ -8,6 +8,7 @@
     "longShiftHours": 11,
     "otWeeklyHours": 40,
     "grossChangePct": 25,
-    "employeesMayBeTexted": true
+    "employeesMayBeTexted": true,
+    "lowMarginPct": 20
   }
 }

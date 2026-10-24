@@ -2,101 +2,284 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
+/* Theme lives on <html data-theme="light|dark">; the inline script in app/layout.tsx resolves "system" before paint. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 @theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--foreground);
+  --color-raised: var(--raised);
+  --color-popover: var(--raised);
+  --color-popover-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-edge: var(--primary-edge);
+  --color-secondary: var(--muted);
+  --color-secondary-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--foreground);
+  --color-link: var(--link);
+  --color-destructive: var(--destructive);
+  --color-destructive-soft: var(--destructive-soft);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  /* Semantic states. Brand green is never a status; verified uses ok + icon + word. */
   --color-hold: var(--hold);
   --color-hold-soft: var(--hold-soft);
   --color-ask: var(--ask);
   --color-ask-soft: var(--ask-soft);
   --color-ok: var(--ok);
   --color-ok-soft: var(--ok-soft);
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-inter);
-  --font-mono: var(--font-geist-mono);
+  --color-sync-error: var(--destructive);
+  --color-sync-error-soft: var(--destructive-soft);
+  --color-neutral-chip: var(--neutral-chip);
+  /* Agent hues (audit log, timelines). */
+  --color-agent-analyst: var(--agent-analyst);
+  --color-agent-analyst-soft: var(--agent-analyst-soft);
+  --color-agent-auditor: var(--agent-auditor);
+  --color-agent-auditor-soft: var(--agent-auditor-soft);
+  --color-agent-messenger: var(--agent-messenger);
+  --color-agent-messenger-soft: var(--agent-messenger-soft);
+
+  --font-sans: var(--font-host-grotesk), ui-sans-serif, system-ui, sans-serif;
   --font-heading: var(--font-sans);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
-  --color-ring: var(--ring);
-  --color-input: var(--input);
-  --color-border: var(--border);
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-  --color-card-foreground: var(--card-foreground);
-  --color-card: var(--card);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* Radii: 10px controls, 16px cards, 20px overlays, pills for badges and segmented tracks. */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 16px;
+  --radius-2xl: 20px;
+  --radius-control: 10px;
+  --radius-card: 16px;
+  --radius-overlay: 20px;
+
+  --shadow-card: var(--shadow-card);
+  --shadow-raised: var(--shadow-raised);
+  --shadow-overlay: var(--shadow-overlay);
+
+  --ease-out-soft: cubic-bezier(0.22, 0.8, 0.24, 1);
 }
 
-/* PayrollPilot tokens: docs/plans/C-product-messaging-demo.md section 4.1 */
-:root {
-  --background: #fafaf7;
-  --foreground: #141a1f;
+/* Light. Values from docs/plans/design-style-handoff.md; status pairs and input boundary contrast-checked (README). */
+:root,
+[data-theme="light"] {
+  color-scheme: light;
+  --background: #f6f7f3;
   --card: #ffffff;
-  --card-foreground: #141a1f;
-  --popover: #ffffff;
-  --popover-foreground: #141a1f;
-  --primary: #0f5c4a;
+  --raised: #ffffff;
+  --muted: #ebf0ea;
+  --foreground: #18251e;
+  --muted-foreground: #56665b;
+  --border: #dce4dc;
+  --input: #7e8f83;
+  --primary: #14543f;
   --primary-foreground: #ffffff;
-  --secondary: #f1f2ee;
-  --secondary-foreground: #141a1f;
-  --muted: #f1f2ee;
-  --muted-foreground: #5f6b73;
-  --accent: #f1f2ee;
-  --accent-foreground: #141a1f;
-  --destructive: #b3261e;
-  --border: #e4e6e1;
-  --input: #e4e6e1;
-  --ring: #0f5c4a;
-  --radius: 12px;
-  --hold: #9a6700;
-  --hold-soft: #fff4d6;
-  --ask: #1d4ed8;
-  --ask-soft: #e8eeff;
-  --ok: #0f5c4a;
-  --ok-soft: #ddf4e7;
-  --sidebar: #ffffff;
-  --sidebar-foreground: #141a1f;
-  --sidebar-primary: #0f5c4a;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #f1f2ee;
-  --sidebar-accent-foreground: #141a1f;
-  --sidebar-border: #e4e6e1;
-  --sidebar-ring: #0f5c4a;
+  --primary-hover: #104633;
+  --primary-edge: #14543f;
+  --link: #14543f;
+  --ring: #14543f;
+  --accent: #ddede1;
+  --destructive: #b42318;
+  --destructive-fill: #b42318;
+  --destructive-soft: #fdebe8;
+  --hold: #8a5300;
+  --hold-soft: #fcefd4;
+  --ask: #1e4fb0;
+  --ask-soft: #e5edfb;
+  --ok: #1c6b36;
+  --ok-soft: #dff2e4;
+  --neutral-chip: #3e4c43;
+  --agent-analyst: #5b3fa8;
+  --agent-analyst-soft: #efeafb;
+  --agent-auditor: #0b6b63;
+  --agent-auditor-soft: #dff3f0;
+  --agent-messenger: #a02860;
+  --agent-messenger-soft: #fbe8f0;
+  --scrim: rgb(16 24 21 / 0.28);
+  --shadow-card:
+    0 1px 2px rgb(24 37 30 / 0.04), 0 12px 32px -16px rgb(24 37 30 / 0.12);
+  --shadow-raised:
+    0 1px 2px rgb(24 37 30 / 0.05), 0 16px 40px -18px rgb(24 37 30 / 0.18);
+  --shadow-overlay:
+    0 2px 6px rgb(24 37 30 / 0.06), 0 32px 72px -24px rgb(24 37 30 / 0.28);
+}
+
+/* Motion (design-style-handoff.md timing table). Theme-independent. */
+:root {
+  --dur-hover: 140ms;
+  --dur-press: 100ms;
+  --dur-tab: 210ms;
+  --dur-sheet: 280ms;
+  --dur-archive: 480ms;
+  --dur-success: 190ms;
+  --press-scale: 0.985;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --background: #101815;
+  --card: #19231e;
+  --raised: #223029;
+  --muted: #202d26;
+  --foreground: #edf3ee;
+  --muted-foreground: #adbdb1;
+  --border: #34473b;
+  --input: #6b8273;
+  --primary: #14543f;
+  --primary-foreground: #ffffff;
+  --primary-hover: #1b654c;
+  /* The fill alone is 1.8:1 against the card; the edge carries the boundary (4.8:1). */
+  --primary-edge: #4e9a7a;
+  --link: #a4d6b5;
+  --ring: #a4d6b5;
+  --accent: #273e30;
+  --destructive: #f7a396;
+  --destructive-fill: #b42318;
+  --destructive-soft: #421e1a;
+  --hold: #f1c26a;
+  --hold-soft: #3a2d12;
+  --ask: #a3c1f7;
+  --ask-soft: #1c2a45;
+  --ok: #93d7a6;
+  --ok-soft: #1c3a26;
+  --neutral-chip: #c9d6cc;
+  --agent-analyst: #c8b6f5;
+  --agent-analyst-soft: #2c2445;
+  --agent-auditor: #8cdcd1;
+  --agent-auditor-soft: #173a36;
+  --agent-messenger: #f3a6c8;
+  --agent-messenger-soft: #3f1d2d;
+  --scrim: rgb(4 8 6 / 0.55);
+  --shadow-card:
+    inset 0 1px 0 rgb(255 255 255 / 0.04), 0 1px 2px rgb(0 0 0 / 0.3);
+  --shadow-raised:
+    inset 0 1px 0 rgb(255 255 255 / 0.06), 0 12px 32px -16px rgb(0 0 0 / 0.6);
+  --shadow-overlay:
+    inset 0 1px 0 rgb(255 255 255 / 0.07), 0 32px 72px -24px rgb(0 0 0 / 0.75);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-hover: 0ms;
+    --dur-press: 0ms;
+    --dur-tab: 0ms;
+    --dur-sheet: 120ms;
+    --dur-archive: 120ms;
+    --dur-success: 0ms;
+    --press-scale: 1;
+  }
+  /* Sheets and dialogs fade in place instead of sliding. */
+  [data-slot="sheet-content"]:is([data-starting-style], [data-ending-style]) {
+    /* biome-ignore lint/complexity/noImportantStyles: beats the side-specific slide utilities */
+    translate: 0 0 !important;
+  }
+  [data-slot="dialog-content"]:is([data-starting-style], [data-ending-style]) {
+    /* biome-ignore lint/complexity/noImportantStyles: keeps the dialog centered while it fades */
+    translate: -50% -50% !important;
+  }
+  /* Third-party enter/exit animations (tw-animate, Base UI) become an instant change. */
+  *,
+  *::before,
+  *::after {
+    /* biome-ignore lint/complexity/noImportantStyles: reduced motion must beat component animation classes */
+    animation-duration: 0.01ms !important;
+    /* biome-ignore lint/complexity/noImportantStyles: reduced motion must beat component animation classes */
+    animation-iteration-count: 1 !important;
+    /* biome-ignore lint/complexity/noImportantStyles: reduced motion must beat component animation classes */
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Static 1.5% monochrome grain for the canvas or archive material. Keep it off dense data surfaces. */
+@utility grain {
+  position: relative;
+  isolation: isolate;
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.015;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  [data-theme="dark"] &::before {
+    opacity: 0.02;
+    filter: invert(1);
+  }
+}
+
+/* Frosted overlay surface with an opaque fallback; text stays readable whatever is behind it. */
+@utility frosted {
+  background-color: var(--raised);
+  @supports (backdrop-filter: blur(1px)) {
+    background-color: color-mix(in srgb, var(--raised) 78%, transparent);
+    backdrop-filter: blur(18px) saturate(1.2);
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    background-color: var(--raised);
+    backdrop-filter: none;
+  }
+}
+
+/* Frosted page scrim behind sheets and dialogs. */
+@utility frosted-scrim {
+  background-color: var(--scrim);
+  @supports (backdrop-filter: blur(1px)) {
+    backdrop-filter: blur(6px);
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    backdrop-filter: none;
+  }
+}
+
+/* Press response: at most 1.5% compression, no layout shift. */
+@utility pressable {
+  transition-property:
+    color, background-color, border-color, box-shadow, transform;
+  transition-duration:
+    var(--dur-hover), var(--dur-hover), var(--dur-hover), var(--dur-hover),
+    var(--dur-press);
+  transition-timing-function: var(--ease-out-soft);
+  &:active:not(:disabled, [aria-disabled="true"]) {
+    transform: scale(var(--press-scale));
+  }
 }
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground tabular-nums;
+    @apply border-border;
   }
   html {
     @apply font-sans;
+    font-size: 100%;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-size: 1rem;
+    line-height: 1.5;
+    /* Host Grotesk has no tnum feature; its default digits are already equal-width lining figures. */
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+  h1,
+  h2,
+  h3 {
+    @apply font-heading;
+    text-wrap: balance;
+  }
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+  ::selection {
+    background-color: var(--accent);
+    color: var(--foreground);
   }
 }
