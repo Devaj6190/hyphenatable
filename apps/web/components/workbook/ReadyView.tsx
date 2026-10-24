@@ -5,14 +5,13 @@ import { useSearchParams } from "next/navigation";
 import { DataLabel } from "@/components/DataLabel";
 import { Money } from "@/components/Money";
 import { PageHeader } from "@/components/PageHeader";
-import { useRole } from "@/components/RoleProvider";
 import { SourceChip } from "@/components/SourceChip";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { companies } from "@/lib/companies";
-import { cyclesFor, holdsOf, periodLabel, workerLabel } from "./data";
+import { holdsOf, periodLabel, type WorkbookData, workerLabel } from "./data";
 import { useGateApproved } from "./gate-store";
 import { HoldReason } from "./WorkbookTable";
 
@@ -43,24 +42,19 @@ function Figure({
   );
 }
 
-export function ReadyView({ companyId }: { companyId: string }) {
-  const { role } = useRole();
+export function ReadyView({
+  companyId,
+  data,
+}: {
+  companyId: string;
+  data: WorkbookData;
+}) {
   const params = useSearchParams();
   const company = companies[companyId];
-  const open = cyclesFor(companyId).filter((c) => c.basis === "engine");
+  const open = data.cycles.filter((c) => c.basis === "engine");
   const wb =
     open.find((c) => c.cycle.id === params.get("cycle")) ?? open.at(-1);
   const approved = useGateApproved(wb?.draftId ?? null);
-
-  if (role === "manager")
-    return (
-      <>
-        <PageHeader title="Payroll ready" />
-        <p className="rounded-card border bg-card p-5 text-muted-foreground">
-          This summary shows pay amounts, so only the owner sees it.
-        </p>
-      </>
-    );
 
   if (!wb)
     return (
@@ -191,7 +185,7 @@ export function ReadyView({ companyId }: { companyId: string }) {
                 >
                   <span className="flex min-w-0 flex-col gap-1">
                     <span className="font-medium first-letter:uppercase">
-                      {h.workerId ? `${workerLabel(companyId, h.workerId)} · ` : ""}
+                      {h.workerId ? `${workerLabel(data.names, h.workerId)} · ` : ""}
                       {h.what}
                     </span>
                     <HoldReason reason={h.reason} />

@@ -7,7 +7,14 @@ import flags from "@/app/_fixtures/flags.json";
 import ownerRoutedFlags from "@/app/_fixtures/flags.owner-routed.json";
 import messages from "@/app/_fixtures/messages.json";
 import questions from "@/app/_fixtures/questions.json";
+import workbook from "@/app/_fixtures/workbook.json";
 import workers from "@/app/_fixtures/workers.json";
+import {
+  type CycleWorkbook,
+  holdsOf,
+  type Readiness,
+  type WorkbookData,
+} from "@/components/workbook/data";
 import {
   canSeeAuditEvent,
   canSeeFlag,
@@ -148,5 +155,51 @@ export function auditView(viewer: Viewer, companyId: string): AuditViewData {
       )
       .map((e) => redactAuditEvent(viewer, e)),
     linkableFlagIds: [...visibleIds],
+  };
+}
+
+const workbookFixture = workbook as unknown as {
+  source: string;
+  companies: Record<
+    string,
+    { workers: Record<string, { name: string }>; cycles: CycleWorkbook[] }
+  >;
+};
+
+/** Counts records, never money. Uses every flag (owner-routed too): only the owner gets here. */
+function readinessOf(wb: CycleWorkbook): Readiness {
+  const mine = allFlags.filter((f) => f.cycleId === wb.cycle.id);
+  const entries = wb.syncRuns.find((s) => s.object === "timeSheetEntries");
+  const flagged = new Set(mine.flatMap((f) => f.subject.entryIds)).size;
+  return {
+    clean: entries ? entries.pulled - flagged : null,
+    pulled: entries ?? null,
+    fixed: mine.filter((f) => f.status === "corrected").length,
+    open: mine.filter((f) => ["open", "asked", "answered"].includes(f.status))
+      .length,
+    // The engine already applies held flags, so its holds are the whole list.
+    held: holdsOf(wb).length,
+    incompleteSyncs: wb.syncRuns.filter((s) => !s.complete).length,
+  };
+}
+
+/** The workbook shows pay, so it is owner-only: null for a manager. Empty cycles when the company has none. */
+export function workbookView(
+  viewer: Viewer,
+  companyId: string,
+): WorkbookData | null {
+  if (viewer.role !== "owner") return null;
+  const company = workbookFixture.companies[companyId];
+  const cycles = company?.cycles ?? [];
+  return {
+    source: workbookFixture.source,
+    names: Object.fromEntries(
+      Object.entries(company?.workers ?? {}).map(([id, w]) => [id, w.name]),
+    ),
+    cycles: cycles.map((wb, i) => ({
+      ...wb,
+      readiness: readinessOf(wb),
+      lastQuestions: i > 0 ? cycles[i - 1].cycle.questionsAsked : null,
+    })),
   };
 }

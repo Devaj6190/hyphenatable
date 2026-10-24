@@ -6,7 +6,6 @@ import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { DataLabel } from "@/components/DataLabel";
 import { PageHeader } from "@/components/PageHeader";
-import { useRole } from "@/components/RoleProvider";
 import { Button } from "@/components/ui/button";
 import {
   Tabs,
@@ -15,41 +14,28 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs";
 import { companies } from "@/lib/companies";
-import { fixtureFlags } from "@/lib/fixtures";
 import { CycleArchive } from "./CycleArchive";
-import {
-  cyclesFor,
-  periodLabel,
-  previousCycle,
-  readinessOf,
-  WORKBOOK_SOURCE,
-  workbookCsv,
-} from "./data";
+import { periodLabel, type WorkbookData, workbookCsv } from "./data";
 import { approveGate, useGateApproved } from "./gate-store";
 import { ReadinessCard } from "./ReadinessCard";
 import { ReconTable, Stage1Table, Stage2Table, VenmoList } from "./WorkbookTable";
 
 const PANEL_ID = "workbook-cycle-panel";
 
-export function WorkbookView({ companyId }: { companyId: string }) {
-  const { role } = useRole();
+export function WorkbookView({
+  companyId,
+  data,
+}: {
+  companyId: string;
+  data: WorkbookData;
+}) {
   const params = useSearchParams();
-  const [picked, setPicked] = useState(params.get("cycle"));
   const company = companies[companyId];
-  const cycles = cyclesFor(companyId);
+  const [picked, setPicked] = useState(params.get("cycle"));
+  const { cycles, names } = data;
   const wb =
     cycles.find((c) => c.cycle.id === picked) ?? cycles.at(-1);
   const approved = useGateApproved(wb?.draftId ?? null);
-
-  if (role === "manager")
-    return (
-      <>
-        <PageHeader title="Workbook and readiness" />
-        <p className="rounded-card border bg-card p-5 text-muted-foreground">
-          The workbook shows pay amounts, so only the owner sees it.
-        </p>
-      </>
-    );
 
   if (!wb)
     return (
@@ -72,7 +58,7 @@ export function WorkbookView({ companyId }: { companyId: string }) {
   };
   const download = () => {
     const url = URL.createObjectURL(
-      new Blob([workbookCsv(companyId, wb)], { type: "text/csv" }),
+      new Blob([workbookCsv(names, wb)], { type: "text/csv" }),
     );
     const a = document.createElement("a");
     a.href = url;
@@ -117,7 +103,7 @@ export function WorkbookView({ companyId }: { companyId: string }) {
           kind={company.kind}
           detail={`${company.label}, cycle ${wb.cycle.number}`}
         />
-        <span>Source: {WORKBOOK_SOURCE}</span>
+        <span>Source: {data.source}</span>
       </div>
 
       <CycleArchive
@@ -137,10 +123,8 @@ export function WorkbookView({ companyId }: { companyId: string }) {
         <ReadinessCard
           companyId={companyId}
           wb={wb}
-          readiness={readinessOf(wb, fixtureFlags)}
-          lastQuestions={
-            previousCycle(companyId, wb.cycle.id)?.cycle.questionsAsked ?? null
-          }
+          readiness={wb.readiness}
+          lastQuestions={wb.lastQuestions}
           approved={approved}
           onApprove={() => wb.draftId && approveGate(wb.draftId)}
         />
@@ -151,11 +135,11 @@ export function WorkbookView({ companyId }: { companyId: string }) {
             <TabsTrigger value="stage2">Stage 2 · Commissions</TabsTrigger>
           </TabsList>
           <TabsContent value="stage1" className="flex flex-col gap-6">
-            <Stage1Table companyId={companyId} wb={wb} />
-            <VenmoList companyId={companyId} wb={wb} />
+            <Stage1Table names={names} wb={wb} />
+            <VenmoList names={names} wb={wb} />
           </TabsContent>
           <TabsContent value="stage2" className="flex flex-col gap-8">
-            <Stage2Table companyId={companyId} wb={wb} />
+            <Stage2Table names={names} wb={wb} />
             <ReconTable wb={wb} />
           </TabsContent>
         </Tabs>

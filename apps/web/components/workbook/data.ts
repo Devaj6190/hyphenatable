@@ -1,9 +1,8 @@
-import workbook from "@/app/_fixtures/workbook.json";
 import { formatCents } from "@/lib/money";
-import type { Flag } from "@/lib/types";
 
-// Workbook values come from app/_fixtures/workbook.json (scripts/workbook-fixture.ts) until drafts.get is live.
-// Nothing here computes pay: amounts are read as stored. Only records are counted.
+// Workbook values come from app/_fixtures/workbook.json (scripts/workbook-fixture.ts) through
+// workbookView in lib/server/fixtures.ts until drafts.get is live. Nothing here computes pay: amounts are read
+// as stored. Only records are counted.
 export type Stage1Line = {
   workerId: string;
   kind: "hourly" | "salary";
@@ -81,31 +80,11 @@ export type CycleWorkbook = {
   lowMarginPct?: number | null;
 };
 
-type Company = {
-  workers: Record<string, { name: string; payType: string }>;
-  cycles: CycleWorkbook[];
-};
-const fixture = workbook as unknown as {
-  source: string;
-  companies: Record<string, Company>;
-};
-export const WORKBOOK_SOURCE = fixture.source;
+/** Display name by worker id. */
+export type Names = Record<string, string>;
 
-const companyData = (companyId: string): Company | null =>
-  fixture.companies[companyId] ?? null;
-
-export const cyclesFor = (companyId: string) =>
-  companyData(companyId)?.cycles ?? [];
-
-export const workerLabel = (companyId: string, workerId: string) =>
-  companyData(companyId)?.workers[workerId]?.name ?? workerId;
-
-/** The cycle before this one, for "questions this cycle vs last". */
-export const previousCycle = (companyId: string, cycleId: string) => {
-  const all = cyclesFor(companyId);
-  const i = all.findIndex((c) => c.cycle.id === cycleId);
-  return i > 0 ? all[i - 1] : null;
-};
+export const workerLabel = (names: Names, workerId: string) =>
+  names[workerId] ?? workerId;
 
 /** Short period, "Oct 10 – Oct 23", in the company timezone. Period ends are exclusive-ish (03:59:59 next day). */
 export function periodLabel(
@@ -163,25 +142,21 @@ export type Readiness = {
   incompleteSyncs: number;
 };
 
-/** Counts records, never money. Flags are the flags.list result (fixture until B's query is live). */
-export function readinessOf(wb: CycleWorkbook, flags: Flag[]): Readiness {
-  const mine = flags.filter((f) => f.cycleId === wb.cycle.id);
-  const entries = wb.syncRuns.find((s) => s.object === "timeSheetEntries");
-  const flagged = new Set(mine.flatMap((f) => f.subject.entryIds)).size;
-  return {
-    clean: entries ? entries.pulled - flagged : null,
-    pulled: entries ?? null,
-    fixed: mine.filter((f) => f.status === "corrected").length,
-    open: mine.filter((f) => ["open", "asked", "answered"].includes(f.status))
-      .length,
-    // The engine already applies held flags, so its holds are the whole list.
-    held: holdsOf(wb).length,
-    incompleteSyncs: wb.syncRuns.filter((s) => !s.complete).length,
-  };
-}
+/** A cycle as the owner's workbook sees it: readiness and last cycle's questions are counted on the server. */
+export type WorkbookCycle = CycleWorkbook & {
+  readiness: Readiness;
+  lastQuestions: number | null;
+};
+
+/** workbookView's result. Owner-only, so it carries pay. */
+export type WorkbookData = {
+  source: string;
+  names: Names;
+  cycles: WorkbookCycle[];
+};
 
 /** Stage 1 and 2 lines as CSV, values exactly as stored (cents and the formatted amount). */
-export function workbookCsv(companyId: string, wb: CycleWorkbook): string {
+export function workbookCsv(names: Names, wb: CycleWorkbook): string {
   const rows: (string | number | null)[][] = [
     [
       "cycle",
@@ -199,7 +174,7 @@ export function workbookCsv(companyId: string, wb: CycleWorkbook): string {
       "source_record",
     ],
   ];
-  const name = (id: string) => workerLabel(companyId, id);
+  const name = (id: string) => workerLabel(names, id);
   for (const l of wb.stage1.lines)
     rows.push([
       wb.cycle.id,

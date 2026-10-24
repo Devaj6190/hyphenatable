@@ -16,6 +16,7 @@ import { cn } from "@/lib/utils";
 import {
   type CycleWorkbook,
   type JobRow,
+  type Names,
   type Stage1Line,
   workerLabel,
 } from "./data";
@@ -64,10 +65,10 @@ function SectionTitle({
 }
 
 export function Stage1Table({
-  companyId,
+  names,
   wb,
 }: {
-  companyId: string;
+  names: Names;
   wb: CycleWorkbook;
 }) {
   const cleared = wb.stage1.lines.filter((l) => !l.held);
@@ -79,7 +80,7 @@ export function Stage1Table({
       className={cn(l.held && "bg-hold-soft/50 hover:bg-hold-soft/70")}
     >
       <TableCell className="font-medium">
-        {workerLabel(companyId, l.workerId)}
+        {workerLabel(names, l.workerId)}
         <span className="block text-xs font-normal text-muted-foreground">
           {l.workerId}
         </span>
@@ -181,10 +182,10 @@ export function Stage1Table({
 }
 
 export function VenmoList({
-  companyId,
+  names,
   wb,
 }: {
-  companyId: string;
+  names: Names;
   wb: CycleWorkbook;
 }) {
   const { venmo, venmoHeld } = wb.stage1;
@@ -202,7 +203,7 @@ export function VenmoList({
             className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 py-2"
           >
             <span className="font-medium">
-              {workerLabel(companyId, v.workerId)}
+              {workerLabel(names, v.workerId)}
             </span>
             <span className="flex items-center gap-3 text-sm">
               <span className="text-muted-foreground tabular-nums">
@@ -225,7 +226,7 @@ export function VenmoList({
             className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2 py-2"
           >
             <span className="font-medium">
-              {workerLabel(companyId, v.workerId)}
+              {workerLabel(names, v.workerId)}
             </span>
             <span className="flex max-w-md items-start gap-2">
               <HoldReason reason={v.reason} />
@@ -239,10 +240,10 @@ export function VenmoList({
 }
 
 export function Stage2Table({
-  companyId,
+  names,
   wb,
 }: {
-  companyId: string;
+  names: Names;
   wb: CycleWorkbook;
 }) {
   const system = sourceOf(wb);
@@ -282,7 +283,7 @@ export function Stage2Table({
             {wb.stage2.lines.map((s) => (
               <TableRow key={`${s.recordId}-${s.workerId}-${s.name}`}>
                 <TableCell className="font-medium">
-                  {workerLabel(companyId, s.workerId)}
+                  {workerLabel(names, s.workerId)}
                 </TableCell>
                 <TableCell>
                   {s.name}
@@ -315,7 +316,7 @@ export function Stage2Table({
                   {h.what}
                 </span>
                 <span className="text-sm text-muted-foreground">
-                  {h.workerId ? workerLabel(companyId, h.workerId) : "—"} ·{" "}
+                  {h.workerId ? workerLabel(names, h.workerId) : "—"} ·{" "}
                   {h.reason}
                 </span>
               </span>
