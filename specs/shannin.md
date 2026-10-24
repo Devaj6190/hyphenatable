@@ -15,6 +15,7 @@ Rules:
 - Stays human: approving questions before they're sent, confirming learned rules, answering questions, and submitting payroll.
 - Proof customer: the owner's landscaping company (about 15 staff, Pennsylvania, biweekly payroll in two stages).
 - Target customer: large service companies, where payroll and accounting teams chase branch and crew managers for the same facts. Same engine, more rules, more people to ask.
+- Today: the owner spends each pay cycle cross-checking Jobber, Gusto and QuickBooks and texting the job manager to fill gaps.
 
 ## 2. Demo company and users
 <!-- The fake company: industry, size, pay schedule. Who uses the app? -->
@@ -36,6 +37,7 @@ Rules:
 - Out: changing Jobber or QuickBooks. Corrections are recorded in the review workbook; people fix the source.
 - Out: tax calculation. Gusto does that.
 - Out: multiple companies, except the stretch goal above.
+- The full cycle is in section 16 and every feature is in section 17.
 
 ## 4. Data sources and syncing
 <!-- Which systems feed payroll, real or mocked, and how each one is pulled (API, browser, file). -->
@@ -75,6 +77,7 @@ Rules:
 - Answers become corrections in the review workbook, never in Jobber, showing before, after and the effect on pay.
 - Unanswered items stay held; only the affected worker or job is held, never the whole payroll.
 - ? Asking workers: the agent asks the job manager, who asks the worker and replies to the agent. Alternative: the agent drafts a message to the worker for the job manager to approve.
+- Later: the agent learns to write better questions from which ones got clear answers.
 
 ## 7. Learning over time
 <!-- How it asks less next run, and who approves what it learns. -->
@@ -86,7 +89,7 @@ Rules:
 - Improve (each cycle): every answer and its reason become a rule; it records who answers which kind of question.
 - Improve: it applies saved rules on the next cycle and shows how many questions it answered on its own.
 - Improve: it spots recurring problems (which jobs often miss expenses) and updates its norms.
-
+- What is shared vs. learned per company is in section 18.
 ## 8. Access, safety and audit
 <!-- What it can and can't touch, who approves what, how its work is recorded, handling personal data. -->
 - Read-only on Jobber and QuickBooks. In Gusto, it fills drafts only and never submits.
@@ -168,3 +171,105 @@ Rules:
 - Which past cycles do we use for the backtest?
 - How should questions to workers flow: through the job manager, or drafted for the job manager to approve?
 - What's the best text message format and approval screen?
+
+## 15. Hyphenate's four pillars
+<!-- Added section: how we meet the four things Hyphenate said matter. -->
+- Self-learning onboarding: learns rates, expense patterns, in-person quotes, typical overhead and who answers what from past cycles; the owner confirms each rule.
+- Autonomous run: runs each pay cycle on a schedule with saved scripts, with no one driving it.
+- Escalation: texts the right person one specific question when unsure or when something is new; holds only the affected worker or job.
+- Self-improvement: every answer and its reason become a rule; it learns recurring issues and who resolves them; the next cycle asks fewer questions.
+
+## 16. The payroll cycle it runs
+<!-- Added section: the end-to-end cycle. -->
+The structure is the shared engine; the company-specific rules inside each step are learned. Each part has its own status; a problem in a later part never reopens earlier wages.
+
+1. Set up: confirm the pay period and any existing Gusto run, split into workweeks, record what each source showed.
+2. Stage 1, wages: read every time entry, match workers to Gusto or the Venmo list, check rates, run the time checks, ask about problems, compute wages and overtime, report wages as a share of revenue. Ready workers go into the regular Gusto draft; workers with open questions are held.
+3. Gate 1: the owner reviews the Stage 1 summary and submits in Gusto.
+4. Financial reconciliation: match customer payments and final payments, match QuickBooks expenses to Jobber, count each cost once, link off-site work (like dump runs) to its parent job, add labor with employer taxes, check overhead. Reported job by job, for example "reconciled: 4 jobs; blocked: 1 job, mulch charge not linked."
+5. Stage 2: quote and marketing commissions, tips by share of hours, the manager split from cycle profit. Fill the off-cycle Gusto draft.
+6. Gate 2: the owner reviews the Stage 2 summary and submits.
+
+## 17. Features
+<!-- Added section: every feature we plan to build. -->
+IDs are for the implementation plan.
+
+Collect data
+- F1 Jobber collector: time entries, jobs, visits, invoices, payments, tips, job expenses and the in-person quoter field for the pay period. A browser agent finds the steps once; a saved script reruns them each cycle.
+- F2 Gusto collector: pay schedule, period dates, existing runs, workers, rates, employer taxes and payroll history, the same way.
+- F3 QuickBooks import: bank and card transactions, expenses and overhead from a spreadsheet export.
+- F4 Completeness check: records pulled vs. the total each site shows; a mismatch blocks the affected stage.
+- F5 Source record: where every number came from (site, page, filters, time read).
+
+Find problems
+- F6 Logic checks (same for every company): duplicate entries, overlapping hours for one worker, open timers, shifts with no job, entries outside the pay period.
+- F7 Norm checks (learned per company): normal shift length (this company flags over 8 hours), typical hours per job type, hours that differ from the schedule.
+- F8 Worker and rate checks: every Jobber worker matched to Gusto or the Venmo list; duplicate or deactivated profiles; Jobber rates vs. Gusto rates.
+- F9 Expense sorting and matching: sort each QuickBooks expense into job cost (materials, equipment, disposal fees) or overhead (subscriptions, insurance, software). Only job costs need a job: match each to a Jobber job expense, flag job costs with no match, catch the same cost counted twice, check shared costs add up. Overhead goes to the cycle's overhead total.
+- F10 Pattern checks from learned rules: a mulch job with no mulch purchase, overhead above the usual amount.
+- F11 Wages vs. revenue: total wages as a share of the period's revenue, shown over time against past cycles.
+- F12 Low profit check: flags a cycle with unusually low profit vs. past cycles and lists likely reasons (jobs not yet paid while their labor is counted, unusually high labor or expenses). The owner decides if it's a concern.
+
+Calculate
+- F13 Wages: pay per worker from verified hours and rates, overtime over 40 hours a week, rounded once at the end.
+- F14 Job profit: invoice minus labor (with employer taxes, across all periods the job ran) minus job expenses.
+- F15 Commissions and tips: quote and marketing commissions, tips split by share of hours.
+- F16 Manager split: cycle profit after wages, expenses, overhead and commissions, split by the company's percentages.
+
+Ask people
+- F17 Question drafting: one short, clear question per problem (worker, date, job, hours or amount), grouped by who should answer.
+- F18 Text messaging: sends approved questions by text and reads replies, including partial or vague answers, which get a follow-up.
+- F19 Answer handling: each answer becomes a correction in the review workbook, never in Jobber, showing before, after and the effect on pay.
+
+Learn (onboarding)
+- F20 Learn from history: proposes the company's rules and norms from past pay cycles, each linked to the cycles that show it, for the owner to confirm, edit or reject.
+- F21 "What did we miss?": asks the owner what its analysis missed.
+- F22 Owner-entered rules: the owner adds a rule in plain words; the agent restates it precisely, labels it "stated by owner, not seen in history," and checks it against past cycles where it can.
+
+Improve (each cycle)
+- F23 Rule memory: saves each answer and its reason as a rule, and records who answers which kind of question.
+- F24 Fewer questions: applies saved rules next cycle and shows how many questions it answered on its own.
+- F25 Business understanding: spots recurring problems and patterns over time and updates its norms.
+
+Prepare payroll
+- F26 Gusto drafts: fills the regular run with verified wages and the off-cycle run with commissions, tips and splits; checks each amount to the cent; never submits.
+- F27 Cycle summary: before each submission: totals, wages vs. revenue over time, cycle profit and any low-profit flag, overtime, held workers and why, the Venmo pay list, anything unusual.
+- F28 Review workbook: a spreadsheet for the period with every ledger tab, including pending items.
+
+Prove it
+- F29 Backtest: runs on past cycles and compares results with what was actually paid and with the known problems.
+- F30 Accuracy report: precision and recall of problems found, and how many learned rules match the owner's real rules.
+
+## 18. Shared engine vs. learned company rules
+<!-- Added section: what is the same for every company and what is learned per company. -->
+For a new company, the engine stays the same and only the learned rules change. That is what makes it work beyond one business.
+
+| | Shared engine (built once) | Learned company rules (per company) |
+|---|---|---|
+| Time | Flag shifts with no job, open shifts, duplicates and overlaps; never trim hours; overtime over 40 hours a week | Which shifts usually run long, typical crew patterns |
+| Expenses | Count each cost once; an expense belongs to the cycle of its job; unknown blocks the item | Which job types need which expenses (mulch jobs need a mulch purchase), recurring fees like the compost drop-off |
+| Pay | Wages from verified hours and rates; hold only the affected worker | Rates by worker, who is paid by Venmo |
+| Commissions and splits | Each item has its own status; never "payroll complete" | 5% for in-person quoters only, tips by share of hours, manager split percentages, overhead per cycle |
+| Escalation | One specific question; record who answered and why | Who answers which kind of question |
+
+For this company, the owner's runbook lists the true rules, so we can measure how many the agent learns correctly from history alone.
+
+## 19. Privacy and the law
+<!-- Added section: research on payroll privacy law and what it means for the product. Research, not legal advice; confirm with an employment lawyer before production. -->
+| Topic | What applies (US, Pennsylvania) | What it means for us |
+|---|---|---|
+| Sharing pay with coworkers | No general federal ban on an employer telling staff what a coworker earns; problems come from contracts, discrimination, or payroll staff leaking without permission | Don't show one worker's pay to others unless their role needs it |
+| Workers discussing their own pay | Protected under the National Labor Relations Act; employers can't forbid it, though they can require payroll staff to keep payroll records confidential | Never build anything that restricts workers from discussing pay |
+| Social Security and bank numbers | Pennsylvania's Supreme Court (Dittman v. UPMC, 2018) requires reasonable care to protect them; a state breach-notice law covers them | Don't collect them at all; Gusto keeps them |
+| Medical information | The ADA requires it be kept separate and limited to those who need it | Never pull leave or medical reasons; only hours |
+
+Product rules:
+- P1 Collect the minimum: hours, jobs, rates, amounts. Never Social Security numbers, bank details, tax forms, medical or leave reasons.
+- P2 Role-based views: the owner sees everything; the job manager sees only the hours and job facts he's asked about, never other workers' rates, pay, commissions or the manager split.
+- P3 Short, need-to-know messages: texts carry the worker, date, job and hours in question, never pay amounts.
+- P4 Model privacy: send the model only what a step needs, with names replaced by IDs where possible; use providers that don't train on or keep the data; the swappable model allows an open-source model for the most sensitive steps.
+- P5 Access log: record who viewed or exported payroll data.
+- P6 Retention: keep records as long as payroll law requires, then delete; the owner can export or delete the company's data and learned rules.
+- P7 Demo data: realistic fake names and job numbers on every screen, in the repo and in the video.
+
+Sources: [Workerplaybook](https://workerplaybook.com/can-my-employer-disclose-my-salary-to-other-employees/), [Paycor](https://www.paycor.com/resource-center/articles/pay-secrecy-policies/), [ResourcefulFinancePro](https://www.resourcefulfinancepro.com/news/confidentiality-policies-what-court-says-about-pay-info/), [National Law Review on Dittman v. UPMC](https://natlawreview.com/article/pennsylvania-supreme-court-holds-employers-have-duty-to-exercise-reasonable-care-to), [Metz Lewis](https://www.metzlewis.com/blog/employment-law-and-data-privacy-how-much-employee-information-can-an-employer-access/), [Ogletree](https://ogletree.com/insights-resources/blog-posts/what-all-employers-need-to-know-about-protecting-employee-health-information/).
