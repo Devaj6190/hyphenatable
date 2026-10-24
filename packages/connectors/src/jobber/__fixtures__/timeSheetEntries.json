@@ -1,0 +1,135 @@
+{
+  "_comment": "Hand-built from the 2026-09-25 introspected schema. Fake ids and data. Two pages keyed by the `after` cursor (null = first page). Period 2026-10-11..2026-10-24, America/Los_Angeles.",
+  "pages": {
+    "null": {
+      "data": {
+        "timeSheetEntries": {
+          "totalCount": 5,
+          "pageInfo": { "hasNextPage": true, "endCursor": "Mw" },
+          "nodes": [
+            {
+              "id": "Z2lkOi8vSm9iYmVyL1RpbWVTaGVldEVudHJ5LzUwMDE=",
+              "user": { "id": "Z2lkOi8vSm9iYmVyL1VzZXIvMTAwMg==" },
+              "job": { "id": "Z2lkOi8vSm9iYmVyL0pvYi8yMDAx" },
+              "targetItem": { "__typename": "Job", "id": "Z2lkOi8vSm9iYmVyL0pvYi8yMDAx" },
+              "startAt": "2026-10-12T08:00:00-07:00",
+              "endAt": "2026-10-12T16:30:00-07:00",
+              "finalDuration": 30600,
+              "ticking": false,
+              "approved": true,
+              "approvedBy": { "id": "Z2lkOi8vSm9iYmVyL1VzZXIvMTAwMQ==" },
+              "payable": true,
+              "label": null,
+              "timeSheetCategory": "GENERAL",
+              "labourRate": 28.5,
+              "note": null,
+              "createdAt": "2026-10-12T23:31:00Z",
+              "updatedAt": "2026-10-13T01:02:00Z"
+            },
+            {
+              "id": "Z2lkOi8vSm9iYmVyL1RpbWVTaGVldEVudHJ5LzUwMDI=",
+              "user": { "id": "Z2lkOi8vSm9iYmVyL1VzZXIvMTAwMg==" },
+              "job": null,
+              "targetItem": { "__typename": "Visit", "id": "Z2lkOi8vSm9iYmVyL1Zpc2l0LzMwMDE=", "job": { "id": "Z2lkOi8vSm9iYmVyL0pvYi8yMDAy" } },
+              "startAt": "2026-10-13T15:00:00Z",
+              "endAt": "2026-10-13T23:15:00Z",
+              "finalDuration": 29700,
+              "ticking": false,
+              "approved": true,
+              "approvedBy": { "id": "Z2lkOi8vSm9iYmVyL1VzZXIvMTAwMQ==" },
+              "payable": true,
+              "label": null,
+              "timeSheetCategory": "GENERAL",
+              "labourRate": 28.5,
+              "note": "fake note text that must never be copied",
+              "createdAt": "2026-10-13T23:16:00Z",
+              "updatedAt": "2026-10-13T23:16:00Z"
+            },
+            {
+              "id": "Z2lkOi8vSm9iYmVyL1RpbWVTaGVldEVudHJ5LzUwMDM=",
+              "user": { "id": "Z2lkOi8vSm9iYmVyL1VzZXIvMTAwMw==" },
+              "job": null,
+              "targetItem": null,
+              "startAt": "2026-10-14T07:30:00-07:00",
+              "endAt": "2026-10-14T09:00:00-07:00",
+              "finalDuration": 5400,
+              "ticking": false,
+              "approved": false,
+              "approvedBy": null,
+              "payable": true,
+              "label": "Shop cleanup",
+              "timeSheetCategory": "CUSTOM",
+              "labourRate": 31.15,
+              "note": "   ",
+              "createdAt": "2026-10-14T16:01:00Z",
+              "updatedAt": "2026-10-14T16:01:00Z"
+            }
+          ]
+        }
+      },
+      "extensions": { "cost": { "requestedQueryCost": 1050, "actualQueryCost": 63, "throttleStatus": { "maximumAvailable": 10000, "currentlyAvailable": 9905, "restoreRate": 500 } } }
+    },
+    "Mw": {
+      "data": {
+        "timeSheetEntries": {
+          "totalCount": 5,
+          "pageInfo": { "hasNextPage": false, "endCursor": "NQ" },
+          "nodes": [
+            {
+              "id": "Z2lkOi8vSm9iYmVyL1RpbWVTaGVldEVudHJ5LzUwMDQ=",
+              "user": { "id": "Z2lkOi8vSm9iYmVyL1VzZXIvMTAwMw==" },
+              "job": { "id": "Z2lkOi8vSm9iYmVyL0pvYi8yMDAy" },
+              "targetItem": { "__typename": "Job", "id": "Z2lkOi8vSm9iYmVyL0pvYi8yMDAy" },
+              "startAt": "2026-10-14T10:00:00-07:00",
+              "endAt": null,
+              "finalDuration": 7200,
+              "ticking": true,
+              "approved": false,
+              "approvedBy": null,
+              "payable": true,
+              "label": null,
+              "timeSheetCategory": "GENERAL",
+              "labourRate": 31.15,
+              "note": null,
+              "createdAt": "2026-10-14T17:00:00Z",
+              "updatedAt": "2026-10-14T17:00:00Z"
+            },
+            {
+              "id": "Z2lkOi8vSm9iYmVyL1RpbWVTaGVldEVudHJ5LzUwMDU=",
+              "user": { "id": "Z2lkOi8vSm9iYmVyL1VzZXIvMTAwNA==" },
+              "job": { "id": "Z2lkOi8vSm9iYmVyL0pvYi8yMDAx" },
+              "targetItem": { "__typename": "Job", "id": "Z2lkOi8vSm9iYmVyL0pvYi8yMDAx" },
+              "startAt": "2026-10-15T08:00:00-07:00",
+              "endAt": "2026-10-15T12:00:00-07:00",
+              "finalDuration": 14400,
+              "ticking": false,
+              "approved": true,
+              "approvedBy": { "id": "Z2lkOi8vSm9iYmVyL1VzZXIvMTAwMQ==" },
+              "payable": true,
+              "label": null,
+              "timeSheetCategory": "GENERAL",
+              "labourRate": 26,
+              "note": null,
+              "createdAt": "2026-10-15T19:00:00Z",
+              "updatedAt": "2026-10-15T19:00:00Z"
+            }
+          ]
+        }
+      },
+      "extensions": { "cost": { "requestedQueryCost": 1050, "actualQueryCost": 42, "throttleStatus": { "maximumAvailable": 10000, "currentlyAvailable": 9880, "restoreRate": 500 } } }
+    }
+  },
+  "byDay": {
+    "Z2lkOi8vSm9iYmVyL1VzZXIvMTAwMQ==": [],
+    "Z2lkOi8vSm9iYmVyL1VzZXIvMTAwMg==": [
+      { "date": "2026-10-12", "totalDuration": 30600, "entries": { "totalCount": 1 } },
+      { "date": "2026-10-13", "totalDuration": 29700, "entries": { "totalCount": 1 } }
+    ],
+    "Z2lkOi8vSm9iYmVyL1VzZXIvMTAwMw==": [
+      { "date": "2026-10-14", "totalDuration": 12600, "entries": { "totalCount": 2 } }
+    ],
+    "Z2lkOi8vSm9iYmVyL1VzZXIvMTAwNA==": [
+      { "date": "2026-10-15", "totalDuration": 14400, "entries": { "totalCount": 1 } }
+    ]
+  }
+}

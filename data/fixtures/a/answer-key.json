@@ -1,0 +1,541 @@
+[
+  {
+    "id": "a-ak-01",
+    "checkId": "CHK-01",
+    "subject": {
+      "workerId": "a-w05",
+      "jobId": null,
+      "entryIds": [
+        "a-te-0121"
+      ],
+      "expenseIds": []
+    },
+    "truth": "entry a-te-0121 was on job a-j03 (hedge cleanup); the job was not picked on the timer",
+    "correctAnswer": {
+      "kind": "change",
+      "values": {
+        "jobId": "a-j03"
+      }
+    },
+    "registerCategory": "hours with no job"
+  },
+  {
+    "id": "a-ak-02",
+    "checkId": "CHK-02",
+    "subject": {
+      "workerId": "a-w05",
+      "jobId": "a-j02",
+      "entryIds": [
+        "a-te-0140"
+      ],
+      "expenseIds": []
+    },
+    "truth": "a-w05 forgot to clock out; entry a-te-0140 ended at 17:00 local (4 h)",
+    "correctAnswer": {
+      "kind": "change",
+      "values": {
+        "endAt": "2026-10-24T00:00:00.000Z",
+        "durationSec": 14400
+      }
+    },
+    "registerCategory": "long or open shifts"
+  },
+  {
+    "id": "a-ak-03",
+    "checkId": "CHK-03",
+    "subject": {
+      "workerId": "a-w07",
+      "jobId": "a-j05",
+      "entryIds": [
+        "a-te-0130"
+      ],
+      "expenseIds": []
+    },
+    "truth": "the 13 h shift a-te-0130 on a-j05 is real (irrigation install day); pay it as logged",
+    "correctAnswer": {
+      "kind": "confirm",
+      "values": {}
+    },
+    "registerCategory": "long or open shifts"
+  },
+  {
+    "id": "a-ak-04",
+    "checkId": "CHK-04",
+    "subject": {
+      "workerId": "a-w03",
+      "jobId": null,
+      "entryIds": [
+        "a-te-0111",
+        "a-te-0113"
+      ],
+      "expenseIds": []
+    },
+    "truth": "entry a-te-0113 belongs to job a-j04 (site prep), not a-j02; a-w03 left a-j02 at 12:00 local, so a-te-0111 ends at 12:00",
+    "correctAnswer": {
+      "kind": "change",
+      "values": {
+        "a-te-0113.jobId": "a-j04",
+        "a-te-0111.endAt": "2026-10-14T19:00:00.000Z"
+      }
+    },
+    "registerCategory": "overlapping hours"
+  },
+  {
+    "id": "a-ak-05",
+    "checkId": "CHK-05",
+    "subject": {
+      "workerId": "a-w04",
+      "jobId": null,
+      "entryIds": [
+        "a-te-0137"
+      ],
+      "expenseIds": []
+    },
+    "truth": "entry a-te-0137 is an accidental clock-in with no time worked; no hours owed",
+    "correctAnswer": {
+      "kind": "confirm",
+      "values": {}
+    },
+    "registerCategory": "zero-minute entries"
+  },
+  {
+    "id": "a-ak-06",
+    "checkId": "CHK-10",
+    "subject": {
+      "workerId": "a-w02",
+      "jobId": null,
+      "entryIds": [],
+      "expenseIds": []
+    },
+    "truth": "a-w02 has been at $26.00/h since a-c04 (Gusto paid it in a-c04, Jobber has it); the Gusto compensation effective 2026-10-11 wrongly reverts to $25.00",
+    "correctAnswer": {
+      "kind": "change",
+      "values": {
+        "gusto.rateCents": 2600
+      }
+    },
+    "registerCategory": "stale rates"
+  },
+  {
+    "id": "a-ak-07",
+    "checkId": "CHK-11",
+    "subject": {
+      "workerId": "a-w10",
+      "jobId": null,
+      "entryIds": [],
+      "expenseIds": []
+    },
+    "truth": "a-w10 is new this cycle and is paid $22.00/h by Venmo (owner's answer; never assumed)",
+    "correctAnswer": {
+      "kind": "change",
+      "values": {
+        "venmoRateCents": 2200
+      }
+    },
+    "registerCategory": "missing Venmo rates"
+  },
+  {
+    "id": "a-ak-08",
+    "checkId": "CHK-14",
+    "subject": {
+      "workerId": null,
+      "jobId": null,
+      "entryIds": [],
+      "expenseIds": [
+        "a-ex-0003"
+      ]
+    },
+    "truth": "purchase a-ex-0003 (PVC fittings, $214.37) was for job a-j05 (irrigation install)",
+    "correctAnswer": {
+      "kind": "change",
+      "values": {
+        "matchedJobId": "a-j05"
+      }
+    },
+    "registerCategory": "unmatched material purchases"
+  },
+  {
+    "id": "a-ak-09",
+    "checkId": "CHK-05",
+    "subject": {
+      "workerId": "a-w02",
+      "jobId": null,
+      "entryIds": [
+        "a-te-0106",
+        "a-te-0146"
+      ],
+      "expenseIds": []
+    },
+    "truth": "entry a-te-0146 is an exact duplicate of a-te-0106; a-w02 worked that shift once",
+    "correctAnswer": {
+      "kind": "change",
+      "values": {
+        "keep": "a-te-0106",
+        "drop": "a-te-0146"
+      }
+    },
+    "registerCategory": "costs counted twice"
+  },
+  {
+    "id": "a-ak-10",
+    "checkId": "CHK-06",
+    "subject": {
+      "workerId": "a-w01",
+      "jobId": null,
+      "entryIds": [
+        "a-te-0183"
+      ],
+      "expenseIds": []
+    },
+    "truth": "entry a-te-0183 is correct; it was approved after cutoff",
+    "correctAnswer": {
+      "kind": "confirm",
+      "values": {}
+    },
+    "registerCategory": "unapproved hours"
+  },
+  {
+    "id": "a-ak-11",
+    "checkId": "CHK-06",
+    "subject": {
+      "workerId": "a-w03",
+      "jobId": null,
+      "entryIds": [
+        "a-te-0184"
+      ],
+      "expenseIds": []
+    },
+    "truth": "entry a-te-0184 is correct; it was approved after cutoff",
+    "correctAnswer": {
+      "kind": "confirm",
+      "values": {}
+    },
+    "registerCategory": "unapproved hours"
+  },
+  {
+    "id": "a-ak-12",
+    "checkId": "CHK-06",
+    "subject": {
+      "workerId": "a-w04",
+      "jobId": null,
+      "entryIds": [
+        "a-te-0185"
+      ],
+      "expenseIds": []
+    },
+    "truth": "entry a-te-0185 is correct; it was approved after cutoff",
+    "correctAnswer": {
+      "kind": "confirm",
+      "values": {}
+    },
+    "registerCategory": "unapproved hours"
+  },
+  {
+    "id": "a-ak-13",
+    "checkId": "CHK-06",
+    "subject": {
+      "workerId": "a-w05",
+      "jobId": null,
+      "entryIds": [
+        "a-te-0140"
+      ],
+      "expenseIds": []
+    },
+    "truth": "entry a-te-0140 is unapproved because its timer is still running (see CHK-02)",
+    "correctAnswer": {
+      "kind": "change",
+      "values": {
+        "endAt": "2026-10-24T00:00:00.000Z",
+        "durationSec": 14400
+      }
+    },
+    "registerCategory": "long or open shifts"
+  },
+  {
+    "id": "a-ak-14",
+    "checkId": "CHK-07",
+    "subject": {
+      "workerId": "a-w06",
+      "jobId": null,
+      "entryIds": [],
+      "expenseIds": []
+    },
+    "truth": "a-w06 was not scheduled this cycle; no hours are owed and the worker stays active",
+    "correctAnswer": {
+      "kind": "confirm",
+      "values": {}
+    },
+    "registerCategory": "missing hours"
+  },
+  {
+    "id": "a-ak-15",
+    "checkId": "CHK-08",
+    "subject": {
+      "workerId": "a-w13",
+      "jobId": null,
+      "entryIds": [
+        "a-te-0144",
+        "a-te-0151"
+      ],
+      "expenseIds": []
+    },
+    "truth": "a-w13 worked these two days before leaving; pay them, then deactivate a-w13 in Gusto too",
+    "correctAnswer": {
+      "kind": "confirm",
+      "values": {}
+    },
+    "registerCategory": "inactive worker with hours"
+  },
+  {
+    "id": "a-ak-16",
+    "checkId": "CHK-09",
+    "subject": {
+      "workerId": "a-w14",
+      "jobId": null,
+      "entryIds": [],
+      "expenseIds": []
+    },
+    "truth": "a-w14 is a new hire who has not finished Gusto onboarding; hold a-w14's pay until onboarding is complete",
+    "correctAnswer": {
+      "kind": "escalate",
+      "values": {}
+    },
+    "registerCategory": "worker not onboarded"
+  },
+  {
+    "id": "a-ak-17",
+    "checkId": "CHK-12",
+    "subject": {
+      "workerId": "a-w08",
+      "jobId": null,
+      "entryIds": [],
+      "expenseIds": []
+    },
+    "truth": "a-w08 is outside the Jobber-to-Gusto sync (salaried or Venmo); listed on the workbook, not an error",
+    "correctAnswer": {
+      "kind": "confirm",
+      "values": {}
+    },
+    "registerCategory": "outside the sync (salaried, contractor)"
+  },
+  {
+    "id": "a-ak-18",
+    "checkId": "CHK-12",
+    "subject": {
+      "workerId": "a-w09",
+      "jobId": null,
+      "entryIds": [],
+      "expenseIds": []
+    },
+    "truth": "a-w09 is outside the Jobber-to-Gusto sync (salaried or Venmo); listed on the workbook, not an error",
+    "correctAnswer": {
+      "kind": "confirm",
+      "values": {}
+    },
+    "registerCategory": "outside the sync (salaried, contractor)"
+  },
+  {
+    "id": "a-ak-19",
+    "checkId": "CHK-12",
+    "subject": {
+      "workerId": "a-w10",
+      "jobId": null,
+      "entryIds": [],
+      "expenseIds": []
+    },
+    "truth": "a-w10 is outside the Jobber-to-Gusto sync (salaried or Venmo); listed on the workbook, not an error",
+    "correctAnswer": {
+      "kind": "confirm",
+      "values": {}
+    },
+    "registerCategory": "outside the sync (salaried, contractor)"
+  },
+  {
+    "id": "a-ak-20",
+    "checkId": "CHK-13",
+    "subject": {
+      "workerId": null,
+      "jobId": "a-j07",
+      "entryIds": [
+        "a-te-0126",
+        "a-te-0170"
+      ],
+      "expenseIds": []
+    },
+    "truth": "a-w02 and a-w03 did the a-j07 visit on 2026-10-20 but logged the day to a-j04 (a-te-0126, a-te-0170)",
+    "correctAnswer": {
+      "kind": "change",
+      "values": {
+        "a-te-0126.jobId": "a-j07",
+        "a-te-0170.jobId": "a-j07"
+      }
+    },
+    "registerCategory": "hours with no job"
+  },
+  {
+    "id": "a-ak-21",
+    "checkId": "CHK-15",
+    "subject": {
+      "workerId": null,
+      "jobId": "a-j05",
+      "entryIds": [],
+      "expenseIds": [
+        "a-ex-0003",
+        "a-ex-0009"
+      ]
+    },
+    "truth": "a-ex-0009 (Jobber) and a-ex-0003 (QuickBooks) are the same $214.37 purchase; count it once, on a-j05",
+    "correctAnswer": {
+      "kind": "change",
+      "values": {
+        "keep": "a-ex-0003",
+        "drop": "a-ex-0009",
+        "a-ex-0003.matchedJobId": "a-j05"
+      }
+    },
+    "registerCategory": "costs counted twice"
+  },
+  {
+    "id": "a-ak-22",
+    "checkId": "CHK-16",
+    "subject": {
+      "workerId": null,
+      "jobId": "a-j08",
+      "entryIds": [],
+      "expenseIds": [
+        "a-ex-0010"
+      ]
+    },
+    "truth": "a-j08 (disposal run, Foxglove Ct) belongs to a-j04 (retaining wall, Foxglove Ct); its dump fee is a-j04's cost",
+    "correctAnswer": {
+      "kind": "change",
+      "values": {
+        "a-j08.parentJobId": "a-j04"
+      }
+    },
+    "registerCategory": "disposal not linked to its parent job"
+  },
+  {
+    "id": "a-ak-23",
+    "checkId": "CHK-17",
+    "subject": {
+      "workerId": null,
+      "jobId": null,
+      "entryIds": [],
+      "expenseIds": [
+        "a-ex-0011"
+      ]
+    },
+    "truth": "Fuel is overhead unless the receipt names a job (owner policy)",
+    "correctAnswer": {
+      "kind": "change",
+      "values": {
+        "kind": "overhead"
+      }
+    },
+    "registerCategory": "expense category unknown"
+  },
+  {
+    "id": "a-ak-24",
+    "checkId": "CHK-18",
+    "subject": {
+      "workerId": "a-w08",
+      "jobId": null,
+      "entryIds": [],
+      "expenseIds": []
+    },
+    "truth": "Jobber still costs a-w08 at $30.00/h; since the a-c04 raise to $67,600/yr the cost is $32.50/h, so job profit is overstated",
+    "correctAnswer": {
+      "kind": "change",
+      "values": {
+        "jobber.labourRateCents": 3250
+      }
+    },
+    "registerCategory": "stale rates inflating job profit"
+  },
+  {
+    "id": "a-ak-25",
+    "checkId": "CHK-19",
+    "subject": {
+      "workerId": null,
+      "jobId": "a-j09",
+      "entryIds": [],
+      "expenseIds": []
+    },
+    "truth": "a-pay03 ($1,200.00) is the deposit taken on quote a-q04, not the final payment; $2,800.00 is still owed on a-in04",
+    "correctAnswer": {
+      "kind": "change",
+      "values": {
+        "a-pay03.kind": "deposit",
+        "a-in04.status": "awaiting_payment"
+      }
+    },
+    "registerCategory": "a deposit mistaken for a final payment"
+  },
+  {
+    "id": "a-ak-26",
+    "checkId": "CHK-20",
+    "subject": {
+      "workerId": "a-w12",
+      "jobId": "a-j10",
+      "entryIds": [],
+      "expenseIds": []
+    },
+    "truth": "a-w05 quoted a-j10 (landscape lighting) in person; the quote's salesperson should be a-w05, who earns the commission",
+    "correctAnswer": {
+      "kind": "change",
+      "values": {
+        "a-q05.salespersonWorkerId": "a-w05"
+      }
+    },
+    "registerCategory": "wrong in-person quoter"
+  },
+  {
+    "id": "a-ak-27",
+    "checkId": "CHK-21",
+    "subject": {
+      "workerId": null,
+      "jobId": "a-j05",
+      "entryIds": [],
+      "expenseIds": []
+    },
+    "truth": "a-j05's margin is about 8% before the unmatched fittings purchase; the job was underpriced (owner confirms)",
+    "correctAnswer": {
+      "kind": "confirm",
+      "values": {}
+    },
+    "registerCategory": "low job profit"
+  },
+  {
+    "id": "a-ak-28",
+    "checkId": "CHK-22",
+    "subject": {
+      "workerId": "a-w04",
+      "jobId": null,
+      "entryIds": [],
+      "expenseIds": []
+    },
+    "truth": "a-w04 picked up a-w06's shifts this cycle (10 h days, overtime in week 1); the higher gross is right",
+    "correctAnswer": {
+      "kind": "confirm",
+      "values": {}
+    },
+    "registerCategory": "gross change over 25%"
+  },
+  {
+    "id": "a-ak-29",
+    "checkId": "CHK-22",
+    "subject": {
+      "workerId": "a-w06",
+      "jobId": null,
+      "entryIds": [],
+      "expenseIds": []
+    },
+    "truth": "a-w06 has no hours this cycle (see CHK-07); a zero gross is right",
+    "correctAnswer": {
+      "kind": "confirm",
+      "values": {}
+    },
+    "registerCategory": "gross change over 25%"
+  }
+]
