@@ -81,7 +81,7 @@ bun run seed/push-qbo.ts --company a --live --reseed   # deletes OUR Purchases/B
 
 - **Host:** `sandbox-quickbooks.api.intuit.com` only. Every URL is built in one function that refuses any other host.
 - **What is created:**
-  - Accounts and vendors are looked up by name and created only if missing.
+  - Accounts and vendors are **ours only**: named with the suffix ` (payrollpilot)` (e.g. `Equipment Rental (payrollpilot)`, AccountType Expense, `Description: payrollpilot:account`; vendors with `Notes: payrollpilot:vendor`), looked up by FullyQualifiedName (vendors by DisplayName) among Active records, created if absent. The sandbox sample chart is never adopted or modified, and a bare name is never used for lookup. A mapping left by an older run that points at a non-suffixed record is dropped (printed as DROPPED) and ours is ensured instead. The read connector strips the suffix to recover the fixture names.
   - One parent customer per client, and one sub-customer per job (`Job: true`, `DisplayName` = job number, marker in `Notes`). A name match without our marker is refused, never adopted.
   - One Purchase per QuickBooks expense (CreditCard, from the "Company A Card (payrollpilot)" account), with the expense account on the line and `CustomerRef` only when the fixture is job-tagged. a-ex-0003 (CHK-14) has none.
   - Bills for two vendor invoices: the first two past-cycle Equipment Rental expenses. The current cycle's Purchase count therefore equals the fixtures (6).
