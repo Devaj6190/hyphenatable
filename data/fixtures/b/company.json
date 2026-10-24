@@ -1,0 +1,13 @@
+{
+  "id": "b",
+  "name": "Company B (synthetic HVAC company)",
+  "kind": "synthetic",
+  "payFrequency": "weekly",
+  "timezone": "America/Los_Angeles",
+  "settings": {
+    "longShiftHours": 12,
+    "otWeeklyHours": 40,
+    "grossChangePct": 25,
+    "employeesMayBeTexted": false
+  }
+}

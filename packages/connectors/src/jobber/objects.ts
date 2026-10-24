@@ -47,17 +47,17 @@ export const VISITS_QUERY = conn(
 export const QUOTES_QUERY = conn(
   "quotes",
   range("sentAt"),
-  `id quoteStatus salesperson { id } sentAt amounts { total } ${nestedIds("jobs")}`,
+  `id quoteStatus salesperson { id } sentAt amounts { total } jobberWebUri ${nestedIds("jobs")}`,
 );
 export const INVOICES_QUERY = conn(
   "invoices",
   range("issuedDate"),
-  `id invoiceStatus issuedDate dueDate amounts { total } ${nestedIds("jobs")}`,
+  `id invoiceStatus issuedDate dueDate amounts { total } jobberWebUri ${nestedIds("jobs")}`,
 );
 export const PAYMENT_RECORDS_QUERY = conn(
   "paymentRecords",
   range("entryDate"),
-  "id amount entryDate paymentType invoice { id } quote { id }",
+  "__typename id amount entryDate paymentType adjustmentType paymentOrigin invoice { id } quote { id }",
 );
 // Expense.accountingCode is hidden from an app without the matching scope (seen live 2026-10-24); requested only when visible.
 export const expensesQuery = (withAccountingCode: boolean) =>
@@ -82,7 +82,9 @@ export type ReimbursementStatus = "PENDING_REIMBURSEMENT" | "PAID";
 export const JOBS_BY_ID_QUERY = conn(
   "jobs",
   "{ ids: $ids }",
-  "id jobNumber title jobStatus client { id } salesperson { id } quote { id } startAt endAt total",
+  // the job's quote inline: quotes converted to jobs are often never "sent" (sentAt null), so a sentAt
+  // filter alone misses them; every in-scope job brings its quote
+  "id jobNumber title jobStatus client { id } salesperson { id } quote { id quoteStatus salesperson { id } sentAt amounts { total } jobberWebUri } startAt endAt total jobberWebUri",
   "$after: String, $first: Int!, $ids: [EncodedId!]!",
 );
 
@@ -97,6 +99,8 @@ export interface RawVisit {
   assignedUsers: Nested;
 }
 export interface RawQuote {
+  /** Jobber web link to the record (traceability: Flag.where[].url) */
+  jobberWebUri?: string | null;
   id: string;
   quoteStatus: string;
   salesperson: Id;
@@ -105,6 +109,7 @@ export interface RawQuote {
   jobs: Nested;
 }
 export interface RawInvoice {
+  jobberWebUri?: string | null;
   id: string;
   invoiceStatus: string;
   issuedDate: string | null;
@@ -117,6 +122,9 @@ export interface RawPayment {
   amount: number;
   entryDate: string;
   paymentType: string | null;
+  __typename?: string;
+  adjustmentType?: string | null;
+  paymentOrigin?: string | null;
   invoice: Id;
   quote: Id;
 }
@@ -131,13 +139,14 @@ export interface RawExpense {
   reimbursableTo: Id;
 }
 export interface RawJob {
+  jobberWebUri?: string | null;
   id: string;
   jobNumber: number;
   title: string | null;
   jobStatus: string;
   client: { id: string };
   salesperson: Id;
-  quote: Id;
+  quote: (Omit<RawQuote, "jobs"> & { jobs?: Nested }) | null;
   startAt: string | null;
   endAt: string | null;
   total: number;
@@ -185,9 +194,28 @@ export const normalizeInvoice = (
 });
 
 /** A payment recorded on a quote is a deposit (even once the quote is invoiced); on an invoice only, final. */
+/** paymentType given to Jobber's own invoice records (see isJobberInvoiceAdjustment). */
+export const JOBBER_INVOICE_ADJUSTMENT = "jobber_invoice_adjustment";
+
+/**
+ * Jobber creates an OtherPaymentRecord itself when an invoice is created or marked (seen live 2026-10-24:
+ * adjustmentType INVOICE, paymentOrigin UNKNOWN_ORIGIN, no payment type, amount = the invoice total, dated
+ * the issue date). That is not money a customer paid, so it must never read as a final payment.
+ */
+export const isJobberInvoiceAdjustment = (
+  r: Pick<RawPayment, "__typename" | "adjustmentType" | "paymentOrigin">,
+): boolean =>
+  r.__typename === "OtherPaymentRecord" &&
+  r.adjustmentType === "INVOICE" &&
+  r.paymentOrigin === "UNKNOWN_ORIGIN";
+
 export function paymentKind(
-  r: Pick<RawPayment, "invoice" | "quote">,
+  r: Pick<
+    RawPayment,
+    "invoice" | "quote" | "__typename" | "adjustmentType" | "paymentOrigin"
+  >,
 ): Payment["kind"] {
+  if (isJobberInvoiceAdjustment(r)) return "unknown";
   if (r.quote?.id) return "deposit";
   if (r.invoice?.id) return "final";
   return "unknown";
@@ -204,7 +232,10 @@ export const normalizePayment = (
   quoteId: ref(r.quote),
   entryDate: toUtcIso(r.entryDate),
   amountCents: toCents(r.amount),
-  paymentType: r.paymentType,
+  // kept, counted and traceable (sourceId), but flagged so CHK-19 and Stage 2 never take it as a final
+  paymentType: isJobberInvoiceAdjustment(r)
+    ? JOBBER_INVOICE_ADJUSTMENT
+    : r.paymentType,
   kind: paymentKind(r),
 });
 
@@ -283,6 +314,8 @@ export interface ObjectRecords {
   invoices: Invoice[];
   payments: Payment[];
   expenses: Expense[];
+  /** Jobber web links by Jobber id (jobs, quotes, invoices): where a person checks the record */
+  webUris?: Record<string, string>;
 }
 export type ObjectRun = {
   object: string;
@@ -450,11 +483,49 @@ export async function pullObjects(
     runs.push({ object: "jobs", method, startedAt, result: failed(e) });
   }
 
+  // Quotes of in-scope jobs (converted quotes are rarely "sent"): added beside the sentAt-range quotes,
+  // with the job as jobId. Complete by construction: each comes from a job that was fetched.
+  const quoteRecords = quotes.map((r) => normalizeQuote(r, companyId));
+  const seenQuotes = new Set(quotes.map((q) => q.id));
+  let viaJobs = 0;
+  for (const j of jobs) {
+    if (!j.quote || seenQuotes.has(j.quote.id)) continue;
+    seenQuotes.add(j.quote.id);
+    viaJobs++;
+    quoteRecords.push({
+      ...normalizeQuote({ ...j.quote, jobs: null }, companyId),
+      jobId: jobberRef(j.id),
+    });
+  }
+  const quoteRun = runs.find((r) => r.object === "quotes");
+  if (quoteRun && viaJobs) {
+    quoteRun.method += ` + quotes of ${viaJobs} in-scope job(s)`;
+    quoteRun.result = {
+      ...quoteRun.result,
+      pulled: quoteRun.result.pulled + viaJobs,
+      expected:
+        quoteRun.result.expected === null
+          ? null
+          : quoteRun.result.expected + viaJobs,
+    };
+  }
+
+  const webUris: Record<string, string> = {};
+  for (const r of [
+    ...jobs,
+    ...quotes,
+    ...invoices,
+    ...jobs.map((j) => j.quote),
+  ]) {
+    if (r?.jobberWebUri) webUris[r.id] = r.jobberWebUri;
+  }
+
   return {
     records: {
+      webUris,
       jobs: jobs.map((r) => normalizeJob(r, companyId)),
       visits: visits.map((r) => normalizeVisit(r, companyId)),
-      quotes: quotes.map((r) => normalizeQuote(r, companyId)),
+      quotes: quoteRecords,
       invoices: invoices.map((r) => normalizeInvoice(r, companyId)),
       payments: payments.map((r) => normalizePayment(r, companyId)),
       expenses: expenses.map((r) =>

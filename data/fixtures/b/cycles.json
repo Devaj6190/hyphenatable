@@ -1,0 +1,62 @@
+[
+  {
+    "id": "b-c01",
+    "companyId": "b",
+    "number": 1,
+    "periodStart": "2026-09-20T07:00:00.000Z",
+    "periodEnd": "2026-09-27T06:59:59.999Z",
+    "cutoffAt": "2026-09-28T17:00:00.000Z",
+    "stage": "closed",
+    "gustoPayrollId": null,
+    "gustoOffCyclePayrollId": null,
+    "questionsAsked": 1
+  },
+  {
+    "id": "b-c02",
+    "companyId": "b",
+    "number": 2,
+    "periodStart": "2026-09-27T07:00:00.000Z",
+    "periodEnd": "2026-10-04T06:59:59.999Z",
+    "cutoffAt": "2026-10-05T17:00:00.000Z",
+    "stage": "closed",
+    "gustoPayrollId": null,
+    "gustoOffCyclePayrollId": null,
+    "questionsAsked": 1
+  },
+  {
+    "id": "b-c03",
+    "companyId": "b",
+    "number": 3,
+    "periodStart": "2026-10-04T07:00:00.000Z",
+    "periodEnd": "2026-10-11T06:59:59.999Z",
+    "cutoffAt": "2026-10-12T17:00:00.000Z",
+    "stage": "closed",
+    "gustoPayrollId": null,
+    "gustoOffCyclePayrollId": null,
+    "questionsAsked": 1
+  },
+  {
+    "id": "b-c04",
+    "companyId": "b",
+    "number": 4,
+    "periodStart": "2026-10-11T07:00:00.000Z",
+    "periodEnd": "2026-10-18T06:59:59.999Z",
+    "cutoffAt": "2026-10-19T17:00:00.000Z",
+    "stage": "closed",
+    "gustoPayrollId": null,
+    "gustoOffCyclePayrollId": null,
+    "questionsAsked": 1
+  },
+  {
+    "id": "b-c05",
+    "companyId": "b",
+    "number": 5,
+    "periodStart": "2026-10-18T07:00:00.000Z",
+    "periodEnd": "2026-10-25T06:59:59.999Z",
+    "cutoffAt": "2026-10-26T17:00:00.000Z",
+    "stage": "setup",
+    "gustoPayrollId": null,
+    "gustoOffCyclePayrollId": null,
+    "questionsAsked": 0
+  }
+]

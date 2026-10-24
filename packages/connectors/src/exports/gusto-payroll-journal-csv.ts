@@ -79,6 +79,12 @@ export interface PayrollJournalRow {
   /** Gusto earning name (same names as Draft lines) -> cents, only for columns present and non-empty. */
   earningsCents: Record<string, number>;
   hours: Record<string, number>;
+  /** sectioned Payroll Journal: which payroll this row belongs to (titles are never kept: free text) */
+  sectionKind?: "regular" | "off_cycle" | "other";
+  section?: number;
+  employeeType?: string | null;
+  /** per pay-type rate in cents, when the report gives one */
+  ratesCents?: Record<string, number>;
 }
 
 const optDate = (c: Cell | undefined) =>

@@ -164,6 +164,9 @@ export type GqlResult = {
   errors: { message: string; extensions?: { code?: string } }[];
 };
 
+/** True for a GraphQL document whose operation is a mutation. */
+export const isMutation = (doc: string) => /^\s*mutation\b/.test(doc);
+
 export class SeedClient {
   private tokens: Tokens;
   constructor(
@@ -172,8 +175,9 @@ export class SeedClient {
     private sleep: (ms: number) => Promise<void> = (ms) =>
       new Promise((r) => setTimeout(r, ms)),
     private log: (s: string) => void = console.log,
+    initial?: Tokens,
   ) {
-    const t = readJsonOrNull<Tokens>(SEED_TOKEN_PATH);
+    const t = initial ?? readJsonOrNull<Tokens>(SEED_TOKEN_PATH);
     if (!t)
       throw new Error(
         `no seed token at ${SEED_TOKEN_PATH}; run \`bun run seed/push-jobber.ts auth-url\` then \`auth-code <code>\``,
@@ -224,15 +228,32 @@ export class SeedClient {
         this.tokens.accessTokenExpiresAt - 60_000 < Date.now()
       )
         await this.refresh();
-      const res = await this.fetchImpl(JOBBER_GRAPHQL_URL, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${this.tokens.accessToken}`,
-          "X-JOBBER-GRAPHQL-VERSION": JOBBER_GRAPHQL_VERSION,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ query, variables }),
-      });
+      let res: Response;
+      try {
+        res = await this.fetchImpl(JOBBER_GRAPHQL_URL, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${this.tokens.accessToken}`,
+            "X-JOBBER-GRAPHQL-VERSION": JOBBER_GRAPHQL_VERSION,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ query, variables }),
+        });
+      } catch (e) {
+        // A dropped connection (e.g. ECONNRESET). Reads are safe to retry. A mutation may or may not have
+        // been applied, so it is never retried blindly: the rerun's marker discovery finds it if it exists.
+        if (isMutation(query)) {
+          throw new Error(
+            `network error during a mutation (${(e as Error).message}); it may have been applied. Re-run: marker discovery picks it up if so.`,
+          );
+        }
+        if (attempt === 6) throw e;
+        this.log(
+          `  (network error on a read, retrying: ${(e as Error).message})`,
+        );
+        await this.sleep(2000 * attempt);
+        continue;
+      }
       if (res.status === 401 && attempt === 1) {
         this.tokens.accessToken = null;
         continue;

@@ -6,21 +6,35 @@
 // Past cycles follow the company's rules and stay clean; the current cycle gets the planted errors from
 // seed/lib/plant.ts. Never invents a rate the config does not give; unknowns stay null.
 
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { type ConfigB, generateB } from "./lib/company-b";
+import { type CycleExtConfig, generateCycleA06 } from "./lib/cycle-a06";
 import { must } from "./lib/must";
-import { JOBBER_EXPENSE_TITLES, STREETS, VENDORS, WORK } from "./lib/names";
+import {
+  JOBBER_EXPENSE_TITLES,
+  STREETS,
+  STREETS_OVERFLOW,
+  VENDORS,
+  WORK,
+} from "./lib/names";
 import { buildAnswerKey, plantCurrent } from "./lib/plant";
 import { rng } from "./lib/random";
 import {
   addDays,
   DAY_MS,
-  local,
+  fridayOnOrBefore,
+  localDateOf,
+  local as localIn,
   seconds,
   shortDate,
   weekday,
   workdays,
 } from "./lib/time";
+
+/** The company's zone, set by generate() from cfg.company.timezone before anything is built. */
+let TZ = "America/Los_Angeles";
+const local = (date: string, hhmm: string) => localIn(date, hhmm, TZ);
 
 // ---------------------------------------------------------------- types
 
@@ -247,7 +261,7 @@ function buildCycles(cfg: Config): Rec[] {
     periodEnd: new Date(
       Date.parse(local(addDays(c.end, 1), "00:00")) - 1,
     ).toISOString(),
-    cutoffAt: local(addDays(c.end, -1), "18:00"), // Friday 18:00 local
+    cutoffAt: local(fridayOnOrBefore(c.end), "18:00"), // Friday 18:00 local
     stage: c.current ? "setup" : "closed",
     gustoPayrollId: c.current ? (cfg.current.gustoPayrollId ?? null) : null,
     gustoOffCyclePayrollId: null,
@@ -368,8 +382,13 @@ function buildPast(ctx: Ctx, wcfg: Map<string, WorkerCfg>) {
     (s) => !cfg.current.jobs.some((j) => j.title.endsWith(s)),
   );
   const streetOrder = rng(`${cfg.seed}:streets`);
+  // When the shuffled pool runs out, take the overflow streets in order. The overflow used to be missing,
+  // which made 5 a-c04 titles end in "undefined"; the order of the first 16 streets is unchanged.
+  const overflow = [...STREETS_OVERFLOW];
   const takeStreet = () =>
-    streetPool.splice(streetOrder.int(0, streetPool.length - 1), 1)[0];
+    streetPool.length
+      ? streetPool.splice(streetOrder.int(0, streetPool.length - 1), 1)[0]
+      : must(overflow.shift(), "a street (extend STREETS_OVERFLOW)");
   const jobberRate = (w: string, c: string) =>
     rateAt(must(wcfg.get(w), `worker ${w}`).jobberRates, c) ??
     must(wcfg.get(w), `worker ${w}`).jobberRate ??
@@ -755,11 +774,7 @@ function weeklySplit(
 ): { regular: number; overtime: number } {
   const weeks = new Map<number, number>();
   for (const e of entries) {
-    const localDate = new Date(
-      Date.parse(e.startAt as string) - 7 * 3600 * 1000,
-    )
-      .toISOString()
-      .slice(0, 10);
+    const localDate = localDateOf(e.startAt as string, TZ);
     const wk = Math.floor(
       (Date.parse(`${localDate}T12:00:00Z`) -
         Date.parse(`${periodStartDate}T12:00:00Z`)) /
@@ -1164,7 +1179,7 @@ function buildSyncRuns(ctx: Ctx) {
   // CHK-23 fixture: the a-c04 time-entry pull missed one entry and was never re-run
   const c04 = must(ctx.cfg.cycles.find((c) => c.id === "a-c04"));
   const n4 = count(ctx.entries, (e) => e.cycleId === "a-c04");
-  const c04end = addDays(c04.end, -1);
+  const c04end = fridayOnOrBefore(c04.end);
   run(
     "a-sr-04",
     "a-c04",
@@ -1190,7 +1205,7 @@ function buildSyncRuns(ctx: Ctx) {
     (x) => !x.current && x.id !== "a-c04",
   )) {
     const n = count(ctx.entries, (e) => e.cycleId === c.id);
-    const end = addDays(c.end, -1);
+    const end = fridayOnOrBefore(c.end);
     run(
       `a-sr-${pad(6 + c.number, 2)}`,
       c.id,
@@ -1279,6 +1294,7 @@ function buildRules(ctx: Ctx): Rec[] {
 // ---------------------------------------------------------------- main
 
 export function generate(cfg: Config): Record<string, unknown> {
+  TZ = cfg.company.timezone;
   const C = cfg.company.id;
   const curCycle = must(cfg.cycles.find((c) => c.current));
   const ctx: Ctx = {
@@ -1346,6 +1362,39 @@ export function generate(cfg: Config): Record<string, unknown> {
   };
 }
 
+/** Company A (and anything without `generator`) uses generate(); Company B's HVAC model is seed/lib/company-b.ts. */
+export function generateAny(cfg: Config | ConfigB): Record<string, unknown> {
+  return (cfg as ConfigB).generator === "hvac-weekly"
+    ? generateB(cfg as ConfigB)
+    : generate(cfg as Config);
+}
+
+/**
+ * Cycle extensions (seed/companies/<company>-cNN.json, e.g. a-c06): extra cycles generated on top of the base
+ * output and written to data/fixtures/<company>/cycles/<cycle>/, so the base files stay byte-identical.
+ */
+export function generateExtensions(
+  company: string,
+): Record<string, Record<string, string>> {
+  const out: Record<string, Record<string, string>> = {};
+  const dir = join(import.meta.dir, "companies");
+  const files = readdirSync(dir)
+    .filter((f) => new RegExp(`^${company}-c\\d+\\.json$`).test(f))
+    .sort();
+  if (!files.length) return out;
+  const cfg = loadConfig(company);
+  const base = generate(cfg) as Record<string, Rec[] | Rec>;
+  for (const f of files) {
+    const ext = JSON.parse(
+      readFileSync(join(dir, f), "utf8"),
+    ) as CycleExtConfig;
+    out[ext.cycle.id] = serialize(
+      generateCycleA06(ext, base, cfg.company.timezone, cfg.holidays),
+    );
+  }
+  return out;
+}
+
 export function loadConfig(company: string): Config {
   return JSON.parse(
     readFileSync(join(import.meta.dir, "companies", `${company}.json`), "utf8"),
@@ -1379,10 +1428,17 @@ if (import.meta.main) {
   const out =
     arg("out") ?? join(import.meta.dir, "..", "data", "fixtures", company);
   mkdirSync(out, { recursive: true });
-  const files = serialize(generate(loadConfig(company)));
+  const files = serialize(generateAny(loadConfig(company)));
   for (const [f, text] of Object.entries(files))
     writeFileSync(join(out, f), text);
   console.log(`wrote ${Object.keys(files).length} files to ${out}`);
+  for (const [cycleId, ext] of Object.entries(generateExtensions(company))) {
+    const dir = join(out, "cycles", cycleId);
+    mkdirSync(dir, { recursive: true });
+    for (const [f, text] of Object.entries(ext))
+      writeFileSync(join(dir, f), text);
+    console.log(`wrote ${Object.keys(ext).length} files to ${dir}`);
+  }
 }
 
 // keep weekday exported for tests

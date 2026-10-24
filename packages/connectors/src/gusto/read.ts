@@ -1,6 +1,7 @@
 // Gusto read connector (A owns; B owns gusto/write*). Plain async functions, GET only, no Convex import.
 // Each pull returns records plus one SyncRun (source "gusto").
 
+import { yearWindows } from "../time.ts";
 import type { SyncRun, Worker } from "../types.ts";
 import { GUSTO_API_VERSION, type GustoAuth, GustoClient } from "./client.ts";
 import {
@@ -207,27 +208,38 @@ export function pullPayrolls(
   opts: GustoPullOptions = {},
 ): Promise<Pulled<{ payrolls: GustoPayroll[] }>> {
   const path = `/v1/companies/${encodeURIComponent(companyUuid)}/payrolls`;
-  const query = {
-    processing_statuses: "processed",
-    payroll_types: "regular,off_cycle",
-    start_date: startDate,
-    end_date: endDate,
-  };
+  // Gusto rejects ranges over 1 year (live: 422 "Date range too long, max 1 year") and matches payrolls by
+  // period overlap, so a payroll crossing a window edge comes back twice: walk 365-day windows, keep one each.
+  const windows = yearWindows(startDate, endDate);
   return withRun(
     auth,
     companyId,
     "payrolls_processed",
-    `GET ${path}?processing_statuses=processed&start_date=${startDate}&end_date=${endDate} + GET each`,
+    `GET ${path}?processing_statuses=processed&start_date=${startDate}&end_date=${endDate} (${windows.length} window(s) of <= 365 days) + GET each`,
     opts,
     { payrolls: [] },
     async (c) => {
-      const list = await c.getAll<RawPayroll>(path, query);
+      const listed = new Map<string, RawPayroll>();
+      const problems: string[] = [];
+      for (const w of windows) {
+        const list = await c.getAll<RawPayroll>(path, {
+          processing_statuses: "processed",
+          payroll_types: "regular,off_cycle",
+          start_date: w.start,
+          end_date: w.end,
+        });
+        problems.push(
+          ...countProblems(
+            `payrolls(${w.start}..${w.end})`,
+            list.rows.length,
+            list.totalCount,
+          ),
+        );
+        for (const p of list.rows)
+          listed.set(String(p.payroll_uuid ?? p.uuid), p);
+      }
+      const list = { rows: [...listed.values()] };
       const payrolls: GustoPayroll[] = [];
-      const problems = countProblems(
-        "payrolls",
-        list.rows.length,
-        list.totalCount,
-      );
       for (const p of list.rows) {
         const uuid = p.payroll_uuid ?? p.uuid;
         const detail = (

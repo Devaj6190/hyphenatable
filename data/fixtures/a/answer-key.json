@@ -34,7 +34,7 @@
     "correctAnswer": {
       "kind": "change",
       "values": {
-        "endAt": "2026-10-24T00:00:00.000Z",
+        "endAt": "2026-10-23T21:00:00.000Z",
         "durationSec": 14400
       }
     },
@@ -75,7 +75,7 @@
       "kind": "change",
       "values": {
         "a-te-0113.jobId": "a-j04",
-        "a-te-0111.endAt": "2026-10-14T19:00:00.000Z"
+        "a-te-0111.endAt": "2026-10-14T16:00:00.000Z"
       }
     },
     "registerCategory": "overlapping hours"
@@ -245,7 +245,7 @@
     "correctAnswer": {
       "kind": "change",
       "values": {
-        "endAt": "2026-10-24T00:00:00.000Z",
+        "endAt": "2026-10-23T21:00:00.000Z",
         "durationSec": 14400
       }
     },

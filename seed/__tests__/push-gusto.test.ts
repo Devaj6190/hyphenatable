@@ -36,8 +36,8 @@ describe("push-gusto dry run (default path)", () => {
     expect(out).toContain("DRY RUN");
     expect(out).toContain("api.gusto-demo.com only");
     expect(out).toContain("never by name");
-    expect(cycleStart).toBe("2026-10-11");
-    expect(cycleEnd).toBe("2026-10-24");
+    expect(cycleStart).toBe("2026-10-10");
+    expect(cycleEnd).toBe("2026-10-23");
   });
 
   test("every non-Venmo worker is a target; Venmo contractors are never sent; a-w14 is the new hire", () => {
@@ -105,18 +105,18 @@ describe("mapping rules", () => {
       [
         {
           payroll_uuid: "old",
-          pay_period: { start_date: "2026-09-27", end_date: "2026-10-10" },
+          pay_period: { start_date: "2026-09-26", end_date: "2026-10-09" },
         },
         {
           payroll_uuid: "cur",
-          pay_period: { start_date: "2026-10-11", end_date: "2026-10-24" },
+          pay_period: { start_date: "2026-10-10", end_date: "2026-10-23" },
         },
       ],
-      "2026-10-11",
-      "2026-10-24",
+      "2026-10-10",
+      "2026-10-23",
     );
     expect(p.uuid).toBe("cur");
-    expect(pickPayroll([], "2026-10-11", "2026-10-24").uuid).toBeNull();
+    expect(pickPayroll([], "2026-10-10", "2026-10-23").uuid).toBeNull();
   });
 });
 

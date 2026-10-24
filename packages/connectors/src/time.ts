@@ -94,15 +94,23 @@ export function resolvePeriod(
   };
 }
 
-/** Inclusive date windows of at most 7 days covering startDate..endDate (Jobber's timeSheetsByDay limit). */
-export function weekWindows(
+/** Inclusive date windows of at most `days` days covering startDate..endDate. */
+export function dayWindows(
   startDate: string,
   endDate: string,
+  days: number,
 ): { start: string; end: string }[] {
   const out: { start: string; end: string }[] = [];
-  for (let s = startDate; s <= endDate; s = addDays(s, 7)) {
-    const e = addDays(s, 6);
+  for (let s = startDate; s <= endDate; s = addDays(s, days)) {
+    const e = addDays(s, days - 1);
     out.push({ start: s, end: e < endDate ? e : endDate });
   }
   return out;
 }
+
+/** At most 7 days per window (Jobber's timeSheetsByDay limit). */
+export const weekWindows = (startDate: string, endDate: string) =>
+  dayWindows(startDate, endDate, 7);
+/** At most 365 days per window (Gusto's payroll list limit, "max 1 year"). */
+export const yearWindows = (startDate: string, endDate: string) =>
+  dayWindows(startDate, endDate, 365);

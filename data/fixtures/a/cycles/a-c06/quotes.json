@@ -1,0 +1,42 @@
+[
+  {
+    "id": "a-q61",
+    "companyId": "a",
+    "sourceId": "a-q61",
+    "jobId": "a-j61",
+    "salespersonWorkerId": "a-w12",
+    "sentAt": "2026-10-12T14:00:00.000Z",
+    "status": "converted",
+    "amountCents": 786000
+  },
+  {
+    "id": "a-q62",
+    "companyId": "a",
+    "sourceId": "a-q62",
+    "jobId": "a-j62",
+    "salespersonWorkerId": "a-w11",
+    "sentAt": "2026-10-14T18:30:00.000Z",
+    "status": "converted",
+    "amountCents": 550000
+  },
+  {
+    "id": "a-q63",
+    "companyId": "a",
+    "sourceId": "a-q63",
+    "jobId": "a-j69",
+    "salespersonWorkerId": "a-w11",
+    "sentAt": "2026-10-09T13:00:00.000Z",
+    "status": "converted",
+    "amountCents": 360000
+  },
+  {
+    "id": "a-q64",
+    "companyId": "a",
+    "sourceId": "a-q64",
+    "jobId": "a-j70",
+    "salespersonWorkerId": "a-w12",
+    "sentAt": "2026-10-28T21:00:00.000Z",
+    "status": "converted",
+    "amountCents": 298000
+  }
+]

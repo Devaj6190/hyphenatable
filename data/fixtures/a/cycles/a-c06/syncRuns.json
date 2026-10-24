@@ -1,0 +1,72 @@
+[
+  {
+    "id": "a-sr-61",
+    "companyId": "a",
+    "cycleId": "a-c06",
+    "source": "jobber",
+    "object": "timeSheetEntries",
+    "startedAt": "2026-11-06T23:05:00.000Z",
+    "finishedAt": "2026-11-06T23:06:00.000Z",
+    "pulled": 83,
+    "expected": 83,
+    "complete": true,
+    "method": "graphql totalCount + timeSheetsByDay",
+    "error": null
+  },
+  {
+    "id": "a-sr-62",
+    "companyId": "a",
+    "cycleId": "a-c06",
+    "source": "qbo",
+    "object": "Purchase",
+    "startedAt": "2026-11-06T23:05:00.000Z",
+    "finishedAt": "2026-11-06T23:06:00.000Z",
+    "pulled": 6,
+    "expected": 6,
+    "complete": true,
+    "method": "query count(*)",
+    "error": null
+  },
+  {
+    "id": "a-sr-63",
+    "companyId": "a",
+    "cycleId": "a-c06",
+    "source": "gusto",
+    "object": "employees",
+    "startedAt": "2026-11-06T23:05:00.000Z",
+    "finishedAt": "2026-11-06T23:06:00.000Z",
+    "pulled": 12,
+    "expected": 12,
+    "complete": true,
+    "method": "rest pagination",
+    "error": null
+  },
+  {
+    "id": "a-sr-64",
+    "companyId": "a",
+    "cycleId": "a-c06",
+    "source": "jobber",
+    "object": "expenses",
+    "startedAt": "2026-11-06T23:05:00.000Z",
+    "finishedAt": "2026-11-06T23:06:00.000Z",
+    "pulled": 5,
+    "expected": 5,
+    "complete": true,
+    "method": "graphql totalCount",
+    "error": null
+  },
+  {
+    "id": "a-sr-65",
+    "companyId": "a",
+    "cycleId": "a-c06",
+    "source": "jobber",
+    "object": "visits",
+    "startedAt": "2026-11-06T23:05:00.000Z",
+    "finishedAt": "2026-11-06T23:06:00.000Z",
+    "pulled": 5,
+    "expected": 5,
+    "complete": true,
+    "method": "graphql totalCount",
+    "error": null
+  }
+]

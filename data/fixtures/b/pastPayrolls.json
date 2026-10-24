@@ -1,0 +1,2662 @@
+[
+  {
+    "id": "b-pp-101",
+    "companyId": "b",
+    "cycleId": "b-c01",
+    "workerId": "b-w01",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Salary",
+        "hours": null,
+        "rateCents": 12480000,
+        "amountCents": 240000
+      }
+    ],
+    "grossCents": 240000
+  },
+  {
+    "id": "b-pp-102",
+    "companyId": "b",
+    "cycleId": "b-c01",
+    "workerId": "b-w02",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Salary",
+        "hours": null,
+        "rateCents": 8840000,
+        "amountCents": 170000
+      }
+    ],
+    "grossCents": 170000
+  },
+  {
+    "id": "b-pp-103",
+    "companyId": "b",
+    "cycleId": "b-c01",
+    "workerId": "b-w03",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Salary",
+        "hours": null,
+        "rateCents": 8580000,
+        "amountCents": 165000
+      }
+    ],
+    "grossCents": 165000
+  },
+  {
+    "id": "b-pp-104",
+    "companyId": "b",
+    "cycleId": "b-c01",
+    "workerId": "b-w04",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 2600,
+        "amountCents": 104000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 3900,
+        "amountCents": 9750
+      }
+    ],
+    "grossCents": 113750
+  },
+  {
+    "id": "b-pp-105",
+    "companyId": "b",
+    "cycleId": "b-c01",
+    "workerId": "b-w05",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 3800,
+        "amountCents": 152000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 5700,
+        "amountCents": 14250
+      }
+    ],
+    "grossCents": 166250
+  },
+  {
+    "id": "b-pp-106",
+    "companyId": "b",
+    "cycleId": "b-c01",
+    "workerId": "b-w06",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 3000,
+        "amountCents": 120000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 4500,
+        "amountCents": 11250
+      }
+    ],
+    "grossCents": 131250
+  },
+  {
+    "id": "b-pp-107",
+    "companyId": "b",
+    "cycleId": "b-c01",
+    "workerId": "b-w07",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 3000,
+        "amountCents": 120000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 4500,
+        "amountCents": 11250
+      }
+    ],
+    "grossCents": 131250
+  },
+  {
+    "id": "b-pp-108",
+    "companyId": "b",
+    "cycleId": "b-c01",
+    "workerId": "b-w08",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 2400,
+        "amountCents": 96000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 3600,
+        "amountCents": 9000
+      }
+    ],
+    "grossCents": 105000
+  },
+  {
+    "id": "b-pp-109",
+    "companyId": "b",
+    "cycleId": "b-c01",
+    "workerId": "b-w09",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 3800,
+        "amountCents": 152000
+      },
+      {
+        "name": "Overtime",
+        "hours": 7.5,
+        "rateCents": 5700,
+        "amountCents": 42750
+      }
+    ],
+    "grossCents": 194750
+  },
+  {
+    "id": "b-pp-110",
+    "companyId": "b",
+    "cycleId": "b-c01",
+    "workerId": "b-w10",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 3000,
+        "amountCents": 120000
+      },
+      {
+        "name": "Overtime",
+        "hours": 7.5,
+        "rateCents": 4500,
+        "amountCents": 33750
+      }
+    ],
+    "grossCents": 153750
+  },
+  {
+    "id": "b-pp-111",
+    "companyId": "b",
+    "cycleId": "b-c01",
+    "workerId": "b-w11",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 2800,
+        "amountCents": 112000
+      },
+      {
+        "name": "Overtime",
+        "hours": 7.5,
+        "rateCents": 4200,
+        "amountCents": 31500
+      }
+    ],
+    "grossCents": 143500
+  },
+  {
+    "id": "b-pp-112",
+    "companyId": "b",
+    "cycleId": "b-c01",
+    "workerId": "b-w12",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 2400,
+        "amountCents": 96000
+      },
+      {
+        "name": "Overtime",
+        "hours": 7.5,
+        "rateCents": 3600,
+        "amountCents": 27000
+      }
+    ],
+    "grossCents": 123000
+  },
+  {
+    "id": "b-pp-113",
+    "companyId": "b",
+    "cycleId": "b-c01",
+    "workerId": "b-w13",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 3800,
+        "amountCents": 152000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 5700,
+        "amountCents": 14250
+      }
+    ],
+    "grossCents": 166250
+  },
+  {
+    "id": "b-pp-114",
+    "companyId": "b",
+    "cycleId": "b-c01",
+    "workerId": "b-w14",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 3000,
+        "amountCents": 120000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 4500,
+        "amountCents": 11250
+      }
+    ],
+    "grossCents": 131250
+  },
+  {
+    "id": "b-pp-115",
+    "companyId": "b",
+    "cycleId": "b-c01",
+    "workerId": "b-w15",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 2800,
+        "amountCents": 112000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 4200,
+        "amountCents": 10500
+      }
+    ],
+    "grossCents": 122500
+  },
+  {
+    "id": "b-pp-116",
+    "companyId": "b",
+    "cycleId": "b-c01",
+    "workerId": "b-w16",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 2400,
+        "amountCents": 96000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 3600,
+        "amountCents": 9000
+      }
+    ],
+    "grossCents": 105000
+  },
+  {
+    "id": "b-pp-117",
+    "companyId": "b",
+    "cycleId": "b-c01",
+    "workerId": "b-w17",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 3600,
+        "amountCents": 144000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 5400,
+        "amountCents": 13500
+      }
+    ],
+    "grossCents": 157500
+  },
+  {
+    "id": "b-pp-118",
+    "companyId": "b",
+    "cycleId": "b-c01",
+    "workerId": "b-w18",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 3400,
+        "amountCents": 136000
+      },
+      {
+        "name": "Overtime",
+        "hours": 6.5,
+        "rateCents": 5100,
+        "amountCents": 33150
+      }
+    ],
+    "grossCents": 169150
+  },
+  {
+    "id": "b-pp-119",
+    "companyId": "b",
+    "cycleId": "b-c01",
+    "workerId": "b-w19",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 3400,
+        "amountCents": 136000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 5100,
+        "amountCents": 12750
+      }
+    ],
+    "grossCents": 148750
+  },
+  {
+    "id": "b-pp-120",
+    "companyId": "b",
+    "cycleId": "b-c01",
+    "workerId": "b-w20",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 3200,
+        "amountCents": 128000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 4800,
+        "amountCents": 12000
+      }
+    ],
+    "grossCents": 140000
+  },
+  {
+    "id": "b-pp-121",
+    "companyId": "b",
+    "cycleId": "b-c01",
+    "workerId": "b-w21",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 3200,
+        "amountCents": 128000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 4800,
+        "amountCents": 12000
+      }
+    ],
+    "grossCents": 140000
+  },
+  {
+    "id": "b-pp-122",
+    "companyId": "b",
+    "cycleId": "b-c01",
+    "workerId": "b-w22",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 3200,
+        "amountCents": 128000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 4800,
+        "amountCents": 12000
+      }
+    ],
+    "grossCents": 140000
+  },
+  {
+    "id": "b-pp-123",
+    "companyId": "b",
+    "cycleId": "b-c01",
+    "workerId": "b-w23",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 3000,
+        "amountCents": 120000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 4500,
+        "amountCents": 11250
+      }
+    ],
+    "grossCents": 131250
+  },
+  {
+    "id": "b-pp-124",
+    "companyId": "b",
+    "cycleId": "b-c01",
+    "workerId": "b-w24",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 3000,
+        "amountCents": 120000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 4500,
+        "amountCents": 11250
+      }
+    ],
+    "grossCents": 131250
+  },
+  {
+    "id": "b-pp-125",
+    "companyId": "b",
+    "cycleId": "b-c01",
+    "workerId": "b-w25",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 2800,
+        "amountCents": 112000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 4200,
+        "amountCents": 10500
+      }
+    ],
+    "grossCents": 122500
+  },
+  {
+    "id": "b-pp-126",
+    "companyId": "b",
+    "cycleId": "b-c01",
+    "workerId": "b-w26",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 2800,
+        "amountCents": 112000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 4200,
+        "amountCents": 10500
+      }
+    ],
+    "grossCents": 122500
+  },
+  {
+    "id": "b-pp-127",
+    "companyId": "b",
+    "cycleId": "b-c01",
+    "workerId": "b-w27",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 2600,
+        "amountCents": 104000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 3900,
+        "amountCents": 9750
+      }
+    ],
+    "grossCents": 113750
+  },
+  {
+    "id": "b-pp-128",
+    "companyId": "b",
+    "cycleId": "b-c01",
+    "workerId": "b-w28",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 2600,
+        "amountCents": 104000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 3900,
+        "amountCents": 9750
+      }
+    ],
+    "grossCents": 113750
+  },
+  {
+    "id": "b-pp-129",
+    "companyId": "b",
+    "cycleId": "b-c01",
+    "workerId": "b-w29",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Salary",
+        "hours": null,
+        "rateCents": 4160000,
+        "amountCents": 80000
+      }
+    ],
+    "grossCents": 80000
+  },
+  {
+    "id": "b-pp-130",
+    "companyId": "b",
+    "cycleId": "b-c01",
+    "workerId": "b-w29",
+    "paidVia": "gusto_off_cycle",
+    "earnings": [
+      {
+        "name": "Commission",
+        "hours": null,
+        "rateCents": null,
+        "amountCents": 90023
+      }
+    ],
+    "grossCents": 90023
+  },
+  {
+    "id": "b-pp-131",
+    "companyId": "b",
+    "cycleId": "b-c01",
+    "workerId": "b-w30",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Salary",
+        "hours": null,
+        "rateCents": 4160000,
+        "amountCents": 80000
+      }
+    ],
+    "grossCents": 80000
+  },
+  {
+    "id": "b-pp-132",
+    "companyId": "b",
+    "cycleId": "b-c01",
+    "workerId": "b-w30",
+    "paidVia": "gusto_off_cycle",
+    "earnings": [
+      {
+        "name": "Commission",
+        "hours": null,
+        "rateCents": null,
+        "amountCents": 110908
+      }
+    ],
+    "grossCents": 110908
+  },
+  {
+    "id": "b-pp-201",
+    "companyId": "b",
+    "cycleId": "b-c02",
+    "workerId": "b-w01",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Salary",
+        "hours": null,
+        "rateCents": 12480000,
+        "amountCents": 240000
+      }
+    ],
+    "grossCents": 240000
+  },
+  {
+    "id": "b-pp-202",
+    "companyId": "b",
+    "cycleId": "b-c02",
+    "workerId": "b-w02",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Salary",
+        "hours": null,
+        "rateCents": 8840000,
+        "amountCents": 170000
+      }
+    ],
+    "grossCents": 170000
+  },
+  {
+    "id": "b-pp-203",
+    "companyId": "b",
+    "cycleId": "b-c02",
+    "workerId": "b-w03",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Salary",
+        "hours": null,
+        "rateCents": 8580000,
+        "amountCents": 165000
+      }
+    ],
+    "grossCents": 165000
+  },
+  {
+    "id": "b-pp-204",
+    "companyId": "b",
+    "cycleId": "b-c02",
+    "workerId": "b-w04",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 2600,
+        "amountCents": 104000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 3900,
+        "amountCents": 9750
+      }
+    ],
+    "grossCents": 113750
+  },
+  {
+    "id": "b-pp-205",
+    "companyId": "b",
+    "cycleId": "b-c02",
+    "workerId": "b-w05",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 3800,
+        "amountCents": 152000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 5700,
+        "amountCents": 14250
+      }
+    ],
+    "grossCents": 166250
+  },
+  {
+    "id": "b-pp-206",
+    "companyId": "b",
+    "cycleId": "b-c02",
+    "workerId": "b-w06",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 3000,
+        "amountCents": 120000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 4500,
+        "amountCents": 11250
+      }
+    ],
+    "grossCents": 131250
+  },
+  {
+    "id": "b-pp-207",
+    "companyId": "b",
+    "cycleId": "b-c02",
+    "workerId": "b-w07",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 3000,
+        "amountCents": 120000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 4500,
+        "amountCents": 11250
+      }
+    ],
+    "grossCents": 131250
+  },
+  {
+    "id": "b-pp-208",
+    "companyId": "b",
+    "cycleId": "b-c02",
+    "workerId": "b-w08",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 2400,
+        "amountCents": 96000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 3600,
+        "amountCents": 9000
+      }
+    ],
+    "grossCents": 105000
+  },
+  {
+    "id": "b-pp-209",
+    "companyId": "b",
+    "cycleId": "b-c02",
+    "workerId": "b-w09",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 3800,
+        "amountCents": 152000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 5700,
+        "amountCents": 14250
+      }
+    ],
+    "grossCents": 166250
+  },
+  {
+    "id": "b-pp-210",
+    "companyId": "b",
+    "cycleId": "b-c02",
+    "workerId": "b-w10",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 3000,
+        "amountCents": 120000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 4500,
+        "amountCents": 11250
+      }
+    ],
+    "grossCents": 131250
+  },
+  {
+    "id": "b-pp-211",
+    "companyId": "b",
+    "cycleId": "b-c02",
+    "workerId": "b-w11",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 2800,
+        "amountCents": 112000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 4200,
+        "amountCents": 10500
+      }
+    ],
+    "grossCents": 122500
+  },
+  {
+    "id": "b-pp-212",
+    "companyId": "b",
+    "cycleId": "b-c02",
+    "workerId": "b-w12",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 2400,
+        "amountCents": 96000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 3600,
+        "amountCents": 9000
+      }
+    ],
+    "grossCents": 105000
+  },
+  {
+    "id": "b-pp-213",
+    "companyId": "b",
+    "cycleId": "b-c02",
+    "workerId": "b-w13",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 3800,
+        "amountCents": 152000
+      },
+      {
+        "name": "Overtime",
+        "hours": 7.5,
+        "rateCents": 5700,
+        "amountCents": 42750
+      }
+    ],
+    "grossCents": 194750
+  },
+  {
+    "id": "b-pp-214",
+    "companyId": "b",
+    "cycleId": "b-c02",
+    "workerId": "b-w14",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 3000,
+        "amountCents": 120000
+      },
+      {
+        "name": "Overtime",
+        "hours": 7.5,
+        "rateCents": 4500,
+        "amountCents": 33750
+      }
+    ],
+    "grossCents": 153750
+  },
+  {
+    "id": "b-pp-215",
+    "companyId": "b",
+    "cycleId": "b-c02",
+    "workerId": "b-w15",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 2800,
+        "amountCents": 112000
+      },
+      {
+        "name": "Overtime",
+        "hours": 7.5,
+        "rateCents": 4200,
+        "amountCents": 31500
+      }
+    ],
+    "grossCents": 143500
+  },
+  {
+    "id": "b-pp-216",
+    "companyId": "b",
+    "cycleId": "b-c02",
+    "workerId": "b-w16",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 2400,
+        "amountCents": 96000
+      },
+      {
+        "name": "Overtime",
+        "hours": 7.5,
+        "rateCents": 3600,
+        "amountCents": 27000
+      }
+    ],
+    "grossCents": 123000
+  },
+  {
+    "id": "b-pp-217",
+    "companyId": "b",
+    "cycleId": "b-c02",
+    "workerId": "b-w17",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 3600,
+        "amountCents": 144000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 5400,
+        "amountCents": 13500
+      }
+    ],
+    "grossCents": 157500
+  },
+  {
+    "id": "b-pp-218",
+    "companyId": "b",
+    "cycleId": "b-c02",
+    "workerId": "b-w18",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 3400,
+        "amountCents": 136000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 5100,
+        "amountCents": 12750
+      }
+    ],
+    "grossCents": 148750
+  },
+  {
+    "id": "b-pp-219",
+    "companyId": "b",
+    "cycleId": "b-c02",
+    "workerId": "b-w19",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 3400,
+        "amountCents": 136000
+      },
+      {
+        "name": "Overtime",
+        "hours": 6.5,
+        "rateCents": 5100,
+        "amountCents": 33150
+      }
+    ],
+    "grossCents": 169150
+  },
+  {
+    "id": "b-pp-220",
+    "companyId": "b",
+    "cycleId": "b-c02",
+    "workerId": "b-w20",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 3200,
+        "amountCents": 128000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 4800,
+        "amountCents": 12000
+      }
+    ],
+    "grossCents": 140000
+  },
+  {
+    "id": "b-pp-221",
+    "companyId": "b",
+    "cycleId": "b-c02",
+    "workerId": "b-w21",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 3200,
+        "amountCents": 128000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 4800,
+        "amountCents": 12000
+      }
+    ],
+    "grossCents": 140000
+  },
+  {
+    "id": "b-pp-222",
+    "companyId": "b",
+    "cycleId": "b-c02",
+    "workerId": "b-w22",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 3200,
+        "amountCents": 128000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 4800,
+        "amountCents": 12000
+      }
+    ],
+    "grossCents": 140000
+  },
+  {
+    "id": "b-pp-223",
+    "companyId": "b",
+    "cycleId": "b-c02",
+    "workerId": "b-w23",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 3000,
+        "amountCents": 120000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 4500,
+        "amountCents": 11250
+      }
+    ],
+    "grossCents": 131250
+  },
+  {
+    "id": "b-pp-224",
+    "companyId": "b",
+    "cycleId": "b-c02",
+    "workerId": "b-w24",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 3000,
+        "amountCents": 120000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 4500,
+        "amountCents": 11250
+      }
+    ],
+    "grossCents": 131250
+  },
+  {
+    "id": "b-pp-225",
+    "companyId": "b",
+    "cycleId": "b-c02",
+    "workerId": "b-w25",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 2800,
+        "amountCents": 112000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 4200,
+        "amountCents": 10500
+      }
+    ],
+    "grossCents": 122500
+  },
+  {
+    "id": "b-pp-226",
+    "companyId": "b",
+    "cycleId": "b-c02",
+    "workerId": "b-w26",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 2800,
+        "amountCents": 112000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 4200,
+        "amountCents": 10500
+      }
+    ],
+    "grossCents": 122500
+  },
+  {
+    "id": "b-pp-227",
+    "companyId": "b",
+    "cycleId": "b-c02",
+    "workerId": "b-w27",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 2600,
+        "amountCents": 104000
+      },
+      {
+        "name": "Overtime",
+        "hours": 6,
+        "rateCents": 3900,
+        "amountCents": 23400
+      },
+      {
+        "name": "Double Overtime",
+        "hours": 0.5,
+        "rateCents": 5200,
+        "amountCents": 2600
+      }
+    ],
+    "grossCents": 130000
+  },
+  {
+    "id": "b-pp-228",
+    "companyId": "b",
+    "cycleId": "b-c02",
+    "workerId": "b-w28",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 2600,
+        "amountCents": 104000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 3900,
+        "amountCents": 9750
+      }
+    ],
+    "grossCents": 113750
+  },
+  {
+    "id": "b-pp-229",
+    "companyId": "b",
+    "cycleId": "b-c02",
+    "workerId": "b-w29",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Salary",
+        "hours": null,
+        "rateCents": 4160000,
+        "amountCents": 80000
+      }
+    ],
+    "grossCents": 80000
+  },
+  {
+    "id": "b-pp-230",
+    "companyId": "b",
+    "cycleId": "b-c02",
+    "workerId": "b-w29",
+    "paidVia": "gusto_off_cycle",
+    "earnings": [
+      {
+        "name": "Commission",
+        "hours": null,
+        "rateCents": null,
+        "amountCents": 104942
+      }
+    ],
+    "grossCents": 104942
+  },
+  {
+    "id": "b-pp-231",
+    "companyId": "b",
+    "cycleId": "b-c02",
+    "workerId": "b-w30",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Salary",
+        "hours": null,
+        "rateCents": 4160000,
+        "amountCents": 80000
+      }
+    ],
+    "grossCents": 80000
+  },
+  {
+    "id": "b-pp-232",
+    "companyId": "b",
+    "cycleId": "b-c02",
+    "workerId": "b-w30",
+    "paidVia": "gusto_off_cycle",
+    "earnings": [
+      {
+        "name": "Commission",
+        "hours": null,
+        "rateCents": null,
+        "amountCents": 122971
+      }
+    ],
+    "grossCents": 122971
+  },
+  {
+    "id": "b-pp-301",
+    "companyId": "b",
+    "cycleId": "b-c03",
+    "workerId": "b-w01",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Salary",
+        "hours": null,
+        "rateCents": 12480000,
+        "amountCents": 240000
+      }
+    ],
+    "grossCents": 240000
+  },
+  {
+    "id": "b-pp-302",
+    "companyId": "b",
+    "cycleId": "b-c03",
+    "workerId": "b-w02",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Salary",
+        "hours": null,
+        "rateCents": 8840000,
+        "amountCents": 170000
+      }
+    ],
+    "grossCents": 170000
+  },
+  {
+    "id": "b-pp-303",
+    "companyId": "b",
+    "cycleId": "b-c03",
+    "workerId": "b-w03",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Salary",
+        "hours": null,
+        "rateCents": 8580000,
+        "amountCents": 165000
+      }
+    ],
+    "grossCents": 165000
+  },
+  {
+    "id": "b-pp-304",
+    "companyId": "b",
+    "cycleId": "b-c03",
+    "workerId": "b-w04",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 2600,
+        "amountCents": 104000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 3900,
+        "amountCents": 9750
+      }
+    ],
+    "grossCents": 113750
+  },
+  {
+    "id": "b-pp-305",
+    "companyId": "b",
+    "cycleId": "b-c03",
+    "workerId": "b-w05",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 3800,
+        "amountCents": 152000
+      },
+      {
+        "name": "Overtime",
+        "hours": 7.5,
+        "rateCents": 5700,
+        "amountCents": 42750
+      }
+    ],
+    "grossCents": 194750
+  },
+  {
+    "id": "b-pp-306",
+    "companyId": "b",
+    "cycleId": "b-c03",
+    "workerId": "b-w06",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 3000,
+        "amountCents": 120000
+      },
+      {
+        "name": "Overtime",
+        "hours": 7.5,
+        "rateCents": 4500,
+        "amountCents": 33750
+      }
+    ],
+    "grossCents": 153750
+  },
+  {
+    "id": "b-pp-307",
+    "companyId": "b",
+    "cycleId": "b-c03",
+    "workerId": "b-w07",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 3000,
+        "amountCents": 120000
+      },
+      {
+        "name": "Overtime",
+        "hours": 7.5,
+        "rateCents": 4500,
+        "amountCents": 33750
+      }
+    ],
+    "grossCents": 153750
+  },
+  {
+    "id": "b-pp-308",
+    "companyId": "b",
+    "cycleId": "b-c03",
+    "workerId": "b-w08",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 2400,
+        "amountCents": 96000
+      },
+      {
+        "name": "Overtime",
+        "hours": 7.5,
+        "rateCents": 3600,
+        "amountCents": 27000
+      }
+    ],
+    "grossCents": 123000
+  },
+  {
+    "id": "b-pp-309",
+    "companyId": "b",
+    "cycleId": "b-c03",
+    "workerId": "b-w09",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 3800,
+        "amountCents": 152000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 5700,
+        "amountCents": 14250
+      }
+    ],
+    "grossCents": 166250
+  },
+  {
+    "id": "b-pp-310",
+    "companyId": "b",
+    "cycleId": "b-c03",
+    "workerId": "b-w10",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 3000,
+        "amountCents": 120000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 4500,
+        "amountCents": 11250
+      }
+    ],
+    "grossCents": 131250
+  },
+  {
+    "id": "b-pp-311",
+    "companyId": "b",
+    "cycleId": "b-c03",
+    "workerId": "b-w11",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 2800,
+        "amountCents": 112000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 4200,
+        "amountCents": 10500
+      }
+    ],
+    "grossCents": 122500
+  },
+  {
+    "id": "b-pp-312",
+    "companyId": "b",
+    "cycleId": "b-c03",
+    "workerId": "b-w12",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 2400,
+        "amountCents": 96000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 3600,
+        "amountCents": 9000
+      }
+    ],
+    "grossCents": 105000
+  },
+  {
+    "id": "b-pp-313",
+    "companyId": "b",
+    "cycleId": "b-c03",
+    "workerId": "b-w13",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 3800,
+        "amountCents": 152000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 5700,
+        "amountCents": 14250
+      }
+    ],
+    "grossCents": 166250
+  },
+  {
+    "id": "b-pp-314",
+    "companyId": "b",
+    "cycleId": "b-c03",
+    "workerId": "b-w14",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 3000,
+        "amountCents": 120000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 4500,
+        "amountCents": 11250
+      }
+    ],
+    "grossCents": 131250
+  },
+  {
+    "id": "b-pp-315",
+    "companyId": "b",
+    "cycleId": "b-c03",
+    "workerId": "b-w15",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 2800,
+        "amountCents": 112000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 4200,
+        "amountCents": 10500
+      }
+    ],
+    "grossCents": 122500
+  },
+  {
+    "id": "b-pp-316",
+    "companyId": "b",
+    "cycleId": "b-c03",
+    "workerId": "b-w16",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 2400,
+        "amountCents": 96000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 3600,
+        "amountCents": 9000
+      }
+    ],
+    "grossCents": 105000
+  },
+  {
+    "id": "b-pp-317",
+    "companyId": "b",
+    "cycleId": "b-c03",
+    "workerId": "b-w17",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 3600,
+        "amountCents": 144000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 5400,
+        "amountCents": 13500
+      }
+    ],
+    "grossCents": 157500
+  },
+  {
+    "id": "b-pp-318",
+    "companyId": "b",
+    "cycleId": "b-c03",
+    "workerId": "b-w18",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 3400,
+        "amountCents": 136000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 5100,
+        "amountCents": 12750
+      }
+    ],
+    "grossCents": 148750
+  },
+  {
+    "id": "b-pp-319",
+    "companyId": "b",
+    "cycleId": "b-c03",
+    "workerId": "b-w19",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 3400,
+        "amountCents": 136000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 5100,
+        "amountCents": 12750
+      }
+    ],
+    "grossCents": 148750
+  },
+  {
+    "id": "b-pp-320",
+    "companyId": "b",
+    "cycleId": "b-c03",
+    "workerId": "b-w20",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 3200,
+        "amountCents": 128000
+      },
+      {
+        "name": "Overtime",
+        "hours": 6.5,
+        "rateCents": 4800,
+        "amountCents": 31200
+      }
+    ],
+    "grossCents": 159200
+  },
+  {
+    "id": "b-pp-321",
+    "companyId": "b",
+    "cycleId": "b-c03",
+    "workerId": "b-w21",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 3200,
+        "amountCents": 128000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 4800,
+        "amountCents": 12000
+      }
+    ],
+    "grossCents": 140000
+  },
+  {
+    "id": "b-pp-322",
+    "companyId": "b",
+    "cycleId": "b-c03",
+    "workerId": "b-w22",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 3200,
+        "amountCents": 128000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 4800,
+        "amountCents": 12000
+      }
+    ],
+    "grossCents": 140000
+  },
+  {
+    "id": "b-pp-323",
+    "companyId": "b",
+    "cycleId": "b-c03",
+    "workerId": "b-w23",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 3000,
+        "amountCents": 120000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 4500,
+        "amountCents": 11250
+      }
+    ],
+    "grossCents": 131250
+  },
+  {
+    "id": "b-pp-324",
+    "companyId": "b",
+    "cycleId": "b-c03",
+    "workerId": "b-w24",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 3000,
+        "amountCents": 120000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 4500,
+        "amountCents": 11250
+      }
+    ],
+    "grossCents": 131250
+  },
+  {
+    "id": "b-pp-325",
+    "companyId": "b",
+    "cycleId": "b-c03",
+    "workerId": "b-w25",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 2800,
+        "amountCents": 112000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 4200,
+        "amountCents": 10500
+      }
+    ],
+    "grossCents": 122500
+  },
+  {
+    "id": "b-pp-326",
+    "companyId": "b",
+    "cycleId": "b-c03",
+    "workerId": "b-w26",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 2800,
+        "amountCents": 112000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 4200,
+        "amountCents": 10500
+      }
+    ],
+    "grossCents": 122500
+  },
+  {
+    "id": "b-pp-327",
+    "companyId": "b",
+    "cycleId": "b-c03",
+    "workerId": "b-w27",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 2600,
+        "amountCents": 104000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 3900,
+        "amountCents": 9750
+      }
+    ],
+    "grossCents": 113750
+  },
+  {
+    "id": "b-pp-328",
+    "companyId": "b",
+    "cycleId": "b-c03",
+    "workerId": "b-w28",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 2600,
+        "amountCents": 104000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 3900,
+        "amountCents": 9750
+      }
+    ],
+    "grossCents": 113750
+  },
+  {
+    "id": "b-pp-329",
+    "companyId": "b",
+    "cycleId": "b-c03",
+    "workerId": "b-w29",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Salary",
+        "hours": null,
+        "rateCents": 4160000,
+        "amountCents": 80000
+      }
+    ],
+    "grossCents": 80000
+  },
+  {
+    "id": "b-pp-330",
+    "companyId": "b",
+    "cycleId": "b-c03",
+    "workerId": "b-w29",
+    "paidVia": "gusto_off_cycle",
+    "earnings": [
+      {
+        "name": "Commission",
+        "hours": null,
+        "rateCents": null,
+        "amountCents": 122760
+      }
+    ],
+    "grossCents": 122760
+  },
+  {
+    "id": "b-pp-331",
+    "companyId": "b",
+    "cycleId": "b-c03",
+    "workerId": "b-w30",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Salary",
+        "hours": null,
+        "rateCents": 4160000,
+        "amountCents": 80000
+      }
+    ],
+    "grossCents": 80000
+  },
+  {
+    "id": "b-pp-332",
+    "companyId": "b",
+    "cycleId": "b-c03",
+    "workerId": "b-w30",
+    "paidVia": "gusto_off_cycle",
+    "earnings": [
+      {
+        "name": "Commission",
+        "hours": null,
+        "rateCents": null,
+        "amountCents": 121356
+      }
+    ],
+    "grossCents": 121356
+  },
+  {
+    "id": "b-pp-401",
+    "companyId": "b",
+    "cycleId": "b-c04",
+    "workerId": "b-w01",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Salary",
+        "hours": null,
+        "rateCents": 12480000,
+        "amountCents": 240000
+      }
+    ],
+    "grossCents": 240000
+  },
+  {
+    "id": "b-pp-402",
+    "companyId": "b",
+    "cycleId": "b-c04",
+    "workerId": "b-w02",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Salary",
+        "hours": null,
+        "rateCents": 8840000,
+        "amountCents": 170000
+      }
+    ],
+    "grossCents": 170000
+  },
+  {
+    "id": "b-pp-403",
+    "companyId": "b",
+    "cycleId": "b-c04",
+    "workerId": "b-w03",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Salary",
+        "hours": null,
+        "rateCents": 8580000,
+        "amountCents": 165000
+      }
+    ],
+    "grossCents": 165000
+  },
+  {
+    "id": "b-pp-404",
+    "companyId": "b",
+    "cycleId": "b-c04",
+    "workerId": "b-w04",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 2600,
+        "amountCents": 104000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 3900,
+        "amountCents": 9750
+      }
+    ],
+    "grossCents": 113750
+  },
+  {
+    "id": "b-pp-405",
+    "companyId": "b",
+    "cycleId": "b-c04",
+    "workerId": "b-w05",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 3800,
+        "amountCents": 152000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 5700,
+        "amountCents": 14250
+      }
+    ],
+    "grossCents": 166250
+  },
+  {
+    "id": "b-pp-406",
+    "companyId": "b",
+    "cycleId": "b-c04",
+    "workerId": "b-w06",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 3000,
+        "amountCents": 120000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 4500,
+        "amountCents": 11250
+      }
+    ],
+    "grossCents": 131250
+  },
+  {
+    "id": "b-pp-407",
+    "companyId": "b",
+    "cycleId": "b-c04",
+    "workerId": "b-w07",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 3000,
+        "amountCents": 120000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 4500,
+        "amountCents": 11250
+      }
+    ],
+    "grossCents": 131250
+  },
+  {
+    "id": "b-pp-408",
+    "companyId": "b",
+    "cycleId": "b-c04",
+    "workerId": "b-w08",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 2400,
+        "amountCents": 96000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 3600,
+        "amountCents": 9000
+      }
+    ],
+    "grossCents": 105000
+  },
+  {
+    "id": "b-pp-409",
+    "companyId": "b",
+    "cycleId": "b-c04",
+    "workerId": "b-w09",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 3800,
+        "amountCents": 152000
+      },
+      {
+        "name": "Overtime",
+        "hours": 7.5,
+        "rateCents": 5700,
+        "amountCents": 42750
+      }
+    ],
+    "grossCents": 194750
+  },
+  {
+    "id": "b-pp-410",
+    "companyId": "b",
+    "cycleId": "b-c04",
+    "workerId": "b-w10",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 3000,
+        "amountCents": 120000
+      },
+      {
+        "name": "Overtime",
+        "hours": 7.5,
+        "rateCents": 4500,
+        "amountCents": 33750
+      }
+    ],
+    "grossCents": 153750
+  },
+  {
+    "id": "b-pp-411",
+    "companyId": "b",
+    "cycleId": "b-c04",
+    "workerId": "b-w11",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 2800,
+        "amountCents": 112000
+      },
+      {
+        "name": "Overtime",
+        "hours": 7.5,
+        "rateCents": 4200,
+        "amountCents": 31500
+      }
+    ],
+    "grossCents": 143500
+  },
+  {
+    "id": "b-pp-412",
+    "companyId": "b",
+    "cycleId": "b-c04",
+    "workerId": "b-w12",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 2400,
+        "amountCents": 96000
+      },
+      {
+        "name": "Overtime",
+        "hours": 7.5,
+        "rateCents": 3600,
+        "amountCents": 27000
+      }
+    ],
+    "grossCents": 123000
+  },
+  {
+    "id": "b-pp-413",
+    "companyId": "b",
+    "cycleId": "b-c04",
+    "workerId": "b-w13",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 3800,
+        "amountCents": 152000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 5700,
+        "amountCents": 14250
+      }
+    ],
+    "grossCents": 166250
+  },
+  {
+    "id": "b-pp-414",
+    "companyId": "b",
+    "cycleId": "b-c04",
+    "workerId": "b-w14",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 3000,
+        "amountCents": 120000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 4500,
+        "amountCents": 11250
+      }
+    ],
+    "grossCents": 131250
+  },
+  {
+    "id": "b-pp-415",
+    "companyId": "b",
+    "cycleId": "b-c04",
+    "workerId": "b-w15",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 2800,
+        "amountCents": 112000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 4200,
+        "amountCents": 10500
+      }
+    ],
+    "grossCents": 122500
+  },
+  {
+    "id": "b-pp-416",
+    "companyId": "b",
+    "cycleId": "b-c04",
+    "workerId": "b-w16",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 2400,
+        "amountCents": 96000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 3600,
+        "amountCents": 9000
+      }
+    ],
+    "grossCents": 105000
+  },
+  {
+    "id": "b-pp-417",
+    "companyId": "b",
+    "cycleId": "b-c04",
+    "workerId": "b-w17",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 3600,
+        "amountCents": 144000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 5400,
+        "amountCents": 13500
+      }
+    ],
+    "grossCents": 157500
+  },
+  {
+    "id": "b-pp-418",
+    "companyId": "b",
+    "cycleId": "b-c04",
+    "workerId": "b-w18",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 3400,
+        "amountCents": 136000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 5100,
+        "amountCents": 12750
+      }
+    ],
+    "grossCents": 148750
+  },
+  {
+    "id": "b-pp-419",
+    "companyId": "b",
+    "cycleId": "b-c04",
+    "workerId": "b-w19",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 3400,
+        "amountCents": 136000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 5100,
+        "amountCents": 12750
+      }
+    ],
+    "grossCents": 148750
+  },
+  {
+    "id": "b-pp-420",
+    "companyId": "b",
+    "cycleId": "b-c04",
+    "workerId": "b-w20",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 3200,
+        "amountCents": 128000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 4800,
+        "amountCents": 12000
+      }
+    ],
+    "grossCents": 140000
+  },
+  {
+    "id": "b-pp-421",
+    "companyId": "b",
+    "cycleId": "b-c04",
+    "workerId": "b-w21",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 3200,
+        "amountCents": 128000
+      },
+      {
+        "name": "Overtime",
+        "hours": 6.5,
+        "rateCents": 4800,
+        "amountCents": 31200
+      }
+    ],
+    "grossCents": 159200
+  },
+  {
+    "id": "b-pp-422",
+    "companyId": "b",
+    "cycleId": "b-c04",
+    "workerId": "b-w22",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 3200,
+        "amountCents": 128000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 4800,
+        "amountCents": 12000
+      }
+    ],
+    "grossCents": 140000
+  },
+  {
+    "id": "b-pp-423",
+    "companyId": "b",
+    "cycleId": "b-c04",
+    "workerId": "b-w23",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 3000,
+        "amountCents": 120000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 4500,
+        "amountCents": 11250
+      }
+    ],
+    "grossCents": 131250
+  },
+  {
+    "id": "b-pp-424",
+    "companyId": "b",
+    "cycleId": "b-c04",
+    "workerId": "b-w24",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 3000,
+        "amountCents": 120000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 4500,
+        "amountCents": 11250
+      }
+    ],
+    "grossCents": 131250
+  },
+  {
+    "id": "b-pp-425",
+    "companyId": "b",
+    "cycleId": "b-c04",
+    "workerId": "b-w25",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 2800,
+        "amountCents": 112000
+      },
+      {
+        "name": "Overtime",
+        "hours": 6,
+        "rateCents": 4200,
+        "amountCents": 25200
+      },
+      {
+        "name": "Double Overtime",
+        "hours": 0.5,
+        "rateCents": 5600,
+        "amountCents": 2800
+      }
+    ],
+    "grossCents": 140000
+  },
+  {
+    "id": "b-pp-426",
+    "companyId": "b",
+    "cycleId": "b-c04",
+    "workerId": "b-w26",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 2800,
+        "amountCents": 112000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 4200,
+        "amountCents": 10500
+      }
+    ],
+    "grossCents": 122500
+  },
+  {
+    "id": "b-pp-427",
+    "companyId": "b",
+    "cycleId": "b-c04",
+    "workerId": "b-w27",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 2600,
+        "amountCents": 104000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 3900,
+        "amountCents": 9750
+      }
+    ],
+    "grossCents": 113750
+  },
+  {
+    "id": "b-pp-428",
+    "companyId": "b",
+    "cycleId": "b-c04",
+    "workerId": "b-w28",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Regular Hours",
+        "hours": 40,
+        "rateCents": 2600,
+        "amountCents": 104000
+      },
+      {
+        "name": "Overtime",
+        "hours": 2.5,
+        "rateCents": 3900,
+        "amountCents": 9750
+      }
+    ],
+    "grossCents": 113750
+  },
+  {
+    "id": "b-pp-429",
+    "companyId": "b",
+    "cycleId": "b-c04",
+    "workerId": "b-w29",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Salary",
+        "hours": null,
+        "rateCents": 4160000,
+        "amountCents": 80000
+      }
+    ],
+    "grossCents": 80000
+  },
+  {
+    "id": "b-pp-430",
+    "companyId": "b",
+    "cycleId": "b-c04",
+    "workerId": "b-w29",
+    "paidVia": "gusto_off_cycle",
+    "earnings": [
+      {
+        "name": "Commission",
+        "hours": null,
+        "rateCents": null,
+        "amountCents": 114604
+      }
+    ],
+    "grossCents": 114604
+  },
+  {
+    "id": "b-pp-431",
+    "companyId": "b",
+    "cycleId": "b-c04",
+    "workerId": "b-w30",
+    "paidVia": "gusto_regular",
+    "earnings": [
+      {
+        "name": "Salary",
+        "hours": null,
+        "rateCents": 4160000,
+        "amountCents": 80000
+      }
+    ],
+    "grossCents": 80000
+  },
+  {
+    "id": "b-pp-432",
+    "companyId": "b",
+    "cycleId": "b-c04",
+    "workerId": "b-w30",
+    "paidVia": "gusto_off_cycle",
+    "earnings": [
+      {
+        "name": "Commission",
+        "hours": null,
+        "rateCents": null,
+        "amountCents": 86190
+      }
+    ],
+    "grossCents": 86190
+  }
+]

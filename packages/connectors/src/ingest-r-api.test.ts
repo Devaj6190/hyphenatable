@@ -53,7 +53,7 @@ describe("ingest-r --source jobber-api", () => {
       timeEntries: 5,
       jobs: 2,
       visits: 1,
-      quotes: 1,
+      quotes: 2,
       invoices: 1,
       payments: 2,
       expenses: 2,

@@ -1,0 +1,11 @@
+[
+  {
+    "id": "r-corr-s01",
+    "target": {
+      "table": "timeEntries",
+      "id": "export:te:sample:20",
+      "field": "deleted"
+    },
+    "after": true
+  }
+]

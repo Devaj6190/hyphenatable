@@ -1,0 +1,380 @@
+{
+  "$comment": "Company B config for seed/generate.ts (generator: hvac-weekly, seed/lib/company-b.ts). Synthetic 30-person HVAC company, weekly pay, California daily overtime. Fixtures only: nothing is pushed to any sandbox. Money in integer cents.",
+  "generator": "hvac-weekly",
+  "seed": "payrollpilot-company-b-v1",
+  "company": {
+    "id": "b",
+    "name": "Company B (synthetic HVAC company)",
+    "kind": "synthetic",
+    "payFrequency": "weekly",
+    "timezone": "America/Los_Angeles",
+    "settings": {
+      "longShiftHours": 12,
+      "otWeeklyHours": 40,
+      "grossChangePct": 25,
+      "employeesMayBeTexted": false
+    }
+  },
+  "lowMarginPct": 20,
+  "overtime": {
+    "workweek": "Sunday-Saturday",
+    "daily": [
+      { "overHours": 8, "multiplier": 1.5 },
+      { "overHours": 12, "multiplier": 2 }
+    ],
+    "weekly": {
+      "overHours": 40,
+      "multiplier": 1.5,
+      "counts": "regular (non-daily-OT) hours only"
+    },
+    "seventhConsecutiveDay": null
+  },
+  "cycles": [
+    { "id": "b-c01", "number": 1, "start": "2026-09-20", "end": "2026-09-26" },
+    { "id": "b-c02", "number": 2, "start": "2026-09-27", "end": "2026-10-03" },
+    { "id": "b-c03", "number": 3, "start": "2026-10-04", "end": "2026-10-10" },
+    { "id": "b-c04", "number": 4, "start": "2026-10-11", "end": "2026-10-17" },
+    {
+      "id": "b-c05",
+      "number": 5,
+      "start": "2026-10-18",
+      "end": "2026-10-24",
+      "current": true
+    }
+  ],
+  "crews": {
+    "install": {
+      "manager": "b-w02",
+      "teams": [
+        ["b-w05", "b-w06", "b-w07", "b-w08"],
+        ["b-w09", "b-w10", "b-w11", "b-w12"],
+        ["b-w13", "b-w14", "b-w15", "b-w16"]
+      ]
+    },
+    "service": {
+      "manager": "b-w03",
+      "techs": [
+        "b-w17",
+        "b-w18",
+        "b-w19",
+        "b-w20",
+        "b-w21",
+        "b-w22",
+        "b-w23",
+        "b-w24",
+        "b-w25",
+        "b-w26",
+        "b-w27",
+        "b-w28"
+      ]
+    }
+  },
+  "workers": [
+    {
+      "n": 1,
+      "name": "Marisol Thackeray",
+      "role": "owner",
+      "payType": "salary",
+      "jobberRate": null,
+      "gustoRate": 12480000
+    },
+    {
+      "n": 2,
+      "name": "Desmond Quill",
+      "role": "manager",
+      "payType": "salary",
+      "jobberRate": null,
+      "gustoRate": 8840000,
+      "crew": "install"
+    },
+    {
+      "n": 3,
+      "name": "Imogen Strand",
+      "role": "manager",
+      "payType": "salary",
+      "jobberRate": null,
+      "gustoRate": 8580000,
+      "crew": "service"
+    },
+    {
+      "n": 4,
+      "name": "Tobias Wren",
+      "role": "office",
+      "payType": "hourly",
+      "jobberRate": 2600,
+      "gustoRate": 2600
+    },
+    {
+      "n": 5,
+      "name": "Anika Holloway",
+      "role": "field",
+      "payType": "hourly",
+      "jobberRate": 3800,
+      "gustoRate": 3800
+    },
+    {
+      "n": 6,
+      "name": "Beckett Navarro",
+      "role": "field",
+      "payType": "hourly",
+      "jobberRate": 3000,
+      "gustoRate": 3000
+    },
+    {
+      "n": 7,
+      "name": "Celeste Ibarra",
+      "role": "field",
+      "payType": "hourly",
+      "jobberRate": 3000,
+      "gustoRate": 3000
+    },
+    {
+      "n": 8,
+      "name": "Dorian Pike",
+      "role": "field",
+      "payType": "hourly",
+      "jobberRate": 2400,
+      "gustoRate": 2400
+    },
+    {
+      "n": 9,
+      "name": "Esme Calder",
+      "role": "field",
+      "payType": "hourly",
+      "jobberRate": 3800,
+      "gustoRate": 3800
+    },
+    {
+      "n": 10,
+      "name": "Fintan Oduya",
+      "role": "field",
+      "payType": "hourly",
+      "jobberRate": 3000,
+      "gustoRate": 3000
+    },
+    {
+      "n": 11,
+      "name": "Gemma Laurier",
+      "role": "field",
+      "payType": "hourly",
+      "jobberRate": 2800,
+      "gustoRate": 2800
+    },
+    {
+      "n": 12,
+      "name": "Hollis Varga",
+      "role": "field",
+      "payType": "hourly",
+      "jobberRate": 2400,
+      "gustoRate": 2400
+    },
+    {
+      "n": 13,
+      "name": "Ines Marchetti",
+      "role": "field",
+      "payType": "hourly",
+      "jobberRate": 3800,
+      "gustoRate": 3800
+    },
+    {
+      "n": 14,
+      "name": "Jasper Kowalczyk",
+      "role": "field",
+      "payType": "hourly",
+      "jobberRate": 3000,
+      "gustoRate": 3000
+    },
+    {
+      "n": 15,
+      "name": "Kenji Abernathy",
+      "role": "field",
+      "payType": "hourly",
+      "jobberRate": 2800,
+      "gustoRate": 2800
+    },
+    {
+      "n": 16,
+      "name": "Leona Fairbanks",
+      "role": "field",
+      "payType": "hourly",
+      "jobberRate": 2400,
+      "gustoRate": 2400
+    },
+    {
+      "n": 17,
+      "name": "Mateo Lindgren",
+      "role": "field",
+      "payType": "hourly",
+      "jobberRate": 3600,
+      "gustoRate": 3600
+    },
+    {
+      "n": 18,
+      "name": "Nadia Osei",
+      "role": "field",
+      "payType": "hourly",
+      "jobberRate": 3400,
+      "gustoRate": 3400
+    },
+    {
+      "n": 19,
+      "name": "Orrin Delacroix",
+      "role": "field",
+      "payType": "hourly",
+      "jobberRate": 3400,
+      "gustoRate": 3400
+    },
+    {
+      "n": 20,
+      "name": "Priya Halvorsen",
+      "role": "field",
+      "payType": "hourly",
+      "jobberRate": 3400,
+      "gustoRate": 3200
+    },
+    {
+      "n": 21,
+      "name": "Quentin Mbeki",
+      "role": "field",
+      "payType": "hourly",
+      "jobberRate": 3200,
+      "gustoRate": 3200
+    },
+    {
+      "n": 22,
+      "name": "Rosalind Achterberg",
+      "role": "field",
+      "payType": "hourly",
+      "jobberRate": 3200,
+      "gustoRate": 3200
+    },
+    {
+      "n": 23,
+      "name": "Silas Okonkwo",
+      "role": "field",
+      "payType": "hourly",
+      "jobberRate": 3000,
+      "gustoRate": 3000
+    },
+    {
+      "n": 24,
+      "name": "Talia Brandvold",
+      "role": "field",
+      "payType": "hourly",
+      "jobberRate": 3000,
+      "gustoRate": 3000
+    },
+    {
+      "n": 25,
+      "name": "Ulric Santangelo",
+      "role": "field",
+      "payType": "hourly",
+      "jobberRate": 2800,
+      "gustoRate": 2800
+    },
+    {
+      "n": 26,
+      "name": "Vera Moss-Halden",
+      "role": "field",
+      "payType": "hourly",
+      "jobberRate": 2800,
+      "gustoRate": 2800
+    },
+    {
+      "n": 27,
+      "name": "Wesley Tran-Oyelaran",
+      "role": "field",
+      "payType": "hourly",
+      "jobberRate": 2600,
+      "gustoRate": 2600
+    },
+    {
+      "n": 28,
+      "name": "Xiomara Gallant",
+      "role": "field",
+      "payType": "hourly",
+      "jobberRate": 2600,
+      "gustoRate": 2600
+    },
+    {
+      "n": 29,
+      "name": "Yusuf Pemberton",
+      "role": "office",
+      "payType": "commission",
+      "jobberRate": null,
+      "gustoRate": 4160000
+    },
+    {
+      "n": 30,
+      "name": "Zara Whitlock",
+      "role": "office",
+      "payType": "commission",
+      "jobberRate": null,
+      "gustoRate": 4160000
+    }
+  ],
+  "rates": {
+    "$comment": "Gusto paid the configured gustoRate in every past cycle, except b-w20 (see plants)."
+  },
+  "salespeople": ["b-w29", "b-w30"],
+  "commissionPctOfProfit": 8,
+  "installDepositPct": 50,
+  "installMarginRange": [30, 40],
+  "serviceMarginRange": [40, 55],
+  "serviceJobsPerCycle": 14,
+  "firstJobNumber": 4001,
+  "snapshot": { "dayAfterEnd": 2, "time": "10:05" },
+  "questions": [
+    {
+      "cycle": "b-c01",
+      "to": "b-w02",
+      "day": 2,
+      "text": "Install manager, on {date} an install entry has no job. Which job was it? 1 #{job1} 2 #{job2} 3 something else",
+      "options": ["#{job1}", "#{job2}", "something else"]
+    },
+    {
+      "cycle": "b-c02",
+      "to": "b-w03",
+      "day": 1,
+      "text": "Service manager, on {date} a service call has no visit. Which job was it? 1 #{job1} 2 #{job2} 3 something else",
+      "options": ["#{job1}", "#{job2}", "something else"]
+    },
+    {
+      "cycle": "b-c03",
+      "to": "b-w01",
+      "day": 3,
+      "text": "Owner, a payment came in on the quote for install #{job1}. Is it the 50% deposit? Reply 1 yes, 2 no",
+      "options": ["yes", "no"]
+    },
+    {
+      "cycle": "b-c04",
+      "to": "b-w03",
+      "day": 4,
+      "text": "Service manager, a Refrigerant purchase on {date} has no job. Which job was it? 1 #{job1} 2 #{job2} 3 something else",
+      "options": ["#{job1}", "#{job2}", "something else"]
+    }
+  ],
+  "expenseAccounts": {
+    "Equipment (Units)": "job_cost",
+    "Ductwork & Parts": "job_cost",
+    "Refrigerant": "job_cost",
+    "Permits": "job_cost",
+    "Subcontractors": "job_cost",
+    "Tools & Small Equipment": "overhead",
+    "Shop Supplies": "overhead",
+    "Vehicle Fuel": "overhead"
+  },
+  "vendors": {
+    "Equipment (Units)": [
+      "Coastline HVAC Distributors",
+      "Summit Climate Supply"
+    ],
+    "Ductwork & Parts": ["Ridgeline Sheet Metal", "Delta Parts Depot"],
+    "Refrigerant": ["Polar Gas Supply"],
+    "Permits": ["County Building Department"],
+    "Subcontractors": ["Brightwire Electric"],
+    "Tools & Small Equipment": ["Ironhand Tool Co"],
+    "Shop Supplies": ["Northgate Industrial Supply"],
+    "Vehicle Fuel": ["Fleetway Fuel Cards"]
+  }
+}

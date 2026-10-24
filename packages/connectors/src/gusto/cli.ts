@@ -8,6 +8,13 @@
 import { randomBytes } from "node:crypto";
 import { createServer } from "node:http";
 import { parseArgs } from "node:util";
+import {
+  compareFailed,
+  compareGustoEmployees,
+  formatCompare,
+  loadFixtures,
+  loadIdMap,
+} from "../compare.ts";
 import { fileTokenStore } from "../tokens.ts";
 import type { SyncRun } from "../types.ts";
 import {
@@ -25,6 +32,7 @@ import {
   pullPayrolls,
   pullUnprocessed,
 } from "./read.ts";
+import { formatSummary, summarizePayrolls } from "./summary.ts";
 
 const { positionals, values } = parseArgs({
   allowPositionals: true,
@@ -33,6 +41,7 @@ const { positionals, values } = parseArgs({
     from: { type: "string" },
     to: { type: "string" },
     "redirect-uri": { type: "string" },
+    compare: { type: "string" },
   },
 });
 
@@ -101,6 +110,15 @@ async function read(cmd: string) {
       r.syncRun,
       `active ${w.filter((x) => x.status === "active").length}; with rate ${w.filter((x) => x.gusto?.rateCents !== null).length}; not onboarded ${w.filter((x) => x.gusto?.onboarded === false).length}`,
     );
+    if (values.compare && cmd === "employees") {
+      const rows = compareGustoEmployees(
+        w,
+        await loadFixtures(values.compare),
+        await loadIdMap(company, "gusto"),
+      );
+      console.log(`\n${formatCompare(rows)}`);
+      if (compareFailed(rows)) process.exitCode = 1;
+    }
   } else if (cmd === "payrolls") {
     if (!values.from || !values.to)
       throw new Error("payrolls needs --from and --to (YYYY-MM-DD)");
@@ -112,25 +130,20 @@ async function read(cmd: string) {
       values.to,
       opts,
     );
-    print(
-      r.syncRun,
-      r.records.payrolls
-        .map(
-          (p) =>
-            `${p.sourceId} ${p.payrollType} ${p.periodStart}..${p.periodEnd} employees ${p.employees?.length ?? "?"}`,
-        )
-        .join("\n"),
-    );
+    // counts only: no uuids, no money, no names
+    print(r.syncRun, formatSummary(summarizePayrolls(r.records.payrolls)));
   } else {
     const r = await pullUnprocessed(a, company, uuid, opts);
     print(
       r.syncRun,
-      r.records.payrolls
-        .map(
+      [
+        formatSummary(summarizePayrolls(r.records.payrolls)),
+        // B's draft writer needs the payroll ids: printed for unprocessed payrolls only (ids, no money)
+        ...r.records.payrolls.map(
           (p) =>
-            `${p.sourceId} ${p.payrollType} ${p.periodStart}..${p.periodEnd}`,
-        )
-        .join("\n"),
+            `  ${p.sourceId} ${p.payrollType} ${p.periodStart}..${p.periodEnd}`,
+        ),
+      ].join("\n"),
     );
   }
 }
