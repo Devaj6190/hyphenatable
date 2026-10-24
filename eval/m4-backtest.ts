@@ -4,6 +4,7 @@
 import { computeStage1 } from "@payrollpilot/engine/payroll/stage1";
 import type { Rule } from "@payrollpilot/engine/payroll/types";
 import type { Fixtures } from "./lib/io";
+import type { M4Summary } from "./m4-r";
 
 export type Backtest = {
   company: string;
@@ -21,7 +22,7 @@ export type Backtest = {
 };
 
 export type M4 = {
-  companyR: { status: "pending"; reason: string };
+  companyR: { status: "pending"; reason: string } | M4Summary;
   syntheticSelfCheck: Backtest | null;
 };
 
@@ -65,9 +66,13 @@ export function backtest(fx: Fixtures): Backtest {
   return out;
 }
 
-export function m4(synthetic: Fixtures | null): M4 {
+/** `companyR` is the counts-only summary m4-r-run.ts writes to data/private/r/m4/summary.json, if any. */
+export function m4(
+  synthetic: Fixtures | null,
+  companyR: M4Summary | null = null,
+): M4 {
   return {
-    companyR: {
+    companyR: companyR ?? {
       status: "pending",
       reason: "Company R paid export not ingested yet (A-12)",
     },

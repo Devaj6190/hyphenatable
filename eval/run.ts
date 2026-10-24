@@ -1,10 +1,15 @@
 // bun run run.ts --company a --cycle a-c05 [--flags fixtures/flags.json] [--out results.json]
 // Writes results.json (M1..M6). Flags default to the naive stand-in until B's eval.summary export exists.
 import { execFileSync } from "node:child_process";
-import { writeFileSync } from "node:fs";
+import { existsSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { loadFixtures, loadFlags, REPO } from "./lib/io";
+import { loadFixtures, loadFlags, REPO, readJson } from "./lib/io";
 import { m2 } from "./m2-rules";
+import { M4Summary } from "./m4-r";
+
+/** Counts only, written by m4-r-run.ts. */
+const R_SUMMARY = join(REPO, "data/private/r/m4/summary.json");
+
 import { buildResults } from "./metrics";
 
 const arg = (name: string, dflt: string) => {
@@ -37,6 +42,7 @@ const results = buildResults({
     : flagsPath,
   m2: m2(),
   syntheticBacktest: loadFixtures("b"),
+  companyR: existsSync(R_SUMMARY) ? M4Summary.parse(readJson(R_SUMMARY)) : null,
   generatedAt: new Date().toISOString(),
   gitSha,
 });

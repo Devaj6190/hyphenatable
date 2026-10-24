@@ -5,6 +5,7 @@ import { m1 } from "./m1-planted";
 import type { M2 } from "./m2-rules";
 import { m3 } from "./m3-questions";
 import { m4 } from "./m4-backtest";
+import type { M4Summary } from "./m4-r";
 import { m5 } from "./m5-completeness";
 import { m6 } from "./m6-traceability";
 import { Results } from "./schema";
@@ -16,6 +17,8 @@ export function buildResults(args: {
   flagsSource: string;
   m2: M2;
   syntheticBacktest: Fixtures | null;
+  /** Counts-only Company R summary from m4-r-run.ts, when it has been run. */
+  companyR?: M4Summary | null;
   generatedAt: string;
   gitSha: string | null;
 }): Results {
@@ -37,7 +40,7 @@ export function buildResults(args: {
     m1: m1(flags, key),
     m2: args.m2,
     m3: m3(fx.cycles, fx.questions, fx.answerKey, current),
-    m4: m4(args.syntheticBacktest),
+    m4: m4(args.syntheticBacktest, args.companyR ?? null),
     m5: m5(fx.syncRuns),
     m6: m6(flags),
   });

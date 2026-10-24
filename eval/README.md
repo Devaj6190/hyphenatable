@@ -22,11 +22,55 @@ bun run test                                    # vitest
 | M1 | `m1-planted.ts` | Recall and precision over the answer key. A row is caught when a flag has the same `checkId` and any overlapping subject id (worker, job, entry, expense), never by text. Reported per check and overall, with every missed row and every unmatched flag | flags + `answer-key.json` (base rows → a-c05, extension rows carry `cycleId`) |
 | M2 | `m2-rules.ts` | Learned rules vs the owner's runbook, counts only | `data/private/r/rule-grading.json` (never committed); `pending` until it exists |
 | M3 | `m3-questions.ts` | **Measured:** `Cycle.questionsAsked` per current cycle (0 until live runs). **Past:** answered questions per closed cycle. **Expected from the answer key:** planted rows needing an answer (CHK-12 is a note, never a question; a-c06 rows with `resolvableByRuleType` are settled by a cycle-1 rule). The expectation is labelled, never shown as a result | `cycles.json`, `questions.json`, answer key |
-| M4 | `m4-backtest.ts` | **Company R:** pending (A-12). **Synthetic self-check:** `computeStage1` gross vs Company B's past Gusto regular rows | Company B fixtures |
+| M4 | `m4-backtest.ts`, `m4-r.ts` | **Company R:** the counts-only summary from `m4-r-run.ts` (below), or `pending`. **Synthetic self-check:** `computeStage1` gross vs Company B's past Gusto regular rows | `data/private/r/m4/summary.json`; Company B fixtures |
 | M5 | `m5-completeness.ts` | Share of `SyncRun.complete`, every blocked object listed | `syncRuns.json` |
 | M6 | `m6-traceability.ts` | Share of flags with at least one `where` ref and a rule or model-call id. A deterministic check (`confidence: "certain"`) counts as its own rule. A judged flag needs `precedent.ruleId`, or a model-call id from the audit log | flags (+ audit export later) |
 
 `schema.ts` is the `results.json` contract (zod). `metrics.ts` builds it from loaded data; `run.ts` does the IO.
+
+## Company R (private inputs; nothing real is committed)
+
+Both runners print counts only. Everything they read and write stays under `data/private/` (gitignored). Their tests run only on the synthetic samples in `fixtures/`, never on real data.
+
+### M2: `data/private/r/rule-grading.json`
+
+```json
+[
+  { "ruleId": "r-rule-03", "runbookId": "RB-07", "verdict": "match" },
+  { "ruleId": "r-rule-05", "runbookId": "RB-02", "verdict": "differs" },
+  { "ruleId": null,        "runbookId": "RB-11", "verdict": "not_learned" }
+]
+```
+
+- **`ruleId`:** the learned `Rule.id`, or `null` exactly when `verdict` is `not_learned`.
+- **`runbookId`:** the owner's runbook rule id.
+- **`verdict`:** `match`, `differs` or `not_learned`.
+- **Ids only:** each id is 1 to 40 characters from `A-Za-z0-9:_.-`, and any extra field is rejected. Rule or runbook text cannot get in, and none comes out.
+- **Example:** `fixtures/rule-grading.example.json` (fake ids).
+
+```bash
+bun run m2-run.ts   # "M2: N of M onboarding rules match the owner's runbook; K differ; J were not learned"
+```
+
+### M4: the Company R backtest
+
+The backtest takes three inputs:
+
+1. **`data/private/r/out/*.json`:** ingest-r's anonymized bundles (`namesAnonymized: true`). It reads `workers`, `timeEntries` and `paid` (gross per pseudonymous worker and pay period, from the Gusto Payroll Journal). Several files are merged by id.
+2. **`data/private/r/m4-rules.json`:** how Company R pays, with `source` set to `owner_stated` or `onboarding`. It gives `timezone`, `payFrequency`, and `workers: [{ id, payType, rateCents, paymentUnit }]`, plus section 6 `rules` (at least an active `overtime_policy`). A worker missing from it is reported as unmatched; no rate is ever invented.
+3. **`data/private/r/corrections.json`** (optional): the owner's register corrections as section 6 Correction targets. Each is `[{ id, target: { table: "timeEntries", id, field }, after }]`, where `field` is one of `durationSec`, `workerId`, `date`, `payable`, `category` or `deleted`.
+
+For each pay period, it runs `computeStage1` and compares gross per worker with what was paid. Venmo is excluded, because it is not in the Gusto journal. The report gives exact matches, matches within $1, the max difference and the unmatched worker-periods, **before and after corrections**.
+
+Explain trails go only to `data/private/r/m4/trails-<time>.json`. The counts go to `data/private/r/m4/summary.json`, which `run.ts` copies into `results.json` as `m4.companyR`. The runner refuses any directory outside `data/private/`.
+
+Export entries without a start time are placed at local noon of their date. An unknown `payable` is counted as worked. Both are listed in `notes`. Hours are never trimmed.
+
+```bash
+bun run m4-r-run.ts   # [--private data/private/r] [--rules …] [--corrections …]
+```
+
+Synthetic sample: `fixtures/r-sample/`. It has 3 workers and one duplicate entry that the register's correction deletes: 2 of 3 exact before the correction, 3 of 3 after.
 
 ## Fixtures
 
