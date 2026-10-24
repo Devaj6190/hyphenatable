@@ -1,0 +1,75 @@
+// Mirrors Flag in docs/plans/00-shared-context.md section 6. B's schema replaces this.
+export type SourceSystem = "Jobber" | "QuickBooks" | "Gusto" | "Workbook";
+
+export type Flag = {
+  id: string;
+  companyId: string;
+  cycleId: string;
+  checkId: string;
+  status: "open" | "asked" | "answered" | "corrected" | "dismissed" | "held";
+  subject: {
+    workerId: string | null;
+    jobId: string | null;
+    entryIds: string[];
+    expenseIds: string[];
+  };
+  seen: string;
+  where: { system: SourceSystem; recordId: string; url: string | null }[];
+  confidence: "certain" | number;
+  precedent: {
+    ruleId: string | null;
+    flagId: string | null;
+    note: string;
+  } | null;
+  routeTo: "owner" | "manager" | "none";
+  affects: {
+    workerId: string | null;
+    jobId: string | null;
+    dollarsCents: number | null;
+  };
+  questionId: string | null;
+  correctionId: string | null;
+};
+
+export type ViewerRole = "owner" | "manager";
+
+// Mirrors Question in docs/plans/00-shared-context.md section 6.
+export type Question = {
+  id: string;
+  companyId: string;
+  cycleId: string;
+  flagIds: string[];
+  toWorkerId: string;
+  toRole: "owner" | "manager" | "employee";
+  text: string;
+  options: string[] | null;
+  kind: "text" | "poll";
+  status:
+    | "draft"
+    | "approved"
+    | "sent"
+    | "reminded"
+    | "answered"
+    | "expired"
+    | "denied";
+  approvedBy: string | null;
+  approvedAt: string | null;
+  sentAt: string | null;
+  remindAt: string | null;
+  expiresAt: string | null;
+  interpretationId: string | null;
+};
+
+// The slice of AuditEvent the flag timeline needs. B's audit.list replaces it.
+export type FlagEvent = {
+  id: string;
+  flagId: string;
+  at: string;
+  actor: {
+    kind: "system" | "agent" | "user";
+    id: string;
+    agent: "analyst" | "auditor" | "messenger" | null;
+  };
+  type: string;
+  summary: string;
+};
