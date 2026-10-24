@@ -1,15 +1,19 @@
 // Gusto "Payroll Journal Report" CSV, sectioned layout (Company R's real export; tested only on synthetic
 // replicas). Preamble lines, then per payroll:
 //   <title>  /  Pay period, MM/DD/YYYY - MM/DD/YYYY  /  Pay day, MM/DD/YYYY  /  30-column header  /
-//   employee rows (first row: Last, First, ..., Employee Type; continuation rows: blank names, one Pay Type each,
-//   sometimes a "Gross" line)  /  Payroll Totals ...
-// Read ONLY: names, employee type, pay type, hours, rate, amount; period, pay day, section kind. Payment (the
-// payment METHOD), tax columns, Work Address, Net Pay, Check Amount, Employer Cost and Donations are never read
-// (only mapped columns are indexed).
-// Gross per employee = the sum of their pay-type Amounts, excluding a "Gross" line; a Gross line, when present,
-// must equal that sum. An employee row with no pay lines at all is gross 0 from the source (a note). Section
-// total = the Payroll Totals row's Amount (or its Gross line), compared to the sum of employee gross.
-// "Owner's Draw" pay lines / "Owner’s draw" employees are owner draws (payKind owner_draw).
+//   employee rows  /  Payroll Totals block
+// Employee rows: the first row has Last, First, Employee Type; then one line per (Job, Pay Type): itemized
+// lines per job (Job = a role such as "Landscaper", each with its own Rate) or with no job, then SUBTOTAL
+// lines per pay type with Job = "Totals", then often a "Gross" line.
+// Read ONLY: names, employee type, job, pay type, hours, rate, amount; period, pay day, section kind. Payment
+// (the payment METHOD), tax columns, Work Address, Net Pay, Check Amount, Employer Cost and Donations are never
+// read (only mapped columns are indexed).
+// Rules (per employee and for the Payroll Totals block alike):
+//   itemized = lines whose Job is not "Totals" and Pay Type is not "Gross"; "Totals" lines are never added,
+//   only checked: per pay type, the Totals line == the sum of that pay type's itemized lines;
+//   gross = the Gross line if present, else the itemized sum; when both exist they must agree.
+// An employee with no pay lines at all is gross 0 from the source (a note). The Payroll Totals gross must equal
+// the sum of employee gross. "Owner's Draw" lines / "Owner’s draw" employees are owner draws.
 
 import { readFile } from "node:fs/promises";
 import { basename } from "node:path";
@@ -31,6 +35,7 @@ type Key =
   | "last"
   | "first"
   | "employeeType"
+  | "job"
   | "payType"
   | "hours"
   | "rate"
@@ -39,6 +44,7 @@ export const SECTIONED_COLUMNS: Mapping<Key> = {
   last: ["Last Name"],
   first: ["First Name"],
   employeeType: ["Employee Type"],
+  job: ["Job"],
   payType: ["Pay Type"],
   hours: ["Hours"],
   rate: ["Rate"],
@@ -62,6 +68,53 @@ const dateAfter = (row: Cell[], i: number): string | undefined =>
     .map((c) => text(c) ?? "")
     .join(" ")
     .match(US_DATE)?.[0];
+const isTotalsJob = (job: string | null) => !!job && /^totals?$/i.test(job);
+
+/** One employee's (or the Payroll Totals block's) lines: itemized, per-type subtotals, the Gross line. */
+class LineBlock {
+  itemized = 0;
+  items = 0;
+  gross: number | null = null;
+  readonly byType = new Map<string, number>();
+  readonly subtotals = new Map<string, number>();
+
+  /** returns true when the line was itemized (so the caller records its earnings detail) */
+  add(job: string | null, type: string, amount: number | null): boolean {
+    if (/^gross$/i.test(type)) {
+      this.gross = amount;
+      return false;
+    }
+    if (amount === null) return false;
+    if (isTotalsJob(job)) {
+      this.subtotals.set(type, (this.subtotals.get(type) ?? 0) + amount);
+      return false;
+    }
+    this.itemized += amount;
+    this.items++;
+    this.byType.set(type, (this.byType.get(type) ?? 0) + amount);
+    return true;
+  }
+
+  /** cross-checks; problems are pushed with `where` (row / section numbers only) */
+  check(where: string, problems: string[]): void {
+    for (const [type, sub] of this.subtotals) {
+      const items = this.byType.get(type) ?? 0;
+      if (sub !== items)
+        problems.push(
+          `${where}: "${type}" Totals line ${sub}¢ vs its itemized lines ${items}¢`,
+        );
+    }
+    if (this.gross !== null && this.items > 0 && this.gross !== this.itemized) {
+      problems.push(
+        `${where}: Gross line ${this.gross}¢ vs itemized lines ${this.itemized}¢`,
+      );
+    }
+  }
+
+  value(): number | null {
+    return this.gross ?? (this.items > 0 ? this.itemized : null);
+  }
+}
 
 export async function readGustoPayrollJournalSectionedCsv(
   input: string | { text: string; fileName: string },
@@ -144,34 +197,20 @@ export async function readGustoPayrollJournalSectionedCsv(
     r += header.headerRow + 1;
 
     let current: PayrollJournalRow | null = null;
-    let lineSum = 0;
-    let lines = 0;
-    let grossLine: number | null = null;
+    let block = new LineBlock();
+    let totalsBlock: LineBlock | null = null;
     let sectionGross = 0;
-    let totals: number | null = null;
-    // the totals block may itemize by pay type instead of giving one Gross amount
-    let totalsItemized: number | null = null;
-    const addItem = (a: number | null) => {
-      if (a !== null) totalsItemized = (totalsItemized ?? 0) + a;
-    };
-    let inTotals = false;
     const finish = () => {
       if (current) {
-        if (grossLine !== null && lines > 0 && grossLine !== lineSum) {
-          problems.push(
-            `${where} row ${current.rowNumber}: Gross line ${grossLine}¢ vs pay lines ${lineSum}¢`,
-          );
-        }
-        // only a Gross line (no itemized lines): that is the gross
-        current.grossCents = lines > 0 ? lineSum : (grossLine ?? 0);
-        if (lines === 0 && grossLine === null) zeroGross++;
+        block.check(`${where} row ${current.rowNumber}`, problems);
+        const gross = block.value();
+        if (gross === null) zeroGross++;
+        current.grossCents = gross ?? 0;
         sectionGross += current.grossCents;
         rows.push(current);
       }
       current = null;
-      lineSum = 0;
-      lines = 0;
-      grossLine = null;
+      block = new LineBlock();
     };
     for (; r < grid.length; r++) {
       const x = grid[r] ?? [];
@@ -181,29 +220,25 @@ export async function readGustoPayrollJournalSectionedCsv(
       const last = text(at(x, "last"));
       const firstName = text(at(x, "first"));
       const type = text(at(x, "payType"));
-      if (last && /^payroll totals?$/i.test(last)) {
-        finish();
-        inTotals = true;
-        try {
-          // the totals row's own Amount (with or without a Gross pay type)
-          const amount = toCents(text(at(x, "amount")));
-          if (amount !== null && (!type || /^gross$/i.test(type)))
-            totals = amount;
-          else addItem(amount);
-        } catch {
-          problems.push(`${where}: unreadable Payroll Totals`);
-        }
+      const job = text(at(x, "job"));
+      let amount: number | null = null;
+      try {
+        amount = toCents(text(at(x, "amount")));
+      } catch {
+        problems.push(`${where} row ${r + 1}: unreadable amount`);
         continue;
       }
-      if (inTotals) {
+      if (last && /^payroll totals?$/i.test(last)) {
+        finish();
+        totalsBlock = new LineBlock();
+        // an Amount with no pay type on the totals row itself is the section's gross
+        if (type) totalsBlock.add(job, type, amount);
+        else if (amount !== null) totalsBlock.gross = amount;
+        continue;
+      }
+      if (totalsBlock) {
         if (last || firstName || (!type && first0)) break; // something else began: the section is over
-        try {
-          if (type && /^gross$/i.test(type))
-            totals = toCents(text(at(x, "amount")));
-          else if (type) addItem(toCents(text(at(x, "amount"))));
-        } catch {
-          problems.push(`${where}: unreadable Payroll Totals gross`);
-        }
+        if (type) totalsBlock.add(job, type, amount);
         continue;
       }
       if (last || firstName) {
@@ -225,6 +260,7 @@ export async function readGustoPayrollJournalSectionedCsv(
           employeeType,
           payKind: isOwnerDraw(employeeType) ? "owner_draw" : "wage",
           ratesCents: {},
+          jobLines: [],
         };
       }
       if (!type) continue;
@@ -234,27 +270,34 @@ export async function readGustoPayrollJournalSectionedCsv(
       }
       const cur = current as PayrollJournalRow;
       try {
-        const amount = toCents(text(at(x, "amount")));
-        if (/^gross$/i.test(type)) {
-          grossLine = amount;
-          continue;
-        }
+        if (!block.add(job, type, amount)) continue; // Gross line or a Totals subtotal: checked, not added
         if (isOwnerDraw(type)) cur.payKind = "owner_draw";
-        if (amount !== null) {
-          cur.earningsCents[type] = (cur.earningsCents[type] ?? 0) + amount;
-          lineSum += amount;
-          lines++;
-        }
-        const h = parseScaled(text(at(x, "hours")), 3);
-        if (h !== null) cur.hours[type] = (cur.hours[type] ?? 0) + h / 1000;
+        const hours = parseScaled(text(at(x, "hours")), 3);
         const rate = toCents(text(at(x, "rate")));
-        if (rate !== null && cur.ratesCents) cur.ratesCents[type] = rate;
+        cur.earningsCents[type] =
+          (cur.earningsCents[type] ?? 0) + (amount ?? 0);
+        if (hours !== null)
+          cur.hours[type] = (cur.hours[type] ?? 0) + hours / 1000;
+        // per-pay-type rate only when unambiguous; per-job rates are in jobLines (M4 needs them)
+        if (rate !== null && cur.ratesCents) {
+          if (cur.ratesCents[type] === undefined) cur.ratesCents[type] = rate;
+          else if (cur.ratesCents[type] !== rate) delete cur.ratesCents[type];
+        }
+        cur.jobLines?.push({
+          job,
+          payType: type,
+          hours: hours === null ? null : hours / 1000,
+          rateCents: rate,
+          amountCents: amount ?? 0,
+        });
       } catch {
         problems.push(`${where} row ${r + 1}: unreadable pay line`);
       }
     }
     finish();
-    if (totals === null) totals = totalsItemized;
+    const tb = totalsBlock as LineBlock | null;
+    if (tb) tb.check(`${where} Payroll Totals`, problems);
+    const totals = tb?.value() ?? null;
     if (totals === null) problems.push(`${where}: no Payroll Totals amount`);
     else if (totals !== sectionGross)
       problems.push(

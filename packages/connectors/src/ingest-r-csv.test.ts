@@ -65,7 +65,7 @@ describe("ingest-r with the real-layout CSVs (replicas)", () => {
         workerId: avery,
         periodStart: "2026-08-29",
         periodEnd: "2026-09-11",
-        regularGrossCents: 111250,
+        regularGrossCents: 116250,
         offCycleGrossCents: 20000,
         otherGrossCents: 0,
         ownerDrawCents: 0,
@@ -117,7 +117,7 @@ describe("ingest-r with the real-layout CSVs (replicas)", () => {
       "gate code",
       "Fake Street",
       "Fake Landscaping",
-      "Team Leader",
+      // (a job role named "Team Leader" in the Gusto lines is a role, not a name: checked on workers below)
       "1234.56",
       "777.77",
       "Direct Deposit",
@@ -125,6 +125,17 @@ describe("ingest-r with the real-layout CSVs (replicas)", () => {
     ]) {
       expect(out).not.toContain(s);
     }
+    expect(
+      b.workers.some((w: { displayName: string }) =>
+        /team leader/i.test(w.displayName),
+      ),
+    ).toBe(false);
+    expect(b.paid[0].jobLines.map((l: { job: string }) => l.job)).toEqual([
+      "Landscaper",
+      "Team Leader",
+      null,
+      null,
+    ]);
     const tokens = (await readFile(join(dir, "real-tokens.txt"), "utf8"))
       .trim()
       .split("\n");

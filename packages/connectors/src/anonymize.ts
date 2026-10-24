@@ -291,6 +291,14 @@ export interface AnonPaid {
   /** per pay-type amounts in cents (Regular, Overtime, Commission, ...); no taxes */
   earningsCents?: Record<string, number>;
   hours?: Record<string, number>;
+  /** itemized lines with job role and rate (job names are roles, e.g. "Landscaper", not people) */
+  jobLines?: {
+    job: string | null;
+    payType: string;
+    hours: number | null;
+    rateCents: number | null;
+    amountCents: number;
+  }[];
 }
 
 export interface AnonPaidPeriod {
@@ -468,6 +476,7 @@ export function anonymizeExports(
               employeeType: r.employeeType ?? null,
               earningsCents: r.earningsCents,
               hours: r.hours,
+              jobLines: r.jobLines ?? [],
             }
           : {}),
       });
