@@ -62,7 +62,13 @@ export class Relay {
       log(`sent ${id} (${row.kind}) via ${this.transport.name} to ${phone} as ${providerId}`);
       await withRetry(
         `markSent ${id}`,
-        () => this.backend.markSent({ courierKey: this.courierKey, messageId: id, providerId }),
+        () =>
+          this.backend.markSent({
+            courierKey: this.courierKey,
+            messageId: id,
+            providerId,
+            conversationKey: conversationKey(phone),
+          }),
         3,
         this.retryBaseMs,
       ).catch(() => log(`markSent ${id} gave up; the text went out as ${providerId} and will not be resent`));

@@ -54,6 +54,7 @@ describe("outbound", () => {
     expect(fake.outbox[0]?.phone).toBe(MANAGER);
     expect(m.status).toBe("sent");
     expect(m.providerId).toBe(fake.outbox[0]?.providerId as string);
+    expect(m.conversationKey).toBe(conversationKey(MANAGER)); // markSent carries it (contract PR #15)
   });
 
   test("an unregistered contactRef is refused and marked failed", async () => {

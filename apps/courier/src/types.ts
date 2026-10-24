@@ -15,7 +15,9 @@ export type OutboundRow = {
   options: string[] | null;
 };
 
-export type MarkSentArgs = { courierKey: string; messageId: string; providerId: string };
+// markSent also carries conversationKey (contract PR #15): only the courier knows sha256(phone), and Convex needs it
+// to tie the reply to the question that was sent.
+export type MarkSentArgs = { courierKey: string; messageId: string; providerId: string; conversationKey: string };
 export type MarkFailedArgs = { courierKey: string; messageId: string; reason: string };
 export type InboundArgs = {
   courierKey: string;

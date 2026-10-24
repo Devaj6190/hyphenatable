@@ -89,6 +89,7 @@ export class StubBackend implements Backend {
     if (!m) throw new Error(`no message ${args.messageId}`);
     m.status = "sent";
     m.providerId = args.providerId;
+    m.conversationKey = args.conversationKey;
     this.notify();
   }
 
