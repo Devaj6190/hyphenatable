@@ -13,7 +13,13 @@ import { pullExpenses } from "./index.ts";
 
 const { positionals, values } = parseArgs({
   allowPositionals: true,
-  options: { company: { type: "string" }, from: { type: "string" }, to: { type: "string" }, cycle: { type: "string" }, out: { type: "string" } },
+  options: {
+    company: { type: "string" },
+    from: { type: "string" },
+    to: { type: "string" },
+    cycle: { type: "string" },
+    out: { type: "string" },
+  },
 });
 
 async function initToken() {
@@ -22,31 +28,59 @@ async function initToken() {
   for await (const c of process.stdin) chunks.push(c as Buffer);
   const refreshToken = Buffer.concat(chunks).toString("utf8").trim();
   if (!refreshToken) throw new Error("no refresh token on stdin");
-  await fileTokenStore(QBO_TOKEN_PATH).save({ accessToken: null, accessTokenExpiresAt: null, refreshToken });
-  console.log(`Stored the QBO refresh token in ${QBO_TOKEN_PATH} (gitignored).`);
+  await fileTokenStore(QBO_TOKEN_PATH).save({
+    accessToken: null,
+    accessTokenExpiresAt: null,
+    refreshToken,
+  });
+  console.log(
+    `Stored the QBO refresh token in ${QBO_TOKEN_PATH} (gitignored).`,
+  );
 }
 
 async function pull() {
   const { company, from, to } = values;
-  if (!company || !from || !to) throw new Error("pull needs --company, --from and --to");
-  const r = await pullExpenses({ ...qboAuthFromEnv(), log: (l) => console.error(l) }, company, from, to, { cycleId: values.cycle ?? null });
+  if (!company || !from || !to)
+    throw new Error("pull needs --company, --from and --to");
+  const r = await pullExpenses(
+    { ...qboAuthFromEnv(), log: (l) => console.error(l) },
+    company,
+    from,
+    to,
+    { cycleId: values.cycle ?? null },
+  );
   console.log(`company ${company}  TxnDate ${from} .. ${to}`);
-  console.log(`${"object".padEnd(10)}${"pulled".padStart(7)}${"expected".padStart(9)}${"complete".padStart(9)}  error`);
-  for (const s of r.syncRuns) console.log(`${s.object.padEnd(10)}${String(s.pulled).padStart(7)}${String(s.expected ?? "null").padStart(9)}${String(s.complete).padStart(9)}  ${s.error ?? ""}`);
+  console.log(
+    `${"object".padEnd(10)}${"pulled".padStart(7)}${"expected".padStart(9)}${"complete".padStart(9)}  error`,
+  );
+  for (const s of r.syncRuns)
+    console.log(
+      `${s.object.padEnd(10)}${String(s.pulled).padStart(7)}${String(s.expected ?? "null").padStart(9)}${String(s.complete).padStart(9)}  ${s.error ?? ""}`,
+    );
   const e = r.records.expenses;
-  console.log(`\nexpense records ${e.length}: job-tagged ${e.filter((x) => x.customerRef).length}, seed-marked ${e.filter((x) => !/^(Purchase|Bill):/.test(x.sourceId)).length}`);
+  console.log(
+    `\nexpense records ${e.length}: job-tagged ${e.filter((x) => x.customerRef).length}, seed-marked ${e.filter((x) => !/^(Purchase|Bill):/.test(x.sourceId)).length}`,
+  );
   if (values.out) {
     const out = resolve(values.out);
-    if (!out.includes(`${sep}data${sep}private${sep}`)) throw new Error("--out must be under data/private/");
+    if (!out.includes(`${sep}data${sep}private${sep}`))
+      throw new Error("--out must be under data/private/");
     await writeFile(out, JSON.stringify(r, null, 2));
     console.log(`wrote ${out}`);
   }
   if (r.syncRuns.some((s) => !s.complete)) process.exitCode = 1;
 }
 
-const main = positionals[0] === "init-token" ? initToken : positionals[0] === "pull" ? pull : null;
+const main =
+  positionals[0] === "init-token"
+    ? initToken
+    : positionals[0] === "pull"
+      ? pull
+      : null;
 if (!main) {
-  console.error("usage: cli.ts init-token < token | pull --company <id> --from YYYY-MM-DD --to YYYY-MM-DD [--cycle <id>] [--out data/private/…]");
+  console.error(
+    "usage: cli.ts init-token < token | pull --company <id> --from YYYY-MM-DD --to YYYY-MM-DD [--cycle <id>] [--out data/private/…]",
+  );
   process.exit(2);
 }
 main().catch((e: unknown) => {

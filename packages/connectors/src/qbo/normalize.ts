@@ -36,10 +36,13 @@ export interface RawBill {
 }
 
 const MARKER = /payrollpilot:([A-Za-z0-9_-]+)/;
-export const seedMarker = (note: string | undefined): string | null => MARKER.exec(note ?? "")?.[1] ?? null;
+export const seedMarker = (note: string | undefined): string | null =>
+  MARKER.exec(note ?? "")?.[1] ?? null;
 
-const detail = (l: RawLine) => l.AccountBasedExpenseLineDetail ?? l.ItemBasedExpenseLineDetail;
-const accountOf = (l: RawLine) => l.AccountBasedExpenseLineDetail?.AccountRef?.name ?? null;
+const detail = (l: RawLine) =>
+  l.AccountBasedExpenseLineDetail ?? l.ItemBasedExpenseLineDetail;
+const accountOf = (l: RawLine) =>
+  l.AccountBasedExpenseLineDetail?.AccountRef?.name ?? null;
 const customerOf = (l: RawLine) => {
   const v = detail(l)?.CustomerRef?.value;
   return v ? `qbo:Customer:${v}` : null;
@@ -48,19 +51,36 @@ const negate = (c: number | null) => (c === null || c === 0 ? c : -c);
 
 function toExpenses(
   entity: "Purchase" | "Bill",
-  raw: { Id: string; TxnDate: string; TotalAmt: number; PrivateNote?: string; Line?: RawLine[] },
+  raw: {
+    Id: string;
+    TxnDate: string;
+    TotalAmt: number;
+    PrivateNote?: string;
+    Line?: RawLine[];
+  },
   companyId: string,
   vendor: string | null,
   paymentType: string | null,
   credit: boolean,
 ): Expense[] {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(raw.TxnDate)) throw new Error(`QBO ${entity} ${raw.Id}: unexpected TxnDate ${JSON.stringify(raw.TxnDate)}`);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(raw.TxnDate))
+    throw new Error(
+      `QBO ${entity} ${raw.Id}: unexpected TxnDate ${JSON.stringify(raw.TxnDate)}`,
+    );
   const lines = (raw.Line ?? []).filter((l) => detail(l));
   const marker = seedMarker(raw.PrivateNote);
   const sign = (c: number | null) => (credit ? negate(c) : c);
   const base = {
-    companyId, source: "qbo" as const, date: raw.TxnDate, vendor, paymentType,
-    kind: "unknown" as const, matchedJobId: null, matchConfidence: null, reimbursableToWorkerId: null, reimbursementStatus: null,
+    companyId,
+    source: "qbo" as const,
+    date: raw.TxnDate,
+    vendor,
+    paymentType,
+    kind: "unknown" as const,
+    matchedJobId: null,
+    matchConfidence: null,
+    reimbursableToWorkerId: null,
+    reimbursementStatus: null,
   };
   if (lines.some(customerOf)) {
     return lines.map((l, i) => {
@@ -78,20 +98,32 @@ function toExpenses(
   }
   const accounts = new Set(lines.map(accountOf));
   const descriptions = lines.map((l) => l.Description?.trim()).filter(Boolean);
-  return [{
-    ...base,
-    id: `qbo:${entity}:${raw.Id}`,
-    sourceId: marker ?? `${entity}:${raw.Id}`,
-    amountCents: sign(toCents(raw.TotalAmt)),
-    description: descriptions.length ? descriptions.join("; ") : null,
-    // one account across all lines -> that account; mixed -> null (never pick one)
-    accountName: accounts.size === 1 ? ([...accounts][0] ?? null) : null,
-    customerRef: null,
-  }];
+  return [
+    {
+      ...base,
+      id: `qbo:${entity}:${raw.Id}`,
+      sourceId: marker ?? `${entity}:${raw.Id}`,
+      amountCents: sign(toCents(raw.TotalAmt)),
+      description: descriptions.length ? descriptions.join("; ") : null,
+      // one account across all lines -> that account; mixed -> null (never pick one)
+      accountName: accounts.size === 1 ? ([...accounts][0] ?? null) : null,
+      customerRef: null,
+    },
+  ];
 }
 
-export const normalizePurchase = (p: RawPurchase, companyId: string): Expense[] =>
-  toExpenses("Purchase", p, companyId, p.EntityRef?.type === "Vendor" ? (p.EntityRef.name ?? null) : null, p.PaymentType ?? null, p.Credit === true);
+export const normalizePurchase = (
+  p: RawPurchase,
+  companyId: string,
+): Expense[] =>
+  toExpenses(
+    "Purchase",
+    p,
+    companyId,
+    p.EntityRef?.type === "Vendor" ? (p.EntityRef.name ?? null) : null,
+    p.PaymentType ?? null,
+    p.Credit === true,
+  );
 
 export const normalizeBill = (b: RawBill, companyId: string): Expense[] =>
   toExpenses("Bill", b, companyId, b.VendorRef?.name ?? null, null, false);

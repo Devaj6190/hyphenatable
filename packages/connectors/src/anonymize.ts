@@ -13,10 +13,66 @@ import type { TimesheetRow } from "./exports/jobber-timesheets-xlsx.ts";
 import type { JobberRecords, PullResult } from "./jobber/index.ts";
 import type { Job, SyncRun } from "./types.ts";
 
-const FIRST = ["Avery", "Quinn", "Rowan", "Sage", "Emery", "Finley", "Harper", "Indigo", "Jules", "Kai", "Lane", "Marlow", "Nova", "Oakley", "Peyton", "Remy", "Shiloh", "Tatum", "Wren", "Zion", "Blair", "Corin", "Dallas", "Ellis"];
-const LAST = ["Ashby", "Brightwater", "Calloway", "Dunmore", "Ellery", "Fairbanks", "Galloway", "Hollis", "Ivers", "Juniper", "Kestrel", "Lindqvist", "Marchetti", "Northcott", "Okafor", "Pemberton", "Quayle", "Rosales", "Stavros", "Thorne"];
+const FIRST = [
+  "Avery",
+  "Quinn",
+  "Rowan",
+  "Sage",
+  "Emery",
+  "Finley",
+  "Harper",
+  "Indigo",
+  "Jules",
+  "Kai",
+  "Lane",
+  "Marlow",
+  "Nova",
+  "Oakley",
+  "Peyton",
+  "Remy",
+  "Shiloh",
+  "Tatum",
+  "Wren",
+  "Zion",
+  "Blair",
+  "Corin",
+  "Dallas",
+  "Ellis",
+];
+const LAST = [
+  "Ashby",
+  "Brightwater",
+  "Calloway",
+  "Dunmore",
+  "Ellery",
+  "Fairbanks",
+  "Galloway",
+  "Hollis",
+  "Ivers",
+  "Juniper",
+  "Kestrel",
+  "Lindqvist",
+  "Marchetti",
+  "Northcott",
+  "Okafor",
+  "Pemberton",
+  "Quayle",
+  "Rosales",
+  "Stavros",
+  "Thorne",
+];
 /** Business suffixes and filler: not identifying, so not scanned for (they would only cause false aborts). */
-const STOP = new Set(["llc", "inc", "ltd", "corp", "company", "the", "and", "client", "job"]);
+const STOP = new Set([
+  "llc",
+  "inc",
+  "ltd",
+  "corp",
+  "company",
+  "the",
+  "and",
+  "client",
+  "job",
+]);
 
 /** Persisted mapping. Keys are normalized real strings: PRIVATE, data/private/r/pseudonyms.json only. */
 export interface PseudonymMap {
@@ -30,7 +86,12 @@ export const nameKey = (real: string): string => words(real).sort().join(" ");
 
 /** Lowercase ASCII words; apostrophes join ("O'Neil" -> "oneil"), every other non-letter splits. Used for keys and for the leak scan alike. */
 function words(s: string): string[] {
-  return s.toLowerCase().normalize("NFKD").replace(/[̀-ͯ'’`]/g, "").split(/[^a-z0-9]+/).filter(Boolean);
+  return s
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/[̀-ͯ'’`]/g, "")
+    .split(/[^a-z0-9]+/)
+    .filter(Boolean);
 }
 
 /** A job is keyed by its number when the text carries one ("Job #101 - …"), else by its normalized text. */
@@ -61,15 +122,21 @@ export class Anonymizer {
 
   /** Register real names up front so pseudonyms avoid all of their words, not only the current one's. */
   reserve(realNames: string[]): void {
-    for (const n of realNames) for (const w of nameKey(n).split(" ")) if (w) this.avoid.add(w);
+    for (const n of realNames)
+      for (const w of nameKey(n).split(" ")) if (w) this.avoid.add(w);
   }
-  constructor(private readonly salt: string, map?: PseudonymMap) {
+  constructor(
+    private readonly salt: string,
+    map?: PseudonymMap,
+  ) {
     if (salt.length < 32) throw new Error("salt too short");
     this.map = map ?? { workers: {}, clients: {}, jobs: {} };
   }
 
   private h(kind: string, key: string): string {
-    return createHmac("sha256", this.salt).update(`${kind}:${key}`).digest("hex");
+    return createHmac("sha256", this.salt)
+      .update(`${kind}:${key}`)
+      .digest("hex");
   }
 
   /** Opaque, stable id for a real entity: no real content, needs the salt to reproduce. */
@@ -91,7 +158,11 @@ export class Anonymizer {
       const last = LAST[Math.floor(i / FIRST.length) % LAST.length] as string;
       const fake = `${first} ${last}`;
       // never reuse a pseudonym, never echo a word of the real name
-      if (!used.has(fake) && !realWords.has(first.toLowerCase()) && !realWords.has(last.toLowerCase())) {
+      if (
+        !used.has(fake) &&
+        !realWords.has(first.toLowerCase()) &&
+        !realWords.has(last.toLowerCase())
+      ) {
         this.map.workers[key] = fake;
         return fake;
       }
@@ -102,7 +173,8 @@ export class Anonymizer {
   clientName(real: string): string {
     const key = nameKey(real);
     if (!key) throw new Error("empty client name");
-    this.map.clients[key] ??= `Client C${String(Object.keys(this.map.clients).length + 1).padStart(2, "0")}`;
+    this.map.clients[key] ??=
+      `Client C${String(Object.keys(this.map.clients).length + 1).padStart(2, "0")}`;
     return this.map.clients[key];
   }
 
@@ -110,15 +182,22 @@ export class Anonymizer {
     const key = jobKey(real);
     if (!key) throw new Error("empty job");
     const n = Object.keys(this.map.jobs).length + 1;
-    this.map.jobs[key] ??= { label: `Job J${String(n).padStart(3, "0")}`, number: n };
+    this.map.jobs[key] ??= {
+      label: `Job J${String(n).padStart(3, "0")}`,
+      number: n,
+    };
     return this.map.jobs[key];
   }
 
   /** Strings that must never appear in output: name and client words (>= 3 letters, not filler). */
   realTokens(): string[] {
     const words = new Set<string>();
-    for (const k of [...Object.keys(this.map.workers), ...Object.keys(this.map.clients)]) {
-      for (const w of k.split(" ")) if (w.length >= 3 && !STOP.has(w)) words.add(w);
+    for (const k of [
+      ...Object.keys(this.map.workers),
+      ...Object.keys(this.map.clients),
+    ]) {
+      for (const w of k.split(" "))
+        if (w.length >= 3 && !STOP.has(w)) words.add(w);
     }
     return [...words].sort();
   }
@@ -132,17 +211,50 @@ export function findRealTokens(output: string, tokens: string[]): string[] {
 
 // ---- anonymized, normalized shapes (local; B's loader maps them into Convex) ----
 
-export interface AnonWorker { id: string; displayName: string }
-export interface AnonClient { id: string; name: string }
-export interface AnonJob { id: string; jobNumber: number; title: string }
+export interface AnonWorker {
+  id: string;
+  displayName: string;
+}
+export interface AnonClient {
+  id: string;
+  name: string;
+}
+export interface AnonJob {
+  id: string;
+  jobNumber: number;
+  title: string;
+}
 /** Section 6 TimeEntry fields an export can know; the rest are null, never defaulted. */
 export interface AnonTimeEntry {
-  id: string; companyId: string; cycleId: null; sourceId: string; workerId: string; jobId: string | null; visitId: null;
-  startAt: string | null; endAt: string | null; durationSec: number; ticking: null; approved: boolean | null; approvedBy: null;
-  payable: null; category: string | null; label: null; hasNote: boolean; date: string; clientRef: string | null;
+  id: string;
+  companyId: string;
+  cycleId: null;
+  sourceId: string;
+  workerId: string;
+  jobId: string | null;
+  visitId: null;
+  startAt: string | null;
+  endAt: string | null;
+  durationSec: number;
+  ticking: null;
+  approved: boolean | null;
+  approvedBy: null;
+  payable: null;
+  category: string | null;
+  label: null;
+  hasNote: boolean;
+  date: string;
+  clientRef: string | null;
 }
 /** M4 input: what was actually paid, gross only, per pseudonymous worker and period. */
-export interface AnonPaid { workerId: string; periodStart: string | null; periodEnd: string | null; checkDate: string | null; grossCents: number; sourceId: string }
+export interface AnonPaid {
+  workerId: string;
+  periodStart: string | null;
+  periodEnd: string | null;
+  checkDate: string | null;
+  grossCents: number;
+  sourceId: string;
+}
 
 export interface AnonymizedBundle {
   namesAnonymized: true;
@@ -158,14 +270,23 @@ export interface AnonymizedBundle {
 export function anonymizeExports(
   a: Anonymizer,
   companyId: string,
-  input: { timesheets: { fileTag: string; rows: TimesheetRow[] }[]; journals: { fileTag: string; rows: PayrollJournalRow[] }[] },
+  input: {
+    timesheets: { fileTag: string; rows: TimesheetRow[] }[];
+    journals: { fileTag: string; rows: PayrollJournalRow[] }[];
+  },
 ): AnonymizedBundle {
-  a.reserve([...input.timesheets.flatMap((f) => f.rows.flatMap((r) => [r.workerName, r.clientName ?? ""])), ...input.journals.flatMap((f) => f.rows.map((r) => r.employeeName))]);
+  a.reserve([
+    ...input.timesheets.flatMap((f) =>
+      f.rows.flatMap((r) => [r.workerName, r.clientName ?? ""]),
+    ),
+    ...input.journals.flatMap((f) => f.rows.map((r) => r.employeeName)),
+  ]);
   const workers = new Map<string, AnonWorker>();
   const jobs = new Map<string, AnonJob>();
   const worker = (real: string) => {
     const id = a.id("w", real);
-    if (!workers.has(id)) workers.set(id, { id, displayName: a.workerName(real) });
+    if (!workers.has(id))
+      workers.set(id, { id, displayName: a.workerName(real) });
     return id;
   };
   const clients = new Map<string, AnonClient>();
@@ -181,23 +302,54 @@ export function anonymizeExports(
       if (r.jobText) {
         jobId = a.id("j", r.jobText);
         const j = a.job(r.jobText);
-        if (!jobs.has(jobId)) jobs.set(jobId, { id: jobId, jobNumber: j.number, title: j.label });
+        if (!jobs.has(jobId))
+          jobs.set(jobId, { id: jobId, jobNumber: j.number, title: j.label });
       }
       timeEntries.push({
-        id: `export:te:${f.fileTag}:${r.rowNumber}`, companyId, cycleId: null, sourceId: `xlsx:${f.fileTag}#row${r.rowNumber}`,
-        workerId: worker(r.workerName), jobId, visitId: null, startAt: r.startAt, endAt: r.endAt, durationSec: r.durationSec,
-        ticking: null, approved: r.approved, approvedBy: null, payable: null, category: r.category, label: null, hasNote: r.hasNote,
-        date: r.date, clientRef: r.clientName ? client(r.clientName) : null,
+        id: `export:te:${f.fileTag}:${r.rowNumber}`,
+        companyId,
+        cycleId: null,
+        sourceId: `xlsx:${f.fileTag}#row${r.rowNumber}`,
+        workerId: worker(r.workerName),
+        jobId,
+        visitId: null,
+        startAt: r.startAt,
+        endAt: r.endAt,
+        durationSec: r.durationSec,
+        ticking: null,
+        approved: r.approved,
+        approvedBy: null,
+        payable: null,
+        category: r.category,
+        label: null,
+        hasNote: r.hasNote,
+        date: r.date,
+        clientRef: r.clientName ? client(r.clientName) : null,
       });
     }
   }
   const paid: AnonPaid[] = [];
   for (const f of input.journals) {
     for (const r of f.rows) {
-      paid.push({ workerId: worker(r.employeeName), periodStart: r.periodStart, periodEnd: r.periodEnd, checkDate: r.checkDate, grossCents: r.grossCents, sourceId: `csv:${f.fileTag}#row${r.rowNumber}` });
+      paid.push({
+        workerId: worker(r.employeeName),
+        periodStart: r.periodStart,
+        periodEnd: r.periodEnd,
+        checkDate: r.checkDate,
+        grossCents: r.grossCents,
+        sourceId: `csv:${f.fileTag}#row${r.rowNumber}`,
+      });
     }
   }
-  return { namesAnonymized: true, companyId, workers: [...workers.values()], clients: [...clients.values()], jobs: [...jobs.values()], timeEntries, paid };
+  return {
+    namesAnonymized: true,
+    companyId,
+    workers: [...workers.values()],
+    clients: [...clients.values()],
+    jobs: [...jobs.values()],
+    timeEntries,
+    paid,
+  };
 }
 
 // ---- Jobber API pull (Company R's real account) ----
@@ -215,7 +367,11 @@ export interface AnonymizedJobberPull {
  * Free text nulled: time-entry labels, job titles (-> "Job Jnnn", renumbered by job number), expense
  * descriptions and vendors. Notes never existed (hasNote only). Clients are Jobber ids already.
  */
-export function anonymizeJobberPull(a: Anonymizer, companyId: string, pull: PullResult): AnonymizedJobberPull {
+export function anonymizeJobberPull(
+  a: Anonymizer,
+  companyId: string,
+  pull: PullResult,
+): AnonymizedJobberPull {
   const r = pull.records;
   a.reserve(r.workers.map((w) => w.displayName));
   const job = (j: Job) => a.job(`#${j.jobNumber}`);
@@ -223,14 +379,28 @@ export function anonymizeJobberPull(a: Anonymizer, companyId: string, pull: Pull
     namesAnonymized: true,
     companyId,
     records: {
-      workers: r.workers.map((w) => ({ ...w, companyId, displayName: a.workerName(w.displayName) })),
+      workers: r.workers.map((w) => ({
+        ...w,
+        companyId,
+        displayName: a.workerName(w.displayName),
+      })),
       timeEntries: r.timeEntries.map((e) => ({ ...e, companyId, label: null })),
-      jobs: r.jobs.map((j) => ({ ...j, companyId, jobNumber: job(j).number, title: job(j).label })),
+      jobs: r.jobs.map((j) => ({
+        ...j,
+        companyId,
+        jobNumber: job(j).number,
+        title: job(j).label,
+      })),
       visits: r.visits.map((v) => ({ ...v, companyId })),
       quotes: r.quotes.map((q) => ({ ...q, companyId })),
       invoices: r.invoices.map((i) => ({ ...i, companyId })),
       payments: r.payments.map((p) => ({ ...p, companyId })),
-      expenses: r.expenses.map((x) => ({ ...x, companyId, description: null, vendor: null })),
+      expenses: r.expenses.map((x) => ({
+        ...x,
+        companyId,
+        description: null,
+        vendor: null,
+      })),
     },
     syncRuns: pull.syncRuns.map((s) => ({ ...s, companyId })),
   };

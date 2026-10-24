@@ -1,31 +1,113 @@
 {
   "_comment": "Hand-built from the 2026-09-25 introspected schema. Fake ids and data, no names. Node lists per connection; the fake server wraps them (totalCount = length unless totalCounts overrides). Job 2001's quote paid a deposit; its invoice was paid the rest.",
   "totalCounts": {},
-  "expenseStatus": { "PENDING_REIMBURSEMENT": [{ "id": "Z2lkOi8vSm9iYmVyL0V4cGVuc2UvODAwMQ==" }], "PAID": [] },
+  "expenseStatus": {
+    "PENDING_REIMBURSEMENT": [{ "id": "Z2lkOi8vSm9iYmVyL0V4cGVuc2UvODAwMQ==" }],
+    "PAID": []
+  },
   "visits": [
-    { "id": "Z2lkOi8vSm9iYmVyL1Zpc2l0LzMwMDE=", "job": { "id": "Z2lkOi8vSm9iYmVyL0pvYi8yMDAy" }, "startAt": "2026-10-13T08:00:00-07:00", "endAt": "2026-10-13T16:00:00-07:00", "isComplete": true,
-      "assignedUsers": { "totalCount": 1, "nodes": [{ "id": "Z2lkOi8vSm9iYmVyL1VzZXIvMTAwMg==" }] } }
+    {
+      "id": "Z2lkOi8vSm9iYmVyL1Zpc2l0LzMwMDE=",
+      "job": { "id": "Z2lkOi8vSm9iYmVyL0pvYi8yMDAy" },
+      "startAt": "2026-10-13T08:00:00-07:00",
+      "endAt": "2026-10-13T16:00:00-07:00",
+      "isComplete": true,
+      "assignedUsers": {
+        "totalCount": 1,
+        "nodes": [{ "id": "Z2lkOi8vSm9iYmVyL1VzZXIvMTAwMg==" }]
+      }
+    }
   ],
   "quotes": [
-    { "id": "Z2lkOi8vSm9iYmVyL1F1b3RlLzQwMDE=", "quoteStatus": "converted", "salesperson": { "id": "Z2lkOi8vSm9iYmVyL1VzZXIvMTAwMw==" }, "sentAt": "2026-10-11T18:00:00Z",
-      "amounts": { "total": 1250.4 }, "jobs": { "totalCount": 1, "nodes": [{ "id": "Z2lkOi8vSm9iYmVyL0pvYi8yMDAx" }] } }
+    {
+      "id": "Z2lkOi8vSm9iYmVyL1F1b3RlLzQwMDE=",
+      "quoteStatus": "converted",
+      "salesperson": { "id": "Z2lkOi8vSm9iYmVyL1VzZXIvMTAwMw==" },
+      "sentAt": "2026-10-11T18:00:00Z",
+      "amounts": { "total": 1250.4 },
+      "jobs": {
+        "totalCount": 1,
+        "nodes": [{ "id": "Z2lkOi8vSm9iYmVyL0pvYi8yMDAx" }]
+      }
+    }
   ],
   "invoices": [
-    { "id": "Z2lkOi8vSm9iYmVyL0ludm9pY2UvNjAwMQ==", "invoiceStatus": "paid", "issuedDate": "2026-10-20T00:00:00-07:00", "dueDate": "2026-11-03T00:00:00-08:00",
-      "amounts": { "total": 1250.4 }, "jobs": { "totalCount": 1, "nodes": [{ "id": "Z2lkOi8vSm9iYmVyL0pvYi8yMDAx" }] } }
+    {
+      "id": "Z2lkOi8vSm9iYmVyL0ludm9pY2UvNjAwMQ==",
+      "invoiceStatus": "paid",
+      "issuedDate": "2026-10-20T00:00:00-07:00",
+      "dueDate": "2026-11-03T00:00:00-08:00",
+      "amounts": { "total": 1250.4 },
+      "jobs": {
+        "totalCount": 1,
+        "nodes": [{ "id": "Z2lkOi8vSm9iYmVyL0pvYi8yMDAx" }]
+      }
+    }
   ],
   "paymentRecords": [
-    { "id": "Z2lkOi8vSm9iYmVyL1BheW1lbnRSZWNvcmQvNzAwMQ==", "amount": 300, "entryDate": "2026-10-12T17:00:00Z", "paymentType": "CHEQUE", "invoice": null, "quote": { "id": "Z2lkOi8vSm9iYmVyL1F1b3RlLzQwMDE=" } },
-    { "id": "Z2lkOi8vSm9iYmVyL1BheW1lbnRSZWNvcmQvNzAwMg==", "amount": 950.4, "entryDate": "2026-10-21T17:00:00Z", "paymentType": "CREDIT_CARD", "invoice": { "id": "Z2lkOi8vSm9iYmVyL0ludm9pY2UvNjAwMQ==" }, "quote": null }
+    {
+      "id": "Z2lkOi8vSm9iYmVyL1BheW1lbnRSZWNvcmQvNzAwMQ==",
+      "amount": 300,
+      "entryDate": "2026-10-12T17:00:00Z",
+      "paymentType": "CHEQUE",
+      "invoice": null,
+      "quote": { "id": "Z2lkOi8vSm9iYmVyL1F1b3RlLzQwMDE=" }
+    },
+    {
+      "id": "Z2lkOi8vSm9iYmVyL1BheW1lbnRSZWNvcmQvNzAwMg==",
+      "amount": 950.4,
+      "entryDate": "2026-10-21T17:00:00Z",
+      "paymentType": "CREDIT_CARD",
+      "invoice": { "id": "Z2lkOi8vSm9iYmVyL0ludm9pY2UvNjAwMQ==" },
+      "quote": null
+    }
   ],
   "expenses": [
-    { "id": "Z2lkOi8vSm9iYmVyL0V4cGVuc2UvODAwMQ==", "title": "Mulch", "description": null, "date": "2026-10-12T00:00:00-07:00", "total": 214.37, "linkedJob": { "id": "Z2lkOi8vSm9iYmVyL0pvYi8yMDAx" }, "accountingCode": { "code": "Materials" }, "reimbursableTo": { "id": "Z2lkOi8vSm9iYmVyL1VzZXIvMTAwMg==" } },
-    { "id": "Z2lkOi8vSm9iYmVyL0V4cGVuc2UvODAwMg==", "title": "Dump fee", "description": "transfer station", "date": "2026-10-16T00:00:00-07:00", "total": null, "linkedJob": null, "accountingCode": null, "reimbursableTo": null }
+    {
+      "id": "Z2lkOi8vSm9iYmVyL0V4cGVuc2UvODAwMQ==",
+      "title": "Mulch",
+      "description": null,
+      "date": "2026-10-12T00:00:00-07:00",
+      "total": 214.37,
+      "linkedJob": { "id": "Z2lkOi8vSm9iYmVyL0pvYi8yMDAx" },
+      "accountingCode": { "code": "Materials" },
+      "reimbursableTo": { "id": "Z2lkOi8vSm9iYmVyL1VzZXIvMTAwMg==" }
+    },
+    {
+      "id": "Z2lkOi8vSm9iYmVyL0V4cGVuc2UvODAwMg==",
+      "title": "Dump fee",
+      "description": "transfer station",
+      "date": "2026-10-16T00:00:00-07:00",
+      "total": null,
+      "linkedJob": null,
+      "accountingCode": null,
+      "reimbursableTo": null
+    }
   ],
   "jobs": [
-    { "id": "Z2lkOi8vSm9iYmVyL0pvYi8yMDAx", "jobNumber": 101, "title": "Spring cleanup", "jobStatus": "requires_invoicing", "client": { "id": "Z2lkOi8vSm9iYmVyL0NsaWVudC85MDAx" },
-      "salesperson": { "id": "Z2lkOi8vSm9iYmVyL1VzZXIvMTAwMw==" }, "quote": { "id": "Z2lkOi8vSm9iYmVyL1F1b3RlLzQwMDE=" }, "startAt": "2026-10-12T15:00:00Z", "endAt": null, "total": 1250.4 },
-    { "id": "Z2lkOi8vSm9iYmVyL0pvYi8yMDAy", "jobNumber": 102, "title": "Hedge trim", "jobStatus": "active", "client": { "id": "Z2lkOi8vSm9iYmVyL0NsaWVudC85MDAx" },
-      "salesperson": null, "quote": null, "startAt": null, "endAt": null, "total": 980.15 }
+    {
+      "id": "Z2lkOi8vSm9iYmVyL0pvYi8yMDAx",
+      "jobNumber": 101,
+      "title": "Spring cleanup",
+      "jobStatus": "requires_invoicing",
+      "client": { "id": "Z2lkOi8vSm9iYmVyL0NsaWVudC85MDAx" },
+      "salesperson": { "id": "Z2lkOi8vSm9iYmVyL1VzZXIvMTAwMw==" },
+      "quote": { "id": "Z2lkOi8vSm9iYmVyL1F1b3RlLzQwMDE=" },
+      "startAt": "2026-10-12T15:00:00Z",
+      "endAt": null,
+      "total": 1250.4
+    },
+    {
+      "id": "Z2lkOi8vSm9iYmVyL0pvYi8yMDAy",
+      "jobNumber": 102,
+      "title": "Hedge trim",
+      "jobStatus": "active",
+      "client": { "id": "Z2lkOi8vSm9iYmVyL0NsaWVudC85MDAx" },
+      "salesperson": null,
+      "quote": null,
+      "startAt": null,
+      "endAt": null,
+      "total": 980.15
+    }
   ]
 }

@@ -16,7 +16,14 @@ function tzOffsetMs(ms: number, tz: string): number {
     second: "2-digit",
   }).formatToParts(new Date(ms));
   const get = (t: string) => Number(parts.find((p) => p.type === t)?.value);
-  const asUtc = Date.UTC(get("year"), get("month") - 1, get("day"), get("hour"), get("minute"), get("second"));
+  const asUtc = Date.UTC(
+    get("year"),
+    get("month") - 1,
+    get("day"),
+    get("hour"),
+    get("minute"),
+    get("second"),
+  );
   return asUtc - Math.floor(ms / 1000) * 1000;
 }
 
@@ -26,7 +33,11 @@ export function zonedMidnight(date: string, tz: string): number {
 }
 
 /** Local wall-clock `date` + `minutes` after midnight in `tz`, as epoch ms. */
-export function zonedWallClock(date: string, minutes: number, tz: string): number {
+export function zonedWallClock(
+  date: string,
+  minutes: number,
+  tz: string,
+): number {
   const [y, m, d] = date.split("-").map(Number) as [number, number, number];
   const guess = Date.UTC(y, m - 1, d, 0, minutes);
   const first = guess - tzOffsetMs(guess, tz);
@@ -35,7 +46,12 @@ export function zonedWallClock(date: string, minutes: number, tz: string): numbe
 
 /** Calendar date of instant `ms` in `tz`. */
 export function zonedDate(ms: number, tz: string): string {
-  return new Intl.DateTimeFormat("en-CA", { timeZone: tz, year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date(ms));
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: tz,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date(ms));
 }
 
 export function addDays(date: string, days: number): string {
@@ -53,11 +69,23 @@ export interface Period {
   endDate: string;
 }
 
-export function resolvePeriod(periodStart: string, periodEnd: string, tz = "UTC"): Period {
-  const startMs = DATE_RE.test(periodStart) ? zonedMidnight(periodStart, tz) : Date.parse(periodStart);
-  const endMs = DATE_RE.test(periodEnd) ? zonedMidnight(addDays(periodEnd, 1), tz) : Date.parse(periodEnd);
-  if (Number.isNaN(startMs) || Number.isNaN(endMs)) throw new Error(`Bad period: ${periodStart} .. ${periodEnd}`);
-  if (endMs <= startMs) throw new Error(`Period ends before it starts: ${periodStart} .. ${periodEnd}`);
+export function resolvePeriod(
+  periodStart: string,
+  periodEnd: string,
+  tz = "UTC",
+): Period {
+  const startMs = DATE_RE.test(periodStart)
+    ? zonedMidnight(periodStart, tz)
+    : Date.parse(periodStart);
+  const endMs = DATE_RE.test(periodEnd)
+    ? zonedMidnight(addDays(periodEnd, 1), tz)
+    : Date.parse(periodEnd);
+  if (Number.isNaN(startMs) || Number.isNaN(endMs))
+    throw new Error(`Bad period: ${periodStart} .. ${periodEnd}`);
+  if (endMs <= startMs)
+    throw new Error(
+      `Period ends before it starts: ${periodStart} .. ${periodEnd}`,
+    );
   return {
     startUtc: new Date(startMs).toISOString(),
     endUtc: new Date(endMs).toISOString(),
@@ -67,7 +95,10 @@ export function resolvePeriod(periodStart: string, periodEnd: string, tz = "UTC"
 }
 
 /** Inclusive date windows of at most 7 days covering startDate..endDate (Jobber's timeSheetsByDay limit). */
-export function weekWindows(startDate: string, endDate: string): { start: string; end: string }[] {
+export function weekWindows(
+  startDate: string,
+  endDate: string,
+): { start: string; end: string }[] {
   const out: { start: string; end: string }[] = [];
   for (let s = startDate; s <= endDate; s = addDays(s, 7)) {
     const e = addDays(s, 6);

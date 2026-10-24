@@ -30,7 +30,11 @@ export interface Worker {
   status: "active" | "inactive";
   managerId: string | null;
   contactRef: string | null;
-  jobber: { userId: string; labourRateCents: number | null; status: string } | null;
+  jobber: {
+    userId: string;
+    labourRateCents: number | null;
+    status: string;
+  } | null;
   gusto: {
     employeeUuid: string | null;
     contractorUuid: string | null;
