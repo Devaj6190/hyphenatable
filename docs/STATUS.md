@@ -2,6 +2,7 @@
 
 Format: `HH:MM PDT · who · what landed on main / what I'm on / what I need`. Decisions that change the plan go here too, with the file they changed.
 
+- Sat 02:55 · A2 · Merged #18 (d72618b), CI green: `seed/` Biome-clean, `"!seed"` exclusion removed from `biome.json` (Devaj's ask, part 1); generator output unchanged.
 - Sat 02:50 · A1 · Merged #17 (3c6d5d6): Jobber live fixes. **Live pull on the trial: all 8 objects complete** (users 14/14, everything else 0/0 until seeded). Hidden fields probed and left null; `timeSheetsByDay` walked in 7-day windows; NOT_INVITED users are active; auth default redirect `https://payrollpilot.vercel.app/auth` with `--paste`.
   - **Note (A, CHK-10):** `User.labourRate` is hidden from the read app, so Jobber-side user rates are null for now. Options being checked: a scope that exposes it, or the rate recorded per time entry (`TimeSheetEntry.labourRate`) as a separate, named fact. Devaj: CHK-10 must skip when `jobber.labourRateCents` is null (no invented rate).
 - Sat 02:45 · A2 · Merged #16 (9e97606): Jobber seed auth by pasted address (callback `https://payrollpilot.vercel.app/auth`); pusher aligned with the live schema (`Account.tester` doesn't exist live, so allowlist-only via `JOBBER_SEED_ACCOUNT_ID`; preflight refuses if any needed mutation is missing).
