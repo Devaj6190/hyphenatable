@@ -30,9 +30,9 @@ Status values: **tested** (ran here, evidence noted), **unverified** (docs read 
 - Sat 02:00 · A · H2 Gusto developer org "PayrollPilot" and application "PayrollPilot Demo" created (signup ~01:55, no approval wait); credentials in local `.env` as `GUSTO_CLIENT_ID` / `GUSTO_CLIENT_SECRET`. **tested**.
 - Sat 02:04 · A · H2 demo company requested from the portal at 02:04:32 PDT; status "generating". Ready time: _pending_.
 
-- Sat 04:40 · A2 · **Jobber seeded (live, trial):** 28 clients, 28 properties, 25 quotes, 32 jobs, 44 visits (completed), 13 expenses, 24 invoices via the PayrollPilot Seed app on the allowlisted account; ~8 s per mutation, no throttling; one dropped connection, no duplicates. Not possible by API: time entries, payment records. Round-trip pull with `--compare`: users/visits/invoices/expenses match for a-c05. **tested**.
+- Sat 03:33 · A2 · **Jobber seeded (live, trial):** 28 clients, 28 properties, 25 quotes, 32 jobs, 44 visits (completed), 13 expenses, 24 invoices via the PayrollPilot Seed app on the allowlisted account; ~8 s per mutation, no throttling; one dropped connection, no duplicates. Not possible by API: time entries, payment records. Round-trip pull with `--compare`: users/visits/invoices/expenses match for a-c05. **tested**.
 
-- Sat 04:50 · A2 · **Gusto demo seeded (live):** compensation PUTs and employee + job creation all accepted in demo; 11 existing employees mapped, 1 new hire created un-onboarded; read-back 14/14 complete. No payroll endpoint written. **tested**.
+- Sat 03:35 · A2 · **Gusto demo seeded (live):** compensation PUTs and employee + job creation all accepted in demo; 11 existing employees mapped, 1 new hire created un-onboarded; read-back 14/14 complete. No payroll endpoint written. **tested**.
 
 ## Live proofs (fill in as they happen)
 - First real text round trip (G1):
