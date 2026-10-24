@@ -31,6 +31,7 @@ import {
   pullPayrolls,
   pullUnprocessed,
 } from "./read.ts";
+import { formatSummary, summarizePayrolls } from "./summary.ts";
 
 const { positionals, values } = parseArgs({
   allowPositionals: true,
@@ -128,25 +129,20 @@ async function read(cmd: string) {
       values.to,
       opts,
     );
-    print(
-      r.syncRun,
-      r.records.payrolls
-        .map(
-          (p) =>
-            `${p.sourceId} ${p.payrollType} ${p.periodStart}..${p.periodEnd} employees ${p.employees?.length ?? "?"}`,
-        )
-        .join("\n"),
-    );
+    // counts only: no uuids, no money, no names
+    print(r.syncRun, formatSummary(summarizePayrolls(r.records.payrolls)));
   } else {
     const r = await pullUnprocessed(a, company, uuid, opts);
     print(
       r.syncRun,
-      r.records.payrolls
-        .map(
+      [
+        formatSummary(summarizePayrolls(r.records.payrolls)),
+        // B's draft writer needs the payroll ids: printed for unprocessed payrolls only (ids, no money)
+        ...r.records.payrolls.map(
           (p) =>
-            `${p.sourceId} ${p.payrollType} ${p.periodStart}..${p.periodEnd}`,
-        )
-        .join("\n"),
+            `  ${p.sourceId} ${p.payrollType} ${p.periodStart}..${p.periodEnd}`,
+        ),
+      ].join("\n"),
     );
   }
 }
