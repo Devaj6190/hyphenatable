@@ -12,6 +12,7 @@ import { JobberRecheck } from "@/components/JobberRecheck";
 import { PageHeader } from "@/components/PageHeader";
 import { useRole } from "@/components/RoleProvider";
 import { Card } from "@/components/ui/card";
+import { WorkerThread } from "@/components/WorkerThread";
 import { checkTitle } from "@/lib/checks";
 import { forViewer } from "@/lib/role";
 import { FIXTURE_SOURCE } from "@/lib/sources";
@@ -30,11 +31,14 @@ export function FlagDetail({
   flagIds,
   dataKind,
   timezone,
+  roleOf,
   viewerRole,
 }: {
   companyId: string;
   data: FlagDetailData | null;
   flagIds: string[];
+  /** Worker id → role, for "Approved by the owner". Ids only; no names. */
+  roleOf: Record<string, string>;
   dataKind: DataKind;
   timezone: string;
   viewerRole?: ViewerRole;
@@ -155,9 +159,21 @@ export function FlagDetail({
         <div className="flex min-w-0 flex-col gap-6">
           {correction && (
             <CorrectionDiff
+              key={`${correction.id}-${viewer}`}
               correction={correction}
+              system={
+                flag.where.find((w) => w.recordId === correction.target.id)
+                  ?.system ??
+                (correction.target.table === "expenses"
+                  ? "QuickBooks"
+                  : "Jobber")
+              }
               dataKind={dataKind}
               viewerRole={viewer}
+              timezone={timezone}
+              approverRole={
+                (correction.approvedBy && roleOf[correction.approvedBy]) || null
+              }
               onDecided={(s) => {
                 setDecided(true);
                 record(s, "correction.decided");
@@ -170,6 +186,9 @@ export function FlagDetail({
               question={question}
               recipientName={data.recipientName ?? undefined}
               thread={data.thread?.messages}
+              approverRole={
+                (question.approvedBy && roleOf[question.approvedBy]) || null
+              }
               canDecide={canDecideText}
               onDecided={(s) => {
                 setDecided(true);
@@ -182,6 +201,16 @@ export function FlagDetail({
                 No text is needed for this one.
               </p>
             )
+          )}
+          {question && (
+            <WorkerThread
+              thread={data.thread}
+              questionId={question.id}
+              workerName={data.recipientName ?? `the ${question.toRole}`}
+              title="Texts"
+              dataKind={dataKind}
+              timezone={timezone}
+            />
           )}
           {jobberIds.length > 0 && (
             <JobberRecheck

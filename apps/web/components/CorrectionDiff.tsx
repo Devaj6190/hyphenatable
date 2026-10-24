@@ -12,7 +12,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import type { Correction, ViewerRole } from "@/lib/types";
+import { isMoneyField } from "@/lib/policy";
+import { formatWhen } from "@/lib/time";
+import type { Correction, SourceSystem, ViewerRole } from "@/lib/types";
 
 const tableWord: Record<string, string> = {
   timeEntries: "Time entry",
@@ -32,9 +34,6 @@ const fieldWord: Record<string, string> = {
 const targetInWords = (t: Correction["target"]) =>
   `${tableWord[t.table] ?? t.table} ${t.id} · ${fieldWord[t.field] ?? t.field}`;
 
-// Same test as redactCorrection in lib/policy: the server nulls these for a manager; this hides them on a role switch.
-const isMoneyField = (field: string) => /cents|rate/i.test(field);
-
 const sourceWord: Record<Correction["source"], string> = {
   reply: "From the reply",
   owner: "From you",
@@ -46,8 +45,9 @@ const statusBadge: Record<
   { status: Status; label: string }
 > = {
   proposed: { status: "needs-you", label: "Correction waiting for you" },
-  approved: { status: "verified", label: "Approved" },
-  applied: { status: "verified", label: "Applied to workbook" },
+  // Approval is a person's decision, not a verification: verified is kept for a re-check that passed.
+  approved: { status: "closed", label: "Approved" },
+  applied: { status: "closed", label: "Applied to workbook" },
   rejected: { status: "closed", label: "Denied" },
 };
 
@@ -61,8 +61,11 @@ function Value({
   viewerRole: ViewerRole;
 }) {
   if (value === null) return <>{field === "jobId" ? "No job" : "None"}</>;
-  if (isMoneyField(field) && typeof value === "number")
-    return viewerRole === "owner" ? <Money cents={value} /> : <>hidden</>;
+  // The server already nulls these for a manager; this also hides them right after an owner-to-manager switch.
+  if (isMoneyField(field)) {
+    if (viewerRole !== "owner") return <>hidden</>;
+    if (typeof value === "number") return <Money cents={value} />;
+  }
   return <>{String(value)}</>;
 }
 
@@ -70,24 +73,47 @@ function Value({
 // Pay and profit are owner-only: a manager sees what changes, never what it costs.
 export function CorrectionDiff({
   correction,
+  system,
   dataKind,
   viewerRole,
+  timezone,
+  approverRole,
   onDecided,
 }: {
   correction: Correction;
+  /** Where the corrected record lives (from the flag's `where`). */
+  system: SourceSystem;
   dataKind: DataKind;
   viewerRole: ViewerRole;
+  timezone: string;
+  /** Role of correction.approvedBy, resolved on the server; null when unknown. */
+  approverRole: string | null;
   onDecided?: (summary: string) => void;
 }) {
   const [status, setStatus] = useState(correction.status);
   const [after, setAfter] = useState(correction.after);
   const [draft, setDraft] = useState(String(correction.after ?? ""));
   const [mode, setMode] = useState<"view" | "edit" | "deny">("view");
+  // True only for a decision made on this page; server state says who decided and when.
+  const [decidedHere, setDecidedHere] = useState(false);
   const owner = viewerRole === "owner";
   const edited = after !== correction.after;
   const { target } = correction;
   const badge = statusBadge[status];
   const decidable = owner && status === "proposed";
+  // A money field or rate is a question for the owner, not a free edit.
+  const editable = !isMoneyField(target.field);
+  // Keep the field's type: an edited number stays a number.
+  const numeric =
+    typeof correction.after === "number" ||
+    typeof correction.before === "number";
+  const parsed = numeric ? Number(draft.trim()) : draft.trim();
+  const draftOk =
+    draft.trim() !== "" &&
+    !(typeof parsed === "number" && !Number.isFinite(parsed));
+  const decidedBy =
+    correction.approvedAt &&
+    `${approverRole ? `by the ${approverRole} ` : ""}· ${formatWhen(correction.approvedAt, timezone)}`;
 
   return (
     <Card className="@container gap-6">
@@ -107,7 +133,7 @@ export function CorrectionDiff({
 
       <div className="flex flex-col gap-3 px-(--card-spacing)">
         <p className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-          <SourceChip system="Jobber" recordId={target.id} />
+          <SourceChip system={system} recordId={target.id} />
           {targetInWords(target)}
         </p>
         {/* Projector size: one line, large type, before struck through, after in full weight. */}
@@ -178,7 +204,7 @@ export function CorrectionDiff({
 
       <div className="flex flex-col gap-3 px-(--card-spacing)">
         <p className="text-sm text-muted-foreground">
-          Changes the workbook only, never Jobber.
+          Changes the workbook only, never {system}.
         </p>
 
         {decidable && mode === "edit" && (
@@ -186,7 +212,8 @@ export function CorrectionDiff({
             className="flex animate-in flex-wrap items-end gap-2 duration-(--dur-sheet) ease-out-soft fade-in slide-in-from-top-1"
             onSubmit={(e) => {
               e.preventDefault();
-              setAfter(draft.trim());
+              if (!draftOk) return;
+              setAfter(parsed);
               setMode("view");
             }}
           >
@@ -198,11 +225,12 @@ export function CorrectionDiff({
               <Input
                 id={`${correction.id}-after`}
                 value={draft}
+                inputMode={numeric ? "decimal" : undefined}
                 onChange={(e) => setDraft(e.target.value)}
                 className="h-10 bg-card text-base"
               />
             </label>
-            <Button type="submit" disabled={draft.trim() === ""}>
+            <Button type="submit" disabled={!draftOk}>
               Save
             </Button>
             <Button
@@ -224,6 +252,7 @@ export function CorrectionDiff({
             onCancel={() => setMode("view")}
             onDeny={(reason) => {
               setStatus("rejected");
+              setDecidedHere(true);
               setMode("view");
               onDecided?.(`Denied the correction. Reason: ${reason}.`);
             }}
@@ -236,6 +265,7 @@ export function CorrectionDiff({
               size="lg"
               onClick={() => {
                 setStatus("approved");
+                setDecidedHere(true);
                 onDecided?.(
                   `Approved the correction${edited ? " after editing it" : ""}: ${targetInWords(target)} → ${after ?? "none"}.`,
                 );
@@ -243,28 +273,35 @@ export function CorrectionDiff({
             >
               Approve correction
             </Button>
-            <Button
-              size="lg"
-              variant="secondary"
-              onClick={() => setMode("edit")}
-            >
-              Edit
-            </Button>
+            {editable && (
+              <Button
+                size="lg"
+                variant="secondary"
+                onClick={() => setMode("edit")}
+              >
+                Edit
+              </Button>
+            )}
             <Button size="lg" variant="quiet" onClick={() => setMode("deny")}>
               Deny
             </Button>
           </div>
         )}
 
-        {status === "approved" && (
+        {decidedHere && status === "approved" && (
           <p className="animate-in text-sm duration-(--dur-success) fade-in">
             Approved by you. Fixture mode: the workbook is not saved. With the
             backend running, this shows the new workbook version.
           </p>
         )}
-        {status === "rejected" && (
+        {decidedHere && status === "rejected" && (
           <p className="animate-in text-sm duration-(--dur-success) fade-in">
             Denied by you. The workbook is unchanged and the item stays open.
+          </p>
+        )}
+        {!decidedHere && status !== "proposed" && decidedBy && (
+          <p className="text-sm text-muted-foreground">
+            {status === "rejected" ? "Denied" : "Approved"} {decidedBy}
           </p>
         )}
       </div>

@@ -11,6 +11,7 @@ import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { companies } from "@/lib/companies";
 import { MAX_QUESTION_LEN, questionTextError } from "@/lib/question";
+import { formatWhen } from "@/lib/time";
 import type { Question, ThreadMessage } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -57,6 +58,7 @@ export function ApprovalSheet({
   question,
   recipientName,
   thread = [],
+  approverRole = null,
   canDecide = true,
   onDecided,
 }: {
@@ -64,6 +66,8 @@ export function ApprovalSheet({
   recipientName?: string;
   /** The question's messages from the server (data.thread); replies show in the phone preview. */
   thread?: ThreadMessage[];
+  /** Role of question.approvedBy, resolved on the server; null when unknown. */
+  approverRole?: string | null;
   /** False when this viewer may only read (a manager looking at a text addressed to themselves). */
   canDecide?: boolean;
   /** Called with a plain summary after a decision, for the inline timeline. */
@@ -74,6 +78,8 @@ export function ApprovalSheet({
   const [draft, setDraft] = useState(question.text);
   const [mode, setMode] = useState<"view" | "edit" | "deny">("view");
   const [edited, setEdited] = useState(false);
+  // True only for a decision made on this page; server state says who decided and when.
+  const [decidedHere, setDecidedHere] = useState(false);
 
   const who = recipientName ?? roleLabel[question.toRole];
   const shown = mode === "edit" ? draft : text;
@@ -210,6 +216,7 @@ export function ApprovalSheet({
               onCancel={() => setMode("view")}
               onDeny={(reason) => {
                 setStatus("denied");
+                setDecidedHere(true);
                 setMode("view");
                 onDecided?.(`Denied the text to ${who}. Reason: ${reason}.`);
               }}
@@ -222,6 +229,7 @@ export function ApprovalSheet({
                 disabled={error !== null}
                 onClick={() => {
                   setStatus("approved");
+                  setDecidedHere(true);
                   onDecided?.(
                     `Approved the text to ${who}${edited ? " after editing it" : ""}.`,
                   );
@@ -243,15 +251,22 @@ export function ApprovalSheet({
             </p>
           )}
 
-          {status === "approved" && (
+          {decidedHere && status === "approved" && (
             <p className="animate-in text-sm duration-(--dur-success) fade-in">
               Approved by you. Fixture mode: nothing was sent. With the courier
               running, this goes to {who}’s phone.
             </p>
           )}
-          {status === "denied" && (
+          {decidedHere && status === "denied" && (
             <p className="animate-in text-sm duration-(--dur-success) fade-in">
               Denied by you. Nothing will be sent and the item stays open.
+            </p>
+          )}
+          {!decidedHere && status !== "draft" && question.approvedAt && (
+            <p className="text-sm text-muted-foreground">
+              {status === "denied" ? "Denied" : "Approved"}
+              {approverRole ? ` by the ${approverRole}` : ""} ·{" "}
+              {formatWhen(question.approvedAt, timeZone)}
             </p>
           )}
           <p className="text-xs text-muted-foreground">

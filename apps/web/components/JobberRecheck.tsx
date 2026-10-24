@@ -11,7 +11,12 @@ export type Recheck =
   | { state: "waiting" }
   | { state: "syncing"; pulled: number; expected: number }
   | { state: "incomplete"; pulled: number; expected: number }
-  | { state: "fixed" | "still-there"; at: string; expected: number };
+  | {
+      state: "fixed" | "still-there";
+      at: string;
+      pulled: number;
+      expected: number;
+    };
 
 const when = (iso: string, timeZone: string) =>
   new Intl.DateTimeFormat("en-US", {
@@ -78,9 +83,9 @@ export function JobberRecheck({
           {recheck.state === "incomplete" &&
             `The sync pulled ${recheck.pulled} of ${recheck.expected} records, so ${checkId} can't re-run. The item stays held.`}
           {recheck.state === "fixed" &&
-            `Sync at ${when(recheck.at, timeZone)} pulled ${recheck.expected} of ${recheck.expected} records. ${checkId} no longer finds this.`}
+            `Sync at ${when(recheck.at, timeZone)} pulled ${recheck.pulled} of ${recheck.expected} records. ${checkId} no longer finds this.`}
           {recheck.state === "still-there" &&
-            `Sync at ${when(recheck.at, timeZone)} pulled ${recheck.expected} of ${recheck.expected} records and ${checkId} still finds this, so the item stays open.`}
+            `Sync at ${when(recheck.at, timeZone)} pulled ${recheck.pulled} of ${recheck.expected} records and ${checkId} still finds this, so the item stays open.`}
         </p>
         {recheck.state === "idle" && (
           <Button
