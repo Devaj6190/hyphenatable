@@ -91,6 +91,24 @@ export type FixtureWorker = {
   id: string;
   displayName: string;
   role: "field" | "manager" | "owner" | "office";
+  managerId: string | null;
+};
+
+// Mirrors Correction in docs/plans/00-shared-context.md section 6. The pay and profit effects are owner-only.
+export type Correction = {
+  id: string;
+  companyId: string;
+  cycleId: string;
+  flagId: string;
+  target: { table: string; id: string; field: string };
+  before: string | number | null;
+  after: string | number | null;
+  effectPayCents: number | null;
+  effectProfitCents: number | null;
+  status: "proposed" | "approved" | "applied" | "rejected";
+  source: "reply" | "owner" | "rule";
+  approvedBy: string | null;
+  approvedAt: string | null;
 };
 
 // Mirrors AuditEvent in docs/plans/00-shared-context.md section 6. B's audit.list replaces the fixture.

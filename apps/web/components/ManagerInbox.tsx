@@ -1,32 +1,22 @@
-"use client";
-
 import { ApprovalSheet } from "@/components/ApprovalSheet";
 import type { DataKind } from "@/components/DataLabel";
 import { FlagCard } from "@/components/FlagCard";
 import { WorkerThread } from "@/components/WorkerThread";
-import {
-  FIXTURE_SOURCE,
-  fixtureFlags,
-  fixtureQuestions,
-  workerName,
-} from "@/lib/fixtures";
-import type { Flag } from "@/lib/types";
+import { FIXTURE_SOURCE } from "@/lib/sources";
+import type { InboxItem, ManagerInboxData } from "@/lib/view-types";
 
-// Always rendered as the manager: viewerRole is fixed so no pay reaches these components, whoever is switched in.
+// Rendered from data the server built for the manager, so no pay is in the props. viewerRole is fixed to
+// manager as well, so a switched-in owner still sees the manager's version of this page.
 export function ManagerInbox({
-  companyId,
+  data,
   dataKind,
 }: {
-  companyId: string;
+  data: ManagerInboxData;
   dataKind: DataKind;
 }) {
-  const crew = fixtureFlags.filter(
-    (f) => f.companyId === companyId && f.routeTo === "manager",
+  const card = (i: InboxItem) => (
+    <FlagCard flag={i.flag} dataKind={dataKind} viewerRole="manager" />
   );
-  const qOf = (f: Flag) => fixtureQuestions.find((q) => q.id === f.questionId);
-  const needsOk = crew.filter((f) => qOf(f)?.status === "draft");
-  const rest = crew.filter((f) => qOf(f)?.status !== "draft");
-
   return (
     <div className="flex flex-col gap-6">
       <p className="text-sm text-muted-foreground">
@@ -35,48 +25,42 @@ export function ManagerInbox({
 
       <section className="flex flex-col gap-3">
         <h2 className="text-lg font-semibold">
-          Needs your OK ({needsOk.length})
+          Needs your OK ({data.needsOk.length})
         </h2>
-        {needsOk.length === 0 && <p>Nothing to approve right now.</p>}
-        {needsOk.map((f) => {
-          const q = qOf(f);
-          return (
-            <div key={f.id} className="flex flex-col gap-3">
-              <FlagCard flag={f} dataKind={dataKind} viewerRole="manager" />
-              {q && q.toRole === "employee" ? (
-                <ApprovalSheet
-                  question={q}
-                  recipientName={workerName(q.toWorkerId)}
-                />
-              ) : (
-                <p className="text-sm text-muted-foreground">
-                  The owner approves the text that reaches you.
-                </p>
-              )}
-            </div>
-          );
-        })}
+        {data.needsOk.length === 0 && <p>Nothing to approve right now.</p>}
+        {data.needsOk.map((i) => (
+          <div key={i.flag.id} className="flex flex-col gap-3">
+            {card(i)}
+            {i.question && i.question.toRole === "employee" ? (
+              <ApprovalSheet
+                question={i.question}
+                recipientName={i.recipientName ?? undefined}
+              />
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                The owner approves the text that reaches you.
+              </p>
+            )}
+          </div>
+        ))}
       </section>
 
       <section className="flex flex-col gap-3">
         <h2 className="text-lg font-semibold">
-          Waiting or answered ({rest.length})
+          Waiting or answered ({data.rest.length})
         </h2>
-        {rest.map((f) => {
-          const q = qOf(f);
-          return (
-            <div key={f.id} className="flex flex-col gap-3">
-              <FlagCard flag={f} dataKind={dataKind} viewerRole="manager" />
-              {q && (
-                <WorkerThread
-                  questionId={q.id}
-                  title="Replies"
-                  dataKind={dataKind}
-                />
-              )}
-            </div>
-          );
-        })}
+        {data.rest.map((i) => (
+          <div key={i.flag.id} className="flex flex-col gap-3">
+            {card(i)}
+            {i.thread && (
+              <WorkerThread
+                thread={i.thread}
+                title="Replies"
+                dataKind={dataKind}
+              />
+            )}
+          </div>
+        ))}
       </section>
     </div>
   );
