@@ -8,7 +8,12 @@ import {
 } from "@payrollpilot/engine/schemas";
 import { describe, expect, test } from "vitest";
 import { dateRange, managerLink, managerSummary, topIssue } from "./summary";
-import { issuePhrases, MAX_LEN, render } from "./templates";
+import {
+  issuePhrases,
+  MAX_LEN,
+  managerSummaryWording,
+  render,
+} from "./templates";
 
 const fixtures = join(import.meta.dirname, "../../../../data/fixtures/a");
 const read = <T>(name: string): T =>
@@ -46,16 +51,17 @@ describe("manager summary", () => {
     );
   });
 
-  test("no DASHBOARD_URL: the text ends after the issue, with no link and no placeholder", () => {
+  test("no DASHBOARD_URL: the link is the placeholder from the wording block", () => {
+    const placeholder = managerSummaryWording.linkPlaceholder;
     for (const dashboardUrl of [undefined, null, "", "  "]) {
       expect(summary({ dashboardUrl })).toBe(
-        "Hi Dakota, before we run payroll (Oct 10–23) there are 10 timesheet items to check, mostly duplicate or zero-hour entries.",
+        `Hi Dakota, before we run payroll (Oct 10–23) there are 10 timesheet items to check, mostly duplicate or zero-hour entries. Details here: ${placeholder}`,
       );
       expect(summary({ flags: [timer], dashboardUrl })).toBe(
-        "Hi Dakota, before we run payroll (Oct 10–23) there is 1 timesheet item to check, about a timer left running.",
+        `Hi Dakota, before we run payroll (Oct 10–23) there is 1 timesheet item to check, about a timer left running. Details here: ${placeholder}`,
       );
     }
-    expect(managerLink(undefined, "a")).toBeNull();
+    expect(managerLink(undefined, "a")).toBe(placeholder);
     expect(managerLink("https://rollpay.app/", "a")).toBe(
       "https://rollpay.app/c/a/manager",
     );
@@ -114,7 +120,8 @@ describe("manager summary", () => {
       summary({ dashboardUrl: `https://${"x".repeat(200)}.com` }),
     ).toThrow(/240/);
     expect(() =>
-      render("managerSummaryNoLink", {
+      render("managerSummary", {
+        link: "https://rollpay.app/c/a/manager",
         name: "Dakota",
         range: "Oct 10–23",
         count: "10",
