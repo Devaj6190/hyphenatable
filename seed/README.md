@@ -87,3 +87,18 @@ bun run seed/push-qbo.ts --company a --live --reseed   # deletes OUR Purchases/B
 - **Re-seed:** deletes only marked Purchases and Bills, one by one with `?operation=delete` (`Id` + `SyncToken`). Customers, vendors and accounts are reused. Never "Clear data and reset".
 - **Limits:** at most 10 requests/s; on a 429 it sleeps 60 s.
 - **Token file:** separate from the read connector's `qbo-token.json`. If both are initialized from the same Playground authorization, refreshing one may rotate the other's token. Authorize twice, or refresh only one.
+
+### Gusto (A-07): `push-gusto.ts`, `lib/gusto.ts`
+
+```bash
+bun run seed/push-gusto.ts --company a                # plan: who maps to what, compensations, new hire, payroll lookup
+# live, once A1's Gusto token exists (GUSTO_CLIENT_ID / GUSTO_CLIENT_SECRET; `packages/connectors/src/gusto/cli.ts auth`):
+bun run seed/push-gusto.ts --company a --live         # writes data/private/a-gusto-map.json
+bun run seed/push-gusto.ts --company a --apply-map    # copies the uuids into seed/companies/a.json (gustoIds, current.gustoPayrollId)
+bun run seed/generate.ts --company a                  # fixtures now carry the real uuids; update EXPECTED_SHA256_A
+```
+
+- **Host and auth:** `api.gusto-demo.com` only, with `X-Gusto-API-Version: 2026-06-15`. Reads go through A1's read-only `GustoClient`. Writes go through `GustoSeedWriter`, which shares A1's token file `data/private/gusto-token.json` and refreshes only through A1's client, so there is one rotation path. Nothing is taken from B's `gusto/write*`.
+- **Write allowlist:** `PUT /v1/compensations/{uuid}`, `POST /v1/companies/{c}/employees`, `POST /v1/employees/{uuid}/jobs`. Any path containing "payroll" is refused before a request. There is no prepare, update, calculate or submit. The payroll is only read, to record `gustoPayrollId`.
+- **Mapping:** the demo company comes from the token (`/v1/token_info`), never from its name. Onboarded, non-terminated demo employees are assigned in uuid order to a-w01..a-w08, a-w11, a-w12, a-w13. a-w14 is created (plus a job) with onboarding left unfinished (CHK-09); if that is refused, it falls back to an existing employee with unfinished onboarding. a-w09 and a-w10 (Venmo) are never sent to Gusto (`gusto: null`). Rates come from the config only; a null rate leaves the demo compensation alone. a-w02 is $25.00 against Jobber's $26.00 (CHK-10).
+- **Fixtures stay generated:** real uuids enter through the config (`--apply-map`), never by editing `data/fixtures`.
