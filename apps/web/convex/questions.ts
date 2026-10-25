@@ -74,11 +74,13 @@ export const draftForCycle = internalMutation({
     let drafted = 0;
     let skippedByRule = 0;
     for (const flag of flags) {
-      // A flag an active learned rule already settles is not asked again (learning contract step 5).
+      // A flag with an active learned rule as precedent is not texted again (learning contract step 5):
+      // it goes to the owner's list with the rule cited, for a one-tap decision. Nothing is dropped.
       const rule = flag.precedent?.ruleId
         ? await ctx.db.get(flag.precedent.ruleId)
         : null;
       if (rule?.status === "active") {
+        await ctx.db.patch(flag._id, { routeTo: "owner" });
         skippedByRule++;
         continue;
       }
@@ -164,7 +166,7 @@ export const draftForCycle = internalMutation({
       cycleId,
       actor: { kind: "system", id: "questions.draftForCycle", agent: null },
       type: "questions.drafted",
-      summary: `${drafted} questions drafted; ${skippedByRule} flags settled by an active rule`,
+      summary: `${drafted} questions drafted; ${skippedByRule} flags with an active rule moved to the owner instead of texted`,
       refs: { cycleId },
       data: { drafted, skippedByRule },
     });
