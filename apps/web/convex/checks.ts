@@ -11,6 +11,7 @@ import {
   mutation,
 } from "./_generated/server";
 import { type AuditInput, write } from "./audit";
+import { startRun } from "./creaoRuns";
 
 /** A Convex doc in the engine's shape: `_id` becomes `id`. */
 function toEngine<T extends { _id: string; _creationTime: number }>(doc: T) {
@@ -50,7 +51,11 @@ export const runAsAgent = internalMutation({
 async function runChecks(
   ctx: MutationCtx,
   cycleId: Id<"cycles">,
-  actor: AuditInput["actor"] = { kind: "system", id: "checks.run", agent: null },
+  actor: AuditInput["actor"] = {
+    kind: "system",
+    id: "checks.run",
+    agent: null,
+  },
 ) {
   {
     const cycle = await ctx.db.get(cycleId);
@@ -156,6 +161,10 @@ async function runChecks(
       await ctx.scheduler.runAfter(0, internal.questions.draftForCycle, {
         cycleId,
       });
+    // creao-plan S3: after the checks, the Creao Auditor explains flags, proposes matches and writes
+    // the morning brief. Only when Creao is configured; the run row guards against a double start.
+    if (process.env.CREAO_API_KEY && actor.kind === "system")
+      await startRun(ctx, companyId, cycleId, "auditor", "checks finished");
 
     await write(ctx, {
       companyId,

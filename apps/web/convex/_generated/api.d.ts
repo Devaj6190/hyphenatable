@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as agentApi from "../agentApi.js";
 import type * as agents_interpret from "../agents/interpret.js";
 import type * as agents_learn from "../agents/learn.js";
 import type * as agents_prompts from "../agents/prompts.js";
@@ -17,6 +18,7 @@ import type * as controller_cycle from "../controller/cycle.js";
 import type * as controller_recompute from "../controller/recompute.js";
 import type * as corrections from "../corrections.js";
 import type * as creao from "../creao.js";
+import type * as creaoRuns from "../creaoRuns.js";
 import type * as crons from "../crons.js";
 import type * as cycles from "../cycles.js";
 import type * as demo from "../demo.js";
@@ -46,6 +48,7 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  agentApi: typeof agentApi;
   "agents/interpret": typeof agents_interpret;
   "agents/learn": typeof agents_learn;
   "agents/prompts": typeof agents_prompts;
@@ -55,6 +58,7 @@ declare const fullApi: ApiFromModules<{
   "controller/recompute": typeof controller_recompute;
   corrections: typeof corrections;
   creao: typeof creao;
+  creaoRuns: typeof creaoRuns;
   crons: typeof crons;
   cycles: typeof cycles;
   demo: typeof demo;

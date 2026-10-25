@@ -1,4 +1,5 @@
 import { httpRouter } from "convex/server";
+import { internal } from "./_generated/api";
 import { httpAction } from "./_generated/server";
 import { callTool, TOOLS } from "./creao";
 
@@ -57,6 +58,32 @@ http.route({
   }),
 });
 
+/**
+ * Creao calls this when a run finishes (up to 3 attempts, unsigned). We check the per-run token and
+ * the run id, then re-fetch the run from Creao before trusting its status; 200 either way so Creao
+ * stops retrying a delivery we have seen.
+ */
+http.route({
+  path: "/creao/webhook",
+  method: "POST",
+  handler: httpAction(async (ctx, req) => {
+    const url = new URL(req.url);
+    const body = (await req.json().catch(() => null)) as {
+      runId?: string;
+    } | null;
+    const id = await ctx.runQuery(internal.creaoRuns.verifyWebhook, {
+      creaoRunId: url.searchParams.get("r") ?? "",
+      token: url.searchParams.get("t") ?? "",
+      runId: body?.runId ?? "",
+    });
+    if (!id) return new Response("unknown run", { status: 404 });
+    await ctx.scheduler.runAfter(0, internal.creaoRuns.refresh, {
+      creaoRunId: id,
+    });
+    return new Response(null, { status: 200 });
+  }),
+});
+
 type Rpc = {
   jsonrpc: "2.0";
   id?: string | number;
@@ -80,7 +107,7 @@ http.route({
       return new Response("unauthorized", { status: 401 });
     let rpc: Rpc;
     try {
-      rpc = await req.json();
+      rpc = (await req.json()) as Rpc;
     } catch {
       return Response.json({
         jsonrpc: "2.0",

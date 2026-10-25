@@ -17,7 +17,7 @@ import { userId } from "./lib/validators";
  * Who answers: a learned routing rule for this check wins (learning contract step 5); else the worker
  * if employees may be texted and they have a phone; else their manager.
  */
-async function recipient(
+export async function recipient(
   ctx: MutationCtx,
   company: Doc<"companies">,
   worker: Doc<"workers">,
@@ -196,7 +196,7 @@ function recentJobs(entries: Doc<"timeEntries">[]): string[] {
     .map(([id]) => id);
 }
 
-async function managerOf(ctx: MutationCtx, worker: Doc<"workers">) {
+export async function managerOf(ctx: MutationCtx, worker: Doc<"workers">) {
   const manager =
     worker.role === "manager"
       ? worker
