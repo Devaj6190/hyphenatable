@@ -11,9 +11,17 @@ bun run run.ts --flags <eval.summary export>    # real flags, once B's export ex
 bun run test                                    # vitest
 ```
 
-## Flags: a stand-in until B's checks run
+## Flags: the checks engine
 
-`fixtures/flags.json` comes from `naive-checks.ts`, a deliberately simple reading of the section 9 catalogue over the fixtures. **It is not B's checks engine.** It was written by someone who knows the fixtures, so its M1 score shows the scoring code works, not that the product does. `results.json.flagsSource` says which flags were scored. The readiness screen and PROOF.md show M1 only from real flags (B's `eval.summary` or a Convex export).
+`engine.ts` runs the product's checks (`runAll` from `packages/engine`) over the fixtures with onboarding's rules (`rules.json`) owner-approved, then applies the backend's settling step (`settlingRule`, `precedentFor`, as `apps/web/convex/checks.ts` does). `results.json.flagsSource` says so; `--flags <export.json>` scores an exported set instead. `m1ByCycle` scores every current cycle.
+
+`fixtures/flags.json` (from `naive-checks.ts`) is the old stand-in that tested the scoring code before the engine existed; `stand-in.test.ts` still checks it.
+
+## Learning curve (M3)
+
+`m3-learning.ts` runs cycle 2 three times: no rules, onboarding's rules, and onboarding plus the rules cycle 1's answers teach. Each flag ends **settled** (an owner-approved rule decides it), **rule-backed** (a rule is cited, one tap for the owner), a **note**, or **needs a person**. `LEARNED_A` is the oracle step (what a correct Analyst writes from each cycle-1 answer-key row); the dedupe, backtest over past cycles, approval, checks and routing are the product's code. `results.json.learning` holds the curve, each learned rule's backtest, and what happened to every row the answer key marks rule-resolvable.
+
+`__tests__/engine.test.ts` is the regression gate CI runs on every PR: cycle 1 catches every planted error with no false alarm, cycle 2 misses only the known CHK-08 gap (a-ak-72), every learned rule passes its backtest, cycle 2 needs a person less at each step, and all 9 rule-resolvable rows are handled by a rule.
 
 ## Metrics
 

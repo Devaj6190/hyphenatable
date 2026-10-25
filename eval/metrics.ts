@@ -21,6 +21,9 @@ export function buildResults(args: {
   companyR?: M4Summary | null;
   generatedAt: string;
   gitSha: string | null;
+  /** Flags for every current cycle, when they come from the checks engine (adds m1ByCycle). */
+  allFlags?: FlagLike[];
+  learning?: Results["learning"];
 }): Results {
   const { fx, cycleId } = args;
   const current = fx.cycles
@@ -45,5 +48,20 @@ export function buildResults(args: {
     m4: m4(args.syntheticBacktest, args.companyR ?? null),
     m5: m5(fx.syncRuns),
     m6: m6(flags),
+    m1ByCycle: args.allFlags
+      ? current.map((c) => {
+          const r = m1(
+            (args.allFlags ?? []).filter((f) => f.cycleId === c),
+            fx.answerKey.filter((k) => (k.cycleId ?? first) === c),
+          );
+          return {
+            cycleId: c,
+            recall: r.recall,
+            precision: r.precision,
+            missedKeyRowIds: r.missedKeyRowIds,
+          };
+        })
+      : undefined,
+    learning: args.learning,
   });
 }

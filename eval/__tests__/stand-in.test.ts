@@ -35,12 +35,12 @@ describe("naive stand-in flags (not B's checks engine)", () => {
       ...naiveFlags(fx, "a-c06"),
     ]);
   });
-  test("the committed results.json validates and says its flags are a stand-in", () => {
+  test("the committed results.json validates and says its flags come from the checks engine", () => {
     const committed = JSON.parse(
       readFileSync(join(import.meta.dirname, "../results.json"), "utf8"),
     );
     expect(Results.safeParse(committed).success).toBe(true);
-    expect(committed.flagsSource).toContain("stand-in");
+    expect(committed.flagsSource).toContain("checks engine");
     expect(committed.synthetic).toBe(true);
   });
 });

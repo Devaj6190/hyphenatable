@@ -48,7 +48,7 @@ flowchart LR
 2. **Check.** A pure TypeScript engine runs 23 checks over hours, jobs, expenses, rates and pay. Then the Creao **Auditor** reads across everything the rules can't: fuzzy job matches, patterns across workers, entries that fit no job's dates.
 3. **Ask.** Anything that needs a human becomes one short question, routed to the person who actually knows: the manager for job facts, the employee for their own hours, the owner for money. The Creao **Messenger** drafts it, a person approves it, and it goes out by iMessage.
 4. **Fix.** Replies are read back automatically (numbered options, poll taps, free text). Each answer becomes a proposed correction in RollPay's own workbook. Jobber and Gusto are never edited.
-5. **Learn.** The Creao **Analyst** turns answers and history into rules. Code backtests each one against what was actually paid; the owner approves it. Cycle 2 asks fewer questions than cycle 1.
+5. **Learn.** The Creao **Analyst** turns answers and history into rules. Code backtests each one against what was actually paid; the owner approves it. On the same cycle-2 payroll, the items needing a person drop from 21 to 17 after one cycle of learning.
 6. **Draft.** RollPay computes pay to the cent, fills the Gusto draft and stops. The owner submits.
 
 ## Deterministic where it counts, agentic where it helps
@@ -140,11 +140,24 @@ An append-only audit log records every pull, flag, agent run, message, answer, c
 
 </details>
 
+## It gets better every cycle, and we measure it
+
+The same cycle-2 payroll, with its planted errors, run three times through the real checks engine. What still needs a person before the owner signs off:
+
+| Rules in force | Need a person | Settled or rule-backed |
+|---|:---:|:---:|
+| None (day zero) | **28** | 0 |
+| Onboarding's rules, learned from 4 past payrolls | **21** | 6 |
+| Plus 3 rules learned from cycle 1's answers, each backtested 4 of 4 | **17** | 9 |
+
+Every planted error the answer key says a learned rule should handle was handled. The engine catches **29 of 29** planted errors in cycle 1 and **30 of 31** in cycle 2, with **zero false alarms**. These evals run on every pull request: if a check stops catching an error or a learned rule stops settling one, CI fails. Method: [docs/PROOF.md §6](docs/PROOF.md#6-the-checks-engine-and-the-learning-curve-m1-m3).
+
 ## Proven on real payroll
 
 | | Result | Data |
 |---|---|---|
 | Backtest on a real landscaping company | **35 of 46** worker pay periods match what was actually paid **to the cent**; **44 of 46 within $1** | 283 real timesheet entries, 188 payroll rows, 8 pay periods, anonymized at ingest |
+| Planted-error detection | **29 of 29** caught in cycle 1, **30 of 31** in cycle 2, **0** false alarms | Company A, synthetic, answer key never shown to a model |
 | Payroll math self-check | **120 of 120** worker-cycles to the cent, including California daily overtime | Company B, synthetic |
 | QuickBooks sandbox read-back | **6 of 6** purchases matched | Company A, synthetic |
 | Test suite | **700+** tests across 100+ files; Biome, typecheck and tests on every PR | `bun run test` |
