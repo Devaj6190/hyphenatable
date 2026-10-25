@@ -109,4 +109,34 @@ describe("precedentFor", () => {
       precedentFor(flag, { rules: [rule({ id: "r_1" })], pastFlags: [] }),
     ).toEqual(none);
   });
+
+  test("a rule naming a worker is precedent only for that worker's flags", () => {
+    const flag = { ...longShift(), checkId: "CHK-18" as const };
+    const pay = (id: string, workerId: string) =>
+      rule({ id, type: "pay_rate", params: { workerId } });
+    expect(
+      precedentFor(flag, { rules: [pay("r_other", "w_99")], pastFlags: [] }),
+    ).toEqual(none);
+    expect(
+      precedentFor(flag, { rules: [pay("r_own", "w_01")], pastFlags: [] })
+        .ruleId,
+    ).toBe("r_own");
+  });
+
+  test("record-keyed rules are cited only by the check that matched them", () => {
+    const flag = { ...longShift(), checkId: "CHK-17" as const };
+    const kind = rule({
+      id: "r_kind",
+      type: "expense_account_kind",
+      params: { accountName: "Materials", kind: "job_cost" },
+    });
+    expect(precedentFor(flag, { rules: [kind], pastFlags: [] })).toEqual(none);
+    const cited = {
+      ...flag,
+      precedent: { ruleId: "r_kind", flagId: null, note: "rule: x" },
+    };
+    expect(precedentFor(cited, { rules: [], pastFlags: [] })).toEqual(
+      cited.precedent,
+    );
+  });
 });
