@@ -13,22 +13,37 @@ import {
 import { write } from "./audit";
 import { userId } from "./lib/validators";
 
-/** Who answers: the worker if employees may be texted and they have a phone, else their manager. */
+/**
+ * Who answers: a learned routing rule for this check wins (learning contract step 5); else the worker
+ * if employees may be texted and they have a phone; else their manager.
+ */
 async function recipient(
   ctx: MutationCtx,
   company: Doc<"companies">,
   worker: Doc<"workers">,
+  checkId: Doc<"flags">["checkId"],
 ): Promise<{ to: Doc<"workers">; toRole: "manager" | "employee" } | null> {
-  if (
+  const learned = (await routingRules(ctx, company._id)).find(
+    (r) => r.params.checkId === checkId,
+  )?.params.answeredBy;
+  const employeeOk =
     company.settings.employeesMayBeTexted &&
     worker.contactRef &&
     worker.role === "field" &&
-    !(await doNotText(ctx, company._id, worker._id))
-  )
-    return { to: worker, toRole: "employee" };
+    learned !== "manager" &&
+    !(await doNotText(ctx, company._id, worker._id));
+  if (employeeOk) return { to: worker, toRole: "employee" };
   const manager = worker.managerId ? await ctx.db.get(worker.managerId) : null;
   return manager?.contactRef ? { to: manager, toRole: "manager" } : null;
 }
+
+const routingRules = (ctx: MutationCtx, companyId: Id<"companies">) =>
+  ctx.db
+    .query("rules")
+    .withIndex("by_status", (q) =>
+      q.eq("companyId", companyId).eq("status", "active").eq("type", "routing"),
+    )
+    .collect();
 
 /** STOP writes an active routing rule; nobody is texted again after it. */
 async function doNotText(
@@ -36,13 +51,9 @@ async function doNotText(
   companyId: Id<"companies">,
   workerId: Id<"workers">,
 ) {
-  const rules = await ctx.db
-    .query("rules")
-    .withIndex("by_status", (q) =>
-      q.eq("companyId", companyId).eq("status", "active").eq("type", "routing"),
-    )
-    .collect();
-  return rules.some((r) => r.params.doNotText === workerId);
+  return (await routingRules(ctx, companyId)).some(
+    (r) => r.params.doNotText === workerId,
+  );
 }
 
 /** Scheduled after checks.run: one draft question per open, person-routed flag that a template can ask. */
@@ -139,7 +150,7 @@ export const draftForCycle = internalMutation({
       const to =
         built.template === "expenseNoJob"
           ? await managerOf(ctx, subjectWorker)
-          : await recipient(ctx, company, subjectWorker);
+          : await recipient(ctx, company, subjectWorker, flag.checkId);
       if (!to) continue;
       const questionId = await ctx.db.insert("questions", {
         companyId: company._id,

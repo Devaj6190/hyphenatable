@@ -9,6 +9,7 @@
  */
 
 import type * as agents_interpret from "../agents/interpret.js";
+import type * as agents_learn from "../agents/learn.js";
 import type * as agents_prompts from "../agents/prompts.js";
 import type * as audit from "../audit.js";
 import type * as checks from "../checks.js";
@@ -20,6 +21,7 @@ import type * as drafts from "../drafts.js";
 import type * as eval from "../eval.js";
 import type * as flags from "../flags.js";
 import type * as http from "../http.js";
+import type * as lessons from "../lessons.js";
 import type * as lib_engine from "../lib/engine.js";
 import type * as lib_ingest from "../lib/ingest.js";
 import type * as lib_stub from "../lib/stub.js";
@@ -42,6 +44,7 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   "agents/interpret": typeof agents_interpret;
+  "agents/learn": typeof agents_learn;
   "agents/prompts": typeof agents_prompts;
   audit: typeof audit;
   checks: typeof checks;
@@ -53,6 +56,7 @@ declare const fullApi: ApiFromModules<{
   eval: typeof eval;
   flags: typeof flags;
   http: typeof http;
+  lessons: typeof lessons;
   "lib/engine": typeof lib_engine;
   "lib/ingest": typeof lib_ingest;
   "lib/stub": typeof lib_stub;
