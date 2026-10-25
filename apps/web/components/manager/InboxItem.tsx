@@ -170,9 +170,11 @@ export function InboxItem({
                 {item.rows.map((r) => (
                   <li
                     key={r.recordId}
-                    className="flex justify-between gap-2 rounded-lg bg-card px-2.5 py-2 text-[0.8125rem] tabular-nums"
+                    className="flex flex-wrap justify-between gap-x-2 gap-y-0.5 rounded-lg bg-card px-2.5 py-2 text-[0.8125rem] tabular-nums"
                   >
-                    <span className="text-muted-foreground">{r.recordId}</span>
+                    <span className="whitespace-nowrap text-muted-foreground">
+                      {r.recordId}
+                    </span>
                     <span className="text-right font-semibold">{r.detail}</span>
                   </li>
                 ))}
@@ -271,7 +273,7 @@ export function InboxItem({
               {item.kind === "fix" ? (
                 <Button
                   variant="quiet"
-                  className="h-auto min-h-10 text-sm whitespace-normal"
+                  className="h-auto min-h-10 text-sm whitespace-normal max-sm:h-auto max-sm:min-h-11"
                   onClick={() => setMode("pick")}
                 >
                   Can't fix it in Jobber now? Tell us which is right

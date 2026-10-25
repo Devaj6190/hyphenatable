@@ -304,6 +304,15 @@
   }
 }
 
+/* Phone (< sm): every direct Button child of an action row takes the full width, with a 44 px target. */
+@utility phone-actions {
+  @media (width < 40rem) {
+    & > [data-slot="button"] {
+      width: 100%;
+    }
+  }
+}
+
 @layer base {
   * {
     @apply border-border;

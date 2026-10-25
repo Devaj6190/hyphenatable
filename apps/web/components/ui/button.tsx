@@ -27,11 +27,12 @@ const buttonVariants = cva(
         link: "h-auto! px-0! text-link underline-offset-4 hover:underline",
       },
       size: {
-        sm: "h-8 px-3 text-sm",
-        default: "h-10 px-4 text-sm",
-        lg: "h-11 px-5 text-base",
-        icon: "size-10",
-        "icon-sm": "size-8",
+        // Phone (< sm) targets are at least 44 px; desktop sizes are unchanged.
+        sm: "h-8 px-3 text-sm max-sm:h-11",
+        default: "h-10 px-4 text-sm max-sm:h-11",
+        lg: "h-11 px-5 text-base max-sm:h-12",
+        icon: "size-10 max-sm:size-11",
+        "icon-sm": "size-8 max-sm:size-11",
         xs: "h-7 px-2 text-xs",
         "icon-xs": "size-7",
         "icon-lg": "size-11",

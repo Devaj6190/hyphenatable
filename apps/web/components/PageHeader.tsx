@@ -18,7 +18,11 @@ export function PageHeader({
         </h1>
         {description && <p className="text-muted-foreground">{description}</p>}
       </div>
-      {actions && <div className="flex flex-wrap gap-2">{actions}</div>}
+      {actions && (
+        <div className="phone-actions flex flex-wrap gap-2 max-sm:w-full">
+          {actions}
+        </div>
+      )}
     </div>
   );
 }

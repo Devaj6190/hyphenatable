@@ -26,7 +26,7 @@ import { cn } from "@/lib/utils";
 import type { AuditViewData } from "@/lib/view-types";
 
 const selectClass =
-  "h-10 rounded-control border border-input bg-card px-3 text-sm text-foreground outline-none focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-1 focus-visible:outline-ring";
+  "h-10 rounded-control border border-input bg-card px-3 text-sm text-foreground outline-none max-sm:h-11 max-sm:min-w-0 max-sm:flex-1 max-sm:basis-[28%] focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-1 focus-visible:outline-ring";
 
 const actorWord: Record<string, string> = { simulated: "Simulated persona" };
 const word = (k: string) => actorWord[k] ?? k[0].toUpperCase() + k.slice(1);
@@ -188,14 +188,14 @@ export function AuditLog({
 
       <div className="flex flex-col gap-3 rounded-card border bg-card p-4 shadow-card">
         <div className="flex flex-wrap items-center gap-2">
-          <div className="relative min-w-0 flex-1 basis-60">
+          <div className="relative min-w-0 flex-1 basis-60 max-sm:basis-full">
             <Search
               aria-hidden
               className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
             />
             <Input
               type="search"
-              className="h-10 pl-9"
+              className="h-10 pl-9 max-sm:h-11"
               placeholder="Search the log"
               aria-label="Search the log"
               value={query}
@@ -304,11 +304,11 @@ export function AuditLog({
           <caption className="sr-only">
             Audit events, {order} first. Append-only.
           </caption>
-          <thead className="sticky top-0 z-10 bg-muted text-xs font-medium tracking-wide text-muted-foreground uppercase">
+          <thead className="sticky top-0 z-10 hidden bg-muted text-xs font-medium tracking-wide text-muted-foreground uppercase md:table-header-group">
             <tr className="border-b">
               <th
                 scope="col"
-                className="w-24 py-2.5 pr-2 pl-4 text-left md:w-36 md:pr-3"
+                className="w-36 py-2.5 pr-3 pl-4 text-left"
               >
                 Time
               </th>

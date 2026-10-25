@@ -149,7 +149,7 @@ export function ApprovalSheet({
                 aria-describedby={`q-${question.id}-count`}
                 className="bg-card text-base"
               />
-              <div className="flex gap-2">
+              <div className="flex gap-2 max-sm:[&>[data-slot=button]]:flex-1">
                 <Button
                   disabled={error !== null}
                   onClick={() => {
@@ -224,7 +224,7 @@ export function ApprovalSheet({
           )}
 
           {status === "draft" && canDecide && mode === "view" && (
-            <div className="flex flex-wrap gap-2">
+            <div className="phone-actions flex flex-wrap gap-2">
               <Button
                 disabled={error !== null}
                 onClick={() => {
