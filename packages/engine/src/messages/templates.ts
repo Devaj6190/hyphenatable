@@ -86,6 +86,14 @@ export const issuePhrases: Record<CheckId, { one: string; many: string }> = {
     many: "pay that changed more than usual",
   },
   "CHK-23": { one: "an incomplete data pull", many: "incomplete data pulls" },
+  "AGT-01": {
+    one: "something the reviewer thinks looks off",
+    many: "things the reviewer thinks look off",
+  },
+  "LRN-01": {
+    one: "an answer that contradicts a rule",
+    many: "answers that contradict rules",
+  },
 };
 
 // ── End-time question: edit wording here ───────────────────────────────────────────────────────────────

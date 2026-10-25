@@ -96,8 +96,8 @@ describe("contract rules", () => {
   });
 
   test("CheckId covers exactly CHK-01..CHK-23", () => {
-    expect(s.CheckId.options).toHaveLength(23);
-    expect(s.CheckId.options.at(-1)).toBe("CHK-23");
+    expect(s.CheckId.options).toHaveLength(25);
+    expect(s.CheckId.options.slice(-3)).toEqual(["CHK-23", "AGT-01", "LRN-01"]);
   });
 });
 
