@@ -3,6 +3,7 @@
 import { useAction, useMutation } from "convex/react";
 import { makeFunctionReference } from "convex/server";
 import { useEffect, useRef, useState } from "react";
+import { AgentActivity } from "@/components/AgentActivity";
 import { DataLabel } from "@/components/DataLabel";
 import { FlagCard } from "@/components/FlagCard";
 import { FlagsSource } from "@/components/FlagsList";
@@ -1308,6 +1309,8 @@ export function HomeBoard({
               }
               onConfirm={() => gate(modal ?? 1)}
             />
+
+            <AgentActivity companyId={companyId} timezone={company.timezone} />
 
             <p className="text-sm text-muted-foreground">
               Draft only. RollPay never submits payroll. Steps:{" "}
