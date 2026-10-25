@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { fixtures, load } from "../payroll/__tests__/fixtures";
-import { type HistoryInput, proposeFromHistory, summarize } from "./history";
+import {
+  earningName,
+  type HistoryInput,
+  proposeFromHistory,
+  summarize,
+} from "./history";
 import type { PastCycle } from "./lessons";
 
 const A = fixtures("a");
@@ -96,5 +101,36 @@ describe("proposeFromHistory on Company A", () => {
     const s = JSON.stringify(summarize(input));
     expect(s.length).toBeLessThan(20_000);
     for (const w of A.workers) expect(s).not.toContain(w.displayName);
+  });
+});
+
+describe("earning names as Gusto's exports spell them", () => {
+  const spelled: Record<string, string> = {
+    "Regular Hours": "Regular",
+    Overtime: " overtime ",
+    "Double Overtime": "DOUBLE  OVERTIME",
+  };
+  const exported: HistoryInput = {
+    ...input,
+    paid: input.paid.map((p) => ({
+      ...p,
+      earnings: p.earnings.map((e) => ({
+        ...e,
+        name: spelled[e.name] ?? e.name,
+      })),
+    })),
+  };
+
+  it("propose the same rules as the API names", () => {
+    const strip = (ps: ReturnType<typeof proposeFromHistory>) =>
+      ps.map(({ type, params, evidence }) => ({ type, params, evidence }));
+    expect(strip(proposeFromHistory(exported))).toEqual(
+      strip(proposeFromHistory(input)),
+    );
+  });
+
+  it("a bare 'Hours' is never read as regular pay", () => {
+    expect(earningName("Hours")).toBe("Hours");
+    expect(earningName("Regular")).toBe("Regular Hours");
   });
 });
