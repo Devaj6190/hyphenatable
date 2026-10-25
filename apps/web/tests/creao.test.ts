@@ -251,6 +251,22 @@ describe("agent proposals", () => {
       ],
     });
     expect(money[0].result).toMatch(/money/);
+    const id = await s.t.mutation(internal.agentApi.proposeQuestions, {
+      cycleId: s.cycleId,
+      proposals: [
+        {
+          flagId,
+          draft: {
+            text: "Was your Oct 8 entry for job k978qzgf?",
+            options: null,
+            kind: "text",
+            toRole: "manager",
+            reason: "x",
+          },
+        },
+      ],
+    });
+    expect(id[0].result).toMatch(/record ids/);
     const ok = await s.t.mutation(internal.agentApi.proposeQuestions, {
       cycleId: s.cycleId,
       proposals: [

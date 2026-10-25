@@ -101,17 +101,45 @@ test("Company A: ingest → onboarding proposes rules from history with evidence
   // Running it again proposes nothing new.
   await t.action(api.onboarding.run, { companyId });
   const again = await t.run((ctx) => ctx.db.query("rules").collect());
-  console.log(
-    "DUP",
-    JSON.stringify(
-      again
-        .slice(rules.length)
-        .map((r) => [r.type, r.params])
-        .slice(0, 3),
-    ),
-    JSON.stringify(rules.slice(0, 2).map((r) => [r.type, r.params])),
-  );
   expect(again).toHaveLength(rules.length);
+
+  // The Analyst restating code's rules with fewer params, or a rate as text, adds nothing.
+  const pay = byType("pay_rate")[0];
+  const evidence = pay.provenance.evidence.slice(0, 1);
+  const restated = await t.mutation(internal.onboarding.proposeRules, {
+    companyId,
+    by: "creao",
+    payload: {
+      rules: [
+        {
+          type: "pay_rate",
+          params: [
+            { key: "workerId", value: pay.params.workerId },
+            { key: "rateCents", value: String(pay.params.rateCents) },
+          ],
+          statement: "Same rate as every past cycle.",
+          evidence,
+          seenInCycles: 4,
+          ofCycles: 4,
+          confidence: 0.9,
+        },
+        {
+          type: "overtime_policy",
+          params: [
+            { key: "weeklyHours", value: 40 },
+            { key: "multiplier", value: 1.5 },
+          ],
+          statement: "Overtime after 40 hours.",
+          evidence,
+          seenInCycles: 4,
+          ofCycles: 4,
+          confidence: 0.9,
+        },
+      ],
+      missing: [],
+    },
+  });
+  expect(restated.stored).toEqual([]);
 });
 
 test("Company A: the ingested current cycle runs its checks and drafts questions on its own", async () => {
@@ -136,6 +164,23 @@ test("Company A: the ingested current cycle runs its checks and drafts questions
   );
   for (const q of questions.filter((x) => x.status === "draft"))
     expect(q.text).not.toMatch(/\$/);
+
+  // People read flags in words: no record ids, and no dollar amounts for the manager.
+  const companyId = ids.a as Id<"companies">;
+  const asOwner = await t.query(api.flags.list, {
+    companyId,
+    viewerId: ids["a-w12"] as Id<"workers">,
+  });
+  const asManager = await t.query(api.flags.list, {
+    companyId,
+    viewerId: ids["a-w11"] as Id<"workers">,
+  });
+  expect(asOwner.length).toBe(flags.length);
+  for (const f of asOwner) expect(f.seen).not.toMatch(/\b[a-zA-Z0-9]{32}\b/);
+  expect(asOwner.some((f) => /Job \d+/.test(f.seen))).toBe(true);
+  expect(asOwner.some((f) => /\$\d/.test(f.seen))).toBe(true);
+  expect(asManager.length).toBeGreaterThan(0);
+  for (const f of asManager) expect(f.seen).not.toMatch(/\$\d/);
   void internal;
 });
 
@@ -196,4 +241,68 @@ test("Company A: demo reset restores the snapshot exactly, twice in a row, keepi
   const summary = await t.query(api.eval.summary, { companyId });
   expect(summary.m1).toBeNull();
   expect(summary.m5?.total).toBeGreaterThan(0);
+});
+
+test("Company A: approving onboarding's rules re-runs the checks; flags they settle close, ones they enable appear", async () => {
+  const t = convexTest(schema, modules);
+  const ids = await t.mutation(api.sync.ingestFixture, {
+    ingestKey: "test-ingest",
+    fixture: fixture(),
+  });
+  for (let i = 0; i < 3; i++) {
+    vi.advanceTimersByTime(1);
+    await t.finishInProgressScheduledFunctions();
+  }
+  const companyId = ids.a as Id<"companies">;
+  const owner = ids["a-w12"];
+  const cycleId = ids["a-c05"] as Id<"cycles">;
+  const live = async () => {
+    const n: Record<string, number> = {};
+    for (const f of await t.run((ctx) => ctx.db.query("flags").collect()))
+      if (f.cycleId === cycleId && f.status !== "dismissed")
+        n[f.checkId] = (n[f.checkId] ?? 0) + 1;
+    return n;
+  };
+  const before = await live();
+
+  await t.action(api.onboarding.run, { companyId });
+  const proposed = await t.query(api.rules.list, {
+    companyId,
+    status: "proposed",
+  });
+  for (const r of proposed)
+    await t.mutation(api.rules.approve, { ruleId: r._id, userId: owner });
+  for (let i = 0; i < 3; i++) {
+    vi.advanceTimersByTime(1);
+    await t.finishInProgressScheduledFunctions();
+  }
+  const after = await live();
+  // Before any rule: every purchase account is unsorted (CHK-17 ×6) and CHK-22 can't see overtime.
+  expect(before["CHK-17"]).toBe(6);
+  // After: the answer key's counts (data/fixtures/a/answer-key.json), except CHK-16, CHK-18 and CHK-20. Those need
+  // rules no payroll history shows (a disposal sub-job link, an in-person quoter, a rate that changed); the owner
+  // states them. eval/engine.ts loads them from rules.json, which is why eval scores 29 of 29.
+  expect(after).toEqual({
+    "CHK-01": 1,
+    "CHK-02": 1,
+    "CHK-03": 1,
+    "CHK-04": 1,
+    "CHK-05": 2,
+    "CHK-06": 4,
+    "CHK-07": 1,
+    "CHK-08": 1,
+    "CHK-09": 1,
+    "CHK-10": 1,
+    "CHK-11": 1,
+    "CHK-12": 3,
+    "CHK-13": 1,
+    "CHK-14": 1,
+    "CHK-15": 1,
+    "CHK-17": 1,
+    "CHK-19": 1,
+    "CHK-21": 1,
+    "CHK-22": 2,
+  });
+  const retracted = await t.run((ctx) => ctx.db.query("auditEvents").collect());
+  expect(retracted.filter((e) => e.type === "flag.retracted")).toHaveLength(5);
 });

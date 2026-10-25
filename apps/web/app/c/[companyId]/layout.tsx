@@ -5,6 +5,7 @@ import { LiveProvider } from "@/components/LiveProvider";
 import { Nav } from "@/components/Nav";
 import { RoleScope } from "@/components/RoleScope";
 import { ShellHeader } from "@/components/ShellHeader";
+import { Stepper } from "@/components/Stepper";
 import { companies } from "@/lib/companies";
 
 // Known companies are prerendered. Nav and ShellHeader read the company from useParams on the client.
@@ -31,20 +32,23 @@ async function KnownCompany({
   );
 }
 
+// The shell is the viewport: sidebar, top bar and stepper are fixed; only <main> scrolls, and only when a page's
+// content is taller than the space left. The window itself never scrolls.
 export default function CompanyLayout({
   children,
   params,
 }: LayoutProps<"/c/[companyId]">) {
   // The role comes from a cookie, so everything role-dependent renders per request inside this boundary.
   return (
-    <Suspense fallback={<div className="min-h-dvh bg-background" />}>
+    <Suspense fallback={<div className="h-dvh bg-background" />}>
       <KnownCompany params={params}>
         <RoleScope>
-          <div className="grain flex min-h-dvh">
+          <div className="flex h-dvh overflow-hidden bg-background">
             <Nav />
-            <div className="min-w-0 flex-1 pb-24 lg:pb-0">
+            <div className="flex min-w-0 flex-1 flex-col">
               <ShellHeader />
-              <main className="mx-auto max-w-6xl px-4 py-6 lg:px-8 lg:py-8">
+              <Stepper />
+              <main className="scroll-panel min-h-0 flex-1 overflow-y-auto px-4 py-5 pb-24 lg:px-6 lg:pb-6">
                 <Suspense
                   fallback={<p className="text-muted-foreground">Loading…</p>}
                 >

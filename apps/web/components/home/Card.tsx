@@ -13,27 +13,27 @@ import type { CardTone, HomeCard } from "@/lib/view-types/home";
 
 export const TONE: Record<CardTone, { grad: string; kicker: string }> = {
   text: {
-    grad: "linear-gradient(135deg, #4F7BFF, #9B6BF2)",
+    grad: "var(--ask)",
     kicker: "text-ask",
   },
   sunset: {
-    grad: "linear-gradient(135deg, var(--sunset-1), var(--sunset-2) 55%, var(--sunset-3))",
+    grad: "var(--link)",
     kicker: "text-link",
   },
   gold: {
-    grad: "linear-gradient(135deg, #FFD36E, #F5A524)",
+    grad: "var(--hold)",
     kicker: "text-hold",
   },
   coral: {
-    grad: "linear-gradient(135deg, #FF9A7A, #E5484D)",
+    grad: "var(--destructive)",
     kicker: "text-destructive",
   },
   sky: {
-    grad: "linear-gradient(135deg, #6CC4FF, #1E4FB0)",
+    grad: "var(--ask)",
     kicker: "text-ask",
   },
   green: {
-    grad: "linear-gradient(135deg, #4FD1A0, #1C6B36)",
+    grad: "var(--ok)",
     kicker: "text-ok",
   },
 };

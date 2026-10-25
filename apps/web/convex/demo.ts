@@ -27,8 +27,15 @@ export const scenario = mutation({
   handler: () => notYet("B-15 / C"),
 });
 
-/** Demo mode only; every message it produces is labelled simulated. */
+/**
+ * Demo mode only: answers an approved or sent question as if the person had texted back (messages.simulateReply).
+ * `text` is the operator's reply; without it, the first option. Every message and audit event it writes says simulated.
+ */
 export const simulatedReply = action({
-  args: { questionId: v.id("questions") },
-  handler: () => notYet("B-15 / C"),
+  args: { questionId: v.id("questions"), text: v.optional(v.string()) },
+  handler: (
+    ctx,
+    args,
+  ): Promise<{ messageId: string; reply: string; status: string }> =>
+    ctx.runMutation(internal.messages.simulateReply, args),
 });

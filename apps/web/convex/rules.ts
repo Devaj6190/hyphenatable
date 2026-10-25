@@ -48,7 +48,11 @@ export const approve = mutation({
     if (rule.status !== "proposed")
       throw new ConvexError(`rule is ${rule.status}, not proposed`);
     const owner = await assertOwner(ctx, rule.companyId, userId);
-    if (rule.provenance.answeredBy === owner._id)
+    // An owner-stated rule is the owner's own words restated by the Analyst; confirming it is the point.
+    if (
+      rule.source !== "owner_stated" &&
+      rule.provenance.answeredBy === owner._id
+    )
       throw new ConvexError(
         "the person whose answer created this rule cannot also approve it",
       );
@@ -72,6 +76,9 @@ export const approve = mutation({
       refs: { ruleId },
       data: { backtest: rule.backtest },
     });
+    await ctx.scheduler.runAfter(0, internal.checks.recheckCompany, {
+      companyId: rule.companyId,
+    });
   },
 });
 
@@ -93,6 +100,9 @@ export const toggle = mutation({
       summary: `Rule turned ${on ? "on" : "off"}: ${String(rule.params.statement ?? rule.type)}`,
       refs: { ruleId },
       data: { on },
+    });
+    await ctx.scheduler.runAfter(0, internal.checks.recheckCompany, {
+      companyId: rule.companyId,
     });
   },
 });

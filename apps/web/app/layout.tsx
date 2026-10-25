@@ -1,24 +1,17 @@
+import { GeistMono } from "geist/font/mono";
+import { GeistSans } from "geist/font/sans";
 import type { Metadata } from "next";
-import localFont from "next/font/local";
+import { Instrument_Serif } from "next/font/google";
 import { THEME_SCRIPT } from "@/lib/theme";
 import "./globals.css";
 import { Providers } from "./providers";
 
-// Host Grotesk v1.002 variable (wght 300–800) from Element Type's release; license in app/fonts/OFL.txt.
-const hostGrotesk = localFont({
-  src: [
-    {
-      path: "./fonts/HostGrotesk-Variable.woff2",
-      weight: "300 800",
-      style: "normal",
-    },
-    {
-      path: "./fonts/HostGrotesk-Italic-Variable.woff2",
-      weight: "300 800",
-      style: "italic",
-    },
-  ],
-  variable: "--font-host-grotesk",
+// Geist (UI and numbers) ships with the `geist` package, so the build needs no network for it. Instrument Serif is
+// the display face for page titles and the greeting only.
+const instrumentSerif = Instrument_Serif({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-instrument-serif",
   display: "swap",
 });
 
@@ -30,12 +23,16 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     // data-theme is set by THEME_SCRIPT before paint, so React must not own it.
-    <html lang="en" className={hostGrotesk.variable} suppressHydrationWarning>
+    <html
+      lang="en"
+      className={`${GeistSans.variable} ${GeistMono.variable} ${instrumentSerif.variable}`}
+      suppressHydrationWarning
+    >
       <head>
         {/* biome-ignore lint/security/noDangerouslySetInnerHtml: static theme script, no user input (next docs: preventing flash before hydration). */}
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
       </head>
-      <body className="min-h-full">
+      <body className="h-dvh overflow-hidden">
         <Providers>{children}</Providers>
       </body>
     </html>

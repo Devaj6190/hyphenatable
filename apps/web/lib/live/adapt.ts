@@ -1,6 +1,14 @@
 import type { AgentKind } from "@/components/AgentChip";
 import type { Doc } from "@/convex/_generated/dataModel";
-import type { Correction, Flag, Question, SourceSystem } from "@/lib/types";
+import type { Rule } from "@/lib/rules";
+import type {
+  AuditData,
+  AuditEvent,
+  Correction,
+  Flag,
+  Question,
+  SourceSystem,
+} from "@/lib/types";
 import type { Cycle, FlagInfo } from "@/lib/view-types";
 
 // Convex documents → the shapes the screens already render. Ids stay Convex row ids (strings) so links and
@@ -191,4 +199,48 @@ export function headerCycle(
  */
 export function pageHasLiveCycle(pathname: string): boolean {
   return /^\/c\/[^/]+\/flags\/[^/]+\/?$/.test(pathname);
+}
+
+/**
+ * Whether the header asks Convex for the cycle. A company with no fixture cycle (Company R: its data is never
+ * committed) has nothing else to show, so its header is live on every page; the others follow pageHasLiveCycle.
+ */
+export function headerReadsLive(
+  pathname: string,
+  fixtureCycle: PeriodCycle | null,
+): boolean {
+  return fixtureCycle === null || pageHasLiveCycle(pathname);
+}
+
+/** A Convex audit row as the audit log renders it. companyId becomes the dashboard's key, as toFlag does. */
+export function toAuditEvent(
+  doc: Doc<"auditEvents">,
+  companyKey: string,
+): AuditEvent {
+  return {
+    id: doc._id,
+    companyId: companyKey,
+    cycleId: doc.cycleId ?? null,
+    at: doc.at,
+    actor: doc.actor,
+    type: doc.type,
+    summary: doc.summary,
+    refs: doc.refs,
+    data: (doc.data as AuditData | null) ?? null,
+  };
+}
+
+/** A Convex rule row as the rules screen reads it; companyId becomes the dashboard's key. */
+export function toRule(doc: Doc<"rules">, companyKey: string): Rule {
+  return {
+    id: doc._id,
+    companyId: companyKey,
+    type: doc.type,
+    params: doc.params,
+    status: doc.status,
+    source: doc.source,
+    provenance: doc.provenance,
+    backtest: doc.backtest ?? null,
+    confidence: doc.confidence,
+  };
 }

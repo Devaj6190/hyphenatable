@@ -7,6 +7,7 @@ import {
   effectOf,
 } from "@payrollpilot/engine/corrections/corrections";
 import { scrub } from "@payrollpilot/engine/llm/scrub";
+import { friendlyDate } from "@payrollpilot/engine/messages/templates";
 import { candidateJobs } from "@payrollpilot/engine/questions/questions";
 import { MatchDecision, QuestionDraft } from "@payrollpilot/engine/schemas";
 import { ConvexError, v } from "convex/values";
@@ -23,6 +24,8 @@ import { managerOf, recipient } from "./questions";
 
 const MATCH_FLOOR = 0.85;
 const MONEY = /\$\s?\d|\d+\s?(dollars|usd|bucks)/i;
+// A record id, or a piece of one: letters and digits mixed, 6 or more long ("k978qzgf"). Texts name jobs by number.
+const RECORD_ID = /\b(?=[a-z0-9]*\d)(?=[a-z0-9]*[a-z])[a-z0-9]{6,}\b/i;
 
 const agentActor = (agent: "auditor" | "messenger") => ({
   kind: "agent" as const,
@@ -135,17 +138,36 @@ export const routedWithoutQuestion = internalQuery({
     ).filter(
       (f) => f.status === "open" && f.routeTo === "manager" && !f.questionId,
     );
+    const cycle = await ctx.db.get(cycleId);
+    const company = cycle && (await ctx.db.get(cycle.companyId));
+    const timezone = company?.timezone ?? "UTC";
+    // What a text can say: job numbers and titles, entry days and hours. The ids are for proposing, never for the text.
     return Promise.all(
       flags.map(async (f) => {
         const worker = f.subject.workerId
           ? await ctx.db.get(f.subject.workerId)
           : null;
+        const job = f.subject.jobId ? await ctx.db.get(f.subject.jobId) : null;
+        const entries = await Promise.all(
+          f.subject.entryIds.map((id) => ctx.db.get(id)),
+        );
         return {
           flagId: f._id,
           checkId: f.checkId,
           seen: f.seen,
           subject: f.subject,
           workerRole: worker?.role ?? null,
+          job: job ? { jobNumber: job.jobNumber, title: job.title } : null,
+          entries: entries.flatMap((e) =>
+            e
+              ? [
+                  {
+                    day: friendlyDate(e.startAt, timezone),
+                    hours: Math.round(e.durationSec / 36) / 100,
+                  },
+                ]
+              : [],
+          ),
         };
       }),
     );
@@ -426,6 +448,14 @@ export const proposeQuestions = internalMutation({
         out.push({
           flagId: p.flagId,
           result: "refused: texts never carry money",
+        });
+        continue;
+      }
+      if (RECORD_ID.test(d.text) || d.options?.some((o) => RECORD_ID.test(o))) {
+        out.push({
+          flagId: p.flagId,
+          result:
+            "refused: texts never carry record ids; say Job <number> or the day",
         });
         continue;
       }

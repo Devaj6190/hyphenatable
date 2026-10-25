@@ -11,13 +11,14 @@ export const NEEDS_MANAGER: readonly Flag["status"][] = [
   "answered",
 ];
 
-// null when DASHBOARD_URL is not set: the text then leaves out the "Details here" line.
+// null when DASHBOARD_URL is not set: the text then leaves out the "Details here" line. `?as=manager` makes the
+// dashboard open the inbox in the manager view (apps/web/proxy.ts), so a tap from the text never lands as the owner.
 export function managerLink(
   dashboardUrl: string | null | undefined,
   companyId: string,
 ): string | null {
   const base = dashboardUrl?.trim().replace(/\/+$/, "");
-  return base ? `${base}/c/${companyId}/manager` : null;
+  return base ? `${base}/c/${companyId}/manager?as=manager` : null;
 }
 
 // "Oct 10–23", or "Sep 26–Oct 9" across a month, in the company's timezone.

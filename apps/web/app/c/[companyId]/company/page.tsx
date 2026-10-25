@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { CompanyView } from "@/components/company/CompanyView";
+import { CompanySource } from "@/components/company/CompanySource";
 import { companies } from "@/lib/companies";
 import type { CompanyTab } from "@/lib/routes";
 import { currentViewer, rulesView } from "@/lib/server/fixtures";
@@ -30,7 +30,7 @@ async function Body({
   const viewer = await currentViewer(companyId);
   const initialTab = TABS.find((t) => t === tab) ?? "people";
   return (
-    <CompanyView
+    <CompanySource
       companyId={companyId}
       name={company.name}
       label={company.label}

@@ -6,6 +6,7 @@ import {
   render,
 } from "@payrollpilot/engine/messages/templates";
 import {
+  clock,
   fromModel,
   PURPOSE,
   type ReplyResult,
@@ -108,8 +109,21 @@ export const markSent = mutation({
     const m = await ctx.db.get(messageId);
     if (!m) throw new ConvexError("message not found");
     if (m.providerId) return; // the courier never sends twice; a retried markSent is a no-op
+    await recordSent(ctx, m, providerId, conversationKey, "courier");
+  },
+});
+
+/** A text went out (by the courier, or by demo.simulatedReply standing in for it): the question is now waiting. */
+async function recordSent(
+  ctx: MutationCtx,
+  m: Doc<"messages">,
+  providerId: string,
+  conversationKey: string,
+  by: "courier" | "demo.simulatedReply",
+) {
+  {
     const now = new Date().toISOString();
-    await ctx.db.patch(messageId, { providerId, conversationKey, at: now });
+    await ctx.db.patch(m._id, { providerId, conversationKey, at: now });
     const q = m.questionId ? await ctx.db.get(m.questionId) : null;
     if (!q || q.status !== "approved") return;
     const remindAt = new Date(Date.now() + remindMs()).toISOString();
@@ -126,14 +140,94 @@ export const markSent = mutation({
     await write(ctx, {
       companyId: q.companyId,
       cycleId: q.cycleId,
-      actor: { kind: "system", id: "courier", agent: null },
+      actor: { kind: "system", id: by, agent: null },
       type: "question.sent",
-      summary: "Question texted",
-      refs: { questionId: q._id, messageId },
-      data: null,
+      summary:
+        by === "courier"
+          ? "Question texted"
+          : "Question marked sent (simulated: no text left this deployment)",
+      refs: { questionId: q._id, messageId: m._id },
+      data: by === "courier" ? null : { simulated: true },
     });
+  }
+}
+
+/**
+ * demo.simulatedReply: an operator's reply to an approved or sent question, in demo mode only. It goes through the same
+ * path as a real text (sent, then inbound, then the same reader), and the messages and audit say simulated.
+ * With no text: "1" (the first option), or for a running timer the end 8 hours after it started.
+ */
+export const simulateReply = internalMutation({
+  args: { questionId: v.id("questions"), text: v.optional(v.string()) },
+  handler: async (ctx, { questionId, text }) => {
+    if (process.env.DEMO_MODE !== "1")
+      throw new ConvexError("simulated replies need DEMO_MODE=1");
+    const question = await ctx.db.get(questionId);
+    if (!question) throw new ConvexError("question not found");
+    const conversationKey = `simulated:${questionId}`;
+    if (question.status === "approved") {
+      const out = (
+        await ctx.db
+          .query("messages")
+          .withIndex("by_company", (q) => q.eq("companyId", question.companyId))
+          .collect()
+      ).find(
+        (m) =>
+          m.questionId === questionId && m.direction === "out" && !m.providerId,
+      );
+      if (!out) throw new ConvexError("no queued text for this question");
+      await recordSent(
+        ctx,
+        out,
+        `simulated:${out._id}`,
+        conversationKey,
+        "demo.simulatedReply",
+      );
+    }
+    const asked = await ctx.db.get(questionId);
+    if (!asked || !(OPEN as readonly string[]).includes(asked.status))
+      throw new ConvexError(
+        `question is ${question.status}; only an approved or sent one gets a reply`,
+      );
+    const reply = text?.trim() || (await defaultReply(ctx, asked));
+    if (reply.length > 240)
+      throw new ConvexError("a reply is at most 240 characters");
+    const at = new Date().toISOString();
+    const messageId = await ctx.db.insert("messages", {
+      companyId: asked.companyId,
+      conversationKey,
+      direction: "in",
+      text: reply,
+      providerId: `simulated:${questionId}:${at}`,
+      at,
+      questionId,
+      kind: "text",
+    });
+    await write(ctx, {
+      companyId: asked.companyId,
+      cycleId: asked.cycleId,
+      actor: { kind: "system", id: "demo.simulatedReply", agent: null },
+      type: "demo.simulated_reply",
+      summary: "Simulated reply (demo operator, not a real text)",
+      refs: { questionId, messageId },
+      data: { simulated: true, typed: Boolean(text?.trim()) },
+    });
+    await interpret(ctx, asked, messageId, reply);
+    const after = await ctx.db.get(questionId);
+    return { messageId, reply, status: after?.status ?? asked.status };
   },
 });
+
+async function defaultReply(ctx: QueryCtx, q: Doc<"questions">) {
+  if (q.options?.length) return "1";
+  const c = await context(ctx, q);
+  if (c?.template === "openTimer" && c.facts.startAt)
+    return clock(
+      new Date(Date.parse(c.facts.startAt) + 8 * 3_600_000).toISOString(),
+      c.facts.timezone,
+    );
+  return "yes";
+}
 
 export const inbound = mutation({
   args: inboundArgs,

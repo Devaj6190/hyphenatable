@@ -13,6 +13,7 @@ import {
   toFlag,
   toQuestion,
 } from "@/lib/live/adapt";
+import { hasConvex } from "@/lib/live/config";
 import type { LiveContext } from "@/lib/live/ids";
 import type { Flag, ViewerRole } from "@/lib/types";
 import type { Cycle, FlagInfo } from "@/lib/view-types";
@@ -111,7 +112,7 @@ export function useLiveInfo(
  * The company's newest cycle from cycles.list, for the page header. The header sits outside every LiveBoundary, so this
  * never throws: useQueries hands back a failed read as an Error, reported as "failed".
  */
-export function useLiveCycle(ctx: LiveContext | null): LiveCycle {
+function useConvexCycle(ctx: LiveContext | null): LiveCycle {
   const companyId = ctx?.ids.companyId ?? null;
   const requests = useMemo(
     (): Parameters<typeof useQueries>[0] =>
@@ -126,3 +127,9 @@ export function useLiveCycle(ctx: LiveContext | null): LiveCycle {
   if (r instanceof Error) return { status: "failed" };
   return { status: "ready", cycle: newestCycle(r) };
 }
+
+// Without a deployment URL there is no ConvexProvider, and useQueries throws even when it asks for nothing, which took
+// every page down in fixture mode. hasConvex never changes at runtime, so the same hooks run on every render.
+export const useLiveCycle: (ctx: LiveContext | null) => LiveCycle = hasConvex
+  ? useConvexCycle
+  : () => ({ status: "off" });

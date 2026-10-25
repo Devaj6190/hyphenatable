@@ -329,7 +329,7 @@ describe("manager summary from the fixtures", () => {
     });
     expect(cycleId).toBe("a-c05");
     expect(text).toBe(
-      "Hi Dakota, before we run payroll (Oct 10–23) there are 10 timesheet items to check, mostly duplicate or zero-hour entries.\nDetails here: https://rollpay.app/c/a/manager",
+      "Hi Dakota, before we run payroll (Oct 10–23) there are 10 timesheet items to check, mostly duplicate or zero-hour entries.\nDetails here: https://rollpay.app/c/a/manager?as=manager",
     );
     stub.enqueue({ contactRef: "contact:a-w11", text: text as string });
     await settle();

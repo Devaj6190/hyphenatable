@@ -506,23 +506,33 @@ describe("Company R package (synthetic, A1-shaped inputs)", () => {
     ).toEqual([
       ["export:qbo:q1:1:2", "qbo", "job_cost", null, null],
       ["je:1", "jobber", "unknown", "r:j:1", "r:w:hrly"],
+      ["venmo:2", "venmo", "unknown", null, "r:w:hrly"],
     ]);
     expect(p.unloadable.find((u) => u.id === "je:2")?.reasons[0]).toContain(
       "blocked",
     );
-    expect(p.unloadable.find((u) => u.id === "venmo:2")?.reasons[0]).toContain(
-      "Venmo reimbursement",
-    );
+    // contract #116: Venmo reimbursements load as source "venmo"
+    expect(ex.find((x) => x.id === "venmo:2")).toMatchObject({
+      date: "2026-09-26",
+      amountCents: 2500,
+      reimbursementStatus: "PAID",
+      sourceId: "venmo#4002",
+    });
   });
 
   test("time entries: approved/payable/category never invented; after the current cycle is labelled, not an error", () => {
-    expect(c["timeEntries.json"]).toEqual([]);
-    const r2 =
-      p.unloadable.find((u) => u.id === "te:2")?.reasons.join(" ") ?? "";
-    expect(r2).toContain("payable");
+    // contract #110: approved/payable/category are nullable; nulls pass through, never defaulted
+    const loaded = c["timeEntries.json"];
+    expect(
+      loaded.map((e) => [e.id, e.approved, e.payable, e.category, e.ticking]),
+    ).toEqual([["te:2", true, null, "GENERAL", false]]);
+    // no endAt and no ticking fact: ticking is still required, so te:3 stays unloadable
     expect(
       p.unloadable.find((u) => u.id === "te:3")?.reasons.join(" "),
-    ).toContain("timeSheetCategory");
+    ).toContain("ticking");
+    expect(
+      p.unloadable.find((u) => u.id === "te:4")?.reasons.join(" "),
+    ).toContain("blocked");
     expect(p.afterCurrentCycle).toEqual([
       { table: "timeEntries", id: "te:5", date: "2026-10-20" },
     ]);

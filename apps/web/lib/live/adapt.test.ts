@@ -4,10 +4,12 @@ import type { Question } from "@/lib/types";
 import {
   currentCycleId,
   headerCycle,
+  headerReadsLive,
   infoOf,
   newestCycle,
   pageHasLiveCycle,
   recipientLabel,
+  toAuditEvent,
   toCorrection,
   toFlag,
 } from "./adapt";
@@ -180,5 +182,64 @@ describe("pageHasLiveCycle", () => {
       "/c/a/flags/a-fl-04/edit",
     ])
       expect(pageHasLiveCycle(path)).toBe(false);
+  });
+});
+
+describe("headerReadsLive", () => {
+  const fixture = {
+    number: 5,
+    periodStart: "2026-10-10T04:00:00.000Z",
+    periodEnd: "2026-10-24T03:59:59.999Z",
+  };
+
+  test("a company with no fixture cycle (Company R) reads Convex on every page", () => {
+    for (const path of [
+      "/c/r",
+      "/c/r/manager",
+      "/c/r/workbook",
+      "/c/r/audit",
+      "/c/r/flags/k57abc",
+    ])
+      expect(headerReadsLive(path, null)).toBe(true);
+  });
+
+  test("a company with fixtures reads Convex on flag detail only", () => {
+    expect(headerReadsLive("/c/a/flags/k57abc", fixture)).toBe(true);
+    for (const path of ["/c/a", "/c/a/manager", "/c/a/workbook"])
+      expect(headerReadsLive(path, fixture)).toBe(false);
+  });
+});
+
+describe("toAuditEvent", () => {
+  const doc = {
+    _id: "k1audit",
+    _creationTime: 1,
+    companyId: "j1company",
+    cycleId: null,
+    at: "2026-10-18T22:00:00.000Z",
+    actor: { kind: "agent", id: "auditor", agent: "auditor" },
+    type: "check.flagged",
+    summary: "Two entries overlap",
+    refs: { flagId: "k1flag" },
+    data: { source: "Convex checks.run" },
+  } as unknown as Doc<"auditEvents">;
+
+  test("keeps the row as stored, keyed by the dashboard's company letter", () => {
+    expect(toAuditEvent(doc, "r")).toEqual({
+      id: "k1audit",
+      companyId: "r",
+      cycleId: null,
+      at: "2026-10-18T22:00:00.000Z",
+      actor: { kind: "agent", id: "auditor", agent: "auditor" },
+      type: "check.flagged",
+      summary: "Two entries overlap",
+      refs: { flagId: "k1flag" },
+      data: { source: "Convex checks.run" },
+    });
+  });
+
+  test("missing data is null, not undefined", () => {
+    const bare = { ...doc, data: undefined } as unknown as Doc<"auditEvents">;
+    expect(toAuditEvent(bare, "r").data).toBeNull();
   });
 });

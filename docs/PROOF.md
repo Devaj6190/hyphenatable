@@ -36,12 +36,31 @@ A real landscaping company in Pennsylvania. Read from two exports (Jobber Timesh
 
 | Metric | Definition | Value |
 |---|---|---|
-| M1 planted-error recall | answer-key rows caught (same checkId, overlapping subject ids), Company A cycle 1 | measured at G3 |
-| M1 precision | flags matching a key row / all flags | measured at G3 |
+| M1 planted-error recall | answer-key rows caught (same checkId, overlapping subject ids) by the checks engine, Company A | cycle 1: **29 of 29**; cycle 2: **30 of 31** (see §6) |
+| M1 precision | flags matching a key row / all flags | cycle 1: **29 of 29**; cycle 2: **30 of 30** |
 | M2 rules vs runbook | N of M onboarding rules match the owner's runbook; K differ; J not learned | measured at G3 |
-| M3 questions per cycle | `Cycle.questionsAsked`, a-c05 vs a-c06, same planted mix | measured at G3 |
+| M3 learning curve | items that still need a person before Gate 1, Company A cycle 2, as the rules grow | **28** with no rules → **21** with onboarding's rules → **17** after learning from cycle 1 (see §6) |
+| M3 questions per cycle | `Cycle.questionsAsked` on live runs | measured at G3 |
 | M4 backtest | Company R workers matching to the cent; max difference | 35 of 46 exact, 44 of 46 within $1 (measured 12:04, see §4) |
-| M5 completeness | share of SyncRuns complete; blocked objects listed | measured at G3 |
-| M6 traceability | share of flags with a `where` ref and a rule or model-call id | measured at G3 |
+| M5 completeness | share of SyncRuns complete; blocked objects listed | 13 of 14 (a-sr-04, a planted incomplete Jobber pull, is listed) |
+| M6 traceability | share of flags with a `where` ref and a rule or model-call id | 28 of 29 (the CHK-15 double-purchase flag has a 90% confidence but no rule or model-call id) |
 
-Until G3, `eval/results.json` is computed on fixtures. Its M1 and M6 score a naive stand-in checker (`flagsSource` says so), not the product's checks, and are not quoted here.
+Measured 2026-10-25 06:53 PDT on synthetic Company A fixtures (`eval/results.json`, `bun run metrics` in `eval/`). `eval/__tests__/engine.test.ts` re-checks M1 and the learning curve on every PR.
+
+## 6. The checks engine and the learning curve (M1, M3)
+
+**How it runs.** `eval/engine.ts` feeds Company A's fixtures through the product's own `runAll()` from `packages/engine`, then applies the backend's settling step (`settlingRule` and `precedentFor`, as `apps/web/convex/checks.ts` does). A flag ends up in one of four places: **settled** by an owner-approved rule (nobody is asked), **rule-backed** (a rule is cited and the owner confirms with one tap; nobody is texted), a **note** (CHK-12), or **needs a person**.
+
+**M1.** With onboarding's rules approved, the engine catches every planted error in cycle 1 with no false alarm. In cycle 2 it misses one: a-ak-72, a worker deactivated in Jobber but still active in Gusto, with no hours. The data contract has no Gusto employment status, so CHK-08 can only see an inactive worker who logs hours. Caveat: the fixtures, the answer key and the checks were written by the same team, so these numbers show the checks do what the catalogue says, not how they do on unseen data. Company R (§3, §4) is the unseen-data test.
+
+**M3.** The same cycle-2 data, run three times:
+
+| Rules in force | Rules | Need a person | Rule-backed | Settled | Notes |
+|---|---|---|---|---|---|
+| none | 0 | 28 | 0 | 0 | 3 |
+| onboarding's (from 4 past payrolls), owner-approved | 23 | 21 | 5 | 1 | 3 |
+| onboarding + learned from cycle 1's answers | 26 | **17** | 7 | 2 | 3 |
+
+- **What was learned.** Four cycle-1 answers produced rule candidates: a Venmo rate, a vendor-to-job hint and an expense category were new (each backtested over 4 past cycles, 4 of 4 agree), and a pay rate duplicated an onboarding rule.
+- **What it settled.** All 9 cycle-2 planted errors the answer key marks as settleable by a cycle-1 rule were settled, rule-backed, or no longer an error.
+- **What is an oracle.** The step from an answer to a rule is what a correct Analyst would write (`LEARNED_A` in `eval/m3-learning.ts`, each citing its answer-key row). The backtest, approval, checks, settling and routing are the product's code. Grading the Analyst's own extraction is the next step.
