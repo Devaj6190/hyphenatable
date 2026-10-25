@@ -33,10 +33,10 @@ sections 4 and 5. Where the style brief and C plan 4.1/4.2 disagree on tokens or
 | `/c/[id]/flags/[flagId]` | 7 Problem detail | Home |
 | `/c/[id]/workbook` | 8 Workbook and readiness | Workbook |
 | `/c/[id]/workbook/ready` | 3 Payroll ready (Gusto draft filled) | Workbook |
-| `/c/[id]/rules` | 9 Rules | Rules |
-| `/c/[id]/rules/learned` | 5 What it learned | Rules |
+| `/c/[id]/company?tab=people\|profile\|rules` | CompanyV2 (People and pay, Profile, Rules + What it learned) | Company |
+| `/c/[id]/rules`, `/c/[id]/rules/learned` | redirect to Company → Rules | Company |
 | `/c/[id]/manager` | 11 Manager inbox | Manager |
-| `/c/[id]/onboarding` | 4 Onboarding | Onboarding |
+| `/c/[id]/onboarding` | OnboardingV3 (guided setup) | Company |
 | `/c/[id]/audit` | 10 Audit log | Audit |
 | `/c/[id]/demo` | 12 Demo panel (404 unless `NEXT_PUBLIC_DEMO_MODE=1`) | Demo |
 | `/styleguide` (outside the shell; 404 in production) | none (dev) | none |
@@ -45,13 +45,15 @@ sections 4 and 5. Where the style brief and C plan 4.1/4.2 disagree on tokens or
 Inputs board highlights Home, Ready highlights Workbook and Learned highlights Rules, and none of them is in
 the nav. They are reached from links on the parent page ("see all", "See every input", "All 11 rules"). Own
 routes keep each page session in its own file. The nav stays at the six C-plan items (plus Demo in demo mode),
-so the phone tab bar keeps the mockup's five slots: Home, Rules, Workbook, Audit, More (Manager, Onboarding, Demo).
+so the phone tab bar keeps the mockup's five slots. Since the shell cleanup the nav is Home, Company, Workbook,
+Audit, Manager (+ Demo); phone tabs Home, Company, Workbook, Audit, More (Manager, Demo). Onboarding is reached
+from What it learned and highlights Company. Build hrefs with `lib/routes.ts`, not template strings.
 
 ## Shell
 
 `app/c/[companyId]/layout.tsx` renders `Nav` (left rail at `lg`, bottom tabs below) and `ShellHeader`: fake
-company name, cycle period, `DataLabel`, seats line, company switcher, theme toggle and, in demo mode, the
-Owner / Manager switch. Company and cycle come from `lib/companies.ts` (fixture copy until `cycles.get` is live).
+company name, cycle period, `DataLabel`, company switcher and, in demo mode only, the Owner / Manager switch and
+the theme toggle (outside demo mode the theme follows the system). Company and cycle come from `lib/companies.ts` (fixture copy until `cycles.get` is live).
 
 Role: `useRole()` from `RoleProvider` (cookie `pp_role`). `RoleScope` in the layout reads the cookie on the
 server, so the first HTML matches the role. `RoleSwitch` calls `router.refresh()` after a change, so the
@@ -138,7 +140,7 @@ above; green stays reserved for verified).
 
 ### `PrecedentBadge`
 `{ precedent: Flag["precedent"]; companyId: string }`. "no precedent" (outlined) or the note verbatim, linked
-to `/c/[id]/rules#<ruleId>`.
+to Company → Rules `#<ruleId>` (`routes.rule`).
 
 ### `AgentChip`
 `{ agent: AgentKind; label?: string }` or `{ actor: AuditEvent["actor"]; label?: string }`.
@@ -187,9 +189,15 @@ are always solid. `SheetContent side="bottom"` for phone sheets. Use `render={<B
 ```
 the mockup's eight elements: status tag, headline, Where, Precedent, Affects, Check, Approve / Edit / Deny.
 
-### `PageHeader`, `Placeholder`, `ThemeToggle`, `RoleSwitch`, `ShellHeader`, `Nav`
-`PageHeader { title; description?; actions? }`. `Placeholder` is the route stub; replace the whole page file.
-The other four belong to the shell.
+### `PageHeader`, `ThemeToggle`, `RoleSwitch`, `ShellHeader`, `Nav`
+`PageHeader { title; description?; actions? }`. The other four belong to the shell.
+
+### `company/*`
+`CompanyView` (tabs in `?tab=`), `PeopleTab` (Found-in marks, pay with a sub-line only when a check is open,
+hours, dot status, detail panel / phone sheet, "Change rate in your rules"), `ProfileTab` (setting cards, edit
+mode). Data: `companyView()` in `lib/server/views/company.ts` (pure builder `companyModel.ts`, tested in
+`tests/company-view.test.ts`). For a manager every `pay` is null. Edits are owner-stated rules in `ruleStore`
+(session only) until the rules and settings mutations land.
 
 ## Tokens
 

@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { companies } from "@/lib/companies";
+import { cn } from "@/lib/utils";
 import { holdsOf, periodLabel, type WorkbookData, workerLabel } from "./data";
 import { GateBlockers } from "./ReadinessCard";
 import { HoldReason, PreviewNote } from "./WorkbookTable";
@@ -24,17 +25,21 @@ const STATUS_WORDS = {
 
 function Figure({
   label,
+  bar,
   children,
   note,
 }: {
   label: string;
+  /** The 4px top rule, in the workbook's tile colours. */
+  bar: string;
   children: React.ReactNode;
   note: React.ReactNode;
 }) {
   return (
-    <Card size="sm" className="px-4">
+    <Card size="sm" className="gap-1 overflow-hidden px-4 pt-0">
+      <div aria-hidden className={cn("-mx-4 mb-3 h-1", bar)} />
       <p className="text-sm text-muted-foreground">{label}</p>
-      <p className="text-[1.75rem] leading-tight font-semibold tracking-[-0.01em]">
+      <p className="text-[1.75rem] leading-tight font-semibold tracking-[-0.01em] tabular-nums">
         {children}
       </p>
       <div className="text-sm text-muted-foreground">{note}</div>
@@ -116,9 +121,9 @@ export function ReadyView({
           </div>
           <p className="text-muted-foreground">
             {status === "computed"
-              ? "Approve Gate 1 on the workbook, then fill the Gusto draft. Nothing is paid until you check the draft and finish it in Gusto yourself."
+              ? "Approve Gate 1 on Home, then fill the Gusto draft. Nothing is paid until you check the draft and finish it in Gusto yourself."
               : status === "approved"
-                ? "Gate 1 is approved. Fill the Gusto draft from the workbook next."
+                ? "Gate 1 is approved. Fill the Gusto draft from Home next."
                 : "Nothing is paid until you open the draft, check it and finish it in Gusto yourself."}
           </p>
           {status === "computed" && (
@@ -135,6 +140,7 @@ export function ReadyView({
         <div className="grid gap-4 md:grid-cols-3">
           <Figure
             label="Stage 1 · Wages in Gusto"
+            bar="bg-primary"
             note={
               <span className="flex flex-col gap-1">
                 <span className="flex flex-wrap items-center gap-2">
@@ -151,6 +157,7 @@ export function ReadyView({
           </Figure>
           <Figure
             label="Stage 2 · Commissions and splits"
+            bar="bg-linear-to-r from-sunset-1 to-sunset-2"
             note={
               <span className="flex flex-col gap-1">
                 <span className="flex flex-wrap items-center gap-2">
@@ -170,6 +177,7 @@ export function ReadyView({
           </Figure>
           <Figure
             label="Cycle profit"
+            bar="bg-ask"
             note={
               wb.totalProfitCents === null ? (
                 "Not known yet: at least one job has no total or invoice."
