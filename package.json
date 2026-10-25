@@ -10,7 +10,8 @@
   "scripts": {
     "dev": "bun run --filter web dev",
     "test": "bun run --filter '*' test",
-    "check": "biome check . && bun run --filter '*' typecheck"
+    "check": "biome check . && bun run --filter '*' typecheck",
+    "courier": "sh apps/courier/scripts/demo.sh"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.2",

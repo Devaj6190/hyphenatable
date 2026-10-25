@@ -43,7 +43,9 @@ log(
 
 const relay = new Relay(backend, transport, contacts, config.courierKey);
 
+let stopping = false;
 async function shutdown() {
+  stopping = true;
   log("stopping");
   stopStub();
   await Promise.allSettled([transport.close(), backend.close()]);
@@ -52,4 +54,27 @@ async function shutdown() {
 process.on("SIGINT", shutdown);
 process.on("SIGTERM", shutdown);
 
-await relay.run();
+// spectrum-ts has no connection events, so a stream that ends or throws is the disconnect signal.
+// Exit non-zero so `bun run courier` restarts it; texts that arrive while it is down are lost (H4).
+function disconnected(why: string): never {
+  log(
+    `WARNING: DISCONNECTED from ${transport.name === "photon" ? "Photon" : transport.name} (${why}).`,
+    "Texts are NOT being received until it reconnects.",
+  );
+  process.exit(1);
+}
+process.on("unhandledRejection", (error) => {
+  if (!stopping) disconnected(`unhandled error: ${String(error)}`);
+});
+
+log(
+  transport.name === "photon"
+    ? "connected to Photon, listening for texts"
+    : "no Photon credentials: texts print here and replies come from POST /reply",
+);
+try {
+  await relay.run();
+  if (!stopping) disconnected("the message stream ended");
+} catch (error) {
+  if (!stopping) disconnected(String(error));
+}
