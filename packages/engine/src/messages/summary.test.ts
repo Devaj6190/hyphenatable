@@ -36,13 +36,13 @@ const timer = flags.find(
 describe("manager summary", () => {
   test("many items: count, range and the most common flag type, then the link", () => {
     expect(summary({})).toBe(
-      "Hi Dakota, before we run payroll (Oct 10–23) there are 10 timesheet items to check, mostly duplicate or zero-hour entries.\nDetails here: https://rollpay.app/c/a/manager",
+      "Hi Dakota, before we run payroll (Oct 10–23) there are 10 timesheet items to check, mostly duplicate or zero-hour entries.\nDetails here: https://rollpay.app/c/a/manager?as=manager",
     );
   });
 
   test("one item: 'there is 1 timesheet item', and 'about' instead of 'mostly'", () => {
     expect(summary({ flags: [timer] })).toBe(
-      "Hi Dakota, before we run payroll (Oct 10–23) there is 1 timesheet item to check, about a timer left running.\nDetails here: https://rollpay.app/c/a/manager",
+      "Hi Dakota, before we run payroll (Oct 10–23) there is 1 timesheet item to check, about a timer left running.\nDetails here: https://rollpay.app/c/a/manager?as=manager",
     );
   });
 
@@ -58,7 +58,7 @@ describe("manager summary", () => {
     expect(summary({ dashboardUrl: null })).not.toMatch(/Details|\[|\n/);
     expect(managerLink(undefined, "a")).toBeNull();
     expect(managerLink("https://rollpay.app/", "a")).toBe(
-      "https://rollpay.app/c/a/manager",
+      "https://rollpay.app/c/a/manager?as=manager",
     );
   });
 
@@ -116,7 +116,7 @@ describe("manager summary", () => {
     ).toThrow(/240/);
     expect(() =>
       render("managerSummary", {
-        link: "https://rollpay.app/c/a/manager",
+        link: "https://rollpay.app/c/a/manager?as=manager",
         name: "Dakota",
         range: "Oct 10–23",
         count: "10",
