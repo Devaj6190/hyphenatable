@@ -146,3 +146,12 @@ describe("backtest", () => {
     expect(backtest({ ...rate(1), type: "routing" }, past)).toBeNull();
   });
 });
+
+describe("canonical", () => {
+  it("compares params the same however their keys were ordered", async () => {
+    const { canonical } = await import("./lessons");
+    expect(canonical({ b: 1, a: { d: [2, { y: 1, x: 0 }], c: null } })).toBe(
+      canonical({ a: { c: null, d: [2, { x: 0, y: 1 }] }, b: 1 }),
+    );
+  });
+});

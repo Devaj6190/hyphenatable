@@ -3,6 +3,7 @@
 import type { CheckInput } from "@payrollpilot/engine/checks/types";
 import {
   backtest,
+  canonical,
   type LessonDraft,
   LOW_RISK,
   lessonFromAnswer,
@@ -387,8 +388,8 @@ export const store = internalMutation({
       (r) =>
         r.status !== "off" &&
         r.type === draft.structured.ruleType &&
-        JSON.stringify(stripStatement(r.params)) ===
-          JSON.stringify(draft.structured.params),
+        canonical(stripStatement(r.params)) ===
+          canonical(draft.structured.params),
     );
     if (c.kind === "confirmed" && !twin) return;
     if (twin) {
