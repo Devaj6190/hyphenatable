@@ -8,12 +8,7 @@ import {
 } from "@payrollpilot/engine/schemas";
 import { describe, expect, test } from "vitest";
 import { dateRange, managerLink, managerSummary, topIssue } from "./summary";
-import {
-  issuePhrases,
-  MAX_LEN,
-  managerSummaryWording,
-  render,
-} from "./templates";
+import { issuePhrases, MAX_LEN, render } from "./templates";
 
 const fixtures = join(import.meta.dirname, "../../../../data/fixtures/a");
 const read = <T>(name: string): T =>
@@ -51,17 +46,17 @@ describe("manager summary", () => {
     );
   });
 
-  test("no DASHBOARD_URL: the link is the placeholder from the wording block", () => {
-    const placeholder = managerSummaryWording.linkPlaceholder;
+  test("no DASHBOARD_URL: the Details here line is left out, never a placeholder", () => {
     for (const dashboardUrl of [undefined, null, "", "  "]) {
       expect(summary({ dashboardUrl })).toBe(
-        `Hi Dakota, before we run payroll (Oct 10–23) there are 10 timesheet items to check, mostly duplicate or zero-hour entries.\nDetails here: ${placeholder}`,
+        "Hi Dakota, before we run payroll (Oct 10–23) there are 10 timesheet items to check, mostly duplicate or zero-hour entries.",
       );
       expect(summary({ flags: [timer], dashboardUrl })).toBe(
-        `Hi Dakota, before we run payroll (Oct 10–23) there is 1 timesheet item to check, about a timer left running.\nDetails here: ${placeholder}`,
+        "Hi Dakota, before we run payroll (Oct 10–23) there is 1 timesheet item to check, about a timer left running.",
       );
     }
-    expect(managerLink(undefined, "a")).toBe(placeholder);
+    expect(summary({ dashboardUrl: null })).not.toMatch(/Details|\[|\n/);
+    expect(managerLink(undefined, "a")).toBeNull();
     expect(managerLink("https://rollpay.app/", "a")).toBe(
       "https://rollpay.app/c/a/manager",
     );
