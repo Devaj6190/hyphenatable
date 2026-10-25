@@ -5,12 +5,14 @@ import { useParams } from "next/navigation";
 import { DataLabel } from "@/components/DataLabel";
 import { RoleNotice, RoleSwitch } from "@/components/RoleSwitch";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { companies, cyclePeriod, SEATS_LINE } from "@/lib/companies";
+import { companies, cyclePeriod } from "@/lib/companies";
 import { DEMO_MODE } from "@/lib/demo";
+import { routes } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 
-// Page header for every /c/[companyId] route: fake company name, cycle period, DataLabel, seats line,
-// company switcher, theme toggle, and (demo mode) the Owner / Manager switch.
+// Page header for every /c/[companyId] route: RollPay mark (phone), fake company name, cycle period, DataLabel
+// and company switcher. The Owner / Manager switch and the theme toggle are demo-mode tools; outside demo mode the
+// role comes from login and the theme follows the system.
 export function ShellHeader() {
   const { companyId } = useParams<{ companyId: string }>();
   const company = companies[companyId];
@@ -22,7 +24,7 @@ export function ShellHeader() {
     <header className="border-b bg-card/70 px-4 py-3 lg:px-8 lg:py-4">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-4 gap-y-2">
         <Link
-          href={`/c/${companyId}`}
+          href={routes.home(companyId)}
           className="text-base font-semibold tracking-tight text-link lg:hidden"
         >
           RollPay
@@ -47,7 +49,7 @@ export function ShellHeader() {
             {Object.keys(companies).map((id) => (
               <Link
                 key={id}
-                href={`/c/${id}`}
+                href={routes.home(id)}
                 aria-current={id === companyId ? "page" : undefined}
                 aria-label={companies[id].label}
                 className={cn(
@@ -61,11 +63,10 @@ export function ShellHeader() {
               </Link>
             ))}
           </nav>
-          <ThemeToggle />
+          {DEMO_MODE && <ThemeToggle />}
         </div>
       </div>
-      <div className="mx-auto mt-1 flex max-w-6xl flex-wrap gap-x-4 text-xs text-muted-foreground sm:text-sm">
-        <p>{SEATS_LINE}</p>
+      <div className="mx-auto max-w-6xl empty:hidden">
         <RoleNotice />
       </div>
     </header>
