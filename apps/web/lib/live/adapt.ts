@@ -184,3 +184,11 @@ export function headerCycle(
   if (live.status === "loading") return null;
   return fixture;
 }
+
+/**
+ * Whether the page under the header reads its cycle from Convex. Only flag detail does today: Home V5 and the
+ * manager inbox build their heading on the server from fixtures, so a live header there would name another cycle.
+ */
+export function pageHasLiveCycle(pathname: string): boolean {
+  return /^\/c\/[^/]+\/flags\/[^/]+\/?$/.test(pathname);
+}

@@ -6,6 +6,7 @@ import {
   headerCycle,
   infoOf,
   newestCycle,
+  pageHasLiveCycle,
   recipientLabel,
   toCorrection,
   toFlag,
@@ -160,5 +161,24 @@ describe("which cycle the header names", () => {
     expect(headerCycle(fixture, { status: "loading" })).toBeNull();
     expect(headerCycle(fixture, { status: "off" })?.number).toBe(5);
     expect(headerCycle(fixture, { status: "failed" })?.number).toBe(5);
+  });
+});
+
+describe("pageHasLiveCycle", () => {
+  test("flag detail reads Convex, so the header names the live cycle there", () => {
+    expect(pageHasLiveCycle("/c/a/flags/k57abc123")).toBe(true);
+    expect(pageHasLiveCycle("/c/a/flags/a-fl-04/")).toBe(true);
+  });
+
+  test("home, the manager inbox and every other page keep the fixture's cycle, matching their own heading", () => {
+    for (const path of [
+      "/c/a",
+      "/c/a/manager",
+      "/c/a/workbook",
+      "/c/a/audit",
+      "/c/a/flags",
+      "/c/a/flags/a-fl-04/edit",
+    ])
+      expect(pageHasLiveCycle(path)).toBe(false);
   });
 });
