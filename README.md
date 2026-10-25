@@ -8,12 +8,7 @@
 
 [**Live demo →**](https://payrollpilot.vercel.app/c/a) &nbsp;·&nbsp; [Manager inbox on your phone](https://payrollpilot.vercel.app/c/a/manager) &nbsp;·&nbsp; [Proof and numbers](docs/PROOF.md) &nbsp;·&nbsp; [Demo script](docs/DEMO.md)
 
-![Cal Hacks 13.0](https://img.shields.io/badge/Cal_Hacks_13.0-Hyphenate_track-f97316?style=flat-square)
-![Creao](https://img.shields.io/badge/agents_on-Creao-8b5cf6?style=flat-square)
-![Claude](https://img.shields.io/badge/Claude-Opus_5.5_%C2%B7_Haiku_5.5-d97757?style=flat-square)
-![Convex](https://img.shields.io/badge/backend-Convex-ee342f?style=flat-square)
-![Next.js](https://img.shields.io/badge/Next.js-16-000?style=flat-square)
-![Tests](https://img.shields.io/badge/tests-700%2B_passing-22c55e?style=flat-square)
+![Cal Hacks 13.0](https://img.shields.io/badge/Cal_Hacks_13.0-Hyphenate_track-f97316?style=flat-square) ![Creao](https://img.shields.io/badge/agents_on-Creao-8b5cf6?style=flat-square) ![Claude](https://img.shields.io/badge/Claude-Opus_5.5_%C2%B7_Haiku_5.5-d97757?style=flat-square) ![Convex](https://img.shields.io/badge/backend-Convex-ee342f?style=flat-square) ![Next.js](https://img.shields.io/badge/Next.js-16-000?style=flat-square) ![Tests](https://img.shields.io/badge/tests-700%2B_passing-22c55e?style=flat-square)
 
 <br/>
 
