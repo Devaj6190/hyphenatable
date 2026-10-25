@@ -1,8 +1,21 @@
+import { backtest } from "@payrollpilot/engine/lessons/lessons";
+import {
+  type Rule as EngineRule,
+  ProposedRules,
+  pairsToRecord,
+} from "@payrollpilot/engine/schemas";
 import { ConvexError, v } from "convex/values";
+import { internal } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
-import { action, type MutationCtx, mutation, query } from "./_generated/server";
+import {
+  action,
+  internalMutation,
+  type MutationCtx,
+  mutation,
+  query,
+} from "./_generated/server";
 import { write } from "./audit";
-import { notYet } from "./lib/stub";
+import { pastCycles } from "./lessons";
 import { userId } from "./lib/validators";
 
 export const list = query({
@@ -96,8 +109,79 @@ async function assertOwner(
   return person;
 }
 
-/** The Analyst restates an owner-typed rule; stored as proposed with a backtest (B-13). */
+/** The Analyst restates an owner-typed rule; stored as proposed with a backtest for the owner to confirm (B-13). */
 export const stateInPlainWords = action({
   args: { companyId: v.id("companies"), text: v.string(), userId },
-  handler: () => notYet("B-13"),
+  handler: async (ctx, { companyId, text, userId }): Promise<unknown> => {
+    if (!process.env.ANTHROPIC_API_KEY)
+      throw new ConvexError(
+        "restating a rule needs ANTHROPIC_API_KEY in Convex env; enter the rule's fields instead",
+      );
+    return ctx.runAction(internal.agents.analyst.restate, {
+      companyId,
+      text,
+      userId,
+    });
+  },
+});
+
+/** Stores the restated rule: source owner_stated, proposed, backtested, labelled "not seen in history". */
+export const storeStated = internalMutation({
+  args: {
+    companyId: v.id("companies"),
+    payload: v.any(),
+    text: v.string(),
+    userId,
+  },
+  handler: async (ctx, { companyId, payload, text, userId }) => {
+    const owner = await assertOwner(ctx, companyId, userId);
+    const parsed = ProposedRules.safeParse(payload);
+    const rule = parsed.success ? parsed.data.rules[0] : undefined;
+    if (!rule)
+      return {
+        stored: null,
+        missing: parsed.success
+          ? parsed.data.missing
+          : [
+              {
+                question: "Could you say that rule another way?",
+                why: "it could not be read as one rule",
+              },
+            ],
+      };
+    const params = pairsToRecord(rule.params);
+    const ruleId = await ctx.db.insert("rules", {
+      companyId,
+      type: rule.type,
+      params: { ...params, statement: rule.statement },
+      status: "proposed",
+      source: "owner_stated",
+      provenance: {
+        lessonId: null,
+        flagId: null,
+        answeredBy: owner._id,
+        approvedBy: null,
+        approvedAt: null,
+        evidence: ["stated by owner, not seen in history"],
+      },
+      backtest: backtest(
+        { id: "candidate", companyId, type: rule.type, params } as Pick<
+          EngineRule,
+          "id" | "companyId" | "type" | "params"
+        >,
+        await pastCycles(ctx, companyId, "" as Id<"cycles">),
+      ),
+      confidence: rule.confidence,
+    });
+    await write(ctx, {
+      companyId,
+      cycleId: null,
+      actor: { kind: "agent", id: "analyst", agent: "analyst" },
+      type: "rule.restated",
+      summary: `Owner's rule restated for confirmation: ${rule.statement}`,
+      refs: { ruleId },
+      data: { text },
+    });
+    return { stored: ruleId, missing: [] };
+  },
 });

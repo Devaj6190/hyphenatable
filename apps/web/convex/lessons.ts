@@ -128,7 +128,7 @@ export const input = internalQuery({
 });
 
 /** Past cycles with what was actually paid, for the backtest. The lesson's own cycle is left out. */
-async function pastCycles(
+export async function pastCycles(
   ctx: QueryCtx,
   companyId: Id<"companies">,
   except: Id<"cycles">,
