@@ -1,5 +1,6 @@
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { IntegrationLogo, integrationOf } from "@/components/BrandLogo";
 import { SourceChip } from "@/components/SourceChip";
 import { StatusBadge } from "@/components/StatusBadge";
 import { clock, objectWord, SOURCES } from "@/lib/home";
@@ -56,6 +57,13 @@ export function SyncStrip({
               )}
             >
               <div className="flex flex-wrap items-center gap-2">
+                {integrationOf(system) && (
+                  <IntegrationLogo
+                    system={integrationOf(system) ?? "Jobber"}
+                    variant="mark"
+                    className="h-5"
+                  />
+                )}
                 <h3 className="font-semibold">{system}</h3>
                 {own.length === 0 ? (
                   <StatusBadge status="closed" label="Not pulled yet" />

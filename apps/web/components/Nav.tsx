@@ -13,6 +13,7 @@ import {
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
 import { useState } from "react";
+import { RollPayLogo } from "@/components/BrandLogo";
 import {
   Sheet,
   SheetContent,
@@ -83,11 +84,8 @@ export function Nav() {
         aria-label="Main"
         className="sticky top-0 hidden h-dvh w-56 shrink-0 flex-col gap-1 border-r bg-card/60 px-3 py-5 lg:flex"
       >
-        <Link
-          href={routes.home(companyId)}
-          className="mb-5 px-3 text-lg font-semibold tracking-tight text-link"
-        >
-          RollPay
+        <Link href={routes.home(companyId)} className="mb-5 px-3">
+          <RollPayLogo className="h-8" />
         </Link>
         {items.map((item) => {
           const active = isActive(pathname, companyId, item);
