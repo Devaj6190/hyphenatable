@@ -25,6 +25,30 @@ const when = (iso: string, timeZone: string) =>
     timeZone,
   }).format(new Date(iso));
 
+/** What a re-check state means, in one sentence. Shared with the manager inbox's "I updated it" flow. */
+export function recheckSentence(
+  recheck: Recheck,
+  recordIds: string[],
+  checkId: string,
+  timeZone: string,
+): string {
+  const records = recordIds.join(" and ");
+  switch (recheck.state) {
+    case "idle":
+      return `Change ${records} in Jobber so it doesn't come back. The next sync re-checks it.`;
+    case "waiting":
+      return `You marked ${records} fixed. Nothing is re-checked until the next Jobber sync reports back. Fixture mode: no sync runs here.`;
+    case "syncing":
+      return `Pulled ${recheck.pulled} of ${recheck.expected} Jobber records so far. ${checkId} re-runs once the pull is complete.`;
+    case "incomplete":
+      return `The sync pulled ${recheck.pulled} of ${recheck.expected} records, so ${checkId} can't re-run. The item stays held.`;
+    case "fixed":
+      return `Sync at ${when(recheck.at, timeZone)} pulled ${recheck.pulled} of ${recheck.expected} records. ${checkId} no longer finds this.`;
+    case "still-there":
+      return `Sync at ${when(recheck.at, timeZone)} pulled ${recheck.pulled} of ${recheck.expected} records and ${checkId} still finds this, so the item stays open.`;
+  }
+}
+
 // "Mark fixed in Jobber": a person's claim, not a check. The page says "waiting" until a sync reports back,
 // shows only the pulled/expected counts the sync records, and shows the result only once the check has re-run.
 export function JobberRecheck({
@@ -41,7 +65,6 @@ export function JobberRecheck({
   onMarked?: (marked: boolean) => void;
 }) {
   const [recheck, setRecheck] = useState<Recheck>(initial);
-  const records = recordIds.join(" and ");
 
   return (
     <Card size="sm" className="gap-3">
@@ -74,18 +97,7 @@ export function JobberRecheck({
         className="flex flex-wrap items-center justify-between gap-3 px-(--card-spacing)"
       >
         <p className="max-w-prose flex-[999_1_20rem] text-sm text-muted-foreground">
-          {recheck.state === "idle" &&
-            `Change ${records} in Jobber so it doesn't come back. The next sync re-checks it.`}
-          {recheck.state === "waiting" &&
-            `You marked ${records} fixed. Nothing is re-checked until the next Jobber sync reports back. Fixture mode: no sync runs here.`}
-          {recheck.state === "syncing" &&
-            `Pulled ${recheck.pulled} of ${recheck.expected} Jobber records so far. ${checkId} re-runs once the pull is complete.`}
-          {recheck.state === "incomplete" &&
-            `The sync pulled ${recheck.pulled} of ${recheck.expected} records, so ${checkId} can't re-run. The item stays held.`}
-          {recheck.state === "fixed" &&
-            `Sync at ${when(recheck.at, timeZone)} pulled ${recheck.pulled} of ${recheck.expected} records. ${checkId} no longer finds this.`}
-          {recheck.state === "still-there" &&
-            `Sync at ${when(recheck.at, timeZone)} pulled ${recheck.pulled} of ${recheck.expected} records and ${checkId} still finds this, so the item stays open.`}
+          {recheckSentence(recheck, recordIds, checkId, timeZone)}
         </p>
         {recheck.state === "idle" && (
           <Button

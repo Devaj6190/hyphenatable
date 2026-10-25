@@ -266,6 +266,13 @@ export const approve = mutation({
     if (!q) throw new ConvexError("question not found");
     if (q.status !== "draft")
       throw new ConvexError(`question is ${q.status}, not draft`);
+    for (const flagId of q.flagIds) {
+      const flag = await ctx.db.get(flagId);
+      if (flag && (flag.status === "corrected" || flag.status === "dismissed"))
+        throw new ConvexError(
+          `flag ${flagId} is already ${flag.status}; this question is out of date`,
+        );
+    }
     const approver = await assertApprover(ctx, q, userId);
     const text = editedText?.trim() || q.text;
     if (/\$\s?\d|\d+\s?(dollars|usd)/i.test(text))

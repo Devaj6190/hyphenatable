@@ -8,9 +8,29 @@
 import { createHmac, randomBytes } from "node:crypto";
 import { chmod, mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname } from "node:path";
+import {
+  type AnonLedgerLine,
+  type AnonVenmo,
+  anonymizeLedger,
+  anonymizeVenmo,
+  type VenmoSummary,
+} from "./anonymize-money.ts";
+import {
+  type AnonInvoiceReport,
+  type AnonJobberExpense,
+  type AnonJobReport,
+  type AnonQuoteReport,
+  type AnonTransaction,
+  anonymizeReports,
+  type ReportInputs,
+  reportNames,
+  reportWorkerNames,
+} from "./anonymize-reports.ts";
 import type { PayrollJournalRow } from "./exports/gusto-payroll-journal-csv.ts";
 import type { TimesheetRow } from "./exports/jobber-timesheets-xlsx.ts";
+import type { LedgerLine } from "./exports/qbo-tda-xlsx.ts";
 import type { QboExportRow } from "./exports/qbo-xlsx.ts";
+import type { VenmoRow } from "./exports/venmo-csv.ts";
 import type { JobberRecords, PullResult } from "./jobber/index.ts";
 import type { Job, SyncRun } from "./types.ts";
 
@@ -82,6 +102,10 @@ export interface PseudonymMap {
   jobs: Record<string, { label: string; number: number }>;
   /** QBO payees that are not workers (added with the QBO export ingest; absent in older maps) */
   vendors?: Record<string, string>;
+  /** Venmo counterparties that are not workers ("Party Pnn") */
+  parties?: Record<string, string>;
+  /** funding sources keyed by a salted hash of the label (the bank + last4 never stored): "bank:A" */
+  funding?: Record<string, string>;
 }
 
 /** "Park, Riley", "riley  PARK" and "Riley Park" are one person: the key is the sorted bag of name words. */
@@ -151,26 +175,42 @@ export class Anonymizer {
   workerName(real: string): string {
     const key = nameKey(real);
     if (!key) throw new Error("empty worker name");
+    const realWords = this.realWords(key);
+    const clashes = (fake: string) => words(fake).some((w) => realWords.has(w));
     const known = this.map.workers[key];
-    if (known) return known;
+    // a stored pseudonym is kept unless a real name seen since shares a word with it
+    if (known && !clashes(known)) return known;
+    delete this.map.workers[key];
     const used = new Set(Object.values(this.map.workers));
-    const realWords = new Set([...key.split(" "), ...this.avoid]);
-    let i = Number.parseInt(this.h("w", key).slice(0, 8), 16);
-    for (let tries = 0; tries < FIRST.length * LAST.length; tries++, i++) {
+    // deterministic re-roll: attempt n draws from HMAC(salt, key + n)
+    for (let n = 0; n < FIRST.length * LAST.length * 4; n++) {
+      const i = Number.parseInt(
+        this.h("w", n === 0 ? key : `${key}#${n}`).slice(0, 8),
+        16,
+      );
       const first = FIRST[i % FIRST.length] as string;
       const last = LAST[Math.floor(i / FIRST.length) % LAST.length] as string;
       const fake = `${first} ${last}`;
-      // never reuse a pseudonym, never echo a word of the real name
-      if (
-        !used.has(fake) &&
-        !realWords.has(first.toLowerCase()) &&
-        !realWords.has(last.toLowerCase())
-      ) {
+      // never reuse a pseudonym, never echo a word of any real name
+      if (!used.has(fake) && !clashes(fake)) {
         this.map.workers[key] = fake;
         return fake;
       }
     }
     throw new Error("pseudonym space exhausted");
+  }
+
+  /** Every word of every real name known (this run's reserved names and every name in the map) plus `key`. */
+  private realWords(key: string): Set<string> {
+    const out = new Set([...key.split(" "), ...this.avoid]);
+    for (const k of [
+      ...Object.keys(this.map.workers),
+      ...Object.keys(this.map.clients),
+      ...Object.keys(this.map.vendors ?? {}),
+      ...Object.keys(this.map.parties ?? {}),
+    ])
+      for (const w of k.split(" ")) if (w) out.add(w);
+    return out;
   }
 
   /** A payee that is not a known worker: "Vendor V07". Vendors can be sole traders (people), so never kept. */
@@ -181,6 +221,35 @@ export class Anonymizer {
     this.map.vendors[key] ??=
       `Vendor V${String(Object.keys(this.map.vendors).length + 1).padStart(2, "0")}`;
     return this.map.vendors[key];
+  }
+
+  /** A Venmo counterparty that is not a worker: "Party P07" (people; never payroll). */
+  partyName(real: string): string {
+    const key = nameKey(real);
+    if (!key) throw new Error("empty party name");
+    this.map.parties ??= {};
+    this.map.parties[key] ??=
+      `Party P${String(Object.keys(this.map.parties).length + 1).padStart(2, "0")}`;
+    return this.map.parties[key];
+  }
+
+  /**
+   * A funding source / destination label ("Chase Checking *1234") -> a stable token ("bank:A"); the Venmo
+   * balance is "venmo_balance". The map keys are salted hashes, so the label itself is never stored.
+   */
+  fundingToken(raw: string | null): string | null {
+    const s = (raw ?? "").trim();
+    if (!s) return null;
+    if (/venmo\s*balance/i.test(s)) return "venmo_balance";
+    const key = this.h("funding", s.toLowerCase().replace(/\s+/g, " ")).slice(
+      0,
+      16,
+    );
+    this.map.funding ??= {};
+    const n = Object.keys(this.map.funding).length;
+    this.map.funding[key] ??=
+      `bank:${n < 26 ? String.fromCharCode(65 + n) : `Z${n}`}`;
+    return this.map.funding[key];
   }
 
   /** Whether a name is a worker this map (or this run's reserved names) already knows. */
@@ -213,21 +282,73 @@ export class Anonymizer {
    * `chartWords`: words of the chart-of-accounts names kept in the output ("Landscape Supplies"). A vendor
    * word that is also an account word ("landscape") is not scanned for, or every such vendor would abort the
    * ingest; person and client words are always scanned.
+   * `allow`: owner-approved words that are not names (data/private/r/token-allow.txt): never scanned for,
+   * whatever list they come from. Nothing is added to it automatically.
    */
-  realTokens(chartWords: Set<string> = new Set()): string[] {
-    const words = new Set<string>();
-    const add = (k: string, skip: Set<string>) => {
-      for (const w of k.split(" "))
-        if (w.length >= 3 && !STOP.has(w) && !skip.has(w)) words.add(w);
-    };
-    for (const k of [
-      ...Object.keys(this.map.workers),
-      ...Object.keys(this.map.clients),
-    ])
-      add(k, new Set());
-    for (const k of Object.keys(this.map.vendors ?? {})) add(k, chartWords);
-    return [...words].sort();
+  realTokens(
+    chartWords: Set<string> = new Set(),
+    allow: Set<string> = new Set(),
+  ): string[] {
+    return [...this.tokenSources(chartWords, allow).keys()].sort();
   }
+
+  /** realTokens with, for each token, the map sections it comes from (for --diagnose: never printed raw). */
+  tokenSources(
+    chartWords: Set<string> = new Set(),
+    allow: Set<string> = new Set(),
+  ): Map<string, Set<TokenSource>> {
+    const out = new Map<string, Set<TokenSource>>();
+    const add = (src: TokenSource, keys: string[], skip: Set<string>) => {
+      for (const k of keys)
+        for (const w of k.split(" "))
+          if (w.length >= 3 && !STOP.has(w) && !skip.has(w) && !allow.has(w))
+            out.set(w, (out.get(w) ?? new Set()).add(src));
+    };
+    add("workers", Object.keys(this.map.workers), new Set());
+    add("clients", Object.keys(this.map.clients), new Set());
+    add("vendors", Object.keys(this.map.vendors ?? {}), chartWords);
+    // Venmo counterparties who are not workers: people, always scanned
+    add("parties", Object.keys(this.map.parties ?? {}), new Set());
+    return out;
+  }
+}
+
+export type TokenSource = "workers" | "clients" | "vendors" | "parties";
+
+/**
+ * --diagnose leak report: for each hit, the JSON path (array indexes collapsed to []; "<key>" when the hit is
+ * in an object key), the hit count, the token's index in the sorted scanned list, its sources and whether it
+ * is a dictionary word. NEVER the token or the value.
+ */
+export function leakReport(
+  payload: unknown,
+  sources: Map<string, Set<TokenSource>>,
+  dictionary: Set<string> = new Set(),
+): string[] {
+  const tokens = [...sources.keys()].sort();
+  const index = new Map(tokens.map((t, i) => [t, i]));
+  const hits = new Map<string, number>();
+  const hit = (path: string, text: string) => {
+    for (const w of new Set(words(text)))
+      if (index.has(w)) {
+        const k = `${path}\u0000${w}`;
+        hits.set(k, (hits.get(k) ?? 0) + 1);
+      }
+  };
+  const walk = (v: unknown, path: string) => {
+    if (typeof v === "string" || typeof v === "number") hit(path, String(v));
+    else if (Array.isArray(v)) for (const x of v) walk(x, `${path}[]`);
+    else if (v && typeof v === "object")
+      for (const [k, x] of Object.entries(v)) {
+        hit(`${path}.<key>`, k);
+        walk(x, `${path}.${k}`);
+      }
+  };
+  walk(payload, "$");
+  return [...hits].map(([k, n]) => {
+    const [path, w] = k.split("\u0000") as [string, string];
+    return `leak: field ${path} count ${n} token #${index.get(w)} of ${tokens.length} from ${[...(sources.get(w) ?? [])].join("+")} dictionary-word ${dictionary.size ? (dictionary.has(w) ? "yes" : "no") : "unknown"}`;
+  });
 }
 
 /** Every real token found in `output` (case-insensitive, whole words). Empty means clean. */
@@ -293,9 +414,9 @@ export interface AnonPaid {
   /** per pay-type amounts in cents (Regular, Overtime, Commission, ...); no taxes */
   earningsCents?: Record<string, number>;
   hours?: Record<string, number>;
-  /** itemized lines with job role and rate (job names are roles, e.g. "Landscaper", not people) */
+  /** itemized lines with job and rate; the Gusto job label (a role, a job, sometimes a person's name) is a job id */
   jobLines?: {
-    job: string | null;
+    jobId: string | null;
     payType: string;
     hours: number | null;
     rateCents: number | null;
@@ -362,6 +483,14 @@ export interface AnonymizedBundle {
   /** M4 input: gross per pseudonymous worker per pay period, regular payrolls apart from off-cycle ones */
   paidByPeriod: AnonPaidPeriod[];
   expenses: AnonExpense[];
+  jobberExpenses: AnonJobberExpense[];
+  transactions: AnonTransaction[];
+  invoices: AnonInvoiceReport[];
+  quotes: AnonQuoteReport[];
+  jobsReport: AnonJobReport[];
+  ledger: AnonLedgerLine[];
+  venmo: AnonVenmo[];
+  venmoSummary: VenmoSummary;
 }
 
 /** Section 6 Expense from a QBO export line. Payee -> worker (reimbursement) or "Vendor Vnn"; memo dropped. */
@@ -394,30 +523,44 @@ export const chartWordsOf = (names: (string | null)[]): Set<string> =>
 export function anonymizeExports(
   a: Anonymizer,
   companyId: string,
-  input: {
+  input: ReportInputs & {
     timesheets: { fileTag: string; rows: TimesheetRow[] }[];
     journals: { fileTag: string; rows: PayrollJournalRow[] }[];
     qbo?: { fileTag: string; rows: QboExportRow[] }[];
+    qboLedger?: { fileTag: string; rows: LedgerLine[] }[];
+    venmo?: { fileTag: string; rows: VenmoRow[] }[];
   },
 ): AnonymizedBundle {
   const runWorkerNames = [
     ...input.timesheets.flatMap((f) => f.rows.map((r) => r.workerName)),
     ...input.journals.flatMap((f) => f.rows.map((r) => r.employeeName)),
+    // people named as Jobber users in the reports are workers too
+    ...reportWorkerNames(input),
   ];
   const runWorkerKeys = new Set(runWorkerNames.map(nameKey));
   a.reserve([
     ...runWorkerNames,
     ...input.timesheets.flatMap((f) => f.rows.map((r) => r.clientName ?? "")),
+    ...reportNames(input),
+    ...(input.qboLedger ?? []).flatMap((f) =>
+      f.rows.map((r) => r.payeeName ?? ""),
+    ),
+    ...(input.venmo ?? []).flatMap((f) =>
+      f.rows.map((r) => r.counterpartyName ?? ""),
+    ),
     ...(input.qbo ?? []).flatMap((f) =>
       f.rows.flatMap((r) => [r.payeeName ?? "", r.customerName ?? ""]),
     ),
   ]);
   const workers = new Map<string, AnonWorker>();
   const jobs = new Map<string, AnonJob>();
+  const workerReal = new Map<string, string>();
   const worker = (real: string) => {
     const id = a.id("w", real);
-    if (!workers.has(id))
+    if (!workers.has(id)) {
       workers.set(id, { id, displayName: a.workerName(real) });
+      workerReal.set(id, real);
+    }
     return id;
   };
   const teamLead = (id: string, flag: boolean | undefined) => {
@@ -464,6 +607,13 @@ export function anonymizeExports(
       });
     }
   }
+  const job = (real: string) => {
+    const id = a.id("j", real);
+    const j = a.job(real);
+    if (!jobs.has(id))
+      jobs.set(id, { id, jobNumber: j.number, title: j.label });
+    return id;
+  };
   const paid: AnonPaid[] = [];
   for (const f of input.journals) {
     for (const r of f.rows) {
@@ -481,20 +631,17 @@ export function anonymizeExports(
               employeeType: r.employeeType ?? null,
               earningsCents: r.earningsCents,
               hours: r.hours,
-              jobLines: r.jobLines ?? [],
+              // job labels can be a person's name: never kept, always a job id
+              jobLines: (r.jobLines ?? []).map(({ job: label, ...l }) => ({
+                jobId: label?.trim() ? job(label) : null,
+                ...l,
+              })),
               ownerDrawCents: r.ownerDrawCents ?? 0,
             }
           : {}),
       });
     }
   }
-  const job = (real: string) => {
-    const id = a.id("j", real);
-    const j = a.job(real);
-    if (!jobs.has(id))
-      jobs.set(id, { id, jobNumber: j.number, title: j.label });
-    return id;
-  };
   const expenses: AnonExpense[] = [];
   for (const f of input.qbo ?? []) {
     // sheets are numbered by first appearance: workbook and sheet names can carry the company's name
@@ -538,6 +685,50 @@ export function anonymizeExports(
       });
     }
   }
+  // Jobber report exports: the same worker / client / job ids as everything above
+  const reports = anonymizeReports(
+    { worker, client, jobOf: (n) => job(`#${n}`) },
+    input,
+  );
+  // QBO ledger and Venmo: a payee / counterparty is a worker only when it matches a known worker (full name;
+  // or a single first name that exactly one known worker has); anyone else is a vendor / party
+  // first name -> the distinct known workers who have it (by name key), with one raw spelling each
+  const firstNames = new Map<string, Map<string, string>>();
+  for (const n of runWorkerNames) {
+    const f = n.trim().split(/\s+/)[0]?.toLowerCase();
+    if (!f) continue;
+    const people = firstNames.get(f) ?? new Map<string, string>();
+    if (!people.has(nameKey(n))) people.set(nameKey(n), n);
+    firstNames.set(f, people);
+  }
+  const knownWorker = (real: string): string | null => {
+    if (a.isKnownWorker(real, runWorkerKeys)) return worker(real);
+    const words = real.trim().split(/\s+/);
+    const people =
+      words.length === 1
+        ? firstNames.get((words[0] ?? "").toLowerCase())
+        : undefined;
+    return people && people.size === 1
+      ? worker([...people.values()][0] as string)
+      : null;
+  };
+  const money = {
+    knownWorker,
+    vendorName: (n: string) => a.vendorName(n),
+    partyName: (n: string) => a.partyName(n),
+    fundingToken: (raw: string | null) => a.fundingToken(raw),
+  };
+  const ledger = anonymizeLedger(money, input.qboLedger ?? []);
+  const { venmo, venmoSummary } = anonymizeVenmo(
+    money,
+    input.venmo ?? [],
+    reports.jobberExpenses,
+  );
+  // names seen after a worker got its pseudonym (a client, vendor or party) can collide with it: re-check
+  for (const [id, w] of workers) {
+    const real = workerReal.get(id);
+    if (real) w.displayName = a.workerName(real);
+  }
   return {
     namesAnonymized: true,
     companyId,
@@ -548,6 +739,10 @@ export function anonymizeExports(
     paid,
     paidByPeriod: paidByPeriod(paid),
     expenses,
+    ...reports,
+    ledger,
+    venmo,
+    venmoSummary,
   };
 }
 

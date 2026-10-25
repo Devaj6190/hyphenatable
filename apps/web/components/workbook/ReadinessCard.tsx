@@ -320,7 +320,7 @@ export function ReadinessCard({
           </>
         )}
         <p className="text-sm font-medium">
-          Draft only. PayrollPilot never submits payroll.
+          Draft only. RollPay never submits payroll.
         </p>
       </div>
     </Card>

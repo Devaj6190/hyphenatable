@@ -3,10 +3,20 @@
 // tests run them. Every rule in the fixtures is still proposed, so open-cycle totals are a preview with proposed
 // rules treated as approved; the UI says so beside the totals. Closed cycles: what Gusto and Venmo actually paid
 // (pastPayrolls), summed here (ponytail: move the sum into the engine). The web app never computes pay.
+// Each person also gets structured fields for the workbook's breakdown: per-workweek hours split by the engine's
+// own overtime functions (checked against computeStage1's earnings, the script throws on any drift), every
+// earning with its hourly rate, and the salary basis. The UI reads these and never parses the explain lines.
 // Run: bun apps/web/scripts/workbook-fixture.ts
 import { execFileSync } from "node:child_process";
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import {
+  bucketHours,
+  dayFromNumber,
+  dayNumber,
+  localDate,
+  workweekAnchor,
+} from "@payrollpilot/engine/payroll/hours";
 import {
   type Cycle,
   computeStage1,
@@ -14,6 +24,13 @@ import {
   type Rule,
   type Worker,
 } from "@payrollpilot/engine/payroll/index";
+import { centsFor, hours2 } from "@payrollpilot/engine/payroll/money";
+import {
+  parseOvertimePolicy,
+  splitWeek,
+} from "@payrollpilot/engine/payroll/overtime";
+import { payRate } from "@payrollpilot/engine/payroll/rates";
+import { PERIODS_PER_YEAR } from "@payrollpilot/engine/payroll/salaried";
 
 const ROOT = join(import.meta.dirname, "../../..");
 const load = <T>(company: string, file: string): T =>
@@ -35,13 +52,32 @@ type PastPayroll = {
   grossCents: number;
 };
 
+/** One earning as the workbook shows it. `hourRateCents` is what one hour of it pays (rate × multiplier). */
+type EarningLine = {
+  name: string;
+  seconds: number | null;
+  hours: number | null;
+  hourRateCents: number | null;
+  multiplier: number | null;
+  amountCents: number;
+};
+
+const sumHours = (hs: (number | null)[]) =>
+  Math.round(hs.reduce<number>((s, h) => s + (h ?? 0) * 100, 0)) / 100;
+
+const OVERTIME = ["Overtime", "Double Overtime"];
+
 const hoursOf = (
   earnings: { name: string; hours: number | null }[],
   name: string,
 ) => earnings.find((e) => e.name === name)?.hours ?? null;
 
 function build(companyId: "a" | "b") {
-  const company = load<{ id: string; timezone: string }>(companyId, "company");
+  const company = load<{
+    id: string;
+    timezone: string;
+    payFrequency: keyof typeof PERIODS_PER_YEAR;
+  }>(companyId, "company");
   const seed = JSON.parse(
     readFileSync(join(ROOT, "seed/companies", `${companyId}.json`), "utf8"),
   ) as { lowMarginPct?: number };
@@ -121,8 +157,38 @@ function build(companyId: "a" | "b") {
             heldFlagIds: [],
             recordSystem: "Gusto" as const,
             recordId: p.id,
+            loggedHours: sumHours(p.earnings.map((e) => e.hours)),
+            // As Gusto paid it: its Overtime rate is already the overtime rate.
+            earnings: p.earnings.map(
+              (e): EarningLine => ({
+                name: e.name,
+                seconds: null,
+                hours: e.hours,
+                hourRateCents: e.hours === null ? null : e.rateCents,
+                multiplier: null,
+                amountCents: e.amountCents,
+              }),
+            ),
+            weeks: null,
+            salary: null,
           })),
           totalCents: regular.reduce((s, p) => s + p.grossCents, 0),
+          overtime: null,
+          totals: {
+            hours: sumHours(
+              regular.flatMap((p) => p.earnings.map((e) => e.hours)),
+            ),
+            overtimeHours: sumHours(
+              regular.flatMap((p) =>
+                p.earnings
+                  .filter((e) => OVERTIME.includes(e.name))
+                  .map((e) => e.hours),
+              ),
+            ),
+            venmoCents: paid
+              .filter((p) => p.paidVia === "venmo")
+              .reduce((s, p) => s + p.grossCents, 0),
+          },
           venmo: paid
             .filter((p) => p.paidVia === "venmo")
             .map((p) => ({
@@ -192,6 +258,87 @@ function build(companyId: "a" | "b") {
       rules,
     });
     const pay = Object.values(s1.pay);
+
+    // Per-workweek split, with the same engine functions and inputs computeStage1 used (no held entries here).
+    const tz = company.timezone;
+    const ot = parseOvertimePolicy(rules);
+    const startDay = localDate(cycle.periodStart, tz);
+    const endDay = localDate(cycle.periodEnd, tz);
+    const { anchor } = workweekAnchor(
+      startDay,
+      ot.ok ? ot.policy.workweek : null,
+    );
+    const { byWorker } = bucketHours(cycleEntries as never, {
+      periodStart: cycle.periodStart,
+      periodEnd: cycle.periodEnd,
+      timeZone: tz,
+      anchor,
+      held: new Set(),
+    });
+    const weekStarts: number[] = [];
+    for (let d = anchor; d <= dayNumber(endDay); d += 7) weekStarts.push(d);
+    const loggedHours = (workerId: string) =>
+      hours2(byWorker.get(workerId)?.seconds ?? 0);
+    const weeksOf = (p: (typeof pay)[number]) => {
+      if (p.kind !== "hourly" || p.excluded || !ot.ok) return null;
+      const policy = ot.policy;
+      const weeks = weekStarts.map((d) => {
+        const days =
+          byWorker.get(p.workerId)?.weeks.get(dayFromNumber(d)) ?? new Map();
+        const split = splitWeek(days, policy);
+        const seconds = [...days.values()].reduce((a, b) => a + b, 0);
+        return {
+          start: dayFromNumber(Math.max(d, dayNumber(startDay))),
+          end: dayFromNumber(Math.min(d + 6, dayNumber(endDay))),
+          seconds,
+          hours: hours2(seconds),
+          regularSeconds: split["Regular Hours"],
+          regularHours: hours2(split["Regular Hours"]),
+          overtimeSeconds: split.Overtime,
+          overtimeHours: hours2(split.Overtime),
+          doubleOvertimeSeconds: split["Double Overtime"],
+          doubleOvertimeHours: hours2(split["Double Overtime"]),
+        };
+      });
+      const keys = {
+        "Regular Hours": "regularSeconds",
+        Overtime: "overtimeSeconds",
+        "Double Overtime": "doubleOvertimeSeconds",
+      } as const;
+      for (const [name, key] of Object.entries(keys)) {
+        const fromWeeks = weeks.reduce((s, w) => s + w[key], 0);
+        const fromEngine =
+          p.earnings.find((e) => e.name === name)?.seconds ?? 0;
+        if (fromWeeks !== fromEngine)
+          throw new Error(
+            `${cycle.id} ${p.workerId}: weeks give ${fromWeeks}s of ${name}, computeStage1 ${fromEngine}s`,
+          );
+      }
+      return weeks;
+    };
+    const salaryOf = (p: (typeof pay)[number]) => {
+      const worker = workers.find((w) => w.id === p.workerId);
+      if (p.kind !== "salary" || p.excluded || !worker) return null;
+      const rate = payRate(worker, rules);
+      return rate.ok
+        ? {
+            rateCents: rate.rateCents,
+            unit: rate.unit,
+            periodsPerYear: PERIODS_PER_YEAR[company.payFrequency],
+          }
+        : null;
+    };
+    const earningsOf = (p: (typeof pay)[number]): EarningLine[] =>
+      p.earnings.map((e) => ({
+        name: e.name,
+        seconds: e.seconds,
+        hours: e.hours,
+        hourRateCents:
+          e.seconds === null ? null : centsFor(3600, e.rateCents, e.multiplier),
+        multiplier: e.seconds === null ? null : e.multiplier,
+        amountCents: e.amountCents,
+      }));
+    const gusto = pay.filter((p) => p.kind !== "venmo" && !p.excluded);
     const recon = new Map(s2.report.recon.jobs.map((j) => [j.jobId, j]));
     return {
       ...base,
@@ -217,16 +364,48 @@ function build(companyId: "a" | "b") {
               reason: p.reason,
               heldFlagIds,
               ...sourceOf(s1.draft.id, p.workerId),
+              loggedHours: loggedHours(p.workerId),
+              earnings: earningsOf(p),
+              weeks: weeksOf(p),
+              salary: salaryOf(p),
             };
           }),
         totalCents: s1.draft.totals.grossCents,
+        overtime: ot.ok
+          ? {
+              ruleId: ot.policy.ruleId,
+              weekly: ot.policy.weekly && {
+                overHours: ot.policy.weekly.overSec / 3600,
+                multiplier: ot.policy.weekly.multiplier,
+              },
+              daily: ot.policy.daily.map((d) => ({
+                overHours: d.overSec / 3600,
+                multiplier: d.multiplier,
+              })),
+            }
+          : null,
+        totals: {
+          hours: s1.draft.totals.hours,
+          overtimeHours: sumHours(
+            gusto.flatMap((p) =>
+              p.earnings
+                .filter((e) => OVERTIME.includes(e.name))
+                .map((e) => e.hours),
+            ),
+          ),
+          venmoCents: s1.draft.venmoList.reduce((s, v) => s + v.amountCents, 0),
+        },
         venmo: s1.draft.venmoList.map((v) => ({
           ...v,
           ...sourceOf(s1.draft.id, v.workerId),
         })),
         venmoHeld: pay
           .filter((p) => p.kind === "venmo" && p.excluded)
-          .map((p) => ({ workerId: p.workerId, reason: p.reason ?? "" })),
+          .map((p) => ({
+            workerId: p.workerId,
+            reason: p.reason ?? "",
+            hours: loggedHours(p.workerId),
+          })),
       },
       stage2: {
         draftId: s2.draft.id,

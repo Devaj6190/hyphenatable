@@ -1,7 +1,7 @@
 // Pure assembly of results.json from loaded data. run.ts does the IO.
 import type { Fixtures } from "./lib/io";
 import type { FlagLike } from "./lib/types";
-import { m1 } from "./m1-planted";
+import { m1, m1Notes } from "./m1-planted";
 import type { M2 } from "./m2-rules";
 import { m3 } from "./m3-questions";
 import { m4 } from "./m4-backtest";
@@ -30,6 +30,7 @@ export function buildResults(args: {
   const first = current[0];
   const key = fx.answerKey.filter((k) => (k.cycleId ?? first) === cycleId);
   const flags = args.flags.filter((f) => f.cycleId === cycleId);
+  const scored = m1(flags, key);
   return Results.parse({
     generatedAt: args.generatedAt,
     gitSha: args.gitSha,
@@ -37,7 +38,8 @@ export function buildResults(args: {
     cycle: cycleId,
     flagsSource: args.flagsSource,
     synthetic: fx.company.kind === "synthetic",
-    m1: m1(flags, key),
+    notes: m1Notes(scored),
+    m1: scored,
     m2: args.m2,
     m3: m3(fx.cycles, fx.questions, fx.answerKey, current),
     m4: m4(args.syntheticBacktest, args.companyR ?? null),

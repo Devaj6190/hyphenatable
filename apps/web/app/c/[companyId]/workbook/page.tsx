@@ -25,7 +25,7 @@ async function Workbook({
   if (!data)
     return (
       <>
-        <PageHeader title="Workbook and readiness" />
+        <PageHeader title="Workbook" />
         <p className="rounded-card border bg-card p-5 text-muted-foreground">
           The workbook shows pay amounts, so only the owner sees it.
         </p>

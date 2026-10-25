@@ -52,10 +52,24 @@ export type Change =
     };
 
 /**
- * The one field an answer changes, or null when the answer changes nothing (a confirm) or
- * cannot be mapped (an unknown job number: never guessed).
+ * The one field an answer changes, or null when the answer changes nothing (a confirm, or the record
+ * already holds the answer) or cannot be mapped (an unknown job number: never guessed).
  */
 export function changeFor(
+  template: QuestionTemplate,
+  r: ReplyResult,
+  subject: { entryIds: string[]; expenseIds: string[] },
+  records: {
+    entries: TimeEntry[];
+    expenses: Expense[];
+    jobIdByNumber: Map<number, string>;
+  },
+): Change | null {
+  const c = changeForRaw(template, r, subject, records);
+  return c && c.before !== c.after ? c : null;
+}
+
+function changeForRaw(
   template: QuestionTemplate,
   r: ReplyResult,
   subject: { entryIds: string[]; expenseIds: string[] },

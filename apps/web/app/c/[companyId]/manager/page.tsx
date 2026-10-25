@@ -2,10 +2,10 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { ManagerInbox } from "@/components/ManagerInbox";
 import { companies } from "@/lib/companies";
-import { managerCrew, managerInbox } from "@/lib/server/fixtures";
+import { managerInboxView } from "@/lib/server/views/manager";
 
-// Params are read inside Suspense so the shell stays instant (Next 16). The title counts open items, so
-// ManagerInbox renders its own PageHeader.
+// The URL is inside sent texts and tests: never rename it. Params are read inside Suspense so the shell stays
+// instant (Next 16); the headline counts open items, so ManagerInbox renders its own title.
 export default function ManagerPage({
   params,
 }: PageProps<"/c/[companyId]/manager">) {
@@ -24,11 +24,10 @@ async function Body({
   if (!company) notFound();
   return (
     <ManagerInbox
-      data={managerInbox(companyId)}
+      data={managerInboxView(companyId)}
       dataKind={company.kind}
       timezone={company.timezone}
-      companyLabel={`${company.label}${company.cycle ? `, cycle ${company.cycle.number}` : ""}`}
-      {...managerCrew(companyId)}
+      companyLabel={company.label}
     />
   );
 }

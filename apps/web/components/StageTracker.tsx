@@ -1,113 +1,121 @@
 import { Check } from "lucide-react";
-import { STAGES, stageIndex } from "@/lib/home";
+import { STAGES } from "@/lib/home";
 import { cn } from "@/lib/utils";
-import type { Cycle } from "@/lib/view-types";
 
-// Where the cycle is, from Cycle.stage. The current step is navigation chrome (charcoal), never a
-// status color: a finished step is not "verified", and gates are marked as the owner's approvals.
-export function StageTracker({ stage }: { stage: Cycle["stage"] }) {
-  const current = stage === "closed" ? STAGES.length : stageIndex[stage];
-  const now = STAGES[Math.min(current, STAGES.length - 1)];
-  const next = STAGES[current + 1];
-
+// Where the payroll is: eight segments, done ones in navy ink, the current one with a flowing Sunset fill.
+// The two halves are labelled by what they produce. Done is never green here: green means "done" on items only.
+export function StageTracker({
+  step,
+  allDone = false,
+  caption = "",
+  fraction = 0,
+}: {
+  /** Index into STAGES; -1 before the run starts. */
+  step: number;
+  /** The cycle is finished: every segment done. */
+  allDone?: boolean;
+  /** Short status under the current step, e.g. "3 of 10 answered". */
+  caption?: string;
+  /** How far the current step is, 0 to 1. */
+  fraction?: number;
+}) {
+  const now = STAGES[Math.max(0, Math.min(step, STAGES.length - 1))];
   return (
-    <div>
-      {/* Phone: one line and a segmented bar. */}
-      <div className="flex flex-col gap-2 md:hidden">
-        <p className="text-sm text-muted-foreground">
-          Step {Math.min(current + 1, STAGES.length)} of {STAGES.length}
-        </p>
-        <p className="text-lg font-semibold">
-          {now.label}
-          <span className="font-normal text-muted-foreground">
-            {" "}
-            · {now.hint}
-          </span>
-        </p>
-        <div className="flex gap-1" aria-hidden>
-          {STAGES.map((s, i) => (
-            <span
-              key={s.label}
-              className={cn(
-                "h-1.5 flex-1 rounded-full",
-                i < current
-                  ? "bg-muted-foreground/60"
-                  : i === current
-                    ? "bg-foreground"
-                    : "bg-muted",
-              )}
-            />
-          ))}
-        </div>
-        {next && (
-          <p className="text-sm text-muted-foreground">
-            Next: {next.label}
-            {"gate" in next && " (you approve)"}
-          </p>
-        )}
+    <div className="flex flex-col gap-3">
+      <div className="hidden grid-cols-2 gap-4 text-[11px] font-bold tracking-[0.07em] text-muted-foreground uppercase md:grid">
+        <span>Stage 1 · wages → regular draft</span>
+        <span>Stage 2 · commissions → off-cycle</span>
       </div>
-
-      {/* Desktop: the full track. */}
-      <ol className="hidden grid-cols-8 md:grid" aria-label="Payroll stages">
+      {/* Phone: one line, then the bar. */}
+      <p className="text-sm md:hidden">
+        {step < 0 ? (
+          <span className="text-muted-foreground">Not started</span>
+        ) : allDone ? (
+          <span className="font-semibold">All 8 steps done</span>
+        ) : (
+          <>
+            <span className="text-muted-foreground">
+              Step {step + 1} of {STAGES.length} ·{" "}
+            </span>
+            <span className="font-semibold text-link">{now.label}</span>
+            {caption && (
+              <span className="text-muted-foreground"> · {caption}</span>
+            )}
+          </>
+        )}
+      </p>
+      <ol
+        aria-label="Payroll stages"
+        className="grid grid-cols-8 gap-1.5 md:gap-3"
+      >
         {STAGES.map((s, i) => {
-          const done = i < current;
-          const here = i === current;
-          const gate = "gate" in s;
+          const done = allDone || i < step;
+          const here = !allDone && i === step;
           return (
             <li
               key={s.label}
               aria-current={here ? "step" : undefined}
-              className="relative flex flex-col items-center gap-2 px-1 text-center"
+              className="flex min-w-0 flex-col gap-2"
             >
-              {i > 0 && (
+              <span className="relative block h-2 overflow-hidden rounded-full bg-border">
+                {done && <span className="absolute inset-0 bg-primary" />}
+                {here && (
+                  <span
+                    className="absolute inset-y-0 left-0 rounded-full bg-sunset-flow transition-[width] duration-(--dur-sheet) ease-out-soft"
+                    style={{
+                      width: `${Math.max(4, fraction * 100).toFixed(1)}%`,
+                    }}
+                  />
+                )}
+              </span>
+              <span className="hidden min-w-0 items-center gap-1.5 md:flex">
                 <span
                   aria-hidden
                   className={cn(
-                    "absolute top-3.5 right-1/2 h-px w-full",
-                    i <= current ? "bg-muted-foreground/60" : "bg-border",
-                  )}
-                />
-              )}
-              <span
-                aria-hidden
-                className={cn(
-                  "relative z-10 grid size-7 place-items-center border-2 bg-card",
-                  gate ? "rotate-45 rounded-[7px]" : "rounded-full",
-                  done && "border-muted-foreground/60 bg-muted",
-                  here &&
-                    "border-foreground bg-foreground text-background ring-4 ring-foreground/10",
-                  !done && !here && "border-border",
-                )}
-              >
-                <span className={cn(gate && "-rotate-45")}>
-                  {done ? (
-                    <Check className="size-3.5 text-muted-foreground" />
-                  ) : here ? (
-                    <span className="block size-2 rounded-full bg-background" />
-                  ) : null}
-                </span>
-              </span>
-              <span
-                className={cn(
-                  "text-sm leading-tight",
-                  here ? "font-semibold" : "text-muted-foreground",
-                )}
-              >
-                {s.label}
-                <span className="sr-only">
-                  {done ? ", done" : here ? ", current step" : ", not started"}
-                </span>
-              </span>
-              {(here || gate) && (
-                <span
-                  className={cn(
-                    "text-xs leading-snug",
-                    here ? "text-foreground" : "text-muted-foreground",
+                    "grid size-4 shrink-0 place-items-center rounded-full text-[10px]",
+                    done && "bg-primary text-primary-foreground",
+                    here && "bg-sunset-2 ring-4 ring-sunset-2/25",
+                    !done &&
+                      !here &&
+                      "border-[1.5px] border-muted-foreground/35",
                   )}
                 >
-                  {here ? s.hint : "You approve"}
+                  {done && <Check className="size-2.5" strokeWidth={3} />}
                 </span>
-              )}
+                <span
+                  className={cn(
+                    "truncate text-[13px]",
+                    here
+                      ? "font-bold text-link"
+                      : done
+                        ? "font-semibold"
+                        : "text-muted-foreground",
+                  )}
+                >
+                  {s.label}
+                  <span className="sr-only">
+                    {done
+                      ? ", done"
+                      : here
+                        ? ", current step"
+                        : ", not started"}
+                  </span>
+                </span>
+              </span>
+              <span
+                className={cn(
+                  "hidden min-h-3.5 truncate text-[11px] leading-tight md:block",
+                  here ? "font-semibold text-link" : "text-muted-foreground",
+                )}
+              >
+                {here
+                  ? caption
+                  : done
+                    ? "Done"
+                    : "gate" in s
+                      ? "You approve"
+                      : ""}
+              </span>
             </li>
           );
         })}

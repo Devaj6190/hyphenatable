@@ -1,0 +1,405 @@
+{
+  "source": "scripts/stage2-fixture.ts: computeStage2 and marginHistory on data/fixtures/a (proposed rules treated as approved)",
+  "companies": {
+    "a": {
+      "cycleId": "a-c05",
+      "stage2": {
+        "draftId": "a-c05-draft-s2",
+        "jobs": [
+          {
+            "jobId": "a-j01",
+            "jobNumber": 101,
+            "title": "Front yard sod install - Larkspur Ln",
+            "revenueCents": 814000,
+            "costCents": 492600,
+            "profitCents": 321400,
+            "marginPct": 39.48,
+            "low": false,
+            "provisional": false,
+            "paidInFull": true,
+            "invoiceStatus": "paid",
+            "hints": []
+          },
+          {
+            "jobId": "a-j02",
+            "jobNumber": 102,
+            "title": "Backyard patio and drainage - Birchwood Ave",
+            "revenueCents": 524000,
+            "costCents": 342758,
+            "profitCents": 181242,
+            "marginPct": 34.59,
+            "low": false,
+            "provisional": true,
+            "paidInFull": false,
+            "invoiceStatus": null,
+            "hints": []
+          },
+          {
+            "jobId": "a-j03",
+            "jobNumber": 103,
+            "title": "Hedge trim and cleanup - Juniper Way",
+            "revenueCents": 587000,
+            "costCents": 324945,
+            "profitCents": 262055,
+            "marginPct": 44.64,
+            "low": false,
+            "provisional": false,
+            "paidInFull": false,
+            "invoiceStatus": "awaiting_payment",
+            "hints": []
+          },
+          {
+            "jobId": "a-j04",
+            "jobNumber": 104,
+            "title": "Retaining wall rebuild - Foxglove Ct",
+            "revenueCents": 711000,
+            "costCents": 487890,
+            "profitCents": 223110,
+            "marginPct": 31.38,
+            "low": false,
+            "provisional": true,
+            "paidInFull": false,
+            "invoiceStatus": null,
+            "hints": []
+          },
+          {
+            "jobId": "a-j05",
+            "jobNumber": 105,
+            "title": "Irrigation system install - Alder Run",
+            "revenueCents": 405000,
+            "costCents": 376972,
+            "profitCents": 28028,
+            "marginPct": 6.92,
+            "low": true,
+            "provisional": true,
+            "paidInFull": false,
+            "invoiceStatus": "draft",
+            "hints": [
+              "unmatched job-cost expense a-ex-0003 on 2026-10-21",
+              "stale Jobber rate for a-w08: 3000¢/h vs 3250¢/h (a-rule-23)"
+            ]
+          },
+          {
+            "jobId": "a-j07",
+            "jobNumber": 107,
+            "title": "Drip line repair - Sorrel St",
+            "revenueCents": 48000,
+            "costCents": 0,
+            "profitCents": 48000,
+            "marginPct": 100,
+            "low": false,
+            "provisional": false,
+            "paidInFull": false,
+            "invoiceStatus": null,
+            "hints": []
+          },
+          {
+            "jobId": "a-j08",
+            "jobNumber": 108,
+            "title": "Disposal run - Foxglove Ct",
+            "revenueCents": null,
+            "costCents": 14250,
+            "profitCents": null,
+            "marginPct": null,
+            "low": false,
+            "provisional": false,
+            "paidInFull": false,
+            "invoiceStatus": null,
+            "hints": []
+          },
+          {
+            "jobId": "a-j09",
+            "jobNumber": 109,
+            "title": "Paver walkway - Hawthorn Pl",
+            "revenueCents": 400000,
+            "costCents": 0,
+            "profitCents": 400000,
+            "marginPct": 100,
+            "low": false,
+            "provisional": false,
+            "paidInFull": false,
+            "invoiceStatus": "paid",
+            "hints": []
+          }
+        ],
+        "revenueCents": null,
+        "knownRevenueCents": 3489000,
+        "totalProfitCents": null,
+        "lowMarginPct": 20,
+        "ready": {
+          "jobIds": ["a-j01"],
+          "payouts": [
+            {
+              "workerId": "a-w11",
+              "name": "Bonus",
+              "amountCents": 32140,
+              "explain": [
+                "10% of cycle job profit 321400¢ over 1 jobs (rule a-rule-11) = 32140¢"
+              ]
+            }
+          ],
+          "totalCents": 32140
+        },
+        "waiting": {
+          "jobIds": [
+            "a-j02",
+            "a-j03",
+            "a-j04",
+            "a-j05",
+            "a-j07",
+            "a-j08",
+            "a-j09"
+          ],
+          "held": [
+            {
+              "workerId": "a-w11",
+              "what": "manager split on a-j02",
+              "reason": "job not complete"
+            },
+            {
+              "workerId": "a-w11",
+              "what": "manager split on a-j04",
+              "reason": "job not complete"
+            },
+            {
+              "workerId": "a-w11",
+              "what": "manager split on a-j05",
+              "reason": "job not complete"
+            },
+            {
+              "workerId": "a-w11",
+              "what": "manager split",
+              "reason": "profit unknown for a-j08 (no job total and no invoice total)"
+            }
+          ]
+        }
+      },
+      "laborShare": {
+        "cycles": [
+          {
+            "cycleId": "a-c01",
+            "periodStart": "2026-08-15T04:00:00.000Z",
+            "revenueCents": 3370000,
+            "laborCents": 1610500,
+            "laborSharePct": 47.8,
+            "complete": true
+          },
+          {
+            "cycleId": "a-c02",
+            "periodStart": "2026-08-29T04:00:00.000Z",
+            "revenueCents": 3425000,
+            "laborCents": 1586700,
+            "laborSharePct": 46.3,
+            "complete": true
+          },
+          {
+            "cycleId": "a-c03",
+            "periodStart": "2026-09-12T04:00:00.000Z",
+            "revenueCents": 3331000,
+            "laborCents": 1610500,
+            "laborSharePct": 48.3,
+            "complete": true
+          },
+          {
+            "cycleId": "a-c04",
+            "periodStart": "2026-09-26T04:00:00.000Z",
+            "revenueCents": 3459000,
+            "laborCents": 1610500,
+            "laborSharePct": 46.6,
+            "complete": true
+          },
+          {
+            "cycleId": "a-c05",
+            "periodStart": "2026-10-10T04:00:00.000Z",
+            "revenueCents": null,
+            "laborCents": null,
+            "laborSharePct": null,
+            "complete": false
+          }
+        ],
+        "usualPct": 47.2,
+        "nowPct": 50.1,
+        "nowLaborCents": 1746283,
+        "nowRevenueCents": 3489000,
+        "leftOutJobIds": ["a-j08"]
+      },
+      "review": {
+        "grossCents": 2224383,
+        "venmoCents": 127500,
+        "people": [
+          {
+            "workerId": "a-w01",
+            "group": "hourly",
+            "hours": 85,
+            "overtimeHours": 5,
+            "grossCents": 245000,
+            "usualCents": 235900,
+            "vsUsualPct": 4
+          },
+          {
+            "workerId": "a-w02",
+            "group": "hourly",
+            "hours": 85,
+            "overtimeHours": 11,
+            "grossCents": 235300,
+            "usualCents": 196967,
+            "vsUsualPct": 19
+          },
+          {
+            "workerId": "a-w03",
+            "group": "hourly",
+            "hours": 80.5,
+            "overtimeHours": 6.5,
+            "grossCents": 201000,
+            "usualCents": 186600,
+            "vsUsualPct": 8
+          },
+          {
+            "workerId": "a-w04",
+            "group": "hourly",
+            "hours": 85.5,
+            "overtimeHours": 7,
+            "grossCents": 213600,
+            "usualCents": 135700,
+            "vsUsualPct": 57
+          },
+          {
+            "workerId": "a-w05",
+            "group": "hourly",
+            "hours": 77.08,
+            "overtimeHours": null,
+            "grossCents": 169583,
+            "usualCents": 171050,
+            "vsUsualPct": -1
+          },
+          {
+            "workerId": "a-w06",
+            "group": "hourly",
+            "hours": null,
+            "overtimeHours": null,
+            "grossCents": 0,
+            "usualCents": 152350,
+            "vsUsualPct": -100
+          },
+          {
+            "workerId": "a-w07",
+            "group": "hourly",
+            "hours": 81,
+            "overtimeHours": 2.5,
+            "grossCents": 164500,
+            "usualCents": 155500,
+            "vsUsualPct": 6
+          },
+          {
+            "workerId": "a-w08",
+            "group": "salary",
+            "hours": null,
+            "overtimeHours": null,
+            "grossCents": 260000,
+            "usualCents": 246667,
+            "vsUsualPct": 5
+          },
+          {
+            "workerId": "a-w11",
+            "group": "salary",
+            "hours": null,
+            "overtimeHours": null,
+            "grossCents": 280000,
+            "usualCents": 280000,
+            "vsUsualPct": 0
+          },
+          {
+            "workerId": "a-w12",
+            "group": "salary",
+            "hours": null,
+            "overtimeHours": null,
+            "grossCents": 350000,
+            "usualCents": 350000,
+            "vsUsualPct": 0
+          },
+          {
+            "workerId": "a-w13",
+            "group": "hourly",
+            "hours": 17,
+            "overtimeHours": null,
+            "grossCents": 37400,
+            "usualCents": 37400,
+            "vsUsualPct": 0
+          },
+          {
+            "workerId": "a-w14",
+            "group": "hourly",
+            "hours": 34,
+            "overtimeHours": null,
+            "grossCents": 68000,
+            "usualCents": null,
+            "vsUsualPct": null
+          },
+          {
+            "workerId": "a-w09",
+            "group": "venmo",
+            "hours": 51,
+            "overtimeHours": null,
+            "grossCents": 127500,
+            "usualCents": 127793,
+            "vsUsualPct": 0
+          },
+          {
+            "workerId": "a-w10",
+            "group": "venmo",
+            "hours": null,
+            "overtimeHours": null,
+            "grossCents": null,
+            "usualCents": null,
+            "vsUsualPct": null
+          }
+        ]
+      },
+      "corrections": [
+        {
+          "id": "a-fix-sam",
+          "flagId": "a-fl-04",
+          "workerId": "a-w03",
+          "what": "a-te-0111 and a-te-0113 become one shift, 11:00 to 20:00 UTC; a-te-0113 dropped",
+          "dayHoursBefore": 12.5,
+          "dayHoursAfter": 9,
+          "overtimeBefore": 6.5,
+          "overtimeAfter": 2.5,
+          "grossBeforeCents": 201000,
+          "grossAfterCents": 186600,
+          "effectPayCents": -14400
+        },
+        {
+          "id": "a-fix-jordan",
+          "flagId": "a-fl-09",
+          "workerId": "a-w02",
+          "what": "duplicate a-te-0146 dropped; a-te-0106 kept",
+          "dayHoursBefore": 17,
+          "dayHoursAfter": 8.5,
+          "overtimeBefore": 11,
+          "overtimeAfter": 2.5,
+          "grossBeforeCents": 235300,
+          "grossAfterCents": 202150,
+          "effectPayCents": -33150
+        }
+      ],
+      "nextPayroll": {
+        "cycleId": "a-c06",
+        "example": true,
+        "releasedJobIds": ["a-j02"],
+        "released": [
+          {
+            "workerId": "a-w11",
+            "name": "Bonus",
+            "amountCents": 18124,
+            "explain": [
+              "10% of cycle job profit 181242¢ over 1 jobs (rule a-rule-11) = 18124¢"
+            ]
+          }
+        ],
+        "releasedTotalCents": 18124,
+        "note": "a-j02 shown paid in full: a synthetic invoice a-in-example-02 and payment a-pay-example-02 are added for the example"
+      }
+    }
+  }
+}

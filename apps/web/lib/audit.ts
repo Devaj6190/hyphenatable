@@ -41,7 +41,7 @@ export function eventSource(e: AuditEvent): string {
   if (e.data?.source) return e.data.source;
   if (e.actor.kind === "user") return "Dashboard";
   if (e.actor.agent) return `${e.actor.agent} agent (Claude)`;
-  return "PayrollPilot engine";
+  return "RollPay engine";
 }
 
 // Which outside system owns a record, by the ref key. Our own ids (syncRunId, flagId, draftId, questionId,
@@ -96,4 +96,48 @@ export function forViewerEvents(
   return events
     .filter((e) => canSeeAuditEvent(viewer, e, visibleFlagIds))
     .map((e) => redactAuditEvent(viewer, e));
+}
+
+export type AgentName = "auditor" | "messenger" | "analyst";
+
+export type HandoffCounts = {
+  auditor: { flagged: number; routed: number };
+  messenger: { drafted: number; read: number };
+  analyst: { proposed: number };
+};
+
+const flagIdOf = (e: AuditEvent) => e.refs.flagId;
+
+/**
+ * Hand-off counts from audit events written by agents (actor.kind === "agent"). Events by code, users or the
+ * demo persona are ignored. "Flagged" is the distinct flags the Auditor wrote check events for; "routed" is
+ * the subset of those a Messenger event also names, which is the hand-off to the Messenger.
+ */
+export function handoffCounts(events: readonly AuditEvent[]): HandoffCounts {
+  const agentEvents = events.filter(
+    (e) => e.actor.kind === "agent" && e.actor.agent,
+  );
+  const by = (agent: AgentName) =>
+    agentEvents.filter((e) => e.actor.agent === agent);
+  const flagged = new Set(
+    by("auditor")
+      .filter((e) => typePrefix(e) === "check")
+      .map(flagIdOf)
+      .filter(Boolean),
+  );
+  const messengerFlags = new Set(by("messenger").map(flagIdOf));
+  const messenger = by("messenger");
+  return {
+    auditor: {
+      flagged: flagged.size,
+      routed: [...flagged].filter((id) => messengerFlags.has(id)).length,
+    },
+    messenger: {
+      drafted: messenger.filter((e) => e.type === "message.drafted").length,
+      read: messenger.filter((e) => e.type === "message.interpreted").length,
+    },
+    analyst: {
+      proposed: by("analyst").filter((e) => e.type === "rule.proposed").length,
+    },
+  };
 }

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
+import { routes } from "@/lib/routes";
 import type { Flag } from "@/lib/types";
 
 // "no precedent" is an outlined neutral chip; a precedent links to its rule. Note text renders verbatim.
@@ -27,7 +28,7 @@ export function PrecedentBadge({
     <Badge
       tone="brand"
       variant="outline"
-      render={<Link href={`/c/${companyId}/rules#${precedent.ruleId}`} />}
+      render={<Link href={routes.rule(companyId, precedent.ruleId)} />}
     >
       {precedent.note}
     </Badge>
