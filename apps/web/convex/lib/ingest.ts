@@ -70,8 +70,12 @@ export function remap(
   key = "",
   parent = "",
 ): unknown {
-  if (typeof value === "string")
+  if (typeof value === "string") {
+    // A flag's sentence names its records by id; a restore re-inserts them under new ids, so the sentence follows.
+    if (key === "seen")
+      return value.replace(/[A-Za-z0-9_-]+/g, (w) => ids.get(w) ?? w);
     return isRef(key, parent) && ids.has(value) ? ids.get(value) : value;
+  }
   if (Array.isArray(value)) return value.map((x) => remap(x, ids, key, parent));
   if (value && typeof value === "object") {
     return Object.fromEntries(

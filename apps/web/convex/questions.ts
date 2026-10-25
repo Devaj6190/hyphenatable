@@ -9,6 +9,7 @@ import {
   internalMutation,
   type MutationCtx,
   mutation,
+  query,
 } from "./_generated/server";
 import { write } from "./audit";
 import { userId } from "./lib/validators";
@@ -353,5 +354,33 @@ export const edit = mutation({
       refs: { questionId },
       data: null,
     });
+  },
+});
+
+/**
+ * Demo panel: the company's questions that can still be approved or answered (draft, approved, sent, reminded), newest
+ * first. Question texts carry no pay (approve refuses one that does). Empty unless DEMO_MODE=1, like roster.list.
+ */
+export const forDemo = query({
+  args: { companyId: v.id("companies") },
+  handler: async (ctx, { companyId }) => {
+    if (process.env.DEMO_MODE !== "1") return [];
+    const rows = await ctx.db
+      .query("questions")
+      .withIndex("by_company", (q) => q.eq("companyId", companyId))
+      .order("desc")
+      .collect();
+    return rows
+      .filter((q) =>
+        ["draft", "approved", "sent", "reminded"].includes(q.status),
+      )
+      .map((q) => ({
+        id: q._id,
+        toWorkerId: q.toWorkerId,
+        toRole: q.toRole,
+        text: q.text,
+        options: q.options,
+        status: q.status,
+      }));
   },
 });

@@ -34,10 +34,16 @@ describe("remap", () => {
       recordId: "a-te-0121",
       category: "a",
       label: "a",
-      seen: "a-w05",
+      note: "a-w05",
       where: [{ system: "jobber", recordId: "a-te-0121", url: null }],
     };
     expect(remap(row, ids)).toEqual(row);
+  });
+
+  test("a flag's sentence follows its records to their new ids", () => {
+    expect(
+      remap({ seen: "Entry a-te-0121 for a-w05 has no job (a-w99)." }, ids),
+    ).toEqual({ seen: "Entry C_te121 for C_w05 has no job (a-w99)." });
   });
 
   test("rewrites the nested references that do not end in Id", () => {
