@@ -67,10 +67,11 @@ export type TimeEntry = {
   endAt: string | null;
   durationSec: number;
   ticking: boolean;
-  approved: boolean;
+  /** null: not in the source (real exports). */
+  approved: boolean | null;
   approvedBy: string | null;
-  payable: boolean;
-  category: string;
+  payable: boolean | null;
+  category: string | null;
   label: string | null;
   hasNote: boolean;
 };
@@ -78,7 +79,7 @@ export type TimeEntry = {
 export type Expense = {
   id: string;
   companyId: string;
-  source: "qbo" | "jobber";
+  source: "qbo" | "jobber" | "venmo";
   sourceId: string;
   date: string;
   amountCents: number | null;

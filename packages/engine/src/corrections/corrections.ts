@@ -33,7 +33,8 @@ export type Change =
       table: "timeEntries";
       id: string;
       field: "payable";
-      before: boolean;
+      /** null: the source never said (real exports). */
+      before: boolean | null;
       after: false;
     }
   | {
