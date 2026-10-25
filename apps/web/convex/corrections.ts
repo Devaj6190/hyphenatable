@@ -9,6 +9,7 @@ import {
 import type { TimeEntry } from "@payrollpilot/engine/payroll/types";
 import { TEMPLATE_FOR } from "@payrollpilot/engine/questions/questions";
 import { ConvexError, v } from "convex/values";
+import { internal } from "./_generated/api";
 import type { Doc, Id } from "./_generated/dataModel";
 import {
   internalMutation,
@@ -53,6 +54,11 @@ export const proposeFromReply = internalMutation({
         "flag.confirmed",
         "The person asked confirmed the record is right; nothing changes",
       );
+      // Learning contract step 1: a confirmed answer is a lesson too.
+      await ctx.scheduler.runAfter(0, internal.agents.learn.recordLesson, {
+        companyId: flag.companyId,
+        from: { kind: "confirm", interpretationId },
+      });
       return;
     }
 
@@ -228,6 +234,11 @@ export const approve = mutation({
       },
     });
     await recomputeDraft(ctx, c.cycleId, { correctionId });
+    // Learning contract step 1: every approved correction is evaluated into a lesson.
+    await ctx.scheduler.runAfter(0, internal.agents.learn.recordLesson, {
+      companyId: c.companyId,
+      from: { kind: "correction", correctionId },
+    });
   },
 });
 
