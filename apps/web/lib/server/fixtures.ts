@@ -15,7 +15,6 @@ import {
   type Readiness,
   type WorkbookData,
 } from "@/components/workbook/data";
-import { formatCents } from "@/lib/money";
 import {
   canSeeAuditEvent,
   canSeeFlag,
@@ -33,6 +32,7 @@ import {
   type Rule,
   type Cycle as RuleCycle,
   type SyncRun as RuleSyncRun,
+  ruleWords,
 } from "@/lib/rules";
 import {
   MISSED_SOURCE,
@@ -261,68 +261,9 @@ function evidenceSummary(f: RuleFixture, items: EvidenceItem[]) {
   };
 }
 
-const str = (v: unknown) => (typeof v === "string" ? v : String(v ?? ""));
-const num = (v: unknown) => (typeof v === "number" ? v : Number(v));
-
-/**
- * The rule in plain words, built from its typed params. Restates, never computes:
- * amounts are the cents already stored on the rule. Managers get no pay amounts.
- */
-function plainWords(companyId: string, rule: Rule, showMoney: boolean): string {
-  const p = rule.params;
-  const who = (k: string) => nameOf(companyId, str(p[k]));
-  switch (rule.type) {
-    case "overtime_policy":
-      return `Overtime starts after ${num(p.weeklyHours)} hours in a week, at ${num(p.multiplier)}×${
-        p.dailyHours == null
-          ? ", not per day."
-          : ` or after ${num(p.dailyHours)} hours in a day.`
-      }`;
-    case "long_shift_threshold":
-      return `A shift longer than ${num(p.hours)} hours gets a question before payroll.`;
-    case "pay_rate": {
-      const yearly = p.paymentUnit === "Year";
-      if (!showMoney)
-        return `${who("workerId")} is paid ${yearly ? "a salary" : "by the hour"} in Gusto.`;
-      return `${who("workerId")} is paid ${formatCents(num(p.rateCents))} ${yearly ? "a year" : "an hour"} in Gusto${
-        yearly
-          ? `, costed at ${formatCents(num(p.costRateCentsPerHour))} an hour on jobs.`
-          : "."
-      }`;
-    }
-    case "venmo_rate":
-      return `${who("workerId")} is paid by Venmo, outside Gusto, ${
-        showMoney
-          ? `at ${formatCents(num(p.rateCents))} an hour`
-          : "by the hour"
-      }.`;
-    case "expense_account_kind":
-      return `QuickBooks “${str(p.accountName)}” purchases count as ${
-        p.kind === "job_cost" ? "a job cost" : "overhead"
-      }.`;
-    case "commission_plan":
-      return `Whoever quotes a job in person earns ${num(p.pctOfJobTotal)}% of the job total.`;
-    case "tip_policy":
-      return p.split === "by_hours_on_job"
-        ? "Tips on a job are split by each person’s hours on that job."
-        : `Tips are split: ${str(p.split)}.`;
-    case "manager_split":
-      return `${who("workerId")} earns ${num(p.pctOfJobProfit)}% of job profit.`;
-    case "routing":
-      return `Ask ${who("jobFacts")} about job facts. Ask ${who("money")} about money.`;
-    case "deposit_vs_final":
-      return "A payment on a quote is a deposit. A payment on an invoice is the final payment.";
-    case "disposal_parent_link":
-      return `A “${str(p.titlePrefix).trim()} …” job belongs to the job with the ${str(p.linkBy)}.`;
-    case "in_person_quoter":
-      return `${who("workerId")} quotes “${str(p.titleKeyword)}” jobs in person.`;
-    default:
-      // Free text can state amounts, so only the owner gets it.
-      return showMoney && typeof p.text === "string"
-        ? p.text
-        : "Rule details not shown.";
-  }
-}
+// The words live in lib/rules.ts so live Convex rules read the same; names come from the fixture roster here.
+const plainWords = (companyId: string, rule: Rule, showMoney: boolean) =>
+  ruleWords(rule, showMoney, (id) => nameOf(companyId, id));
 
 const RULE_SOURCES = {
   rules: "fixture, data/fixtures/a/rules.json",

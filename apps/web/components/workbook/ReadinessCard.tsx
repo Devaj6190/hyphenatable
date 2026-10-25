@@ -8,6 +8,7 @@ import { SourceChip } from "@/components/SourceChip";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { isRealPayroll, REAL_PAYROLL_NOTE } from "@/lib/companies";
 import { cn } from "@/lib/utils";
 import type { CycleWorkbook, Readiness } from "./data";
 import { GateDialog } from "./GateDialog";
@@ -134,14 +135,20 @@ export function ReadinessCard({
                   disabled={blocked > 0}
                 />
               )}
-              {(status === "computed" || status === "approved") && (
-                <Button
-                  variant={status === "approved" ? "primary" : "secondary"}
-                  disabled={status !== "approved"}
-                  onClick={() => setFillTried(true)}
-                >
-                  Fill Gusto draft
-                </Button>
+              {isRealPayroll(companyId) ? (
+                <p className="max-w-sm text-right text-sm text-muted-foreground">
+                  {REAL_PAYROLL_NOTE}.
+                </p>
+              ) : (
+                (status === "computed" || status === "approved") && (
+                  <Button
+                    variant={status === "approved" ? "primary" : "secondary"}
+                    disabled={status !== "approved"}
+                    onClick={() => setFillTried(true)}
+                  >
+                    Fill Gusto draft
+                  </Button>
+                )
               )}
             </div>
             {status === "computed" && (
