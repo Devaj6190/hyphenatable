@@ -1,0 +1,97 @@
+{
+  "timezone": "America/New_York",
+  "source": "Synthetic fixture, ids only",
+  "runs": [
+    {
+      "id": "ar-01",
+      "companyId": "a",
+      "cycleId": "a-c2",
+      "agent": "auditor",
+      "attempt": 1,
+      "runId": "run-synth-01",
+      "status": "completed",
+      "startedAt": "2026-10-24T08:00:00.000Z",
+      "finishedAt": "2026-10-24T08:03:10.000Z",
+      "credits": 4.2,
+      "error": null
+    },
+    {
+      "id": "ar-02",
+      "companyId": "a",
+      "cycleId": "a-c2",
+      "agent": "messenger",
+      "attempt": 1,
+      "runId": "run-synth-02",
+      "status": "running",
+      "startedAt": "2026-10-24T08:04:00.000Z",
+      "finishedAt": null,
+      "credits": null,
+      "error": null
+    },
+    {
+      "id": "ar-03",
+      "companyId": "a",
+      "cycleId": null,
+      "agent": "analyst",
+      "attempt": 2,
+      "runId": null,
+      "status": "starting",
+      "startedAt": "2026-10-24T08:05:00.000Z",
+      "finishedAt": null,
+      "credits": null,
+      "error": null
+    },
+    {
+      "id": "ar-04",
+      "companyId": "a",
+      "cycleId": "a-c1",
+      "agent": "analyst",
+      "attempt": 1,
+      "runId": "run-synth-04",
+      "status": "failed",
+      "startedAt": "2026-10-23T08:00:00.000Z",
+      "finishedAt": "2026-10-23T08:01:30.000Z",
+      "credits": 0.6,
+      "error": "Run failed: webhook re-fetch did not match"
+    }
+  ],
+  "events": [
+    {
+      "id": "ev-01",
+      "companyId": "a",
+      "cycleId": "a-c2",
+      "at": "2026-10-23T08:02:00.000Z",
+      "actor": { "kind": "agent", "id": "auditor", "agent": "auditor" },
+      "type": "auditor.brief",
+      "summary": "Auditor wrote a morning brief",
+      "refs": { "syncRunId": "sync-synth-01" },
+      "data": {
+        "text": "3 flags need the owner today: F-101, F-104, F-107. All are proposals; nothing was changed."
+      }
+    },
+    {
+      "id": "ev-02",
+      "companyId": "a",
+      "cycleId": "a-c2",
+      "at": "2026-10-24T08:03:00.000Z",
+      "actor": { "kind": "agent", "id": "auditor", "agent": "auditor" },
+      "type": "auditor.brief",
+      "summary": "Auditor wrote a morning brief",
+      "refs": { "syncRunId": "sync-synth-02" },
+      "data": {
+        "text": "2 flags need the owner today: F-110, F-112. Entries E-31 and E-32 have proposed job matches."
+      }
+    },
+    {
+      "id": "ev-03",
+      "companyId": "a",
+      "cycleId": "a-c2",
+      "at": "2026-10-24T08:10:00.000Z",
+      "actor": { "kind": "agent", "id": "messenger", "agent": "messenger" },
+      "type": "question.drafted",
+      "summary": "Messenger drafted a question",
+      "refs": { "questionId": "q-synth-01" },
+      "data": null
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
 import { loadFixtures } from "../lib/io";
 import type { AnswerKeyRow, FlagLike } from "../lib/types";
-import { m1, overlaps } from "../m1-planted";
+import { m1, m1Notes, overlaps } from "../m1-planted";
 import { m2FromGrades } from "../m2-rules";
 import { m3 } from "../m3-questions";
 import { backtest } from "../m4-backtest";
@@ -77,6 +77,29 @@ describe("M1", () => {
     expect(r.unmatchedFlags.map((f) => f.id)).toEqual(["f2", "f3"]);
     expect(r.perCheck["CHK-04"].recall.value).toBe(0);
     expect(r.perCheck["CHK-23"].precision.value).toBe(0);
+  });
+  test("AGT-01, LRN-01 and any non-CHK id are otherFlags, outside precision; CHK-23 stays in", () => {
+    const key = [row("k1", "CHK-01", S({ entryIds: ["e1"] }))];
+    const r = m1(
+      [
+        flag("f1", "CHK-01", S({ entryIds: ["e1"] })),
+        flag("f2", "CHK-23"),
+        flag("a1", "AGT-01", S({ entryIds: ["e1"] })),
+        flag("a2", "AGT-01"),
+        flag("l1", "LRN-01"),
+        flag("x1", "CHK-24"),
+      ],
+      key,
+    );
+    expect(r.flags).toBe(2);
+    expect(r.precision).toEqual({ num: 1, den: 2, value: 0.5 });
+    expect(r.otherFlags).toEqual({ "AGT-01": 2, "CHK-24": 1, "LRN-01": 1 });
+    expect(r.unmatchedFlags.map((f) => f.id)).toEqual(["f2"]);
+    expect(r.perCheck["AGT-01"]).toBeUndefined();
+    expect(m1Notes(r)[1]).toBe(
+      "M1 precision excludes 4 flag(s) that are not planted-error checks (AGT-01 2, CHK-24 1, LRN-01 1): agent questions and lesson conflicts",
+    );
+    expect(m1Notes(m1([flag("f1", "CHK-01")], key))).toHaveLength(1);
   });
 });
 

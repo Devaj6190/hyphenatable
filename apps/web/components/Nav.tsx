@@ -1,11 +1,10 @@
 "use client";
 
 import {
-  BookOpen,
+  Building2,
   Ellipsis,
   FlaskConical,
   House,
-  ListChecks,
   type LucideIcon,
   ScrollText,
   Table2,
@@ -21,50 +20,61 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { DEMO_MODE } from "@/lib/demo";
+import { routes } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 
 type Item = {
   label: string;
-  path: string;
+  href: (companyId: string) => string;
   icon: LucideIcon;
-  /** Sub-routes that highlight this item (mockup boards: Inputs and problem detail sit under Home). */
+  /** Sub-routes that highlight this item (Inputs and problem detail sit under Home; Onboarding and the old
+   * Rules URLs under Company). */
   owns?: string[];
   /** Shown in the phone tab bar; the rest go under More. */
   tab?: boolean;
 };
 
+// Mockup nav: Home, Company, Workbook, Audit, Manager, Demo. Phone tabs: Home, Company, Workbook, Audit, More.
 const items: Item[] = [
   {
     label: "Home",
-    path: "",
+    href: routes.home,
     icon: House,
     owns: ["/inputs", "/flags"],
     tab: true,
   },
-  { label: "Manager", path: "/manager", icon: Users },
-  { label: "Onboarding", path: "/onboarding", icon: ListChecks },
-  { label: "Rules", path: "/rules", icon: BookOpen, tab: true },
-  { label: "Workbook", path: "/workbook", icon: Table2, tab: true },
-  { label: "Audit", path: "/audit", icon: ScrollText, tab: true },
-  ...(DEMO_MODE ? [{ label: "Demo", path: "/demo", icon: FlaskConical }] : []),
+  {
+    label: "Company",
+    href: (id) => routes.company(id),
+    icon: Building2,
+    owns: ["/onboarding", "/rules"],
+    tab: true,
+  },
+  { label: "Workbook", href: routes.workbook, icon: Table2, tab: true },
+  { label: "Audit", href: routes.audit, icon: ScrollText, tab: true },
+  { label: "Manager", href: routes.manager, icon: Users },
+  ...(DEMO_MODE
+    ? [{ label: "Demo", href: routes.demo, icon: FlaskConical }]
+    : []),
 ];
 
-function isActive(pathname: string, base: string, item: Item) {
-  const prefixes = [item.path, ...(item.owns ?? [])].map((p) => base + p);
-  if (item.path === "")
-    return (
-      pathname === base || prefixes.slice(1).some((p) => pathname.startsWith(p))
-    );
-  return prefixes.some((p) => pathname === p || pathname.startsWith(`${p}/`));
+function isActive(pathname: string, companyId: string, item: Item) {
+  const base = routes.home(companyId);
+  const own = item.href(companyId);
+  const prefixes = (item.owns ?? []).map((p) => base + p);
+  if (own === base)
+    return pathname === base || prefixes.some((p) => pathname.startsWith(p));
+  return [own, ...prefixes].some(
+    (p) => pathname === p || pathname.startsWith(`${p}/`),
+  );
 }
 
 export function Nav() {
   const { companyId } = useParams<{ companyId: string }>();
   const pathname = usePathname();
   const [moreOpen, setMoreOpen] = useState(false);
-  const base = `/c/${companyId}`;
   const more = items.filter((i) => !i.tab);
-  const moreActive = more.some((i) => isActive(pathname, base, i));
+  const moreActive = more.some((i) => isActive(pathname, companyId, i));
 
   return (
     <>
@@ -74,18 +84,18 @@ export function Nav() {
         className="sticky top-0 hidden h-dvh w-56 shrink-0 flex-col gap-1 border-r bg-card/60 px-3 py-5 lg:flex"
       >
         <Link
-          href={base}
+          href={routes.home(companyId)}
           className="mb-5 px-3 text-lg font-semibold tracking-tight text-link"
         >
-          PayrollPilot
+          RollPay
         </Link>
         {items.map((item) => {
-          const active = isActive(pathname, base, item);
+          const active = isActive(pathname, companyId, item);
           const Icon = item.icon;
           return (
             <Link
               key={item.label}
-              href={base + item.path}
+              href={item.href(companyId)}
               aria-current={active ? "page" : undefined}
               className={cn(
                 "flex h-10 items-center gap-3 rounded-control px-3 text-sm font-medium transition-colors duration-(--dur-hover)",
@@ -99,9 +109,12 @@ export function Nav() {
             </Link>
           );
         })}
+        <p className="mt-auto px-3 text-xs text-muted-foreground">
+          Draft only. RollPay never submits payroll.
+        </p>
       </nav>
 
-      {/* Phone: bottom tabs (mockup HomePhone board: Home, Rules, Workbook, Audit, More) */}
+      {/* Phone: bottom tabs (mockup HomePhone board: Home, Company, Workbook, Audit, More) */}
       <nav
         aria-label="Main"
         className="frosted fixed inset-x-0 bottom-0 z-40 flex border-t pb-[env(safe-area-inset-bottom)] lg:hidden"
@@ -109,12 +122,12 @@ export function Nav() {
         {items
           .filter((i) => i.tab)
           .map((item) => {
-            const active = isActive(pathname, base, item);
+            const active = isActive(pathname, companyId, item);
             const Icon = item.icon;
             return (
               <Link
                 key={item.label}
-                href={base + item.path}
+                href={item.href(companyId)}
                 aria-current={active ? "page" : undefined}
                 className={cn(
                   "flex min-h-14 flex-1 flex-col items-center justify-center gap-0.5 text-xs font-medium",
@@ -147,11 +160,11 @@ export function Nav() {
           <ul className="flex flex-col gap-1 px-3 pb-6">
             {more.map((item) => {
               const Icon = item.icon;
-              const active = isActive(pathname, base, item);
+              const active = isActive(pathname, companyId, item);
               return (
                 <li key={item.label}>
                   <Link
-                    href={base + item.path}
+                    href={item.href(companyId)}
                     onClick={() => setMoreOpen(false)}
                     aria-current={active ? "page" : undefined}
                     className={cn(

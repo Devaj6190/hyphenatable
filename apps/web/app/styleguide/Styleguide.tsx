@@ -100,6 +100,10 @@ const swatches = [
   ["primary-hover", "bg-primary-hover"],
   ["border", "bg-border"],
   ["input", "bg-input"],
+  ["link", "bg-link"],
+  ["sunset-1", "bg-sunset-1"],
+  ["sunset-2", "bg-sunset-2"],
+  ["sunset-3", "bg-sunset-3"],
   ["hold-soft", "bg-hold-soft"],
   ["ask-soft", "bg-ask-soft"],
   ["ok-soft", "bg-ok-soft"],
@@ -177,6 +181,42 @@ function Panel({
         </div>
       </Section>
 
+      <Section title="Sunset (accents and progress, never a status)">
+        <div className="flex flex-col gap-1 text-xs">
+          <span className="flex h-12 items-center rounded-control bg-sunset px-3 text-sm font-semibold text-sunset-ink">
+            bg-sunset · 135° accent fill
+          </span>
+          <span className="text-muted-foreground">
+            Navy ink text on it passes AA at every stop.
+          </span>
+        </div>
+        <div className="flex flex-col gap-1 text-xs">
+          <div
+            className="flex h-2 gap-1"
+            role="img"
+            aria-label="Progress: step 3 of 5 in progress"
+          >
+            <span className="flex-1 rounded-full bg-ok" />
+            <span className="flex-1 rounded-full bg-ok" />
+            <span className="flex-1 rounded-full bg-sunset-flow" />
+            <span className="flex-1 rounded-full bg-muted" />
+            <span className="flex-1 rounded-full bg-muted" />
+          </div>
+          <span className="text-muted-foreground">
+            bg-sunset-flow · current step moves left to right; still under
+            reduced motion. Done steps use ok green.
+          </span>
+        </div>
+        <p className="text-sm">
+          <a
+            href={`/c/${companyId}/workbook`}
+            className="text-link underline underline-offset-2"
+          >
+            Links use text-link
+          </a>
+        </p>
+      </Section>
+
       <Section title="Buttons">
         <Row>
           <Button>Approve and send</Button>
@@ -197,7 +237,7 @@ function Panel({
           </Button>
         </Row>
         <p className="text-sm text-muted-foreground">
-          Draft only. PayrollPilot never submits payroll.
+          Draft only. RollPay never submits payroll.
         </p>
       </Section>
 
@@ -372,7 +412,7 @@ function Panel({
               <DialogHeader>
                 <DialogTitle>Approve Gate 1?</DialogTitle>
                 <DialogDescription>
-                  Then we fill the Gusto draft. Draft only. PayrollPilot never
+                  Then we fill the Gusto draft. Draft only. RollPay never
                   submits payroll.
                 </DialogDescription>
               </DialogHeader>

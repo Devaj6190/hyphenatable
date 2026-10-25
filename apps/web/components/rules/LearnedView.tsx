@@ -7,6 +7,7 @@ import { RuleCard } from "@/components/rules/RuleCard";
 import { PreviewNote, RulesEmpty } from "@/components/rules/RulesBits";
 import { StatusBadge } from "@/components/StatusBadge";
 import { buttonVariants } from "@/components/ui/button";
+import { routes } from "@/lib/routes";
 import { useRuleStore } from "@/lib/ruleStore";
 import { closedOf, shortDate } from "@/lib/rules";
 import type { RulesViewData } from "@/lib/view-types";
@@ -56,12 +57,6 @@ export function LearnedView({
           kind={dataKind}
           detail={`${label}, cycles ${past[0].number}–${last.number}`}
         />
-        <Link
-          href={`/c/${companyId}/rules`}
-          className="text-sm text-link underline-offset-4 hover:underline"
-        >
-          All {store.rules.length} rules
-        </Link>
       </div>
 
       <section className="grid gap-6 rounded-card border bg-card p-5 shadow-card sm:p-6 lg:grid-cols-[1fr_1.2fr]">
@@ -141,7 +136,7 @@ export function LearnedView({
               </p>
             )}
             <Link
-              href={`/c/${companyId}/onboarding`}
+              href={routes.onboarding(companyId)}
               className={buttonVariants({
                 size: "sm",
                 variant: "secondary",

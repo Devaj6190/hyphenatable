@@ -73,7 +73,7 @@ export function DenyReason({
       </div>
       <p className="text-xs text-muted-foreground">
         Nothing is sent or changed, and the item stays open. Your reason helps
-        PayrollPilot ask better next time.
+        RollPay ask better next time.
       </p>
       <div className="flex flex-wrap gap-2">
         <Button
