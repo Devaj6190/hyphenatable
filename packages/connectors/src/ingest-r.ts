@@ -23,10 +23,13 @@ import {
   anonymizeJobberPull,
   chartWordsOf,
   findRealTokens,
+  jobKey,
   leakReport,
   loadOrCreateSalt,
+  nameKey,
   type PseudonymMap,
 } from "./anonymize.ts";
+import { CrossFileDedupe, noteDuplicates } from "./dedupe.ts";
 import { readGustoPayrollJournalCsv } from "./exports/gusto-payroll-journal-csv.ts";
 import {
   isSectionedJournal,
@@ -43,10 +46,13 @@ import {
   TRANSACTION_LIST,
 } from "./exports/jobber-reports.ts";
 import { readJobberTimesheetsCsv } from "./exports/jobber-timesheets-csv.ts";
-import { readJobberTimesheetsXlsx } from "./exports/jobber-timesheets-xlsx.ts";
+import {
+  readJobberTimesheetsXlsx,
+  type TimesheetRow,
+} from "./exports/jobber-timesheets-xlsx.ts";
 import { readQboTransactionDetailXlsx } from "./exports/qbo-tda-xlsx.ts";
 import { readQboXlsx } from "./exports/qbo-xlsx.ts";
-import { readVenmoCsv } from "./exports/venmo-csv.ts";
+import { readVenmoCsv, type VenmoRow } from "./exports/venmo-csv.ts";
 import {
   authFromEnv,
   DEFAULT_TOKEN_PATH,
@@ -91,6 +97,8 @@ type RunCount = {
   complete: boolean;
 };
 export interface IngestCounts {
+  /** entries dropped because an earlier, overlapping export of the same kind already had them */
+  duplicatesAcrossFiles: number;
   workers: number;
   clients: number;
   jobs: number;
@@ -279,6 +287,20 @@ export async function ingestR(o: IngestOptions): Promise<IngestCounts> {
     method: `export ${reader} file:${fileTag}`,
   });
 
+  let duplicatesAcrossFiles = 0;
+  // the same entry in two overlapping exports: same worker, date, start, end, duration, job, label, category
+  const timesheetDedupe = new CrossFileDedupe<TimesheetRow>((t) =>
+    JSON.stringify([
+      nameKey(t.workerName),
+      t.date,
+      t.startAt,
+      t.endAt,
+      t.durationSec,
+      t.jobText ? jobKey(t.jobText) : null,
+      t.label ?? null,
+      t.category,
+    ]),
+  );
   const timesheets = [];
   for (const p of o.timesheets) {
     const { bytes, fileTag } = await tagged(p);
@@ -295,14 +317,19 @@ export async function ingestR(o: IngestOptions): Promise<IngestCounts> {
           { text: bytes.toString("utf8"), fileName: fileTag },
           { companyId, timezone: o.timezone, now },
         );
+    const d = timesheetDedupe.take(r.rows);
+    duplicatesAcrossFiles += d.dropped;
     syncRuns.push(
-      scrub(
-        r.syncRun,
-        isXlsx ? "jobber-timesheets-xlsx" : "jobber-timesheets-csv",
-        fileTag,
+      noteDuplicates(
+        scrub(
+          r.syncRun,
+          isXlsx ? "jobber-timesheets-xlsx" : "jobber-timesheets-csv",
+          fileTag,
+        ),
+        d.dropped,
       ),
     );
-    timesheets.push({ fileTag, rows: r.rows });
+    timesheets.push({ fileTag, rows: d.rows });
   }
   const journals = [];
   for (const p of o.journals) {
@@ -344,10 +371,21 @@ export async function ingestR(o: IngestOptions): Promise<IngestCounts> {
   }
 
   // Jobber report CSVs
+  // overlapping report files: an entry is its source number (invoice #, quote #, job #) when the report has
+  // one, else the whole parsed row
   const readReport = async <K extends string>(
     paths: string[] | undefined,
     spec: ReportSpec<K>,
+    sourceNumber: (
+      r: ReportRow<K>,
+    ) => string | number | null | undefined = () => null,
   ) => {
+    const dedupe = new CrossFileDedupe<ReportRow<K>>((r) => {
+      const n = sourceNumber(r);
+      if (n !== null && n !== undefined && n !== "") return `#${n}`;
+      const { rowNumber: _, ...rest } = r;
+      return JSON.stringify(rest);
+    });
     const out: { fileTag: string; rows: ReportRow<K>[] }[] = [];
     for (const p of paths ?? []) {
       const { bytes, fileTag } = await tagged(p);
@@ -356,22 +394,37 @@ export async function ingestR(o: IngestOptions): Promise<IngestCounts> {
         { text: bytes.toString("utf8"), fileName: fileTag },
         { companyId, now },
       );
-      syncRuns.push(scrub(r.syncRun, `jobber-${spec.name}-csv`, fileTag));
-      out.push({ fileTag, rows: r.rows });
+      const d = dedupe.take(r.rows);
+      duplicatesAcrossFiles += d.dropped;
+      syncRuns.push(
+        noteDuplicates(
+          scrub(r.syncRun, `jobber-${spec.name}-csv`, fileTag),
+          d.dropped,
+        ),
+      );
+      out.push({ fileTag, rows: d.rows });
     }
     return out;
   };
   const reports = {
     jobberExpenses: await readReport(o.jobberExpenses, EXPENSE_REPORT),
     transactions: await readReport(o.transactions, TRANSACTION_LIST),
-    invoices: await readReport(o.invoices, INVOICES_REPORT),
-    quotes: await readReport(o.quotes, QUOTES_REPORT),
+    invoices: await readReport(
+      o.invoices,
+      INVOICES_REPORT,
+      (r) => r.keep.invoice,
+    ),
+    quotes: await readReport(o.quotes, QUOTES_REPORT, (r) => r.keep.quote),
     jobsReports: [
-      ...(await readReport(o.jobsOneOff, JOBS_REPORT)).map((f) => ({
+      ...(
+        await readReport(o.jobsOneOff, JOBS_REPORT, (r) => r.jobs.job?.[0])
+      ).map((f) => ({
         ...f,
         kind: "one_off" as const,
       })),
-      ...(await readReport(o.jobsRecurring, JOBS_REPORT)).map((f) => ({
+      ...(
+        await readReport(o.jobsRecurring, JOBS_REPORT, (r) => r.jobs.job?.[0])
+      ).map((f) => ({
         ...f,
         kind: "recurring" as const,
       })),
@@ -393,14 +446,20 @@ export async function ingestR(o: IngestOptions): Promise<IngestCounts> {
     qboLedger.push({ fileTag, rows: r.rows });
   }
   const venmo = [];
+  const venmoDedupe = new CrossFileDedupe<VenmoRow>((v) => v.id);
   for (const p of o.venmo ?? []) {
     const { bytes, fileTag } = await tagged(p);
     const r = await readVenmoCsv(
       { text: bytes.toString("utf8"), fileName: fileTag },
       { companyId, now },
     );
-    syncRuns.push(scrub(r.syncRun, "venmo-csv", fileTag));
-    venmo.push({ fileTag, rows: r.rows });
+    // overlapping statements: a Venmo transaction id appears once
+    const d = venmoDedupe.take(r.rows);
+    duplicatesAcrossFiles += d.dropped;
+    syncRuns.push(
+      noteDuplicates(scrub(r.syncRun, "venmo-csv", fileTag), d.dropped),
+    );
+    venmo.push({ fileTag, rows: d.rows });
   }
 
   const generatedAt = now();
@@ -429,6 +488,7 @@ export async function ingestR(o: IngestOptions): Promise<IngestCounts> {
     o.diagnose,
   );
   return {
+    duplicatesAcrossFiles,
     workers: bundle.workers.length,
     clients: bundle.clients.length,
     jobs: bundle.jobs.length,
