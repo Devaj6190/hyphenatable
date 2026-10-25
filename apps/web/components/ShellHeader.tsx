@@ -19,13 +19,14 @@ import { cn } from "@/lib/utils";
 export function ShellHeader() {
   const { companyId } = useParams<{ companyId: string }>();
   const company = companies[companyId];
-  // The header names the same cycle as the page under it: Convex's newest on a live page, the fixture's elsewhere.
+  // The header names the same cycle as the page under it: Convex's newest on a live page (every page of a company
+  // with no fixtures), the fixture's elsewhere.
   const pathname = usePathname();
   const live = useLive();
   const liveCycle = useLiveCycle(
     live.status === "ready" &&
       live.ctx.companyKey === companyId &&
-      pageHasLiveCycle(pathname)
+      pageHasLiveCycle(pathname, Boolean(company?.cycle))
       ? live.ctx
       : null,
   );

@@ -1,6 +1,13 @@
 import type { AgentKind } from "@/components/AgentChip";
 import type { Doc } from "@/convex/_generated/dataModel";
-import type { Correction, Flag, Question, SourceSystem } from "@/lib/types";
+import type { Rule } from "@/lib/rules";
+import type {
+  AuditEvent,
+  Correction,
+  Flag,
+  Question,
+  SourceSystem,
+} from "@/lib/types";
 import type { Cycle, FlagInfo } from "@/lib/view-types";
 
 // Convex documents → the shapes the screens already render. Ids stay Convex row ids (strings) so links and
@@ -186,9 +193,50 @@ export function headerCycle(
 }
 
 /**
- * Whether the page under the header reads its cycle from Convex. Only flag detail does today: Home V5 and the
- * manager inbox build their heading on the server from fixtures, so a live header there would name another cycle.
+ * Whether the page under the header reads its cycle from Convex. For a company with fixtures, only flag detail does:
+ * Home V5 and the manager inbox build their heading on the server from fixtures, so a live header there would name
+ * another cycle. A company with no fixture cycle (Company R, whose real data is never committed) has nothing but
+ * Convex to show, so every one of its pages is live.
  */
-export function pageHasLiveCycle(pathname: string): boolean {
-  return /^\/c\/[^/]+\/flags\/[^/]+\/?$/.test(pathname);
+export function pageHasLiveCycle(
+  pathname: string,
+  hasFixtureCycle = true,
+): boolean {
+  return !hasFixtureCycle || /^\/c\/[^/]+\/flags\/[^/]+\/?$/.test(pathname);
+}
+
+/**
+ * One audit event. audit.list does not redact per viewer, and an event's data can carry pay, so the screens only
+ * read it as the owner (see LiveAuditLog). Nothing here adds or drops fields beyond renaming the id.
+ */
+export function toAuditEvent(
+  doc: Doc<"auditEvents">,
+  companyKey: string,
+): AuditEvent {
+  return {
+    id: doc._id,
+    companyId: companyKey,
+    cycleId: doc.cycleId,
+    at: doc.at,
+    actor: doc.actor,
+    type: doc.type,
+    summary: doc.summary,
+    refs: doc.refs,
+    data: doc.data ?? null,
+  };
+}
+
+/** One rule. Its params can hold pay in cents, so rules are only read as the owner (see LiveRules). */
+export function toRule(doc: Doc<"rules">, companyKey: string): Rule {
+  return {
+    id: doc._id,
+    companyId: companyKey,
+    type: doc.type,
+    params: doc.params,
+    status: doc.status,
+    source: doc.source,
+    provenance: doc.provenance,
+    backtest: doc.backtest,
+    confidence: doc.confidence,
+  };
 }

@@ -4,9 +4,11 @@ import { useRef, useState } from "react";
 import { PeopleTab } from "@/components/company/PeopleTab";
 import { ProfileTab } from "@/components/company/ProfileTab";
 import { type DataKind, DataLabel } from "@/components/DataLabel";
+import { LiveRules } from "@/components/LiveRules";
 import { useRole } from "@/components/RoleProvider";
 import { LearnedView } from "@/components/rules/LearnedView";
 import { RulesView } from "@/components/rules/RulesView";
+import { companies } from "@/lib/companies";
 import type { CompanyTab } from "@/lib/routes";
 import { useRuleStore } from "@/lib/ruleStore";
 import { cn } from "@/lib/utils";
@@ -43,6 +45,38 @@ export function CompanyView({
   const refs = useRef<Record<string, HTMLButtonElement | null>>({});
   const rulesOn = store.rules.filter((r) => r.status === "active").length;
   const schedule = data.settings.find((s) => s.id === "schedule")?.text;
+
+  const liveOnly = !companies[companyId]?.cycle;
+  const rulesTab = (r: RulesViewData) => (
+    <div className="flex flex-col gap-10">
+      <RulesView
+        companyId={companyId}
+        dataKind={dataKind}
+        label={label}
+        data={r}
+      />
+      <section
+        aria-labelledby="learned"
+        className="flex flex-col gap-4 border-t pt-8"
+      >
+        <div>
+          <h2 id="learned" className="text-xl font-semibold">
+            What RollPay learned
+          </h2>
+          <p className="text-muted-foreground">
+            Questions per cycle, the rules that changed, and what it learned
+            from.
+          </p>
+        </div>
+        <LearnedView
+          companyId={companyId}
+          dataKind={dataKind}
+          label={label}
+          data={r}
+        />
+      </section>
+    </div>
+  );
 
   const select = (next: CompanyTab) => {
     setTab(next);
@@ -165,36 +199,15 @@ export function CompanyView({
             canEdit={role === "owner" && data.canSeePay}
           />
         )}
-        {tab === "rules" && (
-          <div className="flex flex-col gap-10">
-            <RulesView
-              companyId={companyId}
-              dataKind={dataKind}
-              label={label}
-              data={rules}
-            />
-            <section
-              aria-labelledby="learned"
-              className="flex flex-col gap-4 border-t pt-8"
-            >
-              <div>
-                <h2 id="learned" className="text-xl font-semibold">
-                  What RollPay learned
-                </h2>
-                <p className="text-muted-foreground">
-                  Questions per cycle, the rules that changed, and what it
-                  learned from.
-                </p>
-              </div>
-              <LearnedView
-                companyId={companyId}
-                dataKind={dataKind}
-                label={label}
-                data={rules}
-              />
-            </section>
-          </div>
-        )}
+        {tab === "rules" &&
+          // A company with no fixtures (Company R) reads its rules from Convex; others keep the server's view.
+          (liveOnly ? (
+            <LiveRules companyId={companyId} label={label}>
+              {rulesTab}
+            </LiveRules>
+          ) : (
+            rulesTab(rules)
+          ))}
       </div>
     </div>
   );

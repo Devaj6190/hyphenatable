@@ -8,8 +8,10 @@ import {
   newestCycle,
   pageHasLiveCycle,
   recipientLabel,
+  toAuditEvent,
   toCorrection,
   toFlag,
+  toRule,
 } from "./adapt";
 
 const flagDoc = (over: Record<string, unknown> = {}) =>
@@ -180,5 +182,60 @@ describe("pageHasLiveCycle", () => {
       "/c/a/flags/a-fl-04/edit",
     ])
       expect(pageHasLiveCycle(path)).toBe(false);
+  });
+});
+
+describe("pageHasLiveCycle for a company with no fixtures", () => {
+  test("Company R has no fixture cycle, so every one of its pages names the live cycle", () => {
+    for (const path of ["/c/r", "/c/r/manager", "/c/r/workbook", "/c/r/audit"])
+      expect(pageHasLiveCycle(path, false)).toBe(true);
+  });
+});
+
+describe("toAuditEvent and toRule", () => {
+  test("rename the Convex id and key the row to the dashboard's company, nothing else", () => {
+    const event = toAuditEvent(
+      {
+        _id: "ev1",
+        _creationTime: 0,
+        companyId: "co1",
+        cycleId: null,
+        at: "2026-10-24T10:00:00.000Z",
+        actor: { kind: "agent", id: "auditor", agent: "auditor" },
+        type: "check.flagged",
+        summary: "Flagged an overlap",
+        refs: { flagId: "fl1" },
+        data: null,
+      } as unknown as Doc<"auditEvents">,
+      "r",
+    );
+    expect(event).toMatchObject({ id: "ev1", companyId: "r", data: null });
+    const rule = toRule(
+      {
+        _id: "ru1",
+        _creationTime: 0,
+        companyId: "co1",
+        type: "long_shift_threshold",
+        params: { hours: 11 },
+        status: "active",
+        source: "history",
+        provenance: {
+          lessonId: null,
+          flagId: null,
+          answeredBy: null,
+          approvedBy: null,
+          approvedAt: null,
+          evidence: [],
+        },
+        backtest: null,
+        confidence: 1,
+      } as unknown as Doc<"rules">,
+      "r",
+    );
+    expect(rule).toMatchObject({
+      id: "ru1",
+      companyId: "r",
+      params: { hours: 11 },
+    });
   });
 });

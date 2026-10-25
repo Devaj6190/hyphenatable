@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { AgentOrgChart } from "@/components/AgentOrgChart";
 import { AuditLog } from "@/components/AuditLog";
+import { LiveAuditLog } from "@/components/LiveAuditLog";
 import { PageHeader } from "@/components/PageHeader";
 import { companies } from "@/lib/companies";
 import { auditView, currentViewer, managerIds } from "@/lib/server/fixtures";
@@ -29,6 +30,16 @@ async function Body({
   const { companyId } = await params;
   const company = companies[companyId];
   if (!company) notFound();
+  // A company with no fixtures (Company R, real data never committed) reads its log from Convex.
+  if (!company.cycle)
+    return (
+      <LiveAuditLog
+        dataKind={company.kind}
+        timezone={company.timezone}
+        companyId={companyId}
+        companyLabel={company.label}
+      />
+    );
   const viewer = await currentViewer(companyId);
   const data = auditView(viewer, companyId);
   return (

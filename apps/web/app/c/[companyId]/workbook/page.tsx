@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { LiveWorkbook } from "@/components/LiveWorkbook";
 import { PageHeader } from "@/components/PageHeader";
 import { WorkbookView } from "@/components/workbook/WorkbookView";
 import { companies } from "@/lib/companies";
@@ -20,7 +21,8 @@ async function Workbook({
   params,
 }: Pick<PageProps<"/c/[companyId]/workbook">, "params">) {
   const { companyId } = await params;
-  if (!companies[companyId]) notFound();
+  const company = companies[companyId];
+  if (!company) notFound();
   const data = workbookView(await currentViewer(companyId), companyId);
   if (!data)
     return (
@@ -30,6 +32,15 @@ async function Workbook({
           The workbook shows pay amounts, so only the owner sees it.
         </p>
       </>
+    );
+  // A company with no fixtures (Company R) shows its Stage 1 draft from Convex; the owner-only check above holds.
+  if (!company.cycle)
+    return (
+      <LiveWorkbook
+        companyId={companyId}
+        label={company.label}
+        dataKind={company.kind}
+      />
     );
   return <WorkbookView companyId={companyId} data={data} />;
 }
