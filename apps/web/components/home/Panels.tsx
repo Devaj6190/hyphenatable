@@ -82,7 +82,7 @@ export function StartPanel({
       <section className="relative flex flex-col gap-6 overflow-hidden rounded-[22px] border bg-card p-6 shadow-card sm:p-7">
         <span
           aria-hidden
-          className="pointer-events-none absolute -top-[20%] -right-[6%] hidden h-[140%] w-[42%] bg-sunset opacity-95 [clip-path:polygon(38%_0,100%_0,100%_100%,0_100%)] md:block"
+          className="pointer-events-none absolute -top-[20%] -right-[6%] hidden h-[140%] w-[42%] bg-accent [clip-path:polygon(38%_0,100%_0,100%_100%,0_100%)] md:block"
         />
         <div className="relative flex flex-wrap items-start gap-6 md:max-w-[60%]">
           <div className="flex flex-col gap-1.5">
