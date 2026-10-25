@@ -5,14 +5,14 @@ import type { Check, CheckInput } from "./types";
 /** Categories that legitimately carry no job. Compared trimmed and case-insensitively. */
 const NO_JOB_OK = new Set(["BREAK", "OFFICE", "DRIVING"]);
 
-/** CHK-01 hours_no_job: an entry with no job, no visit, and a category that needs one. */
+/** CHK-01 hours_no_job: an entry with no job, no visit, and a category that needs one (an unknown category is not exempt). */
 export function run(input: CheckInput, _rules: Rule[]): Flag[] {
   return cycleEntries(input)
     .filter(
       (e) =>
         e.jobId === null &&
         e.visitId === null &&
-        !NO_JOB_OK.has(e.category.trim().toUpperCase()),
+        !NO_JOB_OK.has((e.category ?? "").trim().toUpperCase()),
     )
     .map((e) =>
       entryFlag(
