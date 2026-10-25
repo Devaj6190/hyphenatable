@@ -60,6 +60,8 @@ export const R_PRIVATE_DIR = privatePath("r");
 
 export interface IngestOptions {
   privateDir: string;
+  /** --diagnose: label shapes (A/a/9, never the labels) of ledger total rows that close nothing */
+  diagnose?: (line: string) => void;
   companyId?: string;
   timezone: string;
   timesheets: string[];
@@ -355,7 +357,11 @@ export async function ingestR(o: IngestOptions): Promise<IngestCounts> {
     const { bytes, fileTag } = await tagged(p);
     const r = await readQboTransactionDetailXlsx(
       { bytes: new Uint8Array(bytes), fileName: fileTag },
-      { companyId, now },
+      {
+        companyId,
+        now,
+        diagnose: o.diagnose && ((l) => o.diagnose?.(`${fileTag} ${l}`)),
+      },
     );
     syncRuns.push(scrub(r.syncRun, "qbo-transaction-detail", fileTag));
     qboLedger.push({ fileTag, rows: r.rows });
@@ -529,6 +535,7 @@ if (import.meta.main) {
       "qbo-ledger": { type: "string", multiple: true },
       venmo: { type: "string", multiple: true },
       "dry-run": { type: "boolean" },
+      diagnose: { type: "boolean" },
     },
   });
   const source = values.source ?? "exports";
@@ -538,7 +545,7 @@ if (import.meta.main) {
     (source === "jobber-api" && (!values.from || !values.to))
   ) {
     console.error(
-      "usage: ingest-r.ts --tz <IANA> [--timesheets data/private/r/x.xlsx ...] [--journal data/private/r/y.csv ...] [--qbo data/private/r/z.zip ...] [--expenses|--transactions|--invoices|--quotes|--jobs-one-off|--jobs-recurring data/private/r/<report>.csv ...] [--dry-run]",
+      "usage: ingest-r.ts --tz <IANA> [--timesheets data/private/r/x.xlsx ...] [--journal data/private/r/y.csv ...] [--qbo data/private/r/z.zip ...] [--expenses|--transactions|--invoices|--quotes|--jobs-one-off|--jobs-recurring data/private/r/<report>.csv ...] [--qbo-ledger data/private/r/<tda>.xlsx ...] [--venmo data/private/r/<statement>.csv ...] [--dry-run] [--diagnose]",
     );
     console.error(
       "       ingest-r.ts --source jobber-api --tz <IANA> --from YYYY-MM-DD --to YYYY-MM-DD [--dry-run]",
@@ -569,6 +576,9 @@ if (import.meta.main) {
           qboLedger: values["qbo-ledger"] ?? [],
           venmo: values.venmo ?? [],
           dryRun: values["dry-run"],
+          diagnose: values.diagnose
+            ? (l: string) => console.error(`diagnose qbo-ledger ${l}`)
+            : undefined,
         });
   job
     .then((c) => {

@@ -175,6 +175,12 @@ describe("Invoices, Quotes and Jobs reports", () => {
       names: { salesperson: "Jordan Ellis", client: "Brookside Dental" },
     });
     expect(JSON.stringify(r)).not.toContain("Spring cleanup at");
+    // "Tax (%)" is never the tax column (it carries a jurisdiction word); "-" is an empty cell
+    expect(r.rows[1]).toMatchObject({
+      dates: { paid: null },
+      money: { subtotal: 60000, tax: 0, total: 60000 },
+    });
+    expect(JSON.stringify(r)).not.toContain("Fakecounty");
   });
 
   it("quotes and jobs reconcile with their Report totals", async () => {
@@ -182,7 +188,7 @@ describe("Invoices, Quotes and Jobs reports", () => {
     expect(q.syncRun).toMatchObject({ pulled: 2, complete: true });
     expect(q.rows[1]).toMatchObject({
       keep: { quote: "89", status: "Draft" },
-      dates: { sent: null },
+      dates: { sent: null, approved: null, converted: null },
       money: { total: 90000 },
       jobs: { job: [] },
     });
@@ -201,6 +207,7 @@ describe("Invoices, Quotes and Jobs reports", () => {
     ]);
     const rec = await read(JOBS_REPORT, RECURRING_JOBS_CSV);
     expect(rec.syncRun).toMatchObject({ pulled: 1, complete: true });
+    expect(rec.rows[0]?.dates.closed).toBeNull();
     const bad = await read(
       JOBS_REPORT,
       RECURRING_JOBS_CSV.replace('"$3,200.00",Active', '"$3,100.00",Active'),

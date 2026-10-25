@@ -22,28 +22,29 @@ export const TRANSACTION_LIST_CSV = [
 ].join("\n");
 
 export const INVOICES_REPORT_CSV = [
-  "Invoice #,Client name,Job #,Created date,Issued date,Due date,Marked paid date,Salesperson,Subtotal $,Tax $,Total $,Balance $,Status,Subject",
-  '1042,Brookside Dental,#527,"Sep 20, 2026","Sep 21, 2026","Oct 5, 2026","Sep 25, 2026 4:12 PM",Jordan Ellis,"$1,200.00",$50.40,"$1,250.40",$0.00,Paid,Spring cleanup at Brookside',
-  '1043,Maple Grove HOA,#530,"Sep 28, 2026","Sep 29, 2026","Oct 13, 2026",,Avery Reed,$600.00,$0.00,$600.00,$600.00,Awaiting payment,Mulch install',
-  'Report totals:,,,,,,,,"$1,800.00",$50.40,"$1,850.40",$600.00,,',
+  // real header shapes: "Tax (%)" (a rate with a jurisdiction word) sits before "Tax amount ($)"; "-" is empty
+  "Invoice #,Client name,Job #,Created date,Issued date,Due date,Marked paid date,Salesperson,Pre-tax total ($),Tax (%),Tax amount ($),Total ($),Balance ($),Status,Subject",
+  '1042,Brookside Dental,#527,"Sep 20, 2026","Sep 21, 2026","Oct 05, 2026","Sep 25, 2026 4:12 PM",Jordan Ellis,"$1,200.00",Fakecounty (4.2%),$50.40,"$1,250.40",$0.00,Paid,Spring cleanup at Brookside',
+  '1043,Maple Grove HOA,#530,"Sep 28, 2026","Sep 29, 2026","Oct 13, 2026",-,Avery Reed,$600.00,-,$0.00,$600.00,$600.00,Awaiting payment,Mulch install',
+  'Report totals:,,,,,,,,"$1,800.00",,$50.40,"$1,850.40",$600.00,,',
 ].join("\n");
 
 export const QUOTES_REPORT_CSV = [
   "Quote #,Client name,Salesperson,Drafted date,Sent date,Approved date,Converted date,Total $,Status,Job #,Title",
   '88,Brookside Dental,Jordan Ellis,"Sep 1, 2026","Sep 2, 2026","Sep 5, 2026","Sep 6, 2026","$1,250.40",Converted,#527,Spring cleanup',
-  '89,Maple Grove HOA,Avery Reed,"Sep 25, 2026",,,,$900.00,Draft,,Hedge trim',
+  '89,Maple Grove HOA,Avery Reed,"Sep 25, 2026",-,-,–,$900.00,Draft,,Hedge trim',
   'Report totals:,,,,,,,"$2,150.40",,,',
 ].join("\n");
 
 export const ONE_OFF_JOBS_CSV = [
   "Job #,Client name,Title,Created date,Start date,End date,Closed date,Total $,Status,Salesperson",
   '527,Brookside Dental,Spring cleanup,"Sep 5, 2026","Sep 21, 2026","Sep 22, 2026","Sep 25, 2026","$1,250.40",Archived,Jordan Ellis',
-  '530,Maple Grove HOA,Mulch install,"Sep 27, 2026","Sep 29, 2026",,,$600.00,Requires invoicing,Avery Reed',
+  '530,Maple Grove HOA,Mulch install,"Sep 27, 2026","Sep 29, 2026",-,-,$600.00,Requires invoicing,Avery Reed',
   'Report totals:,,,,,,,"$1,850.40",,',
 ].join("\n");
 
 export const RECURRING_JOBS_CSV = [
-  "Job #,Client name,Title,Created date,Start date,End date,Total $,Status",
-  '512,Maple Grove HOA,Weekly lawn care,"Jun 1, 2026","Jun 15, 2026","Oct 31, 2026","$3,200.00",Active',
-  'Report totals:,,,,,,"$3,200.00",',
+  "Job #,Client name,Title,Created date,Start date,End date,Closed date,Total $,Status",
+  '512,Maple Grove HOA,Weekly lawn care,"Jun 1, 2026","Jun 15, 2026","Oct 31, 2026",-,"$3,200.00",Active',
+  'Report totals:,,,,,,,"$3,200.00",',
 ].join("\n");

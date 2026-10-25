@@ -118,8 +118,12 @@ export async function readJobberReportCsv<K extends string>(
   }
 
   const { headerRow, cols } = header;
-  const at = (row: Cell[], k: K) =>
-    cols[k] === undefined ? null : text(row[cols[k] as number] ?? null);
+  // Jobber writes "-" for an empty cell (a date never set): that is null, not unreadable
+  const at = (row: Cell[], k: K) => {
+    const v =
+      cols[k] === undefined ? null : text(row[cols[k] as number] ?? null);
+    return v !== null && EMPTY.test(v) ? null : v;
+  };
   const rows: ReportRow<K>[] = [];
   let dataRows = 0;
   let sum = 0;
@@ -248,6 +252,8 @@ export const TRANSACTION_LIST = {
   names: ["client"],
 } satisfies ReportSpec<"client" | "date" | "type" | "total" | "method" | "job">;
 
+const EMPTY = /^[-–—]$/;
+
 export const INVOICES_REPORT = {
   name: "invoices-report",
   object: "jobberInvoices",
@@ -260,8 +266,10 @@ export const INVOICES_REPORT = {
     due: ["Due date", "Due"],
     paid: ["Marked paid date", "Paid date", "Marked paid", "Paid on"],
     salesperson: ["Salesperson"],
-    subtotal: ["Subtotal $", "Subtotal"],
-    tax: ["Tax $", "Tax amount", "Tax"],
+    // never "Tax (%)" (a rate with a jurisdiction word: free text, not read). Headers normalize to
+    // letters and digits, so "Tax ($)" and "Tax (%)" look alike: only "Tax amount" is accepted.
+    subtotal: ["Pre-tax total ($)", "Subtotal $", "Subtotal"],
+    tax: ["Tax amount ($)", "Tax amount"],
     total: ["Total $", "Total", "Invoice total"],
     balance: ["Balance $", "Balance", "Balance owing"],
     deposit: ["Deposit $", "Deposit"],

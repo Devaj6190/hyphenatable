@@ -72,6 +72,85 @@ describe("QBO Transaction Detail by Account", () => {
   });
 });
 
+describe("QBO TDA total-row matching", () => {
+  const H = TDA_ROWS[4] as (string | number | Date | null)[];
+  const line = (n: string, amount: number) => [
+    null,
+    new Date(Date.UTC(2026, 8, 21)),
+    "Expense",
+    null,
+    n,
+    null,
+    "Fakebank Checking",
+    amount,
+    null,
+  ];
+  const tot = (label: string, amount: number) => [
+    label,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    amount,
+  ];
+  const VARIANTS = [
+    ["Fake Landscaping Co"],
+    [],
+    H,
+    ["6000 Payroll expenses"],
+    ["Payroll expenses:Manager pay"],
+    line("Hollis Supply", 500),
+    tot("Total for Manager pay", 500),
+    ["Wages (deleted)"],
+    line("Hollis Supply", 250),
+    tot("Total for Wages", 250),
+    tot("Total for Payroll expenses with sub-accounts", 750),
+    ["Cost of goods sold"],
+    ["Off Site Fakeword"],
+    line("Hollis Supply", 100),
+    tot("Total for Cost of goods sold", 100),
+    tot("TOTAL", 850),
+  ];
+
+  it("matches totals by leaf or full path, ignoring number prefixes, (deleted) and 'with sub-accounts'; a parent total closes open children", async () => {
+    const r = await readQboTransactionDetailXlsx(
+      { bytes: await tdaWorkbook(VARIANTS), fileName: "t.xlsx" },
+      opts,
+    );
+    expect(r.syncRun.error).toBeNull();
+    expect(r.syncRun.complete).toBe(true);
+    expect(r.rows.map((x) => x.accountName)).toEqual([
+      "Payroll expenses:Manager pay",
+      "Wages (deleted)",
+      "Off Site Fakeword",
+    ]);
+  });
+
+  it("--diagnose prints label shapes only for a total that closes nothing and for groups never closed", async () => {
+    const lines: string[] = [];
+    const rows = [
+      ...VARIANTS.slice(0, 11),
+      tot("Total for Nothing Here 12", 0),
+      ["Unclosed Fakegroup"],
+      line("Hollis Supply", 100),
+      tot("TOTAL", 850),
+    ];
+    const r = await readQboTransactionDetailXlsx(
+      { bytes: await tdaWorkbook(rows), fileName: "t.xlsx" },
+      { ...opts, diagnose: (l) => lines.push(l) },
+    );
+    expect(r.syncRun.complete).toBe(false);
+    expect(lines).toEqual([
+      'sheet 1 row 12: starts with "Total for": yes; label "Aaaaa aaa Aaaaaaa Aaaa 99"; open: (none)',
+      'sheet 1 groups never closed: row 13 "Aaaaaaaa Aaaaaaaaa"',
+    ]);
+    for (const w of ["Nothing", "Unclosed", "Fakegroup"])
+      expect(lines.join()).not.toContain(w);
+  });
+});
+
 describe("Venmo statement CSV", () => {
   it("keeps transactions only, in UTC cents with direction; the note becomes a class", async () => {
     const r = await readVenmoCsv({ text: VENMO_CSV, fileName: "v.csv" }, opts);
