@@ -20,3 +20,4 @@ __pycache__/
 # Tool state
 .claude/settings.local.json
 .claude/worktrees/
+.vercel

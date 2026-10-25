@@ -85,7 +85,7 @@ TypeScript, Bun, Next.js, React, Tailwind CSS, shadcn/ui, Convex, Creao, Claude 
 ## Try it out
 - GitHub repo: https://github.com/Devaj6190/hyphenatable **[TODO: it is private; follow the organizers' instructions to grant judges access, and check `data/private/` and `.env` are absent]**
 - Demo video: **[TODO: YouTube unlisted link, under 3:00, opens on the moment]**
-- Live app: **[TODO: Vercel URL, or say the live demo is at the table]**
+- Live app: https://payrollpilot.vercel.app (demo mode, synthetic Company A; owner home `/c/a`, manager inbox on a phone `/c/a/manager`)
 
 ## Media
 - Project image, 1280×720 PNG: the owner home at cycle 2 with one FlagCard showing `rule: certain` and a precedent, the phone with the text overlaid bottom-right, the label chips visible, "Rollpay" top-left. Exported from the real UI, fake names only. **[TODO: export after G3]**
