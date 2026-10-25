@@ -158,3 +158,18 @@ Jobber has no API to create time entries. Every hour in Company A comes from the
 ### Retitle (street-name fix)
 
 Five a-c04 records used to have "undefined" as the street, because the past-street pool ran out: jobs a-j28..a-j32 and the Jobber expense a-ex-4006 ("Dump fee - …"). `lib/names.ts` now has `STREETS_OVERFLOW`, taken in order once the pool is empty, so only those titles changed and every id is the same. They are already in the Jobber trial, so `bun run seed/push-jobber.ts --company a --live --retitle`, run from the main checkout against the allowlisted account, renames them. It checks that `jobEdit`/`expenseEdit` exist and edits only the titles of mapped jobs and expenses that differ from the fixtures; nothing else changes and nothing is created.
+
+## Company R package: `build-r-package.ts`, `lib/r-package.ts`
+
+`bun run seed/build-r-package.ts [--date YYYY-MM-DD] [--low-margin-pct N --employees-may-be-texted true|false --long-shift-hours N --gross-change-pct N] [--roles data/private/r/roles.json] [--dry-run]` turns ingest-r's anonymized bundles into strict contract tables for `sync.ingestFixture`. It is run by Shanin only, because it reads `data/private/r/`.
+
+- **Writes** `data/private/r/package-<date>/`:
+  - `history/` and `current/`, each holding `<table>.json` plus `company.json`. `current` is `history` plus the unpaid cycle, so load one or the other.
+  - `extras/`: blocked workers, `<table>.unloadable.json`, owner draws.
+  - `MANIFEST.md`, labelled "real, anonymized", with counts, reasons and the check-fixtures output.
+- **Nothing is guessed:**
+  - A worker with no known role (from `m4-rules.json` `workers[].role`, `--roles`, or an owner draw) or no known pay type is blocked. So is any row that references a blocked worker.
+  - Time entries without `approved`/`payable`, which real Jobber exports lack, are unloadable until the contract allows null for them.
+  - Venmo reimbursements are unloadable, because `Expense.source` has no `venmo`.
+  - The company row is written only when every setting is known.
+- **Leak check:** if any word from `data/private/r/real-tokens.txt` appears in any file, the script refuses to write.
