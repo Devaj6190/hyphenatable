@@ -3,6 +3,7 @@ import { precedentFor } from "@payrollpilot/engine/checks/precedent";
 import type { CheckInput } from "@payrollpilot/engine/checks/types";
 import type { Flag } from "@payrollpilot/engine/schemas";
 import { ConvexError, v } from "convex/values";
+import { internal } from "./_generated/api";
 import type { Doc, Id } from "./_generated/dataModel";
 import { mutation } from "./_generated/server";
 import { write } from "./audit";
@@ -125,6 +126,11 @@ export const run = mutation({
 
     const advanced = cycle.stage === "checking";
     if (advanced) await ctx.db.patch(cycleId, { stage: "asking" });
+    // B-08: person-routed flags become draft questions for approval.
+    if (created.length)
+      await ctx.scheduler.runAfter(0, internal.questions.draftForCycle, {
+        cycleId,
+      });
 
     await write(ctx, {
       companyId,
