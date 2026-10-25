@@ -20,7 +20,8 @@
     "typecheck": "tsc --noEmit",
     "jobber": "bun run src/jobber/cli.ts",
     "qbo": "bun run src/qbo/cli.ts",
-    "gusto": "bun run src/gusto/cli.ts"
+    "gusto": "bun run src/gusto/cli.ts",
+    "browser": "bun run src/browser/cli.ts"
   },
   "devDependencies": {
     "@types/bun": "1.3.1",
