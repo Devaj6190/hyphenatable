@@ -103,7 +103,8 @@ Hyphenate's engineers said a few agents that work well together beat a swarm nob
 
 We do not go to seven because a "Preparer" would be arithmetic (that stays in `packages/engine/payroll`), a "Collector" would be HTTP calls (that is `sync/run.ts`), and a "Supervisor" would duplicate the controller, which must stay plain code so that approvals and money never depend on a model's judgment. We do not collapse to one because a single prompt covering history mining, matching and texting would need the whole company in context on every call, would mix Opus-level judgment with Haiku-level parsing, and would make "which agent got this wrong" unanswerable. Three agents, one deterministic engine, one controller.
 
-### 4.3 Agents (`apps/web/convex/agents/`)
+\1**With Creao (see [creao-plan.md](creao-plan.md) section 9):** the Analyst, the Auditor and Messenger drafting run as saved Creao agents that call `/agent/*`; the prompts below become their instructions, and `complete()` runs the same prompts as the fallback. Reply interpretation and lesson classification stay in Convex through `complete()`.
+
 Every call goes through `packages/engine/src/llm/complete.ts`:
 
 ```ts

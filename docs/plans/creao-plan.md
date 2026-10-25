@@ -4,18 +4,26 @@ Replaces the open decisions in [handoff-creao.md](handoff-creao.md). Every platf
 
 **Verdict: GO, gated by a 90-minute spike.** Creao helps us in three concrete ways and has no deal-breaker for how we would use it. If the spike fails, we drop Creao and nothing else in the plan changes.
 
-## 0. Decisions (Sat Oct 24, 15:45 PDT, Devaj)
+## 0. Decisions (updated Sat Oct 24, 18:00 PDT, B)
 
-1. **All three batch agents run on Creao** (Auditor, Messenger, Analyst). The live reply path stays out of Creao.
-2. **Jev is in, for two jobs only** (section 3, "Jev"): scoring entries the checks didn't flag, and mapping free-text replies to a question's options. A Jev result only ever creates a question. It never corrects, blocks or moves money.
-3. **`AGT-01` agent flags.** The Auditor may raise a flag for a vague case, with a reason and evidence ids. It always routes to the owner as a question and never blocks or corrects. This needs a `contract:` PR adding `AGT-01` to the check-id enum.
-4. **Agents are created by a repo script** on the CREAO CLI API (`cr_sk_` key), so they are reproducible. Building them by chatting in the UI is the fallback.
-5. **S0 is done.** Devaj signed up through the hackathon link and gave the email to the booth for Pro Plus.
-6. **`ANTHROPIC_API_KEY` is now fallback only.** Jev handles reply interpretation; Haiku through `complete()` is the backup if Jev is down.
+**Decided by Devaj**
+1. **Creao stays in.** The three batch agents (Auditor, Messenger, Analyst) run as saved Creao agents on Opus 5.5, started by our Convex controller. The live reply path stays in our own code.
+2. **Agents are created by a repo script** on the CREAO CLI API (`cr_sk_` key), so they are reproducible. Building them by chatting in the UI is the fallback.
+3. **S0 is done.** Devaj signed up through the hackathon link and gave the email to the booth for Pro Plus.
+4. **Build to the plan, not to a cut-down version.** Plan fallbacks are used only when a key or service is missing, and each one is labelled in the code and in section 9.
+
+**Defaults B chose (Devaj can change any of them; the code keeps both paths open)**
+5. **Free-text replies are read by Haiku 5.5** through `complete()`, as the original plan says. Numbers, poll votes, `STOP` and clock times are read by code first, with no model. Jev is an optional faster path for the same job (J2), only if a Jev key arrives. Until `ANTHROPIC_API_KEY` is set, free text gets one follow-up and is then held.
+6. **Extra flagging beyond the fixed checks:** the Creao Auditor may raise `AGT-01` agent flags for vague cases, with a reason and evidence ids. They always route to the owner as a question and never block or correct anything. This needs a `contract:` PR adding `AGT-01` to `CheckId`. Jev entry scoring (J1) is optional and comes last: no key yet, and its accuracy figures are the vendor's own.
+
+**Still open (nothing blocks on them)**
+- Jev at all (J1/J2), and its thresholds if used.
+- `creaoRuns` table (a `contract:` PR) vs. run state kept only in `auditEvents`. Default: a `creaoRuns` table, because the UI needs pending/running/done per run.
+- Telling Varnika: the morning brief and run progress need a place in the UI.
 
 ## 1. Why Creao helps us (and only where it does)
 
-1. **It removes our biggest blocker for most agent work.** There is still no `ANTHROPIC_API_KEY` in Convex, so every Claude call is blocked. A Creao agent runs Claude Opus 5.5 on Creao's credits (paid model; the hackathon upgrade covers it). With the batch agents on Creao and reply interpretation on Jev, the Anthropic key becomes a fallback only.
+1. **It removes our biggest blocker for most agent work.** There is still no `ANTHROPIC_API_KEY` in Convex, so every Claude call is blocked. A Creao agent runs Claude Opus 5.5 on Creao's credits (paid model; the hackathon upgrade covers it). With the batch agents on Creao, our own Anthropic key is needed only for reading free-text replies (Haiku), which has a no-model fallback.
 2. **It matches our architecture.** The spec already has three agents (Analyst, Auditor, Messenger) and a plain-code controller. Creao's One-Person Company track asks for "an org chart of agents that hand work to each other", built as "one saved agent per role, coordinated by … an orchestrator via API Trigger". Our Convex controller is that orchestrator.
 3. **It gives us the "runs while you sleep" part for real.** Scheduled runs (every 5 minutes or slower) can run the cycle's checks overnight and have the owner's list ready by morning.
 
@@ -59,7 +67,7 @@ Convex (system of record, controller)                         Creao (agent.creao
 | **Messenger** (question drafter) | Controller, after the Auditor finishes | Open flags routed to people, with worker role and job ids | `QuestionDraft[]` (no money; poll options when 4 or fewer) | `questions` with `status: "draft"`. The owner or manager approves, then the courier sends. |
 | **Analyst** (onboarding + learning) | Controller on onboarding; after answers are corrected | Past cycles, ids only (entries, jobs, past payrolls, answered questions) | `ProposedRules`, `LessonClassification` | `rules` with `status: "proposed"`, which our code backtests. The owner approves. |
 
-### Jev (the TypeSafe AI decision model)
+### Jev (optional; see section 0, items 5 and 6)
 
 Jev answers typed multiple-choice questions with a calibrated probability in about 70–500 ms. It doesn't write text. Cost: about $0.042 per million input tokens. Accuracy figures are the vendor's own; a wrong choice is still possible, which is why a Jev result only ever creates a question.
 
@@ -76,7 +84,7 @@ Jev answers typed multiple-choice questions with a calibrated probability in abo
 - **Reply interpretation (the live path):**
   1. A poll vote or a bare number maps to an option with no model.
   2. `STOP` is handled in code.
-  3. Free text goes to Jev with the question's options; above the threshold it picks one. Below it, or if Jev is down, Haiku through `complete()` tries (when the Anthropic key exists). Otherwise the worker gets a numbered follow-up question.
+  3. Free text goes to Haiku 5.5 through `complete()` with the question and its options (Jev instead, if J2 is turned on). Confidence 0.8 or more applies the answer as a correction proposal; below that, or with no key, the worker gets one follow-up, then the item is held.
 - All pay math, checks, holds, gates, Gusto prepare/update/calculate, the rules and lessons store, and backtests.
 - **The fallback adapter.** The same agent prompts can run through the direct `complete()` adapter (`b/llm-ready`) if Creao is down on demo day. It is a safety net, never pitched.
 
@@ -90,12 +98,12 @@ Jev answers typed multiple-choice questions with a calibrated probability in abo
 | S3 | Controller: `creao.start(agent, cycleId)` action (API Trigger, idempotencyKey), `/creao/webhook` (re-fetch run, dedupe on runId), `creaoRuns` table, progress state for the UI | B | 60 min | A run started from the dashboard shows pending → completed in the audit log |
 | S4 | Auditor proposals: `propose_matches`, `propose_expense_kinds`, morning brief | B | 60 min | Planted CHK-01 entries get proposed matches; under 0.85 becomes ask |
 | S5 | Messenger drafts: `propose_questions` (QuestionDraft, `assertNoMoney`) | B | 45 min | Open routed flags have draft questions waiting for approval |
-| J1 | Jev entry scoring: engine request builder + Convex action; above threshold raises `AGT-01` | B | 45 min | A planted odd entry on a closed job becomes a question |
-| J2 | Jev reply interpretation: options + scrubbed reply → option or follow-up | B | 30 min | "the second one" maps to option 2; a vague reply gets a numbered follow-up |
+| J1 (optional) | Jev entry scoring: engine request builder + Convex action; above threshold raises `AGT-01` | B | 45 min | A planted odd entry on a closed job becomes a question |
+| J2 (optional) | Jev reply interpretation: options + scrubbed reply → option or follow-up | B | 30 min | "the second one" maps to option 2; a vague reply gets a numbered follow-up |
 | S6 | Analyst: `get_history` + `propose_rules` → backtest → proposed rules | B | 90 min | Company A onboarding proposes rules; graded against `rules.json` |
 | S7 | Devpost: agent ids, a run share link, CREAO track selected; demo shows a run in progress and the org chart | C (Varnika) | 20 min | README links work |
 
-**Build order:** S1 → S3 → S4 (with `AGT-01`) → S5 → J2 → J1 → S6. The texting loop (B-08..B-12) is what the demo shows, so J2 goes before S6.
+**Build order:** the texting loop first (B-08 to B-11, it is what the demo shows and needs no Creao), then S3 → S4 (with `AGT-01`) → S5 → S6, then J2 and J1 only if Jev is turned on.
 
 **Cut order (lowest value first):** S6 on Creao (Analyst falls back to the direct adapter, or is cut) → S5 → schedule (manual trigger only). The S2 spike and the Auditor are the minimum that satisfies the Creao rule.
 
@@ -132,5 +140,36 @@ Log the result as a row in `docs/INTEGRATIONS.md`.
 2. In Creao, open Secrets → add `PAYROLLPILOT_KEY` (value: `bunx convex env get MCP_KEY` in `apps/web`; it is the same key until we split them).
 3. Settings → API Keys → create an account `capi_` key, then set it in Convex with `bunx convex env set CREAO_API_KEY <key>`. Don't paste it in chat or the repo.
 4. Create a `cr_sk_` key at developer.creao.ai and keep it local (for example `CREAO_CLI_KEY` in your shell, never in the repo); the agent-creation script reads it from the environment.
-5. Get a Jev key and set it with `bunx convex env set JEV_API_KEY <key>`.
+5. Only if we use Jev: get a key and set it with `bunx convex env set JEV_API_KEY <key>`.
 6. During S2: run the agent script, check the Auditor's default model is Opus 5.5, and add a nightly schedule.
+
+## 9. What Creao changes in the original plan, ticket by ticket
+
+The original plan ran the three agents inside Convex through `complete()`. With Creao, the agents run on Creao's computers and talk to Convex only through `/agent/*`. Everything else is unchanged.
+
+| Ticket | Original plan | With Creao | Unchanged |
+|---|---|---|---|
+| B-03 model adapter | Every agent call goes through `complete()` | Used for reply reading (Haiku) and as the fallback that runs the same agent prompts if Creao is down | Scrubber, schema validation, audit of every call |
+| B-07 matching and the Auditor | Auditor model call for 0.5–0.95 matches inside Convex | The Creao Auditor gets the candidates through `/agent/*` and proposes `MatchDecision`s; it also writes the morning brief and may raise `AGT-01` | Code matches at 0.95 or more with no model; under 0.85 becomes an ask (code downgrades); proposals only |
+| B-08 Messenger drafting | Messenger drafts every question from C's templates | Code fills C's templates for the five template kinds (CHK-01/02/03/04/14). The Creao Messenger drafts `QuestionDraft`s for person-routed flags that have no template | Owner or manager approves every text; no money in texts; one open question per phone |
+| B-09 interpretation | Haiku reads replies | Same (Haiku; Jev optional). Not on Creao: a run takes minutes | `STOP` by code; one follow-up, then held; reminders and expiry |
+| B-10 corrections | Auditor builds `CorrectionProposal` from an interpretation | Code builds the proposal for the five template kinds (the answer maps to one field); the Creao Auditor proposes for the rest | A person approves; pay effect computed by the payroll engine |
+| B-13 Analyst onboarding | Analyst proposes rules from aggregated history in Convex | The Creao Analyst reads aggregates (ids only) through `/agent/*` and proposes `ProposedRules` | Code aggregates first, validates evidence ids, backtests; owner approves |
+| B-14 learning loop | Analyst classifies each lesson | Classification is a short call: runs through `complete()` in Convex (seconds), not a Creao run (minutes) | Lessons, vector search, backtest, separation of duties, active rules feed the next cycle |
+| New: B-19 | — | `/agent/*` API, controller trigger, `/creao/webhook`, run state, agent-creation script | — |
+
+## 10. Implementation status (Sat Oct 24, 18:00 PDT)
+
+| Piece | Status |
+|---|---|
+| Contract (schema, function names) | merged (#15) |
+| Model adapter `complete()` + scrubber (B-03) | PR #75 |
+| Fixed checks CHK-01..12, 23 + `checks.run` (B-06) | PR #76; CHK-13..22 not started |
+| Messages: templates (C-03) | merged (#77); courier app (C-02) still needs a PR to main |
+| Texting backend: drafting, approval, outbox, inbound, reading replies, reminders (B-08/B-09) | in progress on `b/messenger` |
+| Corrections, controller, Gusto draft, sync (B-10/B-11/B-12/B-05) | not started |
+| Learning loop (B-13/B-14) | not started |
+| Creao: `/mcp` and `/agent/*` read tools (S1) | built on `b/creao-mcp` and `b/agent-api`, live on dev, not merged |
+| Creao: controller, webhook, agents (S3–S6) | not started |
+
+Diagram: [creao-architecture.excalidraw](creao-architecture.excalidraw) (open it at excalidraw.com).
