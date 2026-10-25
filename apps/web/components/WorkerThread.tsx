@@ -47,7 +47,7 @@ export function WorkerThread({
             >
               <span>{m.text}</span>
               <span className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                {m.direction === "out" ? "PayrollPilot" : who} ·{" "}
+                {m.direction === "out" ? "RollPay" : who} ·{" "}
                 {formatWhen(m.at, timezone)} · {dataKind}
                 {m.simulated && (
                   <Badge

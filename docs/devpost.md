@@ -9,13 +9,13 @@ Deadlines: draft submitted **Sat 23:00**; final text pasted by **Sun 08:30**; su
 ---
 
 ## Project name
-PayrollPilot
+Rollpay
 
 ## Tagline (elevator pitch)
 It checks the pay before the paycheck.
 
 ## Seats it fills (Hyphenate asks for this line)
-PayrollPilot fills the seat of the person who prepares and checks payroll before it is submitted, and the half-seat of the job manager who answers "whose hours are these?" every other Friday.
+Rollpay fills the seat of the person who prepares and checks payroll before it is submitted, and the half-seat of the job manager who answers "whose hours are these?" every other Friday.
 
 ## Inspiration
 - One of us runs a small service company and does payroll every other Friday. Payroll software does the math right; it assumes the inputs are right. In service businesses they aren't.
@@ -30,21 +30,34 @@ The four pillars, in Hyphenate's words:
 - **Escalates.** When something is missing or contradictory, it holds only that item and texts the right person one short question with numbered options, a confidence and a precedent note. The manager approves every message to an employee before it goes out. Texts never carry pay amounts.
 - **Improves.** Every answer becomes a lesson, is compared with what it already knows, is backtested over past cycles, and becomes a rule only when the owner approves it. The person who answered can't be the one who approves. Cycle 2 asks fewer questions: **[measured at G3]** vs **[measured at G3]**.
 
-The moment: Sam Okafor (a fake worker) has two overlapping entries on the same day. PayrollPilot catches it before the Gusto draft is filled, his manager approves one text, Sam replies, the owner approves the correction in the workbook (never in Jobber), and only Sam's disputed hours were held in the meantime.
+The moment: Sam Okafor (a fake worker) has two overlapping entries on the same day. Rollpay catches it before the Gusto draft is filled, his manager approves one text, Sam replies, the owner approves the correction in the workbook (never in Jobber), and only Sam's disputed hours were held in the meantime.
 
 ## How we built it
 - **Convex** for the database, scheduler, live queries, HTTP actions and vector search, with a **Next.js 16** dashboard (Tailwind, shadcn).
 - A small **Bun** worker (the courier) running Photon's `spectrum-ts` for one-to-one iMessage/SMS, with iMessage polls for tap-to-answer. Phone numbers never leave the courier; Convex only sees a hash.
 - **Jobber GraphQL** (a trial account seeded with our synthetic company), the **Gusto demo API** (draft-only: prepare, update, calculate), and **QuickBooks Online** sandbox **[TODO: confirm once H3 passes]**.
 - A pure TypeScript engine with **23 checks** (CHK-01 to CHK-23), Stage 1 and Stage 2 payroll math, and Vitest tests on every check.
-- Three **Claude** agents over that engine, each returning a validated schema and never acting on its own: **Analyst** (learns rules, backtests), **Auditor** (fuzzy matches and corrections), **Messenger** (drafts questions, interprets replies). Claude Opus 5.5 for judgment, Haiku 5.5 for reply interpretation.
+- Three batch agents on **Creao** over that engine, started by our Convex controller through Creao's API Trigger, each returning a validated schema and never acting on its own: **Analyst** (proposes rules from history, which code backtests), **Auditor** (fuzzy matches, a morning list, vague-case flags that only ever become questions), **Messenger** (drafts questions for person-routed flags). They run on Claude Opus 5.5 and read and write only through our own HTTP API. Creao only ever sees ids. Reading a worker's reply stays in our code: numbers, poll votes and `STOP` by code, free text by Haiku 5.5. Agent ids and the run share link: TODO(S7).
 - Lessons stored with embeddings **[TODO: Voyage or OpenAI, whichever shipped]** and a classifier that marks each new lesson as new, confirmed, superseded or in conflict.
 - An append-only audit log that traces every number to the record, rule or person behind it.
 
 ## What's real, what's simulated, and how we know
-- **Real:** the Jobber trial account (users, clients, properties, jobs, visits, quotes, invoices and expenses, read through the API), the Gusto demo environment (employees, compensations, the current unprocessed payroll), the texts **[TODO: once H4 passes]**, and a real company's past cycles, anonymized at ingest, for the backtest.
-- **Synthetic:** Company A (a 13-person landscaping crew) and Company B, their people, jobs and hours. Time entries and payment records load from fixtures because the Jobber API can't create them; Company A's past payrolls come from fixtures too. Any reply produced by the simulated-manager persona is labelled Simulated. Must match `docs/PROOF.md` section 1.
-- **How we know:** 29 planted errors with an answer key in cycle 1 (covering 22 of the 23 checks): precision **[measured at G3]**, recall **[measured at G3]**. Learned rules graded against the owner's runbook, which the system never saw: **[measured at G3]** (aggregate only). The real company's past cycle matched to the cent: **[measured at G3]**. Full statement in `docs/PROOF.md` **[TODO: link once it exists]**.
+Every number cites `docs/PROOF.md`. "Measured at G3" means not measured yet.
+
+| Item | Real or simulated | Number | Synthetic? | Source |
+|---|---|---|---|---|
+| Jobber trial | real records for users, clients, properties, jobs, visits, quotes, invoices, expenses; time entries and payment records from fixtures (the API cannot create them) | none quoted | Company A is synthetic | PROOF.md section 1 |
+| Gusto demo | employees, compensations and the current unprocessed payroll are real in the demo; past payrolls from fixtures; no submit in the code | none quoted | Company A is synthetic | PROOF.md section 1 |
+| QuickBooks sandbox | real records in our own sandbox | cycle 1 purchases match 6 of 6 | synthetic | PROOF.md section 1 |
+| Company A | seeded landscaping crew | 14 worker records, 12 of them the crew | synthetic | PROOF.md section 2 |
+| Company R | real past timesheets and pay, anonymized at ingest | 283 entries, 188 payroll rows, 8 pay periods | real, anonymized | PROOF.md section 3 |
+| Backtest on Company R | Stage 1 gross vs what was actually paid | 35 of 46 worker pay periods match to the cent; 44 of 46 within $1 | real, anonymized | PROOF.md section 4 |
+| Backtest self-check, Company B | payroll math on four past weekly cycles | 120 of 120 worker-cycles match to the cent | synthetic | PROOF.md section 4 |
+| Planted-error precision and recall, questions in cycle 2 vs cycle 1, rules vs the owner's runbook | not yet measured | measured at G3 | synthetic (Company A) | PROOF.md section 5 |
+| Creao agent runs | real Creao runs once the spike passes; ids only | not yet measured | TODO(S7): agent ids and run share link | `docs/INTEGRATIONS.md` row H9 |
+| Texts | real iMessage through Photon on registered demo phones [TODO: confirm H4 wording at G3]; simulated-manager replies are labelled Simulated | measured at G3 | demo personas are fake | PROOF.md section 1 |
+
+Learned rules are graded against the owner's runbook, which the system never saw (aggregate only). Full statement: `docs/PROOF.md`.
 
 ## Challenges we ran into
 - Inbound texts carry no thread id, so each conversation holds at most one open question, and polls tie votes back to their question.
@@ -67,7 +80,7 @@ The moment: Sam Okafor (a fake worker) has two overlapping entries on the same d
 - **[TODO: anything cut from the plan's stretch list]**
 
 ## Built with
-TypeScript, Bun, Next.js, React, Tailwind CSS, shadcn/ui, Convex, Claude (Anthropic API), Photon Spectrum, Jobber API, Gusto API, QuickBooks Online API, Zod, Vitest, Biome. **[TODO: add Playwright, Voyage AI or OpenAI embeddings, Backboard, Apify only if they shipped]**
+TypeScript, Bun, Next.js, React, Tailwind CSS, shadcn/ui, Convex, Creao, Claude (Anthropic API), Photon Spectrum, Jobber API, Gusto API, QuickBooks Online API, Zod, Vitest, Biome. **[TODO: add Playwright, Voyage AI or OpenAI embeddings, Backboard, Apify only if they shipped]**
 
 ## Try it out
 - GitHub repo: https://github.com/Devaj6190/hyphenatable **[TODO: it is private; follow the organizers' instructions to grant judges access, and check `data/private/` and `.env` are absent]**
@@ -75,7 +88,7 @@ TypeScript, Bun, Next.js, React, Tailwind CSS, shadcn/ui, Convex, Claude (Anthro
 - Live app: **[TODO: Vercel URL, or say the live demo is at the table]**
 
 ## Media
-- Project image, 1280×720 PNG: the owner home at cycle 2 with one FlagCard showing `rule: certain` and a precedent, the phone with the text overlaid bottom-right, the label chips visible, "PayrollPilot" top-left. Exported from the real UI, fake names only. **[TODO: export after G3]**
+- Project image, 1280×720 PNG: the owner home at cycle 2 with one FlagCard showing `rule: certain` and a precedent, the phone with the text overlaid bottom-right, the label chips visible, "Rollpay" top-left. Exported from the real UI, fake names only. **[TODO: export after G3]**
 - Video: as above.
 
 ## Team
@@ -87,6 +100,14 @@ TypeScript, Bun, Next.js, React, Tailwind CSS, shadcn/ui, Convex, Claude (Anthro
 ---
 
 ## Track and sponsor answers
+
+### Creao: Best One-Person Company
+- Track: Best One-Person Company, plus Hyphenate. TODO(S7): check on Devpost whether both can be selected.
+- Three batch agents behind our controller: Auditor, Messenger, Analyst. One saved agent per role, started by our Convex controller through the API Trigger. Proposals only; a person approves everything, and plain code owns the money.
+- Creao only ever sees ids.
+- "Remove the agent, and this product dies. Without the Analyst there are no rules learned from history; without the Auditor, no fuzzy matches or morning list; without the Messenger, no questions. What's left is a calculator."
+- Agent ids: TODO(S7) Auditor, TODO(S7) Messenger, TODO(S7) Analyst. Run share link: TODO(S7).
+- The demo shows a Creao run in progress and the org chart (`docs/DEMO.md`).
 
 ### Hyphenate (main track)
 - Seats line: above.
@@ -111,7 +132,7 @@ TypeScript, Bun, Next.js, React, Tailwind CSS, shadcn/ui, Convex, Claude (Anthro
   - Proposing a rule from a coincidence: backtests over past cycles and owner approval.
   - Following instructions hidden in data: data is never instructions, enforced in code.
   - Leaking pay: the model sees ids only, and texts never carry amounts.
-- Claude does what matters (rule extraction from history, fuzzy matching, question drafting, reply interpretation); code does the money.
+- Claude does what matters (rule extraction from history, fuzzy matching, question drafting, reply interpretation); code does the money. Claude sees ids, never names or phone numbers.
 
 ### Convex
 **[TODO: one paragraph once the backend is built]**: scheduler for reminders and syncs, live queries for the owner home and LiveFeed, vector search for lessons, HTTP actions.
@@ -122,7 +143,7 @@ TypeScript, Bun, Next.js, React, Tailwind CSS, shadcn/ui, Convex, Claude (Anthro
 - Backboard: only if the lessons mirror (B-18) shipped. **[TODO]**
 
 ### Other tracks
-Creao: **[TODO: Devaj reads the restricted criteria doc or asks at the booth]**. Apify: only if the Playwright reader shipped as an Actor. **[TODO]**
+Apify: only if the Playwright reader shipped as an Actor. **[TODO]**
 
 ---
 
@@ -133,6 +154,7 @@ Creao: **[TODO: Devaj reads the restricted criteria doc or asks at the booth]**.
 - [ ] Repo access for judges per the organizers; `data/private/` absent; no `.env`.
 - [ ] Video opens on a phone over cellular.
 - [ ] Hyphenate track selected; the four-pillar text present.
+- [ ] Creao track (Best One-Person Company) selected; agent ids and run share link filled in (TODO(S7)).
 - [ ] MLH categories opted in; Commit Fellowship form submitted.
 - [ ] Final text pasted from this file by 08:30.
 - [ ] Submitted by 08:40; confirmation screen photographed; checked on a second device.

@@ -1,577 +1,272 @@
 "use client";
 
-import { Info } from "lucide-react";
+import { Check, Eye } from "lucide-react";
 import { useState } from "react";
-import { AgentChip } from "@/components/AgentChip";
-import { ConfidenceBadge } from "@/components/ConfidenceBadge";
 import { type DataKind, DataLabel } from "@/components/DataLabel";
-import { PageHeader } from "@/components/PageHeader";
-import { PrecedentBadge } from "@/components/PrecedentBadge";
-import { SourceChip } from "@/components/SourceChip";
-import { type Status, StatusBadge } from "@/components/StatusBadge";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Textarea } from "@/components/ui/textarea";
-import { WorkerThread } from "@/components/WorkerThread";
+import { inboxActions } from "@/components/manager/actions";
+import { InboxItem } from "@/components/manager/InboxItem";
 import {
-  LOCAL_SOURCE,
-  recordLocal,
-  useDemoLocal,
-  withLocal,
-} from "@/lib/demoLocal";
-import { MAX_QUESTION_LEN, questionTextError } from "@/lib/question";
-import { FIXTURE_SOURCE } from "@/lib/sources";
-import { formatWhen } from "@/lib/time";
-import type { Flag, Question } from "@/lib/types";
-import type { ManagerInboxData, ThreadView } from "@/lib/view-types";
+  employeeAnswer,
+  type ItemState,
+  isDone,
+  itemState,
+} from "@/components/manager/inboxState";
+import { useRole } from "@/components/RoleProvider";
+import { SimulatedChip } from "@/components/SimulatedChip";
+import { Button } from "@/components/ui/button";
+import { DEMO_MODE } from "@/lib/demo";
+import { LOCAL_SOURCE, useDemoLocal } from "@/lib/demoLocal";
+import type { ManagerInboxV3, ManagerItem } from "@/lib/view-types/manager";
 
-// What the inbox renders has no pay field at all: dollarsCents is dropped here, before any component sees it.
-type CrewFlag = Omit<Flag, "affects"> & {
-  affects: { workerId: string | null; jobId: string | null };
-};
-function crewView({
-  affects: { dollarsCents: _pay, ...affects },
-  ...f
-}: Flag): CrewFlag {
-  return { ...f, affects };
-}
-
-type Item = {
-  flag: CrewFlag;
-  question: Question | undefined;
-  thread: ThreadView;
-  name: (workerId: string) => string;
-  /** True when this browser changed the question (approved, denied, answered); nothing is saved to Convex. */
-  local: boolean;
-};
-
-// The worker thread, or nothing when no text has gone back and forth yet.
-function Replies({
-  thread,
-  dataKind,
-  timezone,
-}: {
-  thread: ThreadView;
-  dataKind: DataKind;
-  timezone: string;
-}) {
-  if (thread.messages.length === 0) return null;
-  return (
-    <WorkerThread
-      thread={thread}
-      title="Replies"
-      dataKind={dataKind}
-      timezone={timezone}
-    />
-  );
-}
-
-const OPEN_TO_MANAGER: Question["status"][] = ["sent", "reminded"];
-
-// The manager's view, whoever is switched in. The server already picked the crew's flags and removed pay;
-// crewView drops the pay field from the type as a second guard.
+// The manager's inbox (V3), whoever is switched in. Two groups: "Fix in Jobber" (edit there, then I updated
+// it → checking → fixed or still wrong) and "Quick answers" (one tap). The server built every item from the
+// crew's manager-routed flags with pay removed; this component only renders and records taps.
 export function ManagerInbox({
   data,
   dataKind,
-  timezone: tz,
+  timezone,
   companyLabel,
-  manager,
-  names,
 }: {
-  data: ManagerInboxData;
+  data: ManagerInboxV3;
   dataKind: DataKind;
   timezone: string;
   companyLabel: string;
-  manager: { id: string; displayName: string } | null;
-  names: Record<string, string>;
 }) {
+  const { role } = useRole();
   const local = useDemoLocal();
-  const firstName = manager?.displayName.split(" ")[0];
-  const name = (id: string) => names[id] ?? id;
+  const events = local.events.filter((e) => e.companyId === data.companyId);
+  const states = new Map<string, ItemState>(
+    data.items.map((i) => [i.flagId, itemState(i.flagId, events)]),
+  );
+  const stateOf = (i: ManagerItem) =>
+    states.get(i.flagId) ?? ({ st: "open" } as const);
 
-  // Server thread plus replies recorded in this browser (demo panel, answers given here), oldest first.
-  const items: Item[] = [...data.needsOk, ...data.rest].map((i) => {
-    const qid = i.question?.id;
-    return {
-      flag: crewView(i.flag),
-      question: i.question ? withLocal(i.question, local) : undefined,
-      thread: {
-        workerName:
-          i.thread?.workerName ??
-          i.recipientName ??
-          (i.question ? name(i.question.toWorkerId) : "Reply"),
-        messages: [
-          ...(i.thread?.messages ?? []),
-          ...local.messages.filter((m) => m.questionId === qid),
-        ].sort((a, b) => a.at.localeCompare(b.at)),
-      },
-      name,
-      local: qid !== undefined && qid in local.questions,
-    };
+  const owner = data.owner?.firstName ?? "the owner";
+  const manager = data.manager?.firstName;
+  const actions = inboxActions({
+    companyId: data.companyId,
+    cycleId: data.cycleId,
+    managerId: data.manager?.id ?? "manager",
+    ownerName: owner,
   });
 
-  const needsYou = items.filter(({ question: q }) =>
-    q?.toRole === "employee"
-      ? q.status === "draft"
-      : q?.toRole === "manager" && OPEN_TO_MANAGER.includes(q.status),
-  );
-  const answered = items.filter((i) => i.question?.status === "answered");
-  const waiting = items.filter(
-    (i) => !needsYou.includes(i) && !answered.includes(i),
-  );
+  const open = data.items.filter((i) => !isDone(stateOf(i)));
+  const done = data.items.filter((i) => isDone(stateOf(i)));
+  const fixes = open.filter((i) => i.kind === "fix");
+  const answers = open.filter((i) => i.kind === "answer");
+  const total = data.items.length;
+  const left = open.length;
 
-  const n = needsYou.length;
-  const localCount = items.filter((i) => i.local).length;
-  const title =
-    n === 0
-      ? `${firstName ? `${firstName}, n` : "N"}othing needs you right now`
-      : `${firstName ? `${firstName}, ` : ""}${n} ${n === 1 ? "thing needs" : "things need"} you`;
-  const actor = {
-    kind: "user" as const,
-    id: manager?.id ?? "manager",
-    agent: null,
+  // One item open at a time. After a send, the next item that is not mid-check opens.
+  const [openId, setOpenId] = useState<string | null>(
+    () => open[0]?.flagId ?? null,
+  );
+  const nextAfter = (id: string) =>
+    open.find((i) => i.flagId !== id && stateOf(i).st !== "checking")?.flagId ??
+    null;
+
+  // The open item just finished (a re-check came back fixed): move on to the next one.
+  if (openId !== null && done.some((i) => i.flagId === openId))
+    setOpenId(nextAfter(openId));
+
+  const groups = [
+    {
+      key: "fix",
+      title: "Fix in Jobber",
+      sub: "Edit, then tap I updated it",
+      items: fixes,
+    },
+    {
+      key: "answer",
+      title: "Quick answers",
+      sub: "One tap, nothing to edit",
+      items: answers,
+    },
+  ].filter((g) => g.items.length > 0);
+
+  const result = (i: ManagerItem) => {
+    const s = stateOf(i);
+    if (s.st === "fixed") return `Fixed in Jobber · ${i.checkId} re-checked`;
+    if (s.st === "answered")
+      return i.kind === "fix"
+        ? `Answer sent to ${owner}: ${i.options[s.option]}`
+        : `Answered: ${i.options[s.option]}`;
+    return "";
   };
 
   return (
-    <div className="mx-auto flex max-w-2xl flex-col">
-      <PageHeader
-        title={title}
-        description="Answer here or by text. Hours and jobs only; pay is never shown to managers."
-      />
-      <div className="-mt-3 mb-5 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-        <DataLabel kind={dataKind} detail={companyLabel} />
-        <span>
-          Your crew · Source: {FIXTURE_SOURCE}
-          {localCount > 0 &&
-            `. ${localCount} counted here changed in the demo, ${LOCAL_SOURCE}`}
-        </span>
-      </div>
-
-      <Tabs defaultValue="inbox" className="gap-5">
-        <TabsList className="self-start">
-          <TabsTrigger value="inbox">Inbox · {n}</TabsTrigger>
-          <TabsTrigger value="answered">
-            Answered · {answered.length}
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="inbox" className="flex flex-col gap-4">
-          {needsYou.map((i) =>
-            i.question?.toRole === "employee" ? (
-              <ApproveText
-                key={i.flag.id}
-                item={i}
-                question={i.question}
-                onDecide={(status, text) => {
-                  const who = name(i.question?.toWorkerId ?? "");
-                  const edited = text !== i.question?.text;
-                  recordLocal({
-                    event: {
-                      companyId: i.flag.companyId,
-                      cycleId: i.flag.cycleId,
-                      actor,
-                      type:
-                        status === "approved"
-                          ? "message.approved"
-                          : "message.denied",
-                      summary:
-                        status === "approved"
-                          ? `Manager ${edited ? "edited and approved" : "approved"} the text to ${who}.`
-                          : `Manager denied the text to ${who}. Nothing was sent.`,
-                      refs: {
-                        flagId: i.flag.id,
-                        questionId: i.question?.id ?? "",
-                      },
-                      data: { source: `Manager inbox, ${LOCAL_SOURCE}` },
-                    },
-                    question: {
-                      id: i.question?.id ?? "",
-                      status,
-                      text,
-                    },
-                  });
-                }}
-              />
-            ) : (
-              <AnswerQuestion
-                key={i.flag.id}
-                item={i}
-                question={i.question as Question}
-                timeZone={tz}
-                onAnswer={(answer) => {
-                  const q = i.question as Question;
-                  recordLocal({
-                    event: {
-                      companyId: i.flag.companyId,
-                      cycleId: i.flag.cycleId,
-                      actor,
-                      type: "message.received",
-                      summary: `Manager answered in the inbox: ${answer}.`,
-                      refs: { flagId: i.flag.id, questionId: q.id },
-                      data: { source: `Manager inbox, ${LOCAL_SOURCE}` },
-                    },
-                    message: {
-                      questionId: q.id,
-                      workerId: q.toWorkerId,
-                      direction: "in",
-                      text: answer,
-                      kind: "text",
-                    },
-                    question: { id: q.id, status: "answered" },
-                  });
-                }}
-              />
-            ),
-          )}
-          {n === 0 && (
-            <p className="rounded-card border border-dashed px-5 py-8 text-center text-muted-foreground">
-              Nothing to approve or answer. New questions show up here and by
-              text.
-            </p>
-          )}
-
-          {waiting.length > 0 && (
-            <section className="mt-4 flex flex-col gap-3">
-              <h2 className="text-lg font-semibold">Waiting</h2>
-              {waiting.map((i) => (
-                <Waiting
-                  key={i.flag.id}
-                  item={i}
-                  dataKind={dataKind}
-                  timeZone={tz}
-                />
-              ))}
-            </section>
-          )}
-
-          <HowItWorks />
-        </TabsContent>
-
-        <TabsContent value="answered" className="flex flex-col gap-4">
-          {answered.map((i) => (
-            <ItemCard
-              key={i.flag.id}
-              item={i}
-              status="closed"
-              statusLabel="Answered"
-            >
-              <Replies thread={i.thread} dataKind={dataKind} timezone={tz} />
-              <p className="text-sm text-muted-foreground">
-                The owner approves any change this answer makes.
-              </p>
-            </ItemCard>
-          ))}
-          {answered.length === 0 && (
-            <p className="rounded-card border border-dashed px-5 py-8 text-center text-muted-foreground">
-              No answers yet this cycle.
-            </p>
-          )}
-        </TabsContent>
-      </Tabs>
-    </div>
-  );
-}
-
-// Shared frame: status, agents, headline, then who / job / where it came from. No money anywhere.
-function ItemCard({
-  item: { flag, question, name, local },
-  status,
-  statusLabel,
-  eyebrow,
-  children,
-}: {
-  item: Item;
-  status: Status;
-  statusLabel?: string;
-  eyebrow?: string;
-  children?: React.ReactNode;
-}) {
-  return (
-    <Card className="gap-4 px-(--card-spacing)">
-      <div className="flex flex-wrap items-center gap-2">
-        <StatusBadge status={status} label={statusLabel} />
-        {eyebrow && (
-          <span className="text-sm font-medium text-muted-foreground">
-            {eyebrow}
+    <div className="mx-auto flex w-full max-w-xl flex-col gap-5">
+      {role === "owner" && (
+        <p className="flex items-start gap-2 rounded-card border border-dashed bg-card px-4 py-3 text-sm">
+          <Eye aria-hidden className="mt-0.5 size-4 shrink-0 text-link" />
+          <span>
+            You are seeing {manager ? `${manager}'s` : "the manager's"} inbox.{" "}
+            {manager ?? "The manager"} sees hours, jobs and record ids here,
+            never pay.
           </span>
-        )}
-      </div>
-      <div className="flex flex-col gap-2">
-        <h3 className="text-lg leading-snug font-semibold">{flag.seen}</h3>
-        <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
-          {[
-            flag.affects.workerId && name(flag.affects.workerId),
-            flag.affects.jobId && `Job ${flag.affects.jobId}`,
-          ]
-            .filter(Boolean)
-            .join(" · ")}
-          {flag.where.map((w) => (
-            <SourceChip
-              key={`${w.system}-${w.recordId}`}
-              system={w.system}
-              recordId={w.recordId}
-              url={w.url}
-            />
-          ))}
-        </p>
-        <div className="flex flex-wrap items-center gap-1.5">
-          <ConfidenceBadge confidence={flag.confidence} />
-          <PrecedentBadge
-            precedent={flag.precedent}
-            companyId={flag.companyId}
-          />
-          {question?.toRole === "employee" && (
-            <AgentChip agent="messenger" label="Drafted by Messenger" />
-          )}
-        </div>
-      </div>
-      {children}
-      {local && (
-        <p className="text-xs font-medium text-muted-foreground">
-          Demo change, {LOCAL_SOURCE}
         </p>
       )}
-    </Card>
-  );
-}
 
-function ApproveText({
-  item,
-  question,
-  onDecide,
-}: {
-  item: Item;
-  question: Question;
-  onDecide: (status: "approved" | "denied", text: string) => void;
-}) {
-  const [text, setText] = useState(question.text);
-  const [editing, setEditing] = useState(false);
-  const [draft, setDraft] = useState(question.text);
-  const error = questionTextError(editing ? draft : text);
-  const who = item.name(question.toWorkerId);
-  const first = who.split(" ")[0];
-
-  return (
-    <ItemCard
-      item={item}
-      status="needs-you"
-      statusLabel="Needs your OK"
-      eyebrow="Approve a text to your crew"
-    >
-      <div className="flex flex-col gap-2 rounded-control bg-muted/60 p-4">
-        <p className="text-xs font-medium text-muted-foreground">
-          To {who} · crew · {question.kind === "poll" ? "poll" : "text"}
-        </p>
-        {editing ? (
-          <>
-            <Textarea
-              value={draft}
-              onChange={(e) => setDraft(e.target.value)}
-              rows={4}
-              aria-label={`Text to ${who}`}
-              aria-invalid={error !== null}
-              aria-describedby={`${question.id}-hint`}
-              className="bg-card"
-            />
-            <p
-              id={`${question.id}-hint`}
-              className="flex justify-between text-sm"
+      <section className="flex flex-col gap-2.5">
+        <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+          <DataLabel kind={dataKind} detail={companyLabel} />
+          {manager && (
+            <span>
+              {manager} · manager
+              {data.period && ` · payroll ${data.period}`}
+            </span>
+          )}
+        </div>
+        <h1 className="text-[1.5625rem] leading-tight font-bold tracking-[-0.02em]">
+          {total === 0
+            ? "Nothing to check right now"
+            : left === 0
+              ? "All checked"
+              : `${left} ${left === 1 ? "thing" : "things"} to check before payroll`}
+        </h1>
+        {total > 0 && (
+          <p className="text-sm leading-relaxed text-muted-foreground">
+            {owner === "the owner" ? "The owner" : owner} sent you these before
+            payroll. Fix the Jobber ones in Jobber and tap{" "}
+            <b className="text-foreground">I updated it</b>;{" "}
+            {DEMO_MODE
+              ? "we check again right away."
+              : "the next Jobber sync checks again."}{" "}
+            The quick ones just need a tap.
+          </p>
+        )}
+        {total > 0 && (
+          <div className="flex items-center gap-2.5">
+            <span
+              role="progressbar"
+              aria-label="Items done"
+              aria-valuemin={0}
+              aria-valuemax={total}
+              aria-valuenow={done.length}
+              className="block h-2 flex-1 overflow-hidden rounded bg-border"
             >
               <span
-                className={error ? "text-destructive" : "text-muted-foreground"}
-              >
-                {error ?? "Looks good."}
-              </span>
-              <span className="text-muted-foreground tabular-nums">
-                {draft.length}/{MAX_QUESTION_LEN}
-              </span>
-            </p>
-          </>
-        ) : (
-          <p className="text-[0.9375rem]">{text}</p>
+                className="block h-full rounded bg-sunset transition-[width] duration-(--dur-archive) ease-out-soft"
+                style={{ width: `${Math.round((done.length / total) * 100)}%` }}
+              />
+            </span>
+            <span className="text-[0.8125rem] font-bold tabular-nums">
+              {done.length} of {total} done
+            </span>
+          </div>
         )}
-        {question.options && (
-          <ol className="flex flex-wrap gap-1.5 text-sm">
-            {question.options.map((o, i) => (
-              <li
-                key={o}
-                className="rounded-full border border-input bg-card px-2.5 py-0.5"
-              >
-                {i + 1} · {o}
-              </li>
-            ))}
-          </ol>
-        )}
-      </div>
+      </section>
 
-      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
-        {editing ? (
-          <>
-            <Button
-              size="lg"
-              disabled={error !== null}
-              onClick={() => {
-                setText(draft);
-                setEditing(false);
-              }}
-            >
-              Save text
-            </Button>
-            <Button
-              size="lg"
-              variant="secondary"
-              onClick={() => {
-                setDraft(text);
-                setEditing(false);
-              }}
-            >
-              Cancel
-            </Button>
-          </>
-        ) : (
-          <>
-            <Button
-              size="lg"
-              disabled={error !== null}
-              onClick={() => onDecide("approved", text)}
-            >
-              Approve and send
-            </Button>
-            <Button
-              size="lg"
-              variant="secondary"
-              onClick={() => setEditing(true)}
-            >
-              Edit
-            </Button>
-            <Button
-              size="lg"
-              variant="quiet"
-              onClick={() => onDecide("denied", text)}
-            >
-              Deny
-            </Button>
-          </>
-        )}
-      </div>
-      <p className="text-sm text-muted-foreground">
-        Nothing goes to {first} until you approve. Texts never include pay or
-        phone numbers.
-      </p>
-    </ItemCard>
-  );
-}
-
-function AnswerQuestion({
-  item,
-  question,
-  timeZone,
-  onAnswer,
-}: {
-  item: Item;
-  question: Question;
-  timeZone: string;
-  onAnswer: (answer: string) => void;
-}) {
-  const [text, setText] = useState("");
-  const sent = question.sentAt && formatWhen(question.sentAt, timeZone);
-  return (
-    <ItemCard
-      item={item}
-      status="asked"
-      statusLabel="Question for you"
-      eyebrow={question.status === "reminded" ? "Reminder sent" : undefined}
-    >
-      <p className="text-[0.9375rem]">{question.text}</p>
-      {question.options ? (
-        <div className="grid gap-2 sm:grid-cols-2">
-          {question.options.map((o, i) => (
-            <Button
-              key={o}
-              size="lg"
-              variant="secondary"
-              className="justify-start"
-              onClick={() => onAnswer(`${i + 1} · ${o}`)}
-            >
-              <span className="text-muted-foreground tabular-nums">
-                {i + 1}
-              </span>
-              {o}
-            </Button>
-          ))}
-        </div>
-      ) : (
-        <form
+      {groups.map((g) => (
+        <section
+          key={g.key}
+          aria-labelledby={`grp-${g.key}`}
           className="flex flex-col gap-2"
-          onSubmit={(e) => {
-            e.preventDefault();
-            if (text.trim()) onAnswer(text.trim());
-          }}
         >
-          <Textarea
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            rows={2}
-            aria-label="Your answer"
-          />
-          <Button type="submit" size="lg" disabled={!text.trim()}>
-            Send answer
-          </Button>
-        </form>
+          <div className="flex flex-wrap items-baseline gap-x-2 px-0.5">
+            <h2
+              id={`grp-${g.key}`}
+              className="text-[0.8125rem] font-extrabold tracking-[0.05em] text-muted-foreground uppercase"
+            >
+              {g.title} · {g.items.length}
+            </h2>
+            <span className="text-xs text-muted-foreground">{g.sub}</span>
+          </div>
+          {g.items.map((i) => (
+            <InboxItem
+              key={i.flagId}
+              item={i}
+              state={stateOf(i)}
+              open={openId === i.flagId}
+              onToggle={() => setOpenId(openId === i.flagId ? null : i.flagId)}
+              onUpdated={() => {
+                const s = stateOf(i);
+                actions.updated(i, (s.st === "still-there" ? s.tries : 0) + 1);
+              }}
+              onAnswer={(option) => {
+                actions.answer(i, option);
+                setOpenId(nextAfter(i.flagId));
+              }}
+              ownerName={owner}
+              workerAnswer={employeeAnswer(i.flagId, events)?.answer ?? null}
+              timeZone={timezone}
+              dataKind={dataKind}
+            />
+          ))}
+        </section>
+      ))}
+
+      {done.length > 0 && (
+        <section aria-labelledby="grp-done" className="flex flex-col gap-2">
+          <h2
+            id="grp-done"
+            className="px-0.5 text-[0.8125rem] font-extrabold tracking-[0.05em] text-muted-foreground uppercase"
+          >
+            Done · {done.length}
+          </h2>
+          {done.map((i) => {
+            const s = stateOf(i);
+            return (
+              <div
+                key={i.flagId}
+                className="flex animate-in items-center gap-2.5 rounded-card border bg-card px-3.5 py-3 duration-(--dur-success) fade-in"
+              >
+                <span
+                  aria-hidden
+                  className="flex size-[22px] shrink-0 items-center justify-center rounded-full bg-ok text-background"
+                >
+                  <Check className="size-3.5" strokeWidth={3} />
+                </span>
+                <span className="flex min-w-0 flex-1 flex-col">
+                  <span className="text-sm font-semibold">{i.title}</span>
+                  <span className="text-xs text-muted-foreground">
+                    {result(i)}
+                  </span>
+                  {s.st === "fixed" && s.simulated && (
+                    <SimulatedChip className="mt-1" />
+                  )}
+                </span>
+                <Button
+                  variant="quiet"
+                  size="sm"
+                  onClick={() => {
+                    actions.undo(i);
+                    setOpenId(i.flagId);
+                  }}
+                >
+                  Undo
+                </Button>
+              </div>
+            );
+          })}
+        </section>
       )}
-      <p className="text-sm text-muted-foreground">
-        {sent ? `Also sent to you by text at ${sent}. ` : ""}Answer once, either
-        place.
-      </p>
-    </ItemCard>
-  );
-}
 
-function Waiting({
-  item,
-  dataKind,
-  timeZone,
-}: {
-  item: Item;
-  dataKind: DataKind;
-  timeZone: string;
-}) {
-  const q = item.question;
-  const who = q ? item.name(q.toWorkerId) : null;
-  const [status, label, note]: [Status, string, string] =
-    q?.status === "denied"
-      ? ["held", "You denied it", "Nothing was sent. The owner sees it."]
-      : q?.toRole === "manager"
-        ? [
-            "asked",
-            "Coming to you",
-            "The owner checks this question before it reaches you.",
-          ]
-        : [
-            "asked",
-            `Waiting on ${who?.split(" ")[0] ?? "a reply"}`,
-            q?.status === "approved"
-              ? "Approved by you. Fixture mode: no text left this browser."
-              : "Replies show up here as they arrive.",
-          ];
-  return (
-    <ItemCard item={item} status={status} statusLabel={label}>
-      <p className="text-sm text-muted-foreground">{note}</p>
-      <Replies thread={item.thread} dataKind={dataKind} timezone={timeZone} />
-    </ItemCard>
-  );
-}
+      {total > 0 && left === 0 && (
+        <p className="animate-in rounded-card border border-ok/30 bg-ok-soft px-4.5 py-4 text-[0.9375rem] leading-relaxed fade-in">
+          <b>All done{manager ? `. Thanks, ${manager}` : ""}.</b> {owner} sees
+          everything you fixed and answered. Payroll goes on from here.
+        </p>
+      )}
 
-function HowItWorks() {
-  return (
-    <aside className="mt-4 flex gap-3 rounded-card bg-muted/60 p-5 text-sm">
-      <Info aria-hidden className="mt-0.5 size-4 shrink-0 text-link" />
-      <p>
-        <span className="font-medium">How this works.</span> You answer
-        questions about hours and jobs. You approve texts to your crew before
-        they go out. The owner approves every change to pay.
+      <p className="text-xs leading-relaxed text-muted-foreground">
+        RollPay reads Jobber and never edits it. You see your crew's hours and
+        jobs, never pay. Source: {data.source}.
+        {events.length > 0 && ` Your taps are saved in ${LOCAL_SOURCE}.`}{" "}
+        {data.items.some((i) => stateOf(i).st !== "open") && (
+          <button
+            type="button"
+            onClick={() => {
+              for (const i of data.items)
+                if (stateOf(i).st !== "open") actions.undo(i);
+              setOpenId(data.items[0]?.flagId ?? null);
+            }}
+            className="font-semibold text-link underline-offset-4 hover:underline"
+          >
+            Start over
+          </button>
+        )}
       </p>
-    </aside>
+    </div>
   );
 }

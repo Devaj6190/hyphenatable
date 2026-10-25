@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 import { Suspense } from "react";
+import { LiveProvider } from "@/components/LiveProvider";
 import { Nav } from "@/components/Nav";
 import { RoleScope } from "@/components/RoleScope";
 import { ShellHeader } from "@/components/ShellHeader";
@@ -22,7 +23,12 @@ async function KnownCompany({
 }) {
   const { companyId } = await params;
   if (!companies[companyId]) notFound();
-  return children;
+  // Keyed by company, so moving between companies looks the new one up again.
+  return (
+    <LiveProvider key={companyId} companyKey={companyId}>
+      {children}
+    </LiveProvider>
+  );
 }
 
 export default function CompanyLayout({

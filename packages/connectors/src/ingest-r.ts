@@ -23,6 +23,7 @@ import {
   anonymizeJobberPull,
   chartWordsOf,
   findRealTokens,
+  leakReport,
   loadOrCreateSalt,
   type PseudonymMap,
 } from "./anonymize.ts";
@@ -31,9 +32,21 @@ import {
   isSectionedJournal,
   readGustoPayrollJournalSectionedCsv,
 } from "./exports/gusto-payroll-journal-sectioned.ts";
+import {
+  EXPENSE_REPORT,
+  INVOICES_REPORT,
+  JOBS_REPORT,
+  QUOTES_REPORT,
+  type ReportRow,
+  type ReportSpec,
+  readJobberReportCsv,
+  TRANSACTION_LIST,
+} from "./exports/jobber-reports.ts";
 import { readJobberTimesheetsCsv } from "./exports/jobber-timesheets-csv.ts";
 import { readJobberTimesheetsXlsx } from "./exports/jobber-timesheets-xlsx.ts";
+import { readQboTransactionDetailXlsx } from "./exports/qbo-tda-xlsx.ts";
 import { readQboXlsx } from "./exports/qbo-xlsx.ts";
+import { readVenmoCsv } from "./exports/venmo-csv.ts";
 import {
   authFromEnv,
   DEFAULT_TOKEN_PATH,
@@ -48,12 +61,25 @@ export const R_PRIVATE_DIR = privatePath("r");
 
 export interface IngestOptions {
   privateDir: string;
+  /** --diagnose: label shapes (A/a/9, never the labels) of ledger total rows that close nothing */
+  diagnose?: (line: string) => void;
   companyId?: string;
   timezone: string;
   timesheets: string[];
   journals: string[];
   /** QBO Excel exports (.xlsx or the Export data zip) */
   qbo?: string[];
+  /** Jobber report CSVs */
+  jobberExpenses?: string[];
+  transactions?: string[];
+  invoices?: string[];
+  quotes?: string[];
+  jobsOneOff?: string[];
+  jobsRecurring?: string[];
+  /** QBO "Transaction Detail by Account" (.xlsx / zip) */
+  qboLedger?: string[];
+  /** Venmo monthly statement CSVs */
+  venmo?: string[];
   dryRun?: boolean;
   now?: () => Date;
 }
@@ -77,6 +103,19 @@ export interface IngestCounts {
   /** of those, how many carry off-cycle gross */
   paidPeriodsWithOffCycle: number;
   expenses: number;
+  jobberExpenses: number;
+  laborPaidAsExpense: number;
+  transactions: number;
+  invoices: number;
+  quotes: number;
+  jobsReport: number;
+  ledgerLines: number;
+  venmo: number;
+  venmoToWorkers: number;
+  /** counts per class, e.g. "wage 12 / reimbursement 3 / personal_or_unknown 40" */
+  venmoByClass: string;
+  /** counts per funding token, so the owner can confirm e.g. "bank:B = personal" */
+  venmoByFunding: string;
   syncRuns: RunCount[];
   outPath: string | null;
 }
@@ -131,6 +170,35 @@ async function openAnonymizer(privateDir: string): Promise<Anonymizer> {
   return new Anonymizer(salt, map);
 }
 
+/**
+ * data/private/r/token-allow.txt: words the owner approved as not names ("owner", "pay"), one per line,
+ * case-insensitive, "#" comments. Written by a person, never by code; absent means nothing is allowed.
+ */
+export async function loadTokenAllow(privateDir: string): Promise<Set<string>> {
+  try {
+    const text = await readFile(join(privateDir, "token-allow.txt"), "utf8");
+    return new Set(
+      text
+        .split("\n")
+        .map((l) => l.replace(/#.*/, "").trim().toLowerCase())
+        .filter(Boolean),
+    );
+  } catch (e) {
+    if ((e as NodeJS.ErrnoException).code !== "ENOENT") throw e;
+    return new Set();
+  }
+}
+
+/** The system word list, when there is one (macOS / most Linux): only to say "dictionary word or not". */
+async function dictionaryWords(): Promise<Set<string>> {
+  try {
+    const t = await readFile("/usr/share/dict/words", "utf8");
+    return new Set(t.split("\n").map((w) => w.trim().toLowerCase()));
+  } catch {
+    return new Set();
+  }
+}
+
 /** Check, then (unless dry run) persist map + token list and write the payload to out/. Returns the out path. */
 async function persist(
   privateDir: string,
@@ -139,9 +207,23 @@ async function persist(
   name: string,
   dryRun?: boolean,
   chartWords?: Set<string>,
+  diagnose?: (line: string) => void,
 ): Promise<string | null> {
-  const tokens = a.realTokens(chartWords);
-  const json = assertSafeToWrite(payload, tokens);
+  const allow = await loadTokenAllow(privateDir);
+  const tokens = a.realTokens(chartWords, allow);
+  let json: string;
+  try {
+    json = assertSafeToWrite(payload, tokens);
+  } catch (e) {
+    if (diagnose)
+      for (const l of leakReport(
+        payload,
+        a.tokenSources(chartWords, allow),
+        await dictionaryWords(),
+      ))
+        diagnose(l);
+    throw e;
+  }
   if (dryRun) return null;
   await mkdir(join(privateDir, "out"), { recursive: true, mode: 0o700 });
   const outPath = join(privateDir, "out", `${name}.json`);
@@ -162,7 +244,22 @@ const stamp = (d: Date) => d.toISOString().replace(/[:.]/g, "-");
 export async function ingestR(o: IngestOptions): Promise<IngestCounts> {
   const companyId = o.companyId ?? "r";
   const now = o.now ?? (() => new Date());
-  for (const p of [...o.timesheets, ...o.journals, ...(o.qbo ?? [])]) {
+  const reportPaths = [
+    ...(o.jobberExpenses ?? []),
+    ...(o.transactions ?? []),
+    ...(o.invoices ?? []),
+    ...(o.quotes ?? []),
+    ...(o.jobsOneOff ?? []),
+    ...(o.jobsRecurring ?? []),
+    ...(o.qboLedger ?? []),
+    ...(o.venmo ?? []),
+  ];
+  for (const p of [
+    ...o.timesheets,
+    ...o.journals,
+    ...(o.qbo ?? []),
+    ...reportPaths,
+  ]) {
     if (!inside(o.privateDir, p))
       throw new Error(`input must be inside the private dir (${o.privateDir})`);
   }
@@ -246,9 +343,76 @@ export async function ingestR(o: IngestOptions): Promise<IngestCounts> {
     qbo.push({ fileTag, rows: r.rows });
   }
 
+  // Jobber report CSVs
+  const readReport = async <K extends string>(
+    paths: string[] | undefined,
+    spec: ReportSpec<K>,
+  ) => {
+    const out: { fileTag: string; rows: ReportRow<K>[] }[] = [];
+    for (const p of paths ?? []) {
+      const { bytes, fileTag } = await tagged(p);
+      const r = await readJobberReportCsv(
+        spec,
+        { text: bytes.toString("utf8"), fileName: fileTag },
+        { companyId, now },
+      );
+      syncRuns.push(scrub(r.syncRun, `jobber-${spec.name}-csv`, fileTag));
+      out.push({ fileTag, rows: r.rows });
+    }
+    return out;
+  };
+  const reports = {
+    jobberExpenses: await readReport(o.jobberExpenses, EXPENSE_REPORT),
+    transactions: await readReport(o.transactions, TRANSACTION_LIST),
+    invoices: await readReport(o.invoices, INVOICES_REPORT),
+    quotes: await readReport(o.quotes, QUOTES_REPORT),
+    jobsReports: [
+      ...(await readReport(o.jobsOneOff, JOBS_REPORT)).map((f) => ({
+        ...f,
+        kind: "one_off" as const,
+      })),
+      ...(await readReport(o.jobsRecurring, JOBS_REPORT)).map((f) => ({
+        ...f,
+        kind: "recurring" as const,
+      })),
+    ],
+  };
+  const qboLedger = [];
+  for (const p of o.qboLedger ?? []) {
+    const { bytes, fileTag } = await tagged(p);
+    const r = await readQboTransactionDetailXlsx(
+      { bytes: new Uint8Array(bytes), fileName: fileTag },
+      {
+        companyId,
+        now,
+        diagnose:
+          o.diagnose && ((l) => o.diagnose?.(`qbo-ledger ${fileTag} ${l}`)),
+      },
+    );
+    syncRuns.push(scrub(r.syncRun, "qbo-transaction-detail", fileTag));
+    qboLedger.push({ fileTag, rows: r.rows });
+  }
+  const venmo = [];
+  for (const p of o.venmo ?? []) {
+    const { bytes, fileTag } = await tagged(p);
+    const r = await readVenmoCsv(
+      { text: bytes.toString("utf8"), fileName: fileTag },
+      { companyId, now },
+    );
+    syncRuns.push(scrub(r.syncRun, "venmo-csv", fileTag));
+    venmo.push({ fileTag, rows: r.rows });
+  }
+
   const generatedAt = now();
   const bundle = {
-    ...anonymizeExports(a, companyId, { timesheets, journals, qbo }),
+    ...anonymizeExports(a, companyId, {
+      timesheets,
+      journals,
+      qbo,
+      ...reports,
+      qboLedger,
+      venmo,
+    }),
     syncRuns,
     generatedAt: generatedAt.toISOString(),
   };
@@ -258,7 +422,11 @@ export async function ingestR(o: IngestOptions): Promise<IngestCounts> {
     bundle,
     `${companyId}-exports-${stamp(generatedAt)}`,
     o.dryRun,
-    chartWordsOf(bundle.expenses.map((x) => x.accountName)),
+    chartWordsOf([
+      ...bundle.expenses.map((x) => x.accountName),
+      ...bundle.ledger.flatMap((x) => [x.accountName, x.splitAccount]),
+    ]),
+    o.diagnose,
   );
   return {
     workers: bundle.workers.length,
@@ -272,6 +440,25 @@ export async function ingestR(o: IngestOptions): Promise<IngestCounts> {
       (p) => p.offCycleGrossCents !== 0,
     ).length,
     expenses: bundle.expenses.length,
+    jobberExpenses: bundle.jobberExpenses.length,
+    laborPaidAsExpense: bundle.jobberExpenses.filter(
+      (x) => x.kind === "labor_paid_as_expense",
+    ).length,
+    transactions: bundle.transactions.length,
+    invoices: bundle.invoices.length,
+    quotes: bundle.quotes.length,
+    jobsReport: bundle.jobsReport.length,
+    ledgerLines: bundle.ledger.length,
+    venmo: bundle.venmo.length,
+    venmoToWorkers: bundle.venmo.filter((v) => v.counterpartyWorkerId).length,
+    venmoByClass:
+      Object.entries(bundle.venmoSummary.byClass)
+        .map(([k, v]) => `${k} ${v.count}`)
+        .join(" / ") || "none",
+    venmoByFunding:
+      Object.entries(bundle.venmoSummary.byFunding)
+        .map(([k, v]) => `${k} ${v.count} (to workers ${v.workerPayments})`)
+        .join(" / ") || "none",
     syncRuns: runCounts(syncRuns),
     outPath,
   };
@@ -366,7 +553,16 @@ if (import.meta.main) {
       timesheets: { type: "string", multiple: true },
       journal: { type: "string", multiple: true },
       qbo: { type: "string", multiple: true },
+      expenses: { type: "string", multiple: true },
+      transactions: { type: "string", multiple: true },
+      invoices: { type: "string", multiple: true },
+      quotes: { type: "string", multiple: true },
+      "jobs-one-off": { type: "string", multiple: true },
+      "jobs-recurring": { type: "string", multiple: true },
+      "qbo-ledger": { type: "string", multiple: true },
+      venmo: { type: "string", multiple: true },
       "dry-run": { type: "boolean" },
+      diagnose: { type: "boolean" },
     },
   });
   const source = values.source ?? "exports";
@@ -376,7 +572,7 @@ if (import.meta.main) {
     (source === "jobber-api" && (!values.from || !values.to))
   ) {
     console.error(
-      "usage: ingest-r.ts --tz <IANA> [--timesheets data/private/r/x.xlsx ...] [--journal data/private/r/y.csv ...] [--qbo data/private/r/z.zip ...] [--dry-run]",
+      "usage: ingest-r.ts --tz <IANA> [--timesheets data/private/r/x.xlsx ...] [--journal data/private/r/y.csv ...] [--qbo data/private/r/z.zip ...] [--expenses|--transactions|--invoices|--quotes|--jobs-one-off|--jobs-recurring data/private/r/<report>.csv ...] [--qbo-ledger data/private/r/<tda>.xlsx ...] [--venmo data/private/r/<statement>.csv ...] [--dry-run] [--diagnose]",
     );
     console.error(
       "       ingest-r.ts --source jobber-api --tz <IANA> --from YYYY-MM-DD --to YYYY-MM-DD [--dry-run]",
@@ -398,7 +594,18 @@ if (import.meta.main) {
           timesheets: values.timesheets ?? [],
           journals: values.journal ?? [],
           qbo: values.qbo ?? [],
+          jobberExpenses: values.expenses ?? [],
+          transactions: values.transactions ?? [],
+          invoices: values.invoices ?? [],
+          quotes: values.quotes ?? [],
+          jobsOneOff: values["jobs-one-off"] ?? [],
+          jobsRecurring: values["jobs-recurring"] ?? [],
+          qboLedger: values["qbo-ledger"] ?? [],
+          venmo: values.venmo ?? [],
           dryRun: values["dry-run"],
+          diagnose: values.diagnose
+            ? (l: string) => console.error(`diagnose ${l}`)
+            : undefined,
         });
   job
     .then((c) => {

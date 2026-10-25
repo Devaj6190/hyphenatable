@@ -8,8 +8,11 @@
  * @module
  */
 
+import type * as agents_interpret from "../agents/interpret.js";
+import type * as agents_prompts from "../agents/prompts.js";
 import type * as audit from "../audit.js";
 import type * as checks from "../checks.js";
+import type * as controller_recompute from "../controller/recompute.js";
 import type * as corrections from "../corrections.js";
 import type * as cycles from "../cycles.js";
 import type * as demo from "../demo.js";
@@ -17,6 +20,7 @@ import type * as drafts from "../drafts.js";
 import type * as eval from "../eval.js";
 import type * as flags from "../flags.js";
 import type * as http from "../http.js";
+import type * as lib_engine from "../lib/engine.js";
 import type * as lib_ingest from "../lib/ingest.js";
 import type * as lib_stub from "../lib/stub.js";
 import type * as lib_validators from "../lib/validators.js";
@@ -27,6 +31,7 @@ import type * as onboarding from "../onboarding.js";
 import type * as probe from "../probe.js";
 import type * as probeNode from "../probeNode.js";
 import type * as questions from "../questions.js";
+import type * as roster from "../roster.js";
 import type * as rules from "../rules.js";
 import type * as sync from "../sync.js";
 
@@ -37,8 +42,11 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  "agents/interpret": typeof agents_interpret;
+  "agents/prompts": typeof agents_prompts;
   audit: typeof audit;
   checks: typeof checks;
+  "controller/recompute": typeof controller_recompute;
   corrections: typeof corrections;
   cycles: typeof cycles;
   demo: typeof demo;
@@ -46,6 +54,7 @@ declare const fullApi: ApiFromModules<{
   eval: typeof eval;
   flags: typeof flags;
   http: typeof http;
+  "lib/engine": typeof lib_engine;
   "lib/ingest": typeof lib_ingest;
   "lib/stub": typeof lib_stub;
   "lib/validators": typeof lib_validators;
@@ -56,6 +65,7 @@ declare const fullApi: ApiFromModules<{
   probe: typeof probe;
   probeNode: typeof probeNode;
   questions: typeof questions;
+  roster: typeof roster;
   rules: typeof rules;
   sync: typeof sync;
 }>;
