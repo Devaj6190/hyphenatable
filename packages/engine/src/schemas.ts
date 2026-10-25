@@ -56,6 +56,10 @@ export const CheckId = z.enum([
   "CHK-21",
   "CHK-22",
   "CHK-23",
+  // Not deterministic checks: an Auditor flag for a vague case (always a question to the owner, never
+  // blocking) and a learned lesson that contradicts an active rule (plan B 4.5).
+  "AGT-01",
+  "LRN-01",
 ]);
 export const FlagStatus = z.enum([
   "open",
