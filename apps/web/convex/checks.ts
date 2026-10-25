@@ -1,6 +1,10 @@
 import { pastGross } from "@payrollpilot/engine/checks/CHK-22";
 import { runAll } from "@payrollpilot/engine/checks/index";
-import { precedentFor } from "@payrollpilot/engine/checks/precedent";
+import {
+  precedentFor,
+  rulePrecedent,
+  settlingRule,
+} from "@payrollpilot/engine/checks/precedent";
 import type { CheckInput } from "@payrollpilot/engine/checks/types";
 import type { Flag } from "@payrollpilot/engine/schemas";
 import { ConvexError, v } from "convex/values";
@@ -154,17 +158,31 @@ async function runChecks(
       const key = dedupeKey(flag);
       if (existing.has(key)) continue;
       existing.add(key);
+      // An owner-approved rule that already decides this rate settles the flag: kept, cited, not asked.
+      const settledBy = settlingRule(flag, input);
       const { id: _engineId, ...doc } = {
         ...flag,
-        precedent: precedentFor(flag, { rules: input.rules, pastFlags }),
+        status: settledBy ? ("dismissed" as const) : flag.status,
+        precedent: settledBy
+          ? rulePrecedent(settledBy)
+          : precedentFor(flag, { rules: input.rules, pastFlags }),
       };
-      created.push(
-        await ctx.db.insert(
-          "flags",
-          doc as unknown as Omit<Doc<"flags">, "_id" | "_creationTime">,
-        ),
+      const flagId = await ctx.db.insert(
+        "flags",
+        doc as unknown as Omit<Doc<"flags">, "_id" | "_creationTime">,
       );
+      created.push(flagId);
       byCheck[flag.checkId] = (byCheck[flag.checkId] ?? 0) + 1;
+      if (settledBy)
+        await write(ctx, {
+          companyId,
+          cycleId,
+          actor,
+          type: "flag.settled_by_rule",
+          summary: `${flag.checkId} settled by owner-approved rule ${settledBy.id}`,
+          refs: { flagId, ruleId: settledBy.id },
+          data: { ruleType: settledBy.type },
+        });
     }
 
     const advanced = cycle.stage === "checking";
