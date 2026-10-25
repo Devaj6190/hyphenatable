@@ -29,7 +29,7 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  /* Semantic states. Brand green is never a status; verified uses ok + icon + word. */
+  /* Semantic states. Green ok means done only; verified uses ok + icon + word. */
   --color-hold: var(--hold);
   --color-hold-soft: var(--hold-soft);
   --color-ask: var(--ask);
@@ -39,6 +39,11 @@
   --color-sync-error: var(--destructive);
   --color-sync-error-soft: var(--destructive-soft);
   --color-neutral-chip: var(--neutral-chip);
+  /* Sunset: accents and progress only, never a status. */
+  --color-sunset-1: var(--sunset-1);
+  --color-sunset-2: var(--sunset-2);
+  --color-sunset-3: var(--sunset-3);
+  --color-sunset-ink: var(--sunset-ink);
   /* Agent hues (audit log, timelines). */
   --color-agent-analyst: var(--agent-analyst);
   --color-agent-analyst-soft: var(--agent-analyst-soft);
@@ -68,24 +73,29 @@
 }
 
 /* Light. Values from docs/plans/design-style-handoff.md; status pairs and input boundary contrast-checked (README). */
+/* Light: RollPay navy ink on a warm canvas, Sunset for accents and progress. Contrast ratios in components/README.md. */
 :root,
 [data-theme="light"] {
   color-scheme: light;
-  --background: #f6f7f3;
+  --background: #faf7f4;
   --card: #ffffff;
   --raised: #ffffff;
-  --muted: #ebf0ea;
-  --foreground: #18251e;
-  --muted-foreground: #56665b;
-  --border: #dce4dc;
-  --input: #7e8f83;
-  --primary: #14543f;
+  --muted: #f4efe9;
+  --foreground: #1a1f36;
+  --muted-foreground: #62667a;
+  --border: #ede5dd;
+  --input: #858999;
+  --primary: #1a1f36;
   --primary-foreground: #ffffff;
-  --primary-hover: #104633;
-  --primary-edge: #14543f;
-  --link: #14543f;
-  --ring: #14543f;
-  --accent: #ddede1;
+  --primary-hover: #0f1324;
+  --primary-edge: #1a1f36;
+  --link: #c2410c;
+  --ring: #c2410c;
+  --accent: #fff4ea;
+  --sunset-1: #ffb547;
+  --sunset-2: #ff7a3d;
+  --sunset-3: #f5459b;
+  --sunset-ink: #1a1f36;
   --destructive: #b42318;
   --destructive-fill: #b42318;
   --destructive-soft: #fdebe8;
@@ -95,20 +105,20 @@
   --ask-soft: #e5edfb;
   --ok: #1c6b36;
   --ok-soft: #dff2e4;
-  --neutral-chip: #3e4c43;
+  --neutral-chip: #3f4459;
   --agent-analyst: #5b3fa8;
   --agent-analyst-soft: #efeafb;
   --agent-auditor: #0b6b63;
   --agent-auditor-soft: #dff3f0;
   --agent-messenger: #a02860;
   --agent-messenger-soft: #fbe8f0;
-  --scrim: rgb(16 24 21 / 0.28);
+  --scrim: rgb(15 19 36 / 0.28);
   --shadow-card:
-    0 1px 2px rgb(24 37 30 / 0.04), 0 12px 32px -16px rgb(24 37 30 / 0.12);
+    0 1px 2px rgb(26 31 54 / 0.04), 0 12px 32px -16px rgb(26 31 54 / 0.12);
   --shadow-raised:
-    0 1px 2px rgb(24 37 30 / 0.05), 0 16px 40px -18px rgb(24 37 30 / 0.18);
+    0 1px 2px rgb(26 31 54 / 0.05), 0 16px 40px -18px rgb(26 31 54 / 0.18);
   --shadow-overlay:
-    0 2px 6px rgb(24 37 30 / 0.06), 0 32px 72px -24px rgb(24 37 30 / 0.28);
+    0 2px 6px rgb(26 31 54 / 0.06), 0 32px 72px -24px rgb(26 31 54 / 0.28);
 }
 
 /* Motion (design-style-handoff.md timing table). Theme-independent. */
@@ -124,22 +134,26 @@
 
 [data-theme="dark"] {
   color-scheme: dark;
-  --background: #101815;
-  --card: #19231e;
-  --raised: #223029;
-  --muted: #202d26;
-  --foreground: #edf3ee;
-  --muted-foreground: #adbdb1;
-  --border: #34473b;
-  --input: #6b8273;
-  --primary: #14543f;
-  --primary-foreground: #ffffff;
-  --primary-hover: #1b654c;
-  /* The fill alone is 1.8:1 against the card; the edge carries the boundary (4.8:1). */
-  --primary-edge: #4e9a7a;
-  --link: #a4d6b5;
-  --ring: #a4d6b5;
-  --accent: #273e30;
+  --background: #0f1324;
+  --card: #1a1f36;
+  --raised: #242a44;
+  --muted: #20253d;
+  --foreground: #f4efe9;
+  --muted-foreground: #a9adc0;
+  --border: #2f3552;
+  --input: #737995;
+  /* Inverted: a light button on navy keeps the primary action the highest-contrast thing on screen. */
+  --primary: #faf7f4;
+  --primary-foreground: #1a1f36;
+  --primary-hover: #ede5dd;
+  --primary-edge: #faf7f4;
+  --link: #ff9a5c;
+  --ring: #ff9a5c;
+  --accent: #2e2638;
+  --sunset-1: #ffb547;
+  --sunset-2: #ff7a3d;
+  --sunset-3: #f5459b;
+  --sunset-ink: #1a1f36;
   --destructive: #f7a396;
   --destructive-fill: #b42318;
   --destructive-soft: #421e1a;
@@ -149,14 +163,14 @@
   --ask-soft: #1c2a45;
   --ok: #93d7a6;
   --ok-soft: #1c3a26;
-  --neutral-chip: #c9d6cc;
+  --neutral-chip: #ccd0de;
   --agent-analyst: #c8b6f5;
   --agent-analyst-soft: #2c2445;
   --agent-auditor: #8cdcd1;
   --agent-auditor-soft: #173a36;
   --agent-messenger: #f3a6c8;
   --agent-messenger-soft: #3f1d2d;
-  --scrim: rgb(4 8 6 / 0.55);
+  --scrim: rgb(5 7 15 / 0.55);
   --shadow-card:
     inset 0 1px 0 rgb(255 255 255 / 0.04), 0 1px 2px rgb(0 0 0 / 0.3);
   --shadow-raised:
@@ -237,6 +251,43 @@
   }
   @media (prefers-reduced-transparency: reduce) {
     backdrop-filter: none;
+  }
+}
+
+/* Sunset accent fill (135°). Navy ink text on it passes AA at every stop (4.8:1 minimum, on pink). */
+@utility bg-sunset {
+  background-image: linear-gradient(
+    135deg,
+    var(--sunset-1),
+    var(--sunset-2) 50%,
+    var(--sunset-3)
+  );
+}
+
+/* Current progress step: the Sunset gradient drifts left to right. Static under reduced motion. */
+@utility bg-sunset-flow {
+  background-image: linear-gradient(
+    90deg,
+    var(--sunset-1),
+    var(--sunset-2),
+    var(--sunset-3),
+    var(--sunset-2),
+    var(--sunset-1)
+  );
+  background-size: 200% 100%;
+  animation: sunset-flow 2.4s linear infinite;
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+    background-position: 0 0;
+  }
+}
+
+@keyframes sunset-flow {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -100% 0;
   }
 }
 

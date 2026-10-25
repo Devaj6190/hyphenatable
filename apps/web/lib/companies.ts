@@ -50,7 +50,7 @@ export const companies: Record<string, CompanyInfo> = {
 export const DEFAULT_COMPANY = "a";
 
 export const SEATS_LINE =
-  "PayrollPilot fills the seat of the person who prepares and checks payroll before it is submitted.";
+  "RollPay fills the seat of the person who prepares and checks payroll before it is submitted.";
 
 export function cyclePeriod(c: CompanyInfo): string {
   if (!c.cycle) return "No cycle loaded yet";

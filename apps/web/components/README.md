@@ -11,14 +11,14 @@ sections 4 and 5. Where the style brief and C plan 4.1/4.2 disagree on tokens or
 
 - Use tokens (`bg-card`, `text-muted-foreground`, `text-link`, `bg-hold-soft`), never hex values. Links use
   `text-link`, not `text-primary` (the primary fill is too dark for text on the dark theme).
-- Green brand chrome is never a status. Verified is `<StatusBadge status="verified" />` (icon + word).
+- Brand chrome (navy ink, Sunset) is never a status, and green `ok` only means done. Verified is `<StatusBadge status="verified" />` (icon + word).
   Amber = needs you / held, blue = asked / waiting, red = incomplete sync, errors, destructive actions.
 - Every status carries a word, and usually an icon. Never color alone.
 - Every page header area and every Company R card shows a `DataLabel`. Every number says where it came from
   (`SourceChip`) and whether it is synthetic.
 - Money: integer cents through `<Money cents />`. Never on manager or employee surfaces. The server redacts pay
   (see "Data access"), and `FlagCard` also strips `affects.dollarsCents` unless the viewer is the owner.
-- Never the word "submit" near Gusto. Use "Fill Gusto draft" and "Draft only. PayrollPilot never submits payroll."
+- Never the word "submit" near Gusto. Use "Fill Gusto draft" and "Draft only. RollPay never submits payroll."
 - No real names. Ids or fake display names only.
 - Next 16 instant navigation: don't `await params` at the top of a page or layout. Read them in a child inside
   `<Suspense>` (see `app/c/[companyId]/page.tsx`) or with `useParams()` in a client component.
@@ -196,28 +196,35 @@ The other four belong to the shell.
 All tokens are in `app/globals.css` and mapped into Tailwind's theme. Spacing is Tailwind's 4px scale.
 Radii: `rounded-control` 10px, `rounded-card` 16px, `rounded-overlay` 20px, `rounded-full` for pills.
 Shadows: `shadow-card`, `shadow-raised`, `shadow-overlay` (broad and soft in light, tonal with an edge highlight
-in dark). Utilities: `grain` (static 1.5–2% noise, on the canvas only), `frosted` (blurred raised surface with an
+in dark). Utilities: `bg-sunset` (135° Sunset accent fill, text on it uses `text-sunset-ink`), `bg-sunset-flow`
+(animated left-to-right Sunset fill for the current progress step, static under reduced motion), `grain` (static 1.5–2% noise, on the canvas only), `frosted` (blurred raised surface with an
 opaque fallback and reduced-transparency support), `frosted-scrim`, `pressable`.
 
 Motion: `--dur-hover` 140ms, `--dur-press` 100ms, `--dur-tab` 210ms, `--dur-sheet` 280ms, `--dur-archive`
 480ms, `--dur-success` 190ms, easing `ease-out-soft`. Use them as `duration-(--dur-tab) ease-out-soft`. Under
 `prefers-reduced-motion` they drop to 0 (sheets 120ms fade, no slide), and press scale goes to 1.
 
-### Changes from the style brief, all contrast-checked (WCAG: text 4.5:1, boundaries 3:1)
+### RollPay palette, all contrast-checked (WCAG: text 4.5:1, boundaries 3:1)
+
+Navy ink for primary buttons and headings, Sunset (`#FFB547` → `#FF7A3D` → `#F5459B`) for accents and
+progress, burnt orange for links, a warm canvas. This replaced the earlier green `#14543F` brand.
 
 | Token | Light | Dark | Why |
 |---|---|---|---|
-| `--input` (control border) | `#7E8F83` (3.4:1 on card) | `#6B8273` (3.9:1) | the decorative divider is too faint for controls |
-| `--primary-edge` | = fill | `#4E9A7A` (4.8:1 on card) | the dark primary fill is only 1.8:1 on the card |
-| `--link`, `--ring` | `#14543F` (8.9:1) | `#A4D6B5` (9.9:1) | from the brief |
-| hold / hold-soft | `#8A5300` / `#FCEFD4` (5.6:1) | `#F1C26A` / `#3A2D12` (8.1:1) | new |
-| ask / ask-soft | `#1E4FB0` / `#E5EDFB` (6.4:1) | `#A3C1F7` / `#1C2A45` (7.9:1) | new |
-| ok / ok-soft (verified) | `#1C6B36` / `#DFF2E4` (5.6:1) | `#93D7A6` / `#1C3A26` (7.4:1) | new |
-| destructive / soft | `#B42318` / `#FDEBE8` (5.7:1) | `#F7A396` / `#421E1A` (7.4:1) | new; the destructive button fill is `#B42318` with white (6.6:1) in both themes |
-| agents (analyst, auditor, messenger) | 6.6 / 5.5 / 6.0:1 | 7.9 / 7.8 / 7.8:1 | new |
-
-Every other brief value is used as given. Primary text and secondary text pass on every surface (secondary
-text is at least 5.2:1 light and 7.0:1 dark).
+| `--background` / `--card` / `--raised` | `#FAF7F4` / `#FFFFFF` / `#FFFFFF` | `#0F1324` / `#1A1F36` / `#242A44` | warm canvas; navy surfaces in dark |
+| `--foreground` | `#1A1F36` (15.2:1 on canvas) | `#F4EFE9` (14.2:1 on card) | navy ink |
+| `--muted-foreground` | `#62667A` (5.3:1 canvas, 5.0:1 muted) | `#A9ADC0` (7.3:1 card, 6.3:1 raised) | secondary text |
+| `--border` / `--muted` / `--accent` | `#EDE5DD` / `#F4EFE9` / `#FFF4EA` | `#2F3552` / `#20253D` / `#2E2638` | decorative only |
+| `--input` (control border) | `#858999` (3.5:1 on card) | `#737995` (3.8:1) | controls need a 3:1 boundary |
+| `--primary` / `-foreground` | `#1A1F36` / white (16.2:1) | `#FAF7F4` / `#1A1F36` (15.2:1) | dark inverts to a light button so it stays the strongest thing on screen |
+| `--primary-hover` / `--primary-edge` | `#0F1324` / = fill | `#EDE5DD` / = fill | |
+| `--link`, `--ring` | `#C2410C` (5.2:1 card, 4.8:1 canvas and accent) | `#FF9A5C` (7.8:1 card, 6.9:1 accent) | burnt orange |
+| `--sunset-1/2/3`, `--sunset-ink` | `#FFB547` / `#FF7A3D` / `#F5459B`, ink `#1A1F36` | same | navy ink on Sunset: 9.2 / 6.3 / 4.8:1. White on Sunset fails; don't use it |
+| hold / hold-soft | `#8A5300` / `#FCEFD4` (5.6:1) | `#F1C26A` / `#3A2D12` (8.1:1) | unchanged |
+| ask / ask-soft | `#1E4FB0` / `#E5EDFB` (6.4:1) | `#A3C1F7` / `#1C2A45` (7.9:1) | unchanged |
+| ok / ok-soft (done, verified) | `#1C6B36` / `#DFF2E4` (5.6:1) | `#93D7A6` / `#1C3A26` (7.4:1) | unchanged; green only means done |
+| destructive / soft | `#B42318` / `#FDEBE8` (5.7:1) | `#F7A396` / `#421E1A` (7.4:1) | unchanged; the destructive button fill is `#B42318` with white (6.6:1) in both themes |
+| agents (analyst, auditor, messenger) | 6.6 / 5.5 / 6.0:1 | 8.9 / 10.3 / 8.6:1 on card | unchanged |
 
 ## Font
 

@@ -64,7 +64,7 @@ export function GateDialog({
             asks Gusto to calculate it.
           </li>
           <li className="font-medium">
-            Draft only. PayrollPilot never submits payroll.
+            Draft only. RollPay never submits payroll.
           </li>
         </ul>
         {tried && (

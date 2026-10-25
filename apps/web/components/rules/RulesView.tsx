@@ -66,8 +66,8 @@ export function RulesView({
             The person who answers a question never approves the rule it
             becomes.
           </span>{" "}
-          PayrollPilot only uses rules a person approved, and checks never
-          change pay on their own.
+          RollPay only uses rules a person approved, and checks never change pay
+          on their own.
         </p>
       </div>
 

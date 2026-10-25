@@ -254,7 +254,7 @@ export function FlagDetail({
 
       <footer className="flex flex-col gap-1 border-t pt-4 text-sm text-muted-foreground">
         <p>
-          Only this item is held. PayrollPilot changes the workbook, never your
+          Only this item is held. RollPay changes the workbook, never your
           Jobber, QuickBooks or Gusto records.
         </p>
         <p className="text-xs">

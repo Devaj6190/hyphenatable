@@ -25,7 +25,7 @@ export function ShellHeader() {
           href={`/c/${companyId}`}
           className="text-base font-semibold tracking-tight text-link lg:hidden"
         >
-          PayrollPilot
+          RollPay
         </Link>
         <div className="flex min-w-0 flex-col">
           <span className="truncate font-semibold">

@@ -2,7 +2,7 @@ import { Check } from "lucide-react";
 import { SimulatedChip } from "@/components/SimulatedChip";
 import type { ThreadMessage } from "@/lib/types";
 
-// Board 6: what the recipient's phone shows. Their own replies sit on the right, PayrollPilot on the left.
+// Board 6: what the recipient's phone shows. Their own replies sit on the right, RollPay on the left.
 // Words, dates, jobs and hours only: no pay, no phone numbers.
 export function TextPreview({
   text,
@@ -38,7 +38,7 @@ export function TextPreview({
           <span className="flex size-10 items-center justify-center rounded-full bg-primary text-primary-foreground">
             <Check aria-hidden className="size-5" strokeWidth={2.6} />
           </span>
-          <span className="text-xs font-medium">PayrollPilot</span>
+          <span className="text-xs font-medium">RollPay</span>
           <span className="text-xs text-muted-foreground">
             iMessage · falls back to SMS
           </span>

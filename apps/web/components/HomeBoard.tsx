@@ -259,7 +259,7 @@ export function HomeBoard({
             </div>
 
             <p className="text-sm text-muted-foreground">
-              Draft only. PayrollPilot never submits payroll.
+              Draft only. RollPay never submits payroll.
             </p>
           </div>
         );
