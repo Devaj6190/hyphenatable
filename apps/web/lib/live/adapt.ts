@@ -192,3 +192,14 @@ export function headerCycle(
 export function pageHasLiveCycle(pathname: string): boolean {
   return /^\/c\/[^/]+\/flags\/[^/]+\/?$/.test(pathname);
 }
+
+/**
+ * Whether the header asks Convex for the cycle. A company with no fixture cycle (Company R: its data is never
+ * committed) has nothing else to show, so its header is live on every page; the others follow pageHasLiveCycle.
+ */
+export function headerReadsLive(
+  pathname: string,
+  fixtureCycle: PeriodCycle | null,
+): boolean {
+  return fixtureCycle === null || pageHasLiveCycle(pathname);
+}

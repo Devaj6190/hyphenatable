@@ -4,6 +4,7 @@ import type { Question } from "@/lib/types";
 import {
   currentCycleId,
   headerCycle,
+  headerReadsLive,
   infoOf,
   newestCycle,
   pageHasLiveCycle,
@@ -180,5 +181,30 @@ describe("pageHasLiveCycle", () => {
       "/c/a/flags/a-fl-04/edit",
     ])
       expect(pageHasLiveCycle(path)).toBe(false);
+  });
+});
+
+describe("headerReadsLive", () => {
+  const fixture = {
+    number: 5,
+    periodStart: "2026-10-10T04:00:00.000Z",
+    periodEnd: "2026-10-24T03:59:59.999Z",
+  };
+
+  test("a company with no fixture cycle (Company R) reads Convex on every page", () => {
+    for (const path of [
+      "/c/r",
+      "/c/r/manager",
+      "/c/r/workbook",
+      "/c/r/audit",
+      "/c/r/flags/k57abc",
+    ])
+      expect(headerReadsLive(path, null)).toBe(true);
+  });
+
+  test("a company with fixtures reads Convex on flag detail only", () => {
+    expect(headerReadsLive("/c/a/flags/k57abc", fixture)).toBe(true);
+    for (const path of ["/c/a", "/c/a/manager", "/c/a/workbook"])
+      expect(headerReadsLive(path, fixture)).toBe(false);
   });
 });
