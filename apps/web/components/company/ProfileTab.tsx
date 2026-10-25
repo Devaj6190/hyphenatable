@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { IntegrationLogo, integrationOf } from "@/components/BrandLogo";
 import { AppMark, Initials, StatusDot } from "@/components/company/bits";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -235,7 +236,16 @@ export function ProfileTab({
           )}
           {data.apps.map((a) => (
             <div key={a.system} className="flex items-center gap-3">
-              <AppMark app={a.system} size="lg" />
+              {integrationOf(a.name) ? (
+                <span className="flex h-9 w-24 shrink-0 items-center">
+                  <IntegrationLogo
+                    system={integrationOf(a.name) ?? "Jobber"}
+                    className={a.name === "Jobber" ? "h-4" : "h-8"}
+                  />
+                </span>
+              ) : (
+                <AppMark app={a.system} size="lg" />
+              )}
               <span className="flex min-w-0 flex-1 flex-col">
                 <span className="font-semibold">{a.name}</span>
                 <span className="text-sm text-muted-foreground">{a.what}</span>

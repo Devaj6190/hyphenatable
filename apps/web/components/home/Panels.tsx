@@ -3,6 +3,7 @@
 import { Check, CircleAlert, Info } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { IntegrationLogo } from "@/components/BrandLogo";
 import { type DataKind, DataLabel } from "@/components/DataLabel";
 import { Money } from "@/components/Money";
 import { Button } from "@/components/ui/button";
@@ -263,6 +264,13 @@ export function RunPanel({
           </span>
           <span className="font-bold tabular-nums">{Math.round(p * 100)}%</span>
         </div>
+        {!checking && (
+          <span className="flex items-center gap-3 self-start rounded-full bg-white/85 px-3 py-1.5">
+            <IntegrationLogo system="Jobber" className="h-4" />
+            <IntegrationLogo system="QuickBooks" className="h-4" />
+            <IntegrationLogo system="Gusto" className="h-4" />
+          </span>
+        )}
         <span className="block h-1.5 overflow-hidden rounded-full bg-white/35">
           <span
             className="block h-full rounded-full bg-sunset-ink"

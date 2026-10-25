@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
+import { RollPayLogo } from "@/components/BrandLogo";
 import { DataLabel } from "@/components/DataLabel";
 import { useLive } from "@/components/LiveProvider";
 import { RoleNotice, RoleSwitch } from "@/components/RoleSwitch";
@@ -38,11 +39,8 @@ export function ShellHeader() {
   return (
     <header className="border-b bg-card/70 px-4 py-3 lg:px-8 lg:py-4">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-4 gap-y-2">
-        <Link
-          href={routes.home(companyId)}
-          className="text-base font-semibold tracking-tight text-link lg:hidden"
-        >
-          RollPay
+        <Link href={routes.home(companyId)} className="lg:hidden">
+          <RollPayLogo className="h-7" />
         </Link>
         <div className="flex min-w-0 flex-col">
           <span className="truncate font-semibold">

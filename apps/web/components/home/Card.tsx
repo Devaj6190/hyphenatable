@@ -2,6 +2,7 @@
 
 import { Check, Undo2 } from "lucide-react";
 import { type ReactNode, useEffect, useRef } from "react";
+import { IntegrationLogo } from "@/components/BrandLogo";
 import { Money } from "@/components/Money";
 import { SourceChip } from "@/components/SourceChip";
 import { Button } from "@/components/ui/button";
@@ -54,6 +55,12 @@ export function SystemMark({
 }) {
   const m = MARK[system];
   if (!m) return null;
+  if (system === "Gusto" || system === "QuickBooks")
+    return (
+      <span className="inline-flex shrink-0" style={{ height: size }}>
+        <IntegrationLogo system={system} />
+      </span>
+    );
   return (
     <span
       aria-hidden
