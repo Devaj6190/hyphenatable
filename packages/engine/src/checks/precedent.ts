@@ -1,4 +1,5 @@
-import type { CheckId, Flag, Rule, RuleType } from "../schemas";
+import { payRate, venmoRate } from "../payroll/rates";
+import type { CheckId, Flag, Rule, RuleType, Worker } from "../schemas";
 
 /**
  * Which rule types count as precedent for a check. Later PRs append. CHK-14..22 follow the a-c06
@@ -6,6 +7,8 @@ import type { CheckId, Flag, Rule, RuleType } from "../schemas";
  */
 export const CHECK_RULE_TYPES: Partial<Record<CheckId, RuleType[]>> = {
   "CHK-03": ["long_shift_threshold"],
+  "CHK-10": ["pay_rate"],
+  "CHK-11": ["venmo_rate"],
   "CHK-14": ["vendor_job_hint"],
   "CHK-16": ["disposal_parent_link"],
   "CHK-17": ["expense_account_kind"],
@@ -32,6 +35,39 @@ export function rulePrecedent(rule: Rule): NonNullable<Flag["precedent"]> {
   const text =
     typeof statement === "string" && statement.trim() ? statement : rule.type;
   return { ruleId: rule.id, flagId: null, note: `rule: ${text}` };
+}
+
+/** Checks whose whole question is "which rate?": the rate rule that payroll uses answers it. */
+const RATE_FOR: Partial<
+  Record<CheckId, (w: Worker, rules: Rule[]) => ReturnType<typeof payRate>>
+> = {
+  "CHK-10": payRate,
+  "CHK-11": venmoRate,
+};
+
+/**
+ * The owner-approved rule that already answers this flag, or null. Exact: payroll takes this
+ * worker's rate from that one active rule (no conflict, a usable rate), and the owner approved it.
+ * A rule that only the system applied never settles a rate.
+ */
+export function settlingRule(
+  flag: Flag,
+  ctx: { rules: Rule[]; workers: Worker[] },
+): Rule | null {
+  const rateOf = RATE_FOR[flag.checkId];
+  const worker = ctx.workers.find((w) => w.id === flag.subject.workerId);
+  if (!rateOf || !worker) return null;
+  const rules = ctx.rules.filter((r) => r.companyId === flag.companyId);
+  const rate = rateOf(worker, rules);
+  if (!rate.ok) return null;
+  const [type] = CHECK_RULE_TYPES[flag.checkId] ?? [];
+  const used = rules.find(
+    (r) =>
+      r.type === type &&
+      r.status === "active" &&
+      r.params.workerId === worker.id,
+  );
+  return used?.provenance.approvedBy ? used : null;
 }
 
 const approvedAt = (r: Rule) =>
