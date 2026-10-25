@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RollPay</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <a class="logo" href="#home" data-go="home" aria-label="RollPay home">Ro<i></i><i></i>Pay</a>
+    <nav class="nav" id="nav" aria-label="Main">
+      <span class="ind" id="navInd" aria-hidden="true"></span>
+      <a href="#home" data-go="home">Home <span class="badge" id="badge">8</span></a>
+      <a href="#company" data-go="company">Company</a>
+      <a href="#workbook" data-go="workbook">Workbook</a>
+      <a href="#audit" data-go="audit">Audit</a>
+      <a href="#manager" data-go="manager">Manager</a>
+    </nav>
+    <p class="foot">Draft only. RollPay never submits payroll.</p>
+  </aside>
+
+  <main id="main" data-page="home">
+    <header class="top">
+      <span class="co">Greenline Landscaping</span>
+      <span class="muted">Oct 10 – 23</span>
+      <span class="run">Run PR-2026-21 <span class="chip draft">Draft</span> <span class="chip draft">synthetic · prototype</span></span>
+      <div class="switch" role="group" aria-label="Company">
+        <span class="sw" id="swInd" aria-hidden="true"></span>
+        <button type="button" aria-pressed="true" data-co="A" aria-label="Company A">A</button>
+        <button type="button" aria-pressed="false" data-co="B" aria-label="Company B">B</button>
+        <button type="button" aria-pressed="false" data-co="R" aria-label="Company R">R</button>
+      </div>
+    </header>
+
+
+    <div class="view" id="view">
+
+      <!-- HOME · warm paper, one thing at a time, landscape -->
+      <section class="page" data-page="home" aria-label="Home">
+        <div class="wrap">
+          <div data-s>
+            <h1>Good morning, Skyler</h1>
+            <p class="sub" id="homeSub">Pay period Oct 10–23 · <span class="num" id="leftCount">8</span> items need review before Gate 1</p>
+          </div>
+          <div class="kpis" data-s aria-label="Run summary">
+            <div><span class="eyebrow">Gross pay (draft)</span><strong class="num" id="kGross">$12,966.75</strong></div>
+            <div><span class="eyebrow">Employees</span><strong class="num" id="kPeople">14</strong></div>
+            <div><span class="eyebrow">Hours</span><strong class="num" id="kHours">596.5</strong></div>
+            <div><span class="eyebrow">Pay date</span><strong class="num">Fri, Oct 30</strong></div>
+          </div>
+          <div data-s style="display:flex;flex-direction:column;gap:10px">
+            <div class="seg" id="seg" aria-hidden="true"></div>
+            <div class="label" id="stepCaption">Step 3 of 8 · Asking</div>
+          </div>
+          <article class="card focus" data-s aria-label="Current item">
+            <div class="focus-head">
+              <div class="ring" aria-hidden="true"><svg aria-hidden="true" viewBox="0 0 44 44"><circle class="track" cx="22" cy="22" r="18"></circle><circle class="prog" id="ringProg" cx="22" cy="22" r="18"></circle></svg><span id="ringText">0/8</span></div>
+              <div>
+                <div style="font-weight:500">What we need from you</div>
+                <div class="label">Answer in any order</div>
+              </div>
+              <div class="pager">
+                <button type="button" class="btn btn-ghost icon-btn" id="prev" aria-label="Previous item"><span><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 6-6 6 6 6"/></svg></span></button>
+                <span class="count" id="qCount">1 of 8</span>
+                <button type="button" class="btn btn-ghost icon-btn" id="next" aria-label="Next item"><span><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 6 6 6-6 6"/></svg></span></button>
+              </div>
+            </div>
+            <div id="qbody" aria-live="polite"></div>
+          </article>
+          <div data-s id="upWrap">
+            <div class="label" style="margin-bottom:6px">Up next</div>
+            <div class="list" id="upNext"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- COMPANY · green band, roster of people cards -->
+      <section class="page company" data-page="company" aria-label="Company" hidden>
+        <div class="band" data-s>
+          <div class="band-in">
+            <div>
+              <div class="eyebrow">Company</div>
+              <h1>Greenline Landscaping</h1>
+              <p class="sub">14 people · 2 crews · paid every other Friday</p>
+            </div>
+            <div class="band-stats">
+              <div><strong class="num" id="coReady">11</strong><span>ready</span></div>
+              <div><strong class="num" id="coAttention">2</strong><span>need attention</span></div>
+              <div><strong>Oct 30</strong><span>next pay date</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="wrap wide">
+          <div class="tabs" role="tablist" aria-label="Company sections" data-s>
+            <span class="pill" aria-hidden="true"></span>
+            <button type="button" role="tab" aria-selected="true" data-tab="people">People</button>
+            <button type="button" role="tab" aria-selected="false" data-tab="rules">Pay rules</button>
+            <button type="button" role="tab" aria-selected="false" data-tab="conn">Connections</button>
+          </div>
+          <div data-s>
+            <div class="panel" data-panel="people">
+              <div class="roster" id="people"></div>
+              <div class="collapse" id="morePeople"><div><div class="roster" id="people2" style="padding-top:16px"></div></div></div>
+              <button type="button" class="link-btn" id="peopleToggle" aria-expanded="false" aria-controls="morePeople" style="margin-top:18px">Show all 14 <svg aria-hidden="true" class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></button>
+            </div>
+            <div class="panel" data-panel="rules" hidden>
+              <div class="rules">
+                <div class="rule"><span class="eyebrow">Schedule</span><strong>Every other Friday</strong><span class="muted">Next: Fri, Oct 30</span></div>
+                <div class="rule"><span class="eyebrow">Overtime</span><strong>1.5× after 40 hrs</strong><span class="muted">Counted by week</span></div>
+                <div class="rule"><span class="eyebrow">Hours from</span><strong>Jobber</strong><span class="muted">Synced each morning at 6</span></div>
+                <div class="rule"><span class="eyebrow">Cutoff</span><strong>Thu 6 PM</strong><span class="muted">Entries after that go to the next run</span></div>
+              </div>
+            </div>
+            <div class="panel" data-panel="conn" hidden>
+              <div class="card table">
+                <div class="conn"><span class="logo-sq" style="background:var(--sage-soft);color:var(--sage)">J</span><div style="flex:1"><div style="font-weight:500">Jobber</div><div class="label">Jobs and hours · synced 6:02 AM</div></div><span class="chip ok">Connected</span></div>
+                <div class="conn"><span class="logo-sq" style="background:var(--amber-soft);color:var(--amber)">V</span><div style="flex:1"><div style="font-weight:500">Venmo payees</div><div class="label" id="venmoNote">2 people · 1 missing a rate</div></div><span class="chip amber" id="venmoChip">Check</span></div>
+                <div class="conn"><span class="logo-sq" style="background:var(--sunk);color:var(--muted)">P</span><div style="flex:1"><div style="font-weight:500">Payroll provider</div><div class="label">Draft export only</div></div><span class="chip" style="background:var(--sunk);color:var(--muted)">Not set</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- WORKBOOK · ruled ledger sheet, mono numbers, totals rail -->
+      <section class="page workbook" data-page="workbook" aria-label="Workbook" hidden>
+        <div class="wrap full">
+          <div class="wb-head" data-s>
+            <div>
+              <div class="eyebrow">Workbook · regular draft</div>
+              <h1>Hours and wages</h1>
+            </div>
+            <div class="tabs" role="tablist" aria-label="Workbook sections">
+              <span class="pill" aria-hidden="true"></span>
+              <button type="button" role="tab" aria-selected="true" data-tab="hours">Hours</button>
+              <button type="button" role="tab" aria-selected="false" data-tab="comm">Commissions</button>
+              <button type="button" role="tab" aria-selected="false" data-tab="exc">Exceptions</button>
+            </div>
+          </div>
+          <div data-s>
+            <div class="panel" data-panel="hours">
+              <div class="ledger">
+                <div class="lrow lhead"><span class="l-idx">#</span><span class="l-name">Person</span><span class="l-n">Reg</span><span class="l-n">OT</span><span class="l-n">Rate</span><span class="l-n wide">Gross</span></div>
+                <div id="wbRows"></div>
+                <div class="lrow lsub" id="wbSub" aria-label="Subtotal"><span class="l-idx"></span><span class="l-name">Subtotal</span><span class="l-n" id="sReg">588.5</span><span class="l-n" id="sOt">8.0</span><span class="l-n"></span><span class="l-n wide" id="sGross">$12,966.75</span></div>
+              </div>
+            </div>
+            <div class="panel" data-panel="comm" hidden>
+              <div class="ledger">
+                <div class="lrow lhead"><span class="l-idx">#</span><span class="l-name">Person</span><span class="l-n">Sold</span><span class="l-n">Rate</span><span class="l-n wide">Owed</span></div>
+                <div class="lrow"><span class="l-idx">01</span><span class="l-name">Mia Torres</span><span class="l-n">$14,200.00</span><span class="l-n">6%</span><span class="l-n wide">$852.00</span></div>
+                <p class="label" style="padding:14px 0 6px">Paid on a separate run after Gate 2.</p>
+              </div>
+            </div>
+            <div class="panel" data-panel="exc" hidden>
+              <div class="ledger" id="excRows"></div>
+            </div>
+          </div>
+        </div>
+        <div class="totals" data-s>
+          <div class="totals-in">
+            <div><span>Regular</span><strong class="num" id="tReg">588.5 hrs</strong></div>
+            <div><span>Overtime</span><strong class="num" id="tOt">8.0 hrs</strong></div>
+            <div><span>People priced</span><strong class="num" id="tPeople">7 of 8</strong></div>
+            <div class="grand"><span>Gross so far</span><strong class="num" id="wbTotal">$12,966.75</strong></div>
+            <button type="button" class="btn btn-light" id="exportBtn"><span>Download draft</span></button>
+          </div>
+        </div>
+      </section>
+
+      <!-- AUDIT · big score, vertical checklist -->
+      <section class="page audit" data-page="audit" aria-label="Audit" hidden>
+        <div class="wrap wide">
+          <div class="score" data-s>
+            <div class="score-big">
+              <div class="eyebrow">Audit · this run</div>
+              <div class="score-num"><span class="num" id="passed">13</span><span class="of">/ 18</span></div>
+              <div class="muted">checks passed · last run 06:06</div>
+              <div class="label audit-note">Exported to audit log · 06:06</div>
+            </div>
+            <div class="score-side">
+              <div class="tile open"><strong class="num" id="openCount">5</strong><span>need you</span></div>
+              <div class="tile ok"><strong class="num" id="okCount">13</strong><span>passed</span></div>
+            </div>
+          </div>
+          <div class="bar" data-s aria-hidden="true"><span class="ok" id="barOk" style="flex-grow:13"></span><span class="open" id="barOpen" style="flex-grow:5"></span></div>
+          <div class="checklist" data-s>
+            <div class="eyebrow" style="margin-bottom:12px">To fix</div>
+            <div id="fixes"></div>
+            <button type="button" class="link-btn" id="passToggle" aria-expanded="false" aria-controls="passList" style="margin-top:14px"><span id="passLabel">13 passed checks</span><svg aria-hidden="true" class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></button>
+            <div class="collapse" id="passList"><div><div id="passItems" style="padding-top:10px"></div></div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- MANAGER · a conversation -->
+      <section class="page manager" data-page="manager" aria-label="Manager" hidden>
+        <div class="wrap thread">
+          <div class="who" data-s>
+            <span class="avatar big">DR</span>
+            <div><h1>Dakota Reyes</h1><p class="sub" style="margin-top:4px">Crew manager · texts · usually replies in the evening</p></div>
+            <span class="status" id="sendStatus"><i></i><span id="sendStatusText">Not sent</span></span>
+          </div>
+          <div class="chat" data-s>
+            <div class="day">Today</div>
+            <div class="msg them"><span class="avatar sm">DR</span><div class="bubble them">Morning. Crews are out by 7, I'll check my phone at lunch.</div></div>
+            <div class="msg me"><div class="bubble me" id="bubble"><span id="bubbleText"></span><span class="caret" id="caret"></span></div></div>
+            <div class="sysline num" id="sysline" hidden>Sent via SMS · 05:40 · logged to audit trail</div>
+            <div class="msg me"><div class="bubble me card-msg">
+              <div class="eyebrow" style="color:var(--muted)">Shared list · 10 jobs</div>
+              <div id="jobs" class="jobs"></div>
+              <div class="collapse" id="moreJobs"><div><div id="jobs2" class="jobs"></div></div></div>
+              <button type="button" class="link-btn" id="jobsToggle" aria-expanded="false" aria-controls="moreJobs" style="margin-top:6px"><span id="jobsLabel">6 more</span><svg aria-hidden="true" class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></button>
+            </div></div>
+            <div class="msg them waiting" id="waiting" hidden><span class="avatar sm">DR</span><div class="bubble them typing"><i></i><i></i><i></i></div></div>
+          </div>
+          <div class="composer" data-s>
+            <span class="label">Draft · goes out as a text from RollPay</span>
+            <div class="actions">
+              <button type="button" class="btn btn-primary" id="sendBtn"><span>Approve &amp; send</span></button>
+              <button type="button" class="btn btn-ghost" id="editBtn"><span>Edit</span></button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-label="Decision" inert>
+  <div style="display:flex;justify-content:flex-end"><button type="button" class="btn btn-ghost icon-btn" id="closeDrawer" aria-label="Close"><span><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"/></svg></span></button></div>
+  <div id="dBody" style="display:flex;flex-direction:column;gap:22px;flex:1;min-height:0"></div>
+</aside>
+<div class="toast" id="toast" role="status" aria-live="polite"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m5 12 5 5 9-10"/></svg><span id="toastText"></span></div>
+
+<script src="app.js"></script>
+</body>
+</html>
