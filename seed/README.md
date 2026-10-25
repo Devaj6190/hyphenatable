@@ -169,7 +169,7 @@ Five a-c04 records used to have "undefined" as the street, because the past-stre
   - `MANIFEST.md`, labelled "real, anonymized", with counts, reasons and the check-fixtures output.
 - **Nothing is guessed:**
   - A worker with no known role (from `m4-rules.json` `workers[].role`, `--roles`, or an owner draw) or no known pay type is blocked. So is any row that references a blocked worker.
-  - Time entries without `approved`/`payable`, which real Jobber exports lack, are unloadable until the contract allows null for them.
-  - Venmo reimbursements are unloadable, because `Expense.source` has no `venmo`.
+  - Time entries: `approved`, `payable` and `category` pass through as null when real exports lack them (contract #110); they are never defaulted. `ticking` is still required, so it is set only from a fact (false when `endAt` exists).
+  - Venmo reimbursements load as expenses with `source: "venmo"` (contract #116), `reimbursableToWorkerId` = the payee worker, and `reimbursementStatus: PAID` when the statement says Complete.
   - The company row is written only when every setting is known.
 - **Leak check:** if any word from `data/private/r/real-tokens.txt` appears in any file, the script refuses to write.

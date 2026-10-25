@@ -519,16 +519,43 @@ export function buildRPackage(
       expenseOf(x, "jobber"),
     ),
   ];
+  // Venmo reimbursements paid out to a worker: Expense.source "venmo" (contract #116)
+  const venmoReimbursements = load(
+    "expenses",
+    venmo.filter((v) => vClass(v) === "reimbursement"),
+    (v) => {
+      if (v.direction !== "out")
+        return { reasons: ["direction: a reimbursement must be paid out"] };
+      if (!vWorker(v) || !workerKnown(vWorker(v)))
+        return {
+          reasons: [
+            `reimbursableToWorkerId: worker ${vWorker(v)} is blocked or unknown (null would mean "not reimbursable")`,
+          ],
+        };
+      return {
+        id: v.id,
+        source: "venmo",
+        sourceId: v.sourceId ?? v.id,
+        date: vDay(v) || undefined,
+        amountCents: Math.abs(Number(v.amountCents)),
+        vendor: null,
+        description: null,
+        accountName: null,
+        customerRef: null,
+        paymentType: "venmo",
+        kind: "unknown",
+        matchedJobId: null,
+        matchConfidence: null,
+        reimbursableToWorkerId: vWorker(v),
+        // the statement's own status: a completed payout is a paid reimbursement
+        reimbursementStatus: v.status === "Complete" ? "PAID" : null,
+      };
+    },
+  );
+  expenses.push(...venmoReimbursements);
   for (const v of venmo) {
     const c = vClass(v);
-    if (c === "reimbursement")
-      unloadable.push({
-        table: "expenses",
-        id: String(v.id),
-        reasons: [
-          "source: Venmo reimbursement; Expense.source allows only qbo|jobber (contract ask: add venmo)",
-        ],
-      });
+    if (c === "reimbursement") continue;
     else if (c === "wage" && v.direction === "out" && vWorker(v)) continue;
     else if (c !== "personal_or_unknown") {
       const k =
@@ -537,7 +564,7 @@ export function buildRPackage(
     }
   }
 
-  // ---- time entries: ticking only as a fact; approved/payable/category never invented
+  // ---- time entries: ticking only as a fact; approved/payable/category pass through as null (contract #110), never defaulted
   const timeEntries: Rec[] = [];
   for (const e of merged("timeEntries")) {
     const d = String(
@@ -558,10 +585,6 @@ export function buildRPackage(
     if (!c) reasons.push(`cycleId: date ${d || "unknown"} is in no pay period`);
     if (e.jobId && !jobIds.has(String(e.jobId)))
       reasons.push(`jobId: job ${e.jobId} not loadable`);
-    if (e.category == null)
-      reasons.push(
-        "category: null (the Timesheets export has no timeSheetCategory column)",
-      );
     const row = {
       ...e,
       cycleId: c?.id,
