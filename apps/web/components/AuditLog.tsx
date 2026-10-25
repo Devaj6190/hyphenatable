@@ -306,10 +306,7 @@ export function AuditLog({
           </caption>
           <thead className="sticky top-0 z-10 hidden bg-muted text-xs font-medium tracking-wide text-muted-foreground uppercase md:table-header-group">
             <tr className="border-b">
-              <th
-                scope="col"
-                className="w-36 py-2.5 pr-3 pl-4 text-left"
-              >
+              <th scope="col" className="w-36 py-2.5 pr-3 pl-4 text-left">
                 Time
               </th>
               <th

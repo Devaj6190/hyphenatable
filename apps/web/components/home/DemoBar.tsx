@@ -88,12 +88,7 @@ export function DemoBar({
         >
           Next payroll
         </Button>
-        <Button
-          size="sm"
-          variant="quiet"
-          className={compact}
-          onClick={onReset}
-        >
+        <Button size="sm" variant="quiet" className={compact} onClick={onReset}>
           Reset
         </Button>
       </span>
