@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-10-24T19:04:39.016Z",
-  "gitSha": "9c15732cf3337ff4518c22c0d0a662d11a77a0f0",
+  "generatedAt": "2026-10-25T02:10:49.704Z",
+  "gitSha": "a90536eff9caf16bcbc50f230f3f39c64fa74ac8",
   "company": "a",
   "cycle": "a-c05",
   "flagsSource": "naive-fixture-checker (stand-in, not B's checks engine)",
