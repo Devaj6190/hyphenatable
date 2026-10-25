@@ -1,6 +1,6 @@
 # Role B: Agent and Backend (PayrollPilot, Cal Hacks 13.0)
 
-Binding context: `docs/plans/00-shared-context.md` (wins on any conflict), `specs/final.md`, `docs/plan-research.md`. Written Sat 2026-10-24 about 1:30 AM PDT. All clock times are PDT. Anything not confirmed by a first-hour check is marked **UNVERIFIED**. No private data (real names, runbook content, problem-register rows) appears here.
+Binding context: `docs/plans/00-shared-context.md` (wins on any conflict), `specs/final.md`, `docs/sources/plan-research.md`. Written Sat 2026-10-24 about 1:30 AM PDT. All clock times are PDT. Anything not confirmed by a first-hour check is marked **UNVERIFIED**. No private data (real names, runbook content, problem-register rows) appears here.
 
 Owner: **Devaj**.
 
@@ -28,7 +28,7 @@ Owner: **Devaj**.
 
 ## 2. Role onboarding (15 minutes)
 
-1. **Accounts.** GitHub repo write access. Convex: create the team project `payrollpilot` (free plan), invite Shanin and Varnika. Anthropic API key: one team key, stored only with `bunx convex env set ANTHROPIC_API_KEY …` and in your local `.env`. Voyage AI key (via MongoDB Atlas, see `docs/plan-research.md` section 7) or an OpenAI key for embeddings. Gusto developer org: Shanin creates it (H2); you get the `client_id` and `client_secret` for the demo app and the demo company id.
+1. **Accounts.** GitHub repo write access. Convex: create the team project `payrollpilot` (free plan), invite Shanin and Varnika. Anthropic API key: one team key, stored only with `bunx convex env set ANTHROPIC_API_KEY …` and in your local `.env`. Voyage AI key (via MongoDB Atlas, see `docs/sources/plan-research.md` section 7) or an OpenAI key for embeddings. Gusto developer org: Shanin creates it (H2); you get the `client_id` and `client_secret` for the demo app and the demo company id.
 2. **Tools.** Bun 1.4+, Node 22, Git, GitHub CLI. `bunx convex --version` once to pull the CLI.
 3. **Repo.** You run the scaffold (B-01) at 01:45. Until then, read `00-shared-context.md` sections 4 to 12 and this plan.
 4. **Local run.** Two terminals in `apps/web`: `bunx convex dev` and `bun dev`. The dashboard should show Company A fixture data once A-02 lands and you seed with `bunx convex run demo:reset '{"companyKey":"a","toCycle":1}'`.

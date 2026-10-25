@@ -1,12 +1,8 @@
 # PayrollPilot: Shared Context and Binding Conventions (all three role plans follow this)
 
-Read this first. Every role plan (`A-data-payroll.md`, `B-agent-backend.md`, `C-product-messaging-demo.md`) builds on it. If a plan and this file disagree, this file wins until the team changes it in a PR. Written Sat 2026-10-24 at about 1:15 AM PDT. All clock times are PDT.
+Reference, not required reading: open the section you need. Every role plan (`A-data-payroll.md`, `B-agent-backend.md`, `C-product-messaging-demo.md`) builds on it; if a plan and this file disagree, this file wins. Where code exists (`packages/engine/src/schemas.ts`, `apps/web/convex/schema.ts`), the code is the contract. Written Sat 2026-10-24 at about 1:15 AM PDT. All clock times are PDT.
 
-Related files:
-- Spec (source of truth for what we build): `specs/final.md`
-- Research (why each tool was chosen, with sources): `docs/plan-research.md`, raw notes in `docs/sources/research/`
-- Hyphenate track and workshop notes: `docs/sources/`
-- Team brief (who does what, first hour): `docs/plans/00-team-brief.md`
+Sections 3, 4.2, 4.3 and 18 to 20 (the night-one clock, scaffold commands, first-hour checks, onboarding) are done and retired; they are in git history at `a90563e`. Section numbers are kept so references elsewhere still point to the right place.
 
 ---
 
@@ -30,38 +26,9 @@ Shanin may take dashboard design work if the data side moves fast; the trade is 
 
 ---
 
-## 3. Clock (PDT) and gates
-
-Hard facts: at the venue by **Sun 08:00**, Devpost submission by **Sun 09:00** (hard), judging 10:30 to 12:30, 3-minute pitch plus 2 minutes of questions, live demo required.
-
-| Time | Milestone | Gate checklist (owner in bold) |
-|---|---|---|
-| Sat 01:15 to 01:45 | Everyone reads `00-team-brief.md`, skims this file, reads their own plan | |
-| Sat 01:45 to 03:00 | **Foundation.** Accounts and first-hour checks (section 4.3), scaffold, schema PR, fixtures | |
-| **Sat 03:00 G0** | Repo scaffolded and on `main`; Convex deployed; schema merged; one fixture JSON per table; first-hour-check results logged in `docs/INTEGRATIONS.md`; Jobber tester account authorized; Gusto developer org created; Photon test message sent | **B** schema and Convex; **A** fixtures, Jobber, Gusto signup; **C** Photon, Next.js skeleton |
-| Sat 03:00 to 05:00 | First vertical slices: seed generator v1 (A), Jobber sync into Convex (A+B), dashboard skeleton reading Convex (C), courier hello round trip (C) | |
-| Sat 05:00 to 09:00 | **Sleep, everyone.** Leave `main` green and a note in `docs/STATUS.md` | |
-| Sat 09:00 to 13:00 | Data in, checks on | |
-| **Sat 13:00 G1** | Company A seeded in all three sandboxes and pulled into Convex with completeness checks green; the checks engine produces flags for the planted errors; the dashboard lists flags live; Company R's past cycle ingested read-only and anonymized; courier round trip proven on the real phone | **A** seed and sync; **B** checks; **C** dashboard and courier |
-| Sat 13:00 to 18:00 | The loop | |
-| **Sat 18:00 G2** | The full loop once, end to end: flag → question drafted → owner approves → text reaches the phone → reply lands → interpreted → correction proposed → approved → workbook updates → Stage 1 draft filled in Gusto demo (prepare + update + calculate) → audit log complete. Onboarding proposes rules from Company A's past cycles | **B** loop and Gusto write; **C** approval UI and courier; **A** payroll math and workbook |
-| Sat 18:00 to 23:00 | Learning and proof | |
-| **Sat 23:00 G3** | Lesson loop works: an answer becomes a lesson, is classified and backtested, the owner approves it, cycle 2 asks fewer questions (counts on screen). The 25% catch-all and the judge scenario (unseen case → "no precedent" escalation) work. `eval/` prints precision and recall vs. the answer key and the Company R backtest. Stage 2 math and reconciliation report render. Devpost draft submitted (the hacker guide says submit a draft Saturday night). Video script locked | **B** lessons; **A** eval and Stage 2; **C** Devpost draft and script |
-| Sat 23:00 to Sun 02:00 | Stretch in order: Company B seed; Stage 2 off-cycle draft; real-company live run on the current cycle (the moment); polish. Record raw video takes | |
-| Sun 02:00 to 05:00 | **Sleep in two shifts** (two sleep 02:00 to 04:00, one sleeps 04:00 to 06:00); the awake person keeps `main` green and edits video | |
-| Sun 05:00 to 06:30 | Final video cut; rehearsal 1 (timed, 3 minutes); README final | |
-| **Sun 06:30 Freeze** | Fixes only. Tag `demo`. Cached fallbacks verified (section 15) | **C** |
-| Sun 06:30 to 08:00 | Travel; be at the venue by 08:00 | |
-| Sun 08:00 to 08:40 | Final Devpost edits; video link checked on a phone; rehearsal 2 | **C** |
-| **Sun 08:40** | Submit. Confirm on a second device | **C** |
-| Sun 09:00 | Deadline | |
-| Sun 10:30 to 12:30 | Judging. Laptop charged, phone registered with Photon, Company A loaded at cycle 2, judge-scenario script in hand | all |
-
----
-
 ## 4. Stack
 
-### 4.1 Choices (justified in `docs/plan-research.md`)
+### 4.1 Choices (justified in `docs/sources/plan-research.md`)
 | Layer | Choice | Why |
 |---|---|---|
 | Language | TypeScript everywhere, Bun 1.3.13 (pinned in CI) as package manager and runtime for scripts | one language for three people; the earlier Photon bridge ran on Bun |
@@ -75,44 +42,6 @@ Hard facts: at the venue by **Sun 08:00**, Devpost submission by **Sun 09:00** (
 | Tests | Vitest for `packages/engine` and `packages/connectors`; `convex-test` for Convex functions (verify the package on first use) | pure engine is 100% testable offline |
 | Lint and format | Biome | one tool |
 | CI | GitHub Actions: install, Biome, typecheck, Vitest | small on purpose |
-
-Plan B if Convex fails its first-hour check (H5): Neon Postgres + Drizzle, one Bun worker on Railway doing the loop and the Photon stream, Next.js polling every 2 s. The engine and connectors packages do not change.
-
-### 4.2 Scaffold (B runs this at 01:45; everyone else pulls at G0)
-```bash
-# from the repo root
-bun init -y >/dev/null 2>&1 || true
-mkdir -p apps packages seed eval data/fixtures data/private docs
-# dashboard + convex
-# create-next-app 16.4.3 has no --eslint=false / --src-dir=false; this is the form that works:
-cd apps && npx create-next-app@16.4.3 web --ts --app --tailwind --biome --no-src-dir --import-alias "@/*" --use-bun --skip-install --disable-git --yes && cd web
-mv biome.json ../../biome.json   # one Biome config at the root
-bun add convex @anthropic-ai/sdk zod
-bunx convex login        # once per machine (device flow in the browser)
-bunx convex dev --once   # creates the dev deployment, convex/_generated and .env.local (NEXT_PUBLIC_CONVEX_URL)
-# no login yet? CONVEX_AGENT_MODE=anonymous bunx convex dev runs a local backend (port 3210) for offline work
-cd ../..
-# workspaces
-cat > package.json <<'JSON'
-{ "name": "payrollpilot", "private": true, "workspaces": ["apps/*", "packages/*", "seed", "eval"],
-  "scripts": { "dev": "bun run --filter web dev", "test": "bun run --filter '*' test", "check": "bunx biome check . && bun run --filter '*' typecheck" } }
-JSON
-```
-Then `packages/engine` (`bun init`, `vitest`, `zod`), `packages/connectors`, `apps/courier` (`bun create spectrum-project@latest courier --providers imessage`, then move into `apps/`), `seed`, `eval`. Exact commands are in plan B (B-01). If `create-next-app` or `convex dev` behaves differently from the above, B fixes the commands in this file in the same PR.
-
-### 4.3 First-hour checks (from `docs/plan-research.md` section 13; each result goes in `docs/INTEGRATIONS.md`)
-| # | Check | Owner | Fallback |
-|---|---|---|---|
-| H1 | Jobber tester account created; "PayrollPilot (Dev)" read app authorized via GraphiQL once; `timeSheetEntries(first: 5)` returns `approved`, `ticking`, `totalCount`; second write-scope app "PayrollPilot Seed" created. **Also check how many users a tester account can have** (unknown; Company A needs 12) | A | fewer workers (6) or the Excel export route |
-| H2 | Gusto developer org + application created at dev.gusto.com; demo company created; `GET /v1/companies/{c}/payrolls?processing_statuses=unprocessed` works; `prepare` on it works | A (signup) then B | local mock of the six payroll endpoints; UI labels Gusto "simulated" |
-| H3 | QuickBooks sandbox: OAuth Playground tokens; `SELECT count(*) FROM Purchase`; credentials in the shared `.env`; whose developer account | A | Devaj's sandbox or export fixtures |
-| H4 | Photon: owner phone and "manager" phone registered as project users; one message sent from `spectrum-ts`; one reply received through `app.messages` without a tunnel | C | Telegram provider; last resort an in-app inbox labelled simulated |
-| H5 | Convex: dev deployment, one table, one scheduled function, one HTTP action, a Next.js page subscribed to a query; one Anthropic call from a `"use node"` action | B | Plan B above |
-| H6 | Claude: one structured-output call to `claude-opus-5-5` with `effort: "medium"`; billing confirmed | B | OpenRouter route from the earlier build |
-| H7 | Embeddings: one Voyage or OpenAI call; one vector stored and searched with a company filter in Convex | B | lexical match on structured rule fields for the weekend |
-| H8 | Playwright `storageState` login to the Jobber tester account and one Timesheets report read | A, after G1 | Browser Use Cloud |
-
----
 
 ## 5. Repo layout (target; this reorganizes the repo)
 
@@ -388,41 +317,3 @@ A target is never presented as a result. Every number on screen says "measured o
 - Contract changes: PR title starts with `contract:`; message the other two before merging.
 - Decisions go in repo files (`docs/STATUS.md`, this plan), not chat.
 - Commit messages: `feat(engine): CHK-04 overlap`, `fix(web): approval sheet on mobile`.
-
----
-
-## 18. AGENTS.md (copy into the repo root)
-
-```
-# PayrollPilot agent rules
-- Read docs/plans/00-shared-context.md and your role plan before changing code.
-- Plain code owns state, approvals and money. Agents return validated proposals; nothing happens without a human approval or a deterministic rule.
-- Pure logic lives in packages/engine (no IO, Vitest). Convex functions are thin. The UI never computes pay.
-- Money is integer cents. Times are ISO UTC. Ids trace back to the source record.
-- The model never receives names, phone numbers, notes, pay amounts in texts, SSNs or bank data. Ids only.
-- Checks fire only on exact conditions; anything that needs judgment becomes a question. Never auto-correct. Never invent a rate. Never trim hours.
-- Every sync records pulled vs expected. Incomplete blocks what it covers.
-- Never call Gusto submit. There is no submit function in this codebase.
-- Edit only the folders your role owns. Contract files change only by a `contract:` PR.
-- Every PR targets main. One feature per PR. Check main after merging.
-- No secrets in the repo. No real names anywhere. data/private is gitignored.
-- Numbers shown to users say where they came from and whether they are synthetic.
-```
-
----
-
-## 19. Team onboarding (15 minutes per person)
-
-1. Accounts: GitHub repo; Convex (B creates the project, invites A and C); Vercel project `payrollpilot` (Shanin invites C); Anthropic API key (one team key in Convex env); Jobber Developer Center (Shanin) and the tester account login (shared); Gusto developer org (whoever creates it invites the others); QuickBooks developer account (Devaj) with sandbox credentials in `.env`; Photon dashboard (Shanin) with both demo phones registered as users.
-2. Tools: Bun 1.4+, Node 22, Git, GitHub CLI, Playwright browsers (`bunx playwright install chromium`, A only).
-3. `git clone`, `bun install`, `cp .env.example .env` (fill from the shared vault message), `cd apps/web && bunx convex dev` (in one terminal) and `bun dev` (in another). Open the dashboard; confirm you see Company A's fixture data.
-4. Read `AGENTS.md`, `docs/STATUS.md`, your role plan. Pick your first task id and post it in `docs/STATUS.md`.
-
----
-
-## 20. Plan files
-
-- `docs/plans/00-team-brief.md`: who does what, the first hour, hand-offs.
-- `docs/plans/A-data-payroll.md`
-- `docs/plans/B-agent-backend.md`
-- `docs/plans/C-product-messaging-demo.md`

@@ -1,6 +1,6 @@
 # Role A: Data and Payroll (PayrollPilot, Cal Hacks 13.0)
 
-Binding context: `docs/plans/00-shared-context.md` (wins on any conflict), `specs/final.md`, `docs/plan-research.md` (sections 9 to 14 are A's reference material). Written Sat 2026-10-24 about 1:30 AM PDT. All clock times are PDT. Anything not confirmed is marked **UNVERIFIED** and has a first-hour check. No number in this file is invented; every figure has a source or is labelled synthetic.
+Binding context: `docs/plans/00-shared-context.md` (wins on any conflict), `specs/final.md`, `docs/sources/plan-research.md` (sections 9 to 14 are A's reference material). Written Sat 2026-10-24 about 1:30 AM PDT. All clock times are PDT. Anything not confirmed is marked **UNVERIFIED** and has a first-hour check. No number in this file is invented; every figure has a source or is labelled synthetic.
 
 Person: Shanin. Also the only person who can run anything against Company R (the real company) and the only one with the Jobber Developer Center login.
 

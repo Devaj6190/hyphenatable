@@ -1,6 +1,6 @@
 # Creao plan: verified against Creao's own docs (Sat Oct 24, 15:10 PDT, B)
 
-Replaces the open decisions in [handoff-creao.md](handoff-creao.md). Every platform fact below was read today in one of three places: the hackathon page (`community.creao.ai/CalHacks2026`), its Tech Stack page (`/CalHacks2026/tech`), and the full docs file `docs.creao.ai/llms-full.txt`. Where the handoff or [research/creao.md](../sources/research/creao.md) said something different, section 2 says so.
+Replaces the open decisions in the Creao handoff (retired; in git history at `a90563e`). Every platform fact below was read today in one of three places: the hackathon page (`community.creao.ai/CalHacks2026`), its Tech Stack page (`/CalHacks2026/tech`), and the full docs file `docs.creao.ai/llms-full.txt`. Where the handoff or [research/creao.md](../sources/research/creao.md) said something different, section 2 says so.
 
 **Verdict: GO, gated by a 90-minute spike.** Creao helps us in three concrete ways and has no deal-breaker for how we would use it. If the spike fails, we drop Creao and nothing else in the plan changes.
 

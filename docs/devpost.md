@@ -1,6 +1,6 @@
 # Devpost submission text
 
-Owner: Varnika (C). v0 skeleton, Sat Oct 24. Paste from here into Devpost; edit here first. Sources: `docs/plans/C-product-messaging-demo.md` section 8.4, `specs/final.md`, `docs/plan-research.md` sections 1 to 3. **[TODO]** marks what the plan doesn't answer yet; **[measured at G3]** marks a number that must come from `eval/results.json` / `docs/PROOF.md`.
+Owner: Varnika (C). v0 skeleton, Sat Oct 24. Paste from here into Devpost; edit here first. Sources: `docs/plans/C-product-messaging-demo.md` section 8.4, `specs/final.md`, `docs/sources/plan-research.md` sections 1 to 3. **[TODO]** marks what the plan doesn't answer yet; **[measured at G3]** marks a number that must come from `eval/results.json` / `docs/PROOF.md`.
 
 Rules for every word below: fake names only; no pay amounts; no real company names, runbook contents or problem-register rows (counts only); nothing Hyphenate shared privately (funding, pricing, contract sizes, roadmap); a target is never presented as a result.
 
