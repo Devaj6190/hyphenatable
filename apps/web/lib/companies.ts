@@ -49,6 +49,13 @@ export const companies: Record<string, CompanyInfo> = {
 
 export const DEFAULT_COMPANY = "a";
 
+// A real company's payroll is never written: RollPay fills a Gusto draft for synthetic companies only (plan A-16).
+// The UI hides every fill action for these; Convex should refuse it too (asked of B).
+export const REAL_PAYROLL_NOTE =
+  "Real company: RollPay never fills its Gusto draft";
+export const isRealPayroll = (companyId: string): boolean =>
+  companies[companyId]?.kind === "real, anonymized";
+
 export const SEATS_LINE =
   "RollPay fills the seat of the person who prepares and checks payroll before it is submitted.";
 
