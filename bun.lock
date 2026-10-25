@@ -82,6 +82,7 @@
     "packages/engine": {
       "name": "@payrollpilot/engine",
       "dependencies": {
+        "@anthropic-ai/sdk": "^1.3.0",
         "zod": "^4",
       },
       "devDependencies": {
