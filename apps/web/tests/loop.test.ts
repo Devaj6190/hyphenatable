@@ -296,3 +296,57 @@ describe("settled flags stay settled", () => {
     ).rejects.toThrow(/out of date/);
   });
 });
+
+describe("demo.simulatedReply", () => {
+  test("an approved question gets a simulated send and reply through the real path; off outside demo mode", async () => {
+    const s = await seed();
+    const { t } = s;
+    await t.mutation(internal.questions.draftForCycle, { cycleId: s.cycleId });
+    const q = await t.run(async (ctx) =>
+      (await ctx.db.query("questions").collect()).find(
+        (x) => x.status === "draft",
+      ),
+    );
+    if (!q) throw new Error("no draft question");
+    await t.mutation(api.questions.approve, {
+      questionId: q._id,
+      userId: s.managerId,
+    });
+
+    delete process.env.DEMO_MODE;
+    await expect(
+      t.action(api.demo.simulatedReply, { questionId: q._id }),
+    ).rejects.toThrow(/DEMO_MODE/);
+
+    process.env.DEMO_MODE = "1";
+    const r = await t.action(api.demo.simulatedReply, { questionId: q._id });
+    expect(r.reply).toBe("1");
+    await t.finishAllScheduledFunctions(vi.runAllTimers);
+    const after = await t.run(async (ctx) => ({
+      question: await ctx.db.get(q._id),
+      cycle: await ctx.db.get(s.cycleId),
+      messages: await ctx.db.query("messages").collect(),
+      corrections: await ctx.db.query("corrections").collect(),
+      audit: await ctx.db.query("auditEvents").collect(),
+    }));
+    // Same outcome as the courier test above: "1" drops the 1pm-3pm entry, for the owner to approve.
+    expect(after.question?.status).toBe("answered");
+    expect(after.cycle?.questionsAsked).toBe(1);
+    expect(after.corrections[0]).toMatchObject({
+      status: "proposed",
+      target: { table: "timeEntries", id: s.b, field: "payable" },
+    });
+    expect(after.messages.map((m) => m.providerId)).toEqual(
+      after.messages.map(() => expect.stringMatching(/^simulated:/)),
+    );
+    expect(after.audit.map((e) => e.type)).toEqual(
+      expect.arrayContaining(["question.sent", "demo.simulated_reply"]),
+    );
+
+    // Answered: nothing left to reply to.
+    await expect(
+      t.action(api.demo.simulatedReply, { questionId: q._id, text: "2" }),
+    ).rejects.toThrow(/only an approved or sent/);
+    delete process.env.DEMO_MODE;
+  });
+});
