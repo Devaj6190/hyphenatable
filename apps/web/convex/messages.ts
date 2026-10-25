@@ -38,6 +38,9 @@ import { queueText } from "./questions";
 
 const OPEN = ["sent", "reminded"] as const;
 
+/** Flags a person already settled; replies and questions never move them back. */
+export const SETTLED = new Set(["corrected", "dismissed"]);
+
 /** Demo timing: 2 minutes to a reminder and 2 more to expiry; otherwise 4 hours each. */
 const remindMs = () =>
   process.env.DEMO_MODE === "1" ? 2 * 60_000 : 4 * 3_600_000;
@@ -403,6 +406,14 @@ async function decide(
         model,
       },
     });
+
+  // A reply about a flag a person already settled is kept as evidence but changes nothing: it never
+  // reopens the flag or proposes a second correction. STOP is still honoured.
+  if (step !== "stop" && SETTLED.has(flag.status))
+    return audit(
+      "reply.after_settled",
+      `Reply kept; the flag was already ${flag.status}, so nothing changes`,
+    );
 
   switch (step) {
     case "stop": {

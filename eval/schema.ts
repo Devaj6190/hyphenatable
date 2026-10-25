@@ -15,6 +15,8 @@ export const Results = z.object({
   cycle: z.string(),
   flagsSource: z.string(),
   synthetic: z.boolean(),
+  /** How to read the numbers (e.g. what M1 counts). */
+  notes: z.array(z.string()),
   m1: z.object({
     keyRows: z.number().int(),
     flags: z.number().int(),
@@ -28,6 +30,8 @@ export const Results = z.object({
     unmatchedFlags: z.array(
       z.object({ id: z.string(), checkId: z.string(), seen: z.string() }),
     ),
+    /** Flags that are not planted-error checks (AGT-01, LRN-01, ...), by checkId; not in precision. */
+    otherFlags: z.record(z.string(), z.number().int()),
   }),
   m2: z.union([
     z.object({ status: z.literal("pending"), reason: z.string() }),
