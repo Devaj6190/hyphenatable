@@ -175,26 +175,42 @@ export class Anonymizer {
   workerName(real: string): string {
     const key = nameKey(real);
     if (!key) throw new Error("empty worker name");
+    const realWords = this.realWords(key);
+    const clashes = (fake: string) => words(fake).some((w) => realWords.has(w));
     const known = this.map.workers[key];
-    if (known) return known;
+    // a stored pseudonym is kept unless a real name seen since shares a word with it
+    if (known && !clashes(known)) return known;
+    delete this.map.workers[key];
     const used = new Set(Object.values(this.map.workers));
-    const realWords = new Set([...key.split(" "), ...this.avoid]);
-    let i = Number.parseInt(this.h("w", key).slice(0, 8), 16);
-    for (let tries = 0; tries < FIRST.length * LAST.length; tries++, i++) {
+    // deterministic re-roll: attempt n draws from HMAC(salt, key + n)
+    for (let n = 0; n < FIRST.length * LAST.length * 4; n++) {
+      const i = Number.parseInt(
+        this.h("w", n === 0 ? key : `${key}#${n}`).slice(0, 8),
+        16,
+      );
       const first = FIRST[i % FIRST.length] as string;
       const last = LAST[Math.floor(i / FIRST.length) % LAST.length] as string;
       const fake = `${first} ${last}`;
-      // never reuse a pseudonym, never echo a word of the real name
-      if (
-        !used.has(fake) &&
-        !realWords.has(first.toLowerCase()) &&
-        !realWords.has(last.toLowerCase())
-      ) {
+      // never reuse a pseudonym, never echo a word of any real name
+      if (!used.has(fake) && !clashes(fake)) {
         this.map.workers[key] = fake;
         return fake;
       }
     }
     throw new Error("pseudonym space exhausted");
+  }
+
+  /** Every word of every real name known (this run's reserved names and every name in the map) plus `key`. */
+  private realWords(key: string): Set<string> {
+    const out = new Set([...key.split(" "), ...this.avoid]);
+    for (const k of [
+      ...Object.keys(this.map.workers),
+      ...Object.keys(this.map.clients),
+      ...Object.keys(this.map.vendors ?? {}),
+      ...Object.keys(this.map.parties ?? {}),
+    ])
+      for (const w of k.split(" ")) if (w) out.add(w);
+    return out;
   }
 
   /** A payee that is not a known worker: "Vendor V07". Vendors can be sole traders (people), so never kept. */
@@ -266,12 +282,18 @@ export class Anonymizer {
    * `chartWords`: words of the chart-of-accounts names kept in the output ("Landscape Supplies"). A vendor
    * word that is also an account word ("landscape") is not scanned for, or every such vendor would abort the
    * ingest; person and client words are always scanned.
+   * `allow`: owner-approved words that are not names (data/private/r/token-allow.txt): never scanned for,
+   * whatever list they come from. Nothing is added to it automatically.
    */
-  realTokens(chartWords: Set<string> = new Set()): string[] {
+  realTokens(
+    chartWords: Set<string> = new Set(),
+    allow: Set<string> = new Set(),
+  ): string[] {
     const words = new Set<string>();
     const add = (k: string, skip: Set<string>) => {
       for (const w of k.split(" "))
-        if (w.length >= 3 && !STOP.has(w) && !skip.has(w)) words.add(w);
+        if (w.length >= 3 && !STOP.has(w) && !skip.has(w) && !allow.has(w))
+          words.add(w);
     };
     for (const k of [
       ...Object.keys(this.map.workers),
@@ -348,9 +370,9 @@ export interface AnonPaid {
   /** per pay-type amounts in cents (Regular, Overtime, Commission, ...); no taxes */
   earningsCents?: Record<string, number>;
   hours?: Record<string, number>;
-  /** itemized lines with job role and rate (job names are roles, e.g. "Landscaper", not people) */
+  /** itemized lines with job and rate; the Gusto job label (a role, a job, sometimes a person's name) is a job id */
   jobLines?: {
-    job: string | null;
+    jobId: string | null;
     payType: string;
     hours: number | null;
     rateCents: number | null;
@@ -488,10 +510,13 @@ export function anonymizeExports(
   ]);
   const workers = new Map<string, AnonWorker>();
   const jobs = new Map<string, AnonJob>();
+  const workerReal = new Map<string, string>();
   const worker = (real: string) => {
     const id = a.id("w", real);
-    if (!workers.has(id))
+    if (!workers.has(id)) {
       workers.set(id, { id, displayName: a.workerName(real) });
+      workerReal.set(id, real);
+    }
     return id;
   };
   const teamLead = (id: string, flag: boolean | undefined) => {
@@ -538,6 +563,13 @@ export function anonymizeExports(
       });
     }
   }
+  const job = (real: string) => {
+    const id = a.id("j", real);
+    const j = a.job(real);
+    if (!jobs.has(id))
+      jobs.set(id, { id, jobNumber: j.number, title: j.label });
+    return id;
+  };
   const paid: AnonPaid[] = [];
   for (const f of input.journals) {
     for (const r of f.rows) {
@@ -555,20 +587,17 @@ export function anonymizeExports(
               employeeType: r.employeeType ?? null,
               earningsCents: r.earningsCents,
               hours: r.hours,
-              jobLines: r.jobLines ?? [],
+              // job labels can be a person's name: never kept, always a job id
+              jobLines: (r.jobLines ?? []).map(({ job: label, ...l }) => ({
+                jobId: label?.trim() ? job(label) : null,
+                ...l,
+              })),
               ownerDrawCents: r.ownerDrawCents ?? 0,
             }
           : {}),
       });
     }
   }
-  const job = (real: string) => {
-    const id = a.id("j", real);
-    const j = a.job(real);
-    if (!jobs.has(id))
-      jobs.set(id, { id, jobNumber: j.number, title: j.label });
-    return id;
-  };
   const expenses: AnonExpense[] = [];
   for (const f of input.qbo ?? []) {
     // sheets are numbered by first appearance: workbook and sheet names can carry the company's name
@@ -651,6 +680,11 @@ export function anonymizeExports(
     input.venmo ?? [],
     reports.jobberExpenses,
   );
+  // names seen after a worker got its pseudonym (a client, vendor or party) can collide with it: re-check
+  for (const [id, w] of workers) {
+    const real = workerReal.get(id);
+    if (real) w.displayName = a.workerName(real);
+  }
   return {
     namesAnonymized: true,
     companyId,

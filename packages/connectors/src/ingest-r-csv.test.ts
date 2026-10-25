@@ -35,7 +35,7 @@ describe("ingest-r with the real-layout CSVs (replicas)", () => {
       paidPeriods: 5,
       paidPeriodsWithOffCycle: 1,
       ownerDrawRows: 1,
-      jobs: 2,
+      jobs: 5, // 2 Jobber jobs + 3 Gusto job labels (Landscaper, Team Leader, Truck Hauling)
       clients: 2,
     });
     expect(c.syncRuns).toEqual([
@@ -95,6 +95,9 @@ describe("ingest-r with the real-layout CSVs (replicas)", () => {
     expect(b.jobs.map((j: { title: string }) => j.title)).toEqual([
       "Job J001",
       "Job J002",
+      "Job J003",
+      "Job J004",
+      "Job J005",
     ]);
     expect(b.syncRuns.map((s: { method: string }) => s.method)).toEqual([
       expect.stringMatching(/^export jobber-timesheets-csv file:[0-9a-f]{10}$/),
@@ -130,12 +133,12 @@ describe("ingest-r with the real-layout CSVs (replicas)", () => {
         /team leader/i.test(w.displayName),
       ),
     ).toBe(false);
-    expect(b.paid[0].jobLines.map((l: { job: string }) => l.job)).toEqual([
-      "Landscaper",
-      "Team Leader",
-      "Team Leader",
-      "Team Leader",
-    ]);
+    // Gusto job labels are job ids (a label can be a person's name)
+    const ids = b.paid[0].jobLines.map((l: { jobId: string }) => l.jobId);
+    expect(ids[0]).toMatch(/^r:j:/);
+    expect(ids.slice(1)).toEqual([ids[1], ids[1], ids[1]]);
+    expect(ids[1]).not.toBe(ids[0]);
+    expect(out).not.toContain("Landscaper");
     const tokens = (await readFile(join(dir, "real-tokens.txt"), "utf8"))
       .trim()
       .split("\n");

@@ -167,6 +167,25 @@ async function openAnonymizer(privateDir: string): Promise<Anonymizer> {
   return new Anonymizer(salt, map);
 }
 
+/**
+ * data/private/r/token-allow.txt: words the owner approved as not names ("owner", "pay"), one per line,
+ * case-insensitive, "#" comments. Written by a person, never by code; absent means nothing is allowed.
+ */
+export async function loadTokenAllow(privateDir: string): Promise<Set<string>> {
+  try {
+    const text = await readFile(join(privateDir, "token-allow.txt"), "utf8");
+    return new Set(
+      text
+        .split("\n")
+        .map((l) => l.replace(/#.*/, "").trim().toLowerCase())
+        .filter(Boolean),
+    );
+  } catch (e) {
+    if ((e as NodeJS.ErrnoException).code !== "ENOENT") throw e;
+    return new Set();
+  }
+}
+
 /** Check, then (unless dry run) persist map + token list and write the payload to out/. Returns the out path. */
 async function persist(
   privateDir: string,
@@ -176,7 +195,7 @@ async function persist(
   dryRun?: boolean,
   chartWords?: Set<string>,
 ): Promise<string | null> {
-  const tokens = a.realTokens(chartWords);
+  const tokens = a.realTokens(chartWords, await loadTokenAllow(privateDir));
   const json = assertSafeToWrite(payload, tokens);
   if (dryRun) return null;
   await mkdir(join(privateDir, "out"), { recursive: true, mode: 0o700 });
