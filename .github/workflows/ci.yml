@@ -16,4 +16,5 @@ jobs:
       - run: bun run check
       - run: bun run test
       - name: auditEvents is append-only
-        run: "! grep -rnE 'db\.(patch|replace|delete)\([^)]*auditEvents' apps/web/convex --include=*.ts --exclude-dir=_generated"
+        run: |
+          ! grep -rnE 'db\.(patch|replace|delete)\([^)]*auditEvents' apps/web/convex --include=*.ts --exclude-dir=_generated
