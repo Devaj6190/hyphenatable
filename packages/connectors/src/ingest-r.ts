@@ -31,6 +31,16 @@ import {
   isSectionedJournal,
   readGustoPayrollJournalSectionedCsv,
 } from "./exports/gusto-payroll-journal-sectioned.ts";
+import {
+  EXPENSE_REPORT,
+  INVOICES_REPORT,
+  JOBS_REPORT,
+  QUOTES_REPORT,
+  type ReportRow,
+  type ReportSpec,
+  readJobberReportCsv,
+  TRANSACTION_LIST,
+} from "./exports/jobber-reports.ts";
 import { readJobberTimesheetsCsv } from "./exports/jobber-timesheets-csv.ts";
 import { readJobberTimesheetsXlsx } from "./exports/jobber-timesheets-xlsx.ts";
 import { readQboXlsx } from "./exports/qbo-xlsx.ts";
@@ -54,6 +64,13 @@ export interface IngestOptions {
   journals: string[];
   /** QBO Excel exports (.xlsx or the Export data zip) */
   qbo?: string[];
+  /** Jobber report CSVs */
+  jobberExpenses?: string[];
+  transactions?: string[];
+  invoices?: string[];
+  quotes?: string[];
+  jobsOneOff?: string[];
+  jobsRecurring?: string[];
   dryRun?: boolean;
   now?: () => Date;
 }
@@ -77,6 +94,12 @@ export interface IngestCounts {
   /** of those, how many carry off-cycle gross */
   paidPeriodsWithOffCycle: number;
   expenses: number;
+  jobberExpenses: number;
+  laborPaidAsExpense: number;
+  transactions: number;
+  invoices: number;
+  quotes: number;
+  jobsReport: number;
   syncRuns: RunCount[];
   outPath: string | null;
 }
@@ -162,7 +185,20 @@ const stamp = (d: Date) => d.toISOString().replace(/[:.]/g, "-");
 export async function ingestR(o: IngestOptions): Promise<IngestCounts> {
   const companyId = o.companyId ?? "r";
   const now = o.now ?? (() => new Date());
-  for (const p of [...o.timesheets, ...o.journals, ...(o.qbo ?? [])]) {
+  const reportPaths = [
+    ...(o.jobberExpenses ?? []),
+    ...(o.transactions ?? []),
+    ...(o.invoices ?? []),
+    ...(o.quotes ?? []),
+    ...(o.jobsOneOff ?? []),
+    ...(o.jobsRecurring ?? []),
+  ];
+  for (const p of [
+    ...o.timesheets,
+    ...o.journals,
+    ...(o.qbo ?? []),
+    ...reportPaths,
+  ]) {
     if (!inside(o.privateDir, p))
       throw new Error(`input must be inside the private dir (${o.privateDir})`);
   }
@@ -246,9 +282,49 @@ export async function ingestR(o: IngestOptions): Promise<IngestCounts> {
     qbo.push({ fileTag, rows: r.rows });
   }
 
+  // Jobber report CSVs
+  const readReport = async <K extends string>(
+    paths: string[] | undefined,
+    spec: ReportSpec<K>,
+  ) => {
+    const out: { fileTag: string; rows: ReportRow<K>[] }[] = [];
+    for (const p of paths ?? []) {
+      const { bytes, fileTag } = await tagged(p);
+      const r = await readJobberReportCsv(
+        spec,
+        { text: bytes.toString("utf8"), fileName: fileTag },
+        { companyId, now },
+      );
+      syncRuns.push(scrub(r.syncRun, `jobber-${spec.name}-csv`, fileTag));
+      out.push({ fileTag, rows: r.rows });
+    }
+    return out;
+  };
+  const reports = {
+    jobberExpenses: await readReport(o.jobberExpenses, EXPENSE_REPORT),
+    transactions: await readReport(o.transactions, TRANSACTION_LIST),
+    invoices: await readReport(o.invoices, INVOICES_REPORT),
+    quotes: await readReport(o.quotes, QUOTES_REPORT),
+    jobsReports: [
+      ...(await readReport(o.jobsOneOff, JOBS_REPORT)).map((f) => ({
+        ...f,
+        kind: "one_off" as const,
+      })),
+      ...(await readReport(o.jobsRecurring, JOBS_REPORT)).map((f) => ({
+        ...f,
+        kind: "recurring" as const,
+      })),
+    ],
+  };
+
   const generatedAt = now();
   const bundle = {
-    ...anonymizeExports(a, companyId, { timesheets, journals, qbo }),
+    ...anonymizeExports(a, companyId, {
+      timesheets,
+      journals,
+      qbo,
+      ...reports,
+    }),
     syncRuns,
     generatedAt: generatedAt.toISOString(),
   };
@@ -272,6 +348,14 @@ export async function ingestR(o: IngestOptions): Promise<IngestCounts> {
       (p) => p.offCycleGrossCents !== 0,
     ).length,
     expenses: bundle.expenses.length,
+    jobberExpenses: bundle.jobberExpenses.length,
+    laborPaidAsExpense: bundle.jobberExpenses.filter(
+      (x) => x.kind === "labor_paid_as_expense",
+    ).length,
+    transactions: bundle.transactions.length,
+    invoices: bundle.invoices.length,
+    quotes: bundle.quotes.length,
+    jobsReport: bundle.jobsReport.length,
     syncRuns: runCounts(syncRuns),
     outPath,
   };
@@ -366,6 +450,12 @@ if (import.meta.main) {
       timesheets: { type: "string", multiple: true },
       journal: { type: "string", multiple: true },
       qbo: { type: "string", multiple: true },
+      expenses: { type: "string", multiple: true },
+      transactions: { type: "string", multiple: true },
+      invoices: { type: "string", multiple: true },
+      quotes: { type: "string", multiple: true },
+      "jobs-one-off": { type: "string", multiple: true },
+      "jobs-recurring": { type: "string", multiple: true },
       "dry-run": { type: "boolean" },
     },
   });
@@ -376,7 +466,7 @@ if (import.meta.main) {
     (source === "jobber-api" && (!values.from || !values.to))
   ) {
     console.error(
-      "usage: ingest-r.ts --tz <IANA> [--timesheets data/private/r/x.xlsx ...] [--journal data/private/r/y.csv ...] [--qbo data/private/r/z.zip ...] [--dry-run]",
+      "usage: ingest-r.ts --tz <IANA> [--timesheets data/private/r/x.xlsx ...] [--journal data/private/r/y.csv ...] [--qbo data/private/r/z.zip ...] [--expenses|--transactions|--invoices|--quotes|--jobs-one-off|--jobs-recurring data/private/r/<report>.csv ...] [--dry-run]",
     );
     console.error(
       "       ingest-r.ts --source jobber-api --tz <IANA> --from YYYY-MM-DD --to YYYY-MM-DD [--dry-run]",
@@ -398,6 +488,12 @@ if (import.meta.main) {
           timesheets: values.timesheets ?? [],
           journals: values.journal ?? [],
           qbo: values.qbo ?? [],
+          jobberExpenses: values.expenses ?? [],
+          transactions: values.transactions ?? [],
+          invoices: values.invoices ?? [],
+          quotes: values.quotes ?? [],
+          jobsOneOff: values["jobs-one-off"] ?? [],
+          jobsRecurring: values["jobs-recurring"] ?? [],
           dryRun: values["dry-run"],
         });
   job

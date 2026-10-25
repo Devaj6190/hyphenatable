@@ -8,6 +8,16 @@
 import { createHmac, randomBytes } from "node:crypto";
 import { chmod, mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname } from "node:path";
+import {
+  type AnonInvoiceReport,
+  type AnonJobberExpense,
+  type AnonJobReport,
+  type AnonQuoteReport,
+  type AnonTransaction,
+  anonymizeReports,
+  type ReportInputs,
+  reportNames,
+} from "./anonymize-reports.ts";
 import type { PayrollJournalRow } from "./exports/gusto-payroll-journal-csv.ts";
 import type { TimesheetRow } from "./exports/jobber-timesheets-xlsx.ts";
 import type { QboExportRow } from "./exports/qbo-xlsx.ts";
@@ -362,6 +372,11 @@ export interface AnonymizedBundle {
   /** M4 input: gross per pseudonymous worker per pay period, regular payrolls apart from off-cycle ones */
   paidByPeriod: AnonPaidPeriod[];
   expenses: AnonExpense[];
+  jobberExpenses: AnonJobberExpense[];
+  transactions: AnonTransaction[];
+  invoices: AnonInvoiceReport[];
+  quotes: AnonQuoteReport[];
+  jobsReport: AnonJobReport[];
 }
 
 /** Section 6 Expense from a QBO export line. Payee -> worker (reimbursement) or "Vendor Vnn"; memo dropped. */
@@ -394,7 +409,7 @@ export const chartWordsOf = (names: (string | null)[]): Set<string> =>
 export function anonymizeExports(
   a: Anonymizer,
   companyId: string,
-  input: {
+  input: ReportInputs & {
     timesheets: { fileTag: string; rows: TimesheetRow[] }[];
     journals: { fileTag: string; rows: PayrollJournalRow[] }[];
     qbo?: { fileTag: string; rows: QboExportRow[] }[];
@@ -408,6 +423,7 @@ export function anonymizeExports(
   a.reserve([
     ...runWorkerNames,
     ...input.timesheets.flatMap((f) => f.rows.map((r) => r.clientName ?? "")),
+    ...reportNames(input),
     ...(input.qbo ?? []).flatMap((f) =>
       f.rows.flatMap((r) => [r.payeeName ?? "", r.customerName ?? ""]),
     ),
@@ -538,6 +554,11 @@ export function anonymizeExports(
       });
     }
   }
+  // Jobber report exports: the same worker / client / job ids as everything above
+  const reports = anonymizeReports(
+    { worker, client, jobOf: (n) => job(`#${n}`) },
+    input,
+  );
   return {
     namesAnonymized: true,
     companyId,
@@ -548,6 +569,7 @@ export function anonymizeExports(
     paid,
     paidByPeriod: paidByPeriod(paid),
     expenses,
+    ...reports,
   };
 }
 
