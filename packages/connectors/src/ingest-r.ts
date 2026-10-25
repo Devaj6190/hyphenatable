@@ -43,7 +43,9 @@ import {
 } from "./exports/jobber-reports.ts";
 import { readJobberTimesheetsCsv } from "./exports/jobber-timesheets-csv.ts";
 import { readJobberTimesheetsXlsx } from "./exports/jobber-timesheets-xlsx.ts";
+import { readQboTransactionDetailXlsx } from "./exports/qbo-tda-xlsx.ts";
 import { readQboXlsx } from "./exports/qbo-xlsx.ts";
+import { readVenmoCsv } from "./exports/venmo-csv.ts";
 import {
   authFromEnv,
   DEFAULT_TOKEN_PATH,
@@ -71,6 +73,10 @@ export interface IngestOptions {
   quotes?: string[];
   jobsOneOff?: string[];
   jobsRecurring?: string[];
+  /** QBO "Transaction Detail by Account" (.xlsx / zip) */
+  qboLedger?: string[];
+  /** Venmo monthly statement CSVs */
+  venmo?: string[];
   dryRun?: boolean;
   now?: () => Date;
 }
@@ -100,6 +106,13 @@ export interface IngestCounts {
   invoices: number;
   quotes: number;
   jobsReport: number;
+  ledgerLines: number;
+  venmo: number;
+  venmoToWorkers: number;
+  /** counts per class, e.g. "wage 12 / reimbursement 3 / personal_or_unknown 40" */
+  venmoByClass: string;
+  /** counts per funding token, so the owner can confirm e.g. "bank:B = personal" */
+  venmoByFunding: string;
   syncRuns: RunCount[];
   outPath: string | null;
 }
@@ -192,6 +205,8 @@ export async function ingestR(o: IngestOptions): Promise<IngestCounts> {
     ...(o.quotes ?? []),
     ...(o.jobsOneOff ?? []),
     ...(o.jobsRecurring ?? []),
+    ...(o.qboLedger ?? []),
+    ...(o.venmo ?? []),
   ];
   for (const p of [
     ...o.timesheets,
@@ -316,6 +331,26 @@ export async function ingestR(o: IngestOptions): Promise<IngestCounts> {
       })),
     ],
   };
+  const qboLedger = [];
+  for (const p of o.qboLedger ?? []) {
+    const { bytes, fileTag } = await tagged(p);
+    const r = await readQboTransactionDetailXlsx(
+      { bytes: new Uint8Array(bytes), fileName: fileTag },
+      { companyId, now },
+    );
+    syncRuns.push(scrub(r.syncRun, "qbo-transaction-detail", fileTag));
+    qboLedger.push({ fileTag, rows: r.rows });
+  }
+  const venmo = [];
+  for (const p of o.venmo ?? []) {
+    const { bytes, fileTag } = await tagged(p);
+    const r = await readVenmoCsv(
+      { text: bytes.toString("utf8"), fileName: fileTag },
+      { companyId, now },
+    );
+    syncRuns.push(scrub(r.syncRun, "venmo-csv", fileTag));
+    venmo.push({ fileTag, rows: r.rows });
+  }
 
   const generatedAt = now();
   const bundle = {
@@ -324,6 +359,8 @@ export async function ingestR(o: IngestOptions): Promise<IngestCounts> {
       journals,
       qbo,
       ...reports,
+      qboLedger,
+      venmo,
     }),
     syncRuns,
     generatedAt: generatedAt.toISOString(),
@@ -334,7 +371,10 @@ export async function ingestR(o: IngestOptions): Promise<IngestCounts> {
     bundle,
     `${companyId}-exports-${stamp(generatedAt)}`,
     o.dryRun,
-    chartWordsOf(bundle.expenses.map((x) => x.accountName)),
+    chartWordsOf([
+      ...bundle.expenses.map((x) => x.accountName),
+      ...bundle.ledger.flatMap((x) => [x.accountName, x.splitAccount]),
+    ]),
   );
   return {
     workers: bundle.workers.length,
@@ -356,6 +396,17 @@ export async function ingestR(o: IngestOptions): Promise<IngestCounts> {
     invoices: bundle.invoices.length,
     quotes: bundle.quotes.length,
     jobsReport: bundle.jobsReport.length,
+    ledgerLines: bundle.ledger.length,
+    venmo: bundle.venmo.length,
+    venmoToWorkers: bundle.venmo.filter((v) => v.counterpartyWorkerId).length,
+    venmoByClass:
+      Object.entries(bundle.venmoSummary.byClass)
+        .map(([k, v]) => `${k} ${v.count}`)
+        .join(" / ") || "none",
+    venmoByFunding:
+      Object.entries(bundle.venmoSummary.byFunding)
+        .map(([k, v]) => `${k} ${v.count} (to workers ${v.workerPayments})`)
+        .join(" / ") || "none",
     syncRuns: runCounts(syncRuns),
     outPath,
   };
@@ -456,6 +507,8 @@ if (import.meta.main) {
       quotes: { type: "string", multiple: true },
       "jobs-one-off": { type: "string", multiple: true },
       "jobs-recurring": { type: "string", multiple: true },
+      "qbo-ledger": { type: "string", multiple: true },
+      venmo: { type: "string", multiple: true },
       "dry-run": { type: "boolean" },
     },
   });
@@ -494,6 +547,8 @@ if (import.meta.main) {
           quotes: values.quotes ?? [],
           jobsOneOff: values["jobs-one-off"] ?? [],
           jobsRecurring: values["jobs-recurring"] ?? [],
+          qboLedger: values["qbo-ledger"] ?? [],
+          venmo: values.venmo ?? [],
           dryRun: values["dry-run"],
         });
   job

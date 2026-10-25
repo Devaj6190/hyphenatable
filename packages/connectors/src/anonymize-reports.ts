@@ -229,3 +229,17 @@ export function anonymizeReports(h: ReportHelpers, i: ReportInputs) {
   );
   return { jobberExpenses, transactions, invoices, quotes, jobsReport };
 }
+
+/** Names the reports give as Jobber users (entered by, reimbursable to, salesperson): workers. */
+export function reportWorkerNames(i: ReportInputs): string[] {
+  const n: (string | null | undefined)[] = [];
+  for (const f of i.jobberExpenses ?? [])
+    for (const r of f.rows) n.push(r.names.enteredBy, r.names.reimbursableTo);
+  for (const f of i.invoices ?? [])
+    for (const r of f.rows) n.push(r.names.salesperson);
+  for (const f of i.quotes ?? [])
+    for (const r of f.rows) n.push(r.names.salesperson);
+  for (const f of i.jobsReports ?? [])
+    for (const r of f.rows) n.push(r.names.salesperson);
+  return n.filter((s): s is string => !!s);
+}

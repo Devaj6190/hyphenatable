@@ -9,6 +9,13 @@ import { createHmac, randomBytes } from "node:crypto";
 import { chmod, mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname } from "node:path";
 import {
+  type AnonLedgerLine,
+  type AnonVenmo,
+  anonymizeLedger,
+  anonymizeVenmo,
+  type VenmoSummary,
+} from "./anonymize-money.ts";
+import {
   type AnonInvoiceReport,
   type AnonJobberExpense,
   type AnonJobReport,
@@ -17,10 +24,13 @@ import {
   anonymizeReports,
   type ReportInputs,
   reportNames,
+  reportWorkerNames,
 } from "./anonymize-reports.ts";
 import type { PayrollJournalRow } from "./exports/gusto-payroll-journal-csv.ts";
 import type { TimesheetRow } from "./exports/jobber-timesheets-xlsx.ts";
+import type { LedgerLine } from "./exports/qbo-tda-xlsx.ts";
 import type { QboExportRow } from "./exports/qbo-xlsx.ts";
+import type { VenmoRow } from "./exports/venmo-csv.ts";
 import type { JobberRecords, PullResult } from "./jobber/index.ts";
 import type { Job, SyncRun } from "./types.ts";
 
@@ -92,6 +102,10 @@ export interface PseudonymMap {
   jobs: Record<string, { label: string; number: number }>;
   /** QBO payees that are not workers (added with the QBO export ingest; absent in older maps) */
   vendors?: Record<string, string>;
+  /** Venmo counterparties that are not workers ("Party Pnn") */
+  parties?: Record<string, string>;
+  /** funding sources keyed by a salted hash of the label (the bank + last4 never stored): "bank:A" */
+  funding?: Record<string, string>;
 }
 
 /** "Park, Riley", "riley  PARK" and "Riley Park" are one person: the key is the sorted bag of name words. */
@@ -193,6 +207,35 @@ export class Anonymizer {
     return this.map.vendors[key];
   }
 
+  /** A Venmo counterparty that is not a worker: "Party P07" (people; never payroll). */
+  partyName(real: string): string {
+    const key = nameKey(real);
+    if (!key) throw new Error("empty party name");
+    this.map.parties ??= {};
+    this.map.parties[key] ??=
+      `Party P${String(Object.keys(this.map.parties).length + 1).padStart(2, "0")}`;
+    return this.map.parties[key];
+  }
+
+  /**
+   * A funding source / destination label ("Chase Checking *1234") -> a stable token ("bank:A"); the Venmo
+   * balance is "venmo_balance". The map keys are salted hashes, so the label itself is never stored.
+   */
+  fundingToken(raw: string | null): string | null {
+    const s = (raw ?? "").trim();
+    if (!s) return null;
+    if (/venmo\s*balance/i.test(s)) return "venmo_balance";
+    const key = this.h("funding", s.toLowerCase().replace(/\s+/g, " ")).slice(
+      0,
+      16,
+    );
+    this.map.funding ??= {};
+    const n = Object.keys(this.map.funding).length;
+    this.map.funding[key] ??=
+      `bank:${n < 26 ? String.fromCharCode(65 + n) : `Z${n}`}`;
+    return this.map.funding[key];
+  }
+
   /** Whether a name is a worker this map (or this run's reserved names) already knows. */
   isKnownWorker(real: string, runWorkerKeys: Set<string>): boolean {
     const key = nameKey(real);
@@ -236,6 +279,8 @@ export class Anonymizer {
     ])
       add(k, new Set());
     for (const k of Object.keys(this.map.vendors ?? {})) add(k, chartWords);
+    // Venmo counterparties who are not workers: people, always scanned
+    for (const k of Object.keys(this.map.parties ?? {})) add(k, new Set());
     return [...words].sort();
   }
 }
@@ -377,6 +422,9 @@ export interface AnonymizedBundle {
   invoices: AnonInvoiceReport[];
   quotes: AnonQuoteReport[];
   jobsReport: AnonJobReport[];
+  ledger: AnonLedgerLine[];
+  venmo: AnonVenmo[];
+  venmoSummary: VenmoSummary;
 }
 
 /** Section 6 Expense from a QBO export line. Payee -> worker (reimbursement) or "Vendor Vnn"; memo dropped. */
@@ -413,17 +461,27 @@ export function anonymizeExports(
     timesheets: { fileTag: string; rows: TimesheetRow[] }[];
     journals: { fileTag: string; rows: PayrollJournalRow[] }[];
     qbo?: { fileTag: string; rows: QboExportRow[] }[];
+    qboLedger?: { fileTag: string; rows: LedgerLine[] }[];
+    venmo?: { fileTag: string; rows: VenmoRow[] }[];
   },
 ): AnonymizedBundle {
   const runWorkerNames = [
     ...input.timesheets.flatMap((f) => f.rows.map((r) => r.workerName)),
     ...input.journals.flatMap((f) => f.rows.map((r) => r.employeeName)),
+    // people named as Jobber users in the reports are workers too
+    ...reportWorkerNames(input),
   ];
   const runWorkerKeys = new Set(runWorkerNames.map(nameKey));
   a.reserve([
     ...runWorkerNames,
     ...input.timesheets.flatMap((f) => f.rows.map((r) => r.clientName ?? "")),
     ...reportNames(input),
+    ...(input.qboLedger ?? []).flatMap((f) =>
+      f.rows.map((r) => r.payeeName ?? ""),
+    ),
+    ...(input.venmo ?? []).flatMap((f) =>
+      f.rows.map((r) => r.counterpartyName ?? ""),
+    ),
     ...(input.qbo ?? []).flatMap((f) =>
       f.rows.flatMap((r) => [r.payeeName ?? "", r.customerName ?? ""]),
     ),
@@ -559,6 +617,40 @@ export function anonymizeExports(
     { worker, client, jobOf: (n) => job(`#${n}`) },
     input,
   );
+  // QBO ledger and Venmo: a payee / counterparty is a worker only when it matches a known worker (full name;
+  // or a single first name that exactly one known worker has); anyone else is a vendor / party
+  // first name -> the distinct known workers who have it (by name key), with one raw spelling each
+  const firstNames = new Map<string, Map<string, string>>();
+  for (const n of runWorkerNames) {
+    const f = n.trim().split(/\s+/)[0]?.toLowerCase();
+    if (!f) continue;
+    const people = firstNames.get(f) ?? new Map<string, string>();
+    if (!people.has(nameKey(n))) people.set(nameKey(n), n);
+    firstNames.set(f, people);
+  }
+  const knownWorker = (real: string): string | null => {
+    if (a.isKnownWorker(real, runWorkerKeys)) return worker(real);
+    const words = real.trim().split(/\s+/);
+    const people =
+      words.length === 1
+        ? firstNames.get((words[0] ?? "").toLowerCase())
+        : undefined;
+    return people && people.size === 1
+      ? worker([...people.values()][0] as string)
+      : null;
+  };
+  const money = {
+    knownWorker,
+    vendorName: (n: string) => a.vendorName(n),
+    partyName: (n: string) => a.partyName(n),
+    fundingToken: (raw: string | null) => a.fundingToken(raw),
+  };
+  const ledger = anonymizeLedger(money, input.qboLedger ?? []);
+  const { venmo, venmoSummary } = anonymizeVenmo(
+    money,
+    input.venmo ?? [],
+    reports.jobberExpenses,
+  );
   return {
     namesAnonymized: true,
     companyId,
@@ -570,6 +662,9 @@ export function anonymizeExports(
     paidByPeriod: paidByPeriod(paid),
     expenses,
     ...reports,
+    ledger,
+    venmo,
+    venmoSummary,
   };
 }
 
