@@ -5,6 +5,8 @@ import { makeFunctionReference } from "convex/server";
 import { FlaskConical, RotateCcw, Timer } from "lucide-react";
 import { useState } from "react";
 import { type DataKind, DataLabel } from "@/components/DataLabel";
+import { useLive } from "@/components/LiveProvider";
+import { LiveSimulatedReply } from "@/components/LiveSimulatedReply";
 import { Segmented } from "@/components/Segmented";
 import { SimulatedChip } from "@/components/SimulatedChip";
 import { Badge } from "@/components/ui/badge";
@@ -313,6 +315,24 @@ function SimulatedReplyCard({
   const [persona, setPersona] = useState<"manager" | "owner">("manager");
   const [reply, setReply] = useState("");
   const q = questions.find((x) => x.id === qid) ?? questions[0];
+  const live = useLive();
+
+  // On Convex the card drives the real functions; the browser-only version below is for fixture mode.
+  if (live.status === "ready")
+    return (
+      <Section
+        title="Simulated reply"
+        icon={FlaskConical}
+        badge={<SimulatedChip />}
+      >
+        <p className="text-muted-foreground">
+          Answer a text as the person would. The reply goes through the same
+          reader as a real one, and Convex labels it Simulated in the messages
+          and the audit log.
+        </p>
+        <LiveSimulatedReply ctx={live.ctx} />
+      </Section>
+    );
 
   const send = () => {
     if (!q || !reply.trim()) return;

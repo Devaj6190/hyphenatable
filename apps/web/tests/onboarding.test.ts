@@ -191,6 +191,11 @@ test("Company A: demo reset restores the snapshot exactly, twice in a row, keepi
     fixture: fixture(),
   });
   const companyId = ids.a as Id<"companies">;
+  // The checks run first, so the snapshot holds flags whose sentences name entries by id.
+  for (let i = 0; i < 3; i++) {
+    vi.advanceTimersByTime(1);
+    await t.finishInProgressScheduledFunctions();
+  }
   const counts = () =>
     t.run(async (ctx) => {
       const out: Record<string, number> = {};
@@ -237,6 +242,13 @@ test("Company A: demo reset restores the snapshot exactly, twice in a row, keepi
   expect(after.company?.name).toBeDefined();
   expect(after.owner?.role).toBe("owner");
   expect(after.resets).toBe(2);
+  // Entries came back under new ids; the flag sentences still name them, in words.
+  const flags = await t.query(api.flags.list, {
+    companyId,
+    viewerId: ids["a-w12"] as Id<"workers">,
+  });
+  expect(flags.length).toBeGreaterThan(0);
+  for (const f of flags) expect(f.seen).not.toMatch(/\b[a-zA-Z0-9]{32}\b/);
 
   const summary = await t.query(api.eval.summary, { companyId });
   expect(summary.m1).toBeNull();
