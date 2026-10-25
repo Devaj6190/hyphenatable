@@ -52,7 +52,9 @@ export const DEFAULT_COMPANY = "a";
 export const SEATS_LINE =
   "RollPay fills the seat of the person who prepares and checks payroll before it is submitted.";
 
-export function cyclePeriod(c: CompanyInfo): string {
+export function cyclePeriod(
+  c: Pick<CompanyInfo, "timezone" | "cycle">,
+): string {
   if (!c.cycle) return "No cycle loaded yet";
   const f = new Intl.DateTimeFormat("en-US", {
     month: "short",

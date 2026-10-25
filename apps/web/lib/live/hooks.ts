@@ -3,10 +3,12 @@
 import { useQueries, useQuery } from "convex/react";
 import { useMemo } from "react";
 import { api } from "@/convex/_generated/api";
-import type { Id } from "@/convex/_generated/dataModel";
+import type { Doc, Id } from "@/convex/_generated/dataModel";
 import {
   currentCycleId,
   infoOf,
+  type LiveCycle,
+  newestCycle,
   toCycle,
   toFlag,
   toQuestion,
@@ -103,4 +105,24 @@ export function useLiveInfo(
       info[f.id] = infoOf(toQuestion(r.question, ctx.companyKey), ctx.names);
   }
   return { info, loading };
+}
+
+/**
+ * The company's newest cycle from cycles.list, for the page header. The header sits outside every LiveBoundary, so this
+ * never throws: useQueries hands back a failed read as an Error, reported as "failed".
+ */
+export function useLiveCycle(ctx: LiveContext | null): LiveCycle {
+  const companyId = ctx?.ids.companyId ?? null;
+  const requests = useMemo(
+    (): Parameters<typeof useQueries>[0] =>
+      companyId
+        ? { cycles: { query: api.cycles.list, args: { companyId } } }
+        : {},
+    [companyId],
+  );
+  const r: Doc<"cycles">[] | Error | undefined = useQueries(requests).cycles;
+  if (!companyId) return { status: "off" };
+  if (r === undefined) return { status: "loading" };
+  if (r instanceof Error) return { status: "failed" };
+  return { status: "ready", cycle: newestCycle(r) };
 }

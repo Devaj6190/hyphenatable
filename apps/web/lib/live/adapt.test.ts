@@ -3,7 +3,9 @@ import type { Doc } from "@/convex/_generated/dataModel";
 import type { Question } from "@/lib/types";
 import {
   currentCycleId,
+  headerCycle,
   infoOf,
+  newestCycle,
   recipientLabel,
   toCorrection,
   toFlag,
@@ -116,5 +118,47 @@ describe("which cycle the screens show", () => {
   test("the newest cycle when there are no flags; null when there are no cycles", () => {
     expect(currentCycleId(cycles, [])).toBe("cy3");
     expect(currentCycleId([], [])).toBeNull();
+  });
+});
+
+const cycleDoc = (id: string, number: number) =>
+  ({
+    _id: id,
+    _creationTime: 1,
+    companyId: "co1",
+    number,
+    periodStart: `2026-10-0${number}T04:00:00.000Z`,
+    periodEnd: `2026-10-1${number}T03:59:59.999Z`,
+    cutoffAt: "2026-10-20T00:00:00.000Z",
+    stage: "asking",
+    gustoPayrollId: null,
+    gustoOffCyclePayrollId: null,
+    questionsAsked: 0,
+  }) as unknown as Doc<"cycles">;
+
+describe("which cycle the header names", () => {
+  const fixture = {
+    number: 5,
+    periodStart: "2026-10-10T04:00:00.000Z",
+    periodEnd: "2026-10-24T03:59:59.999Z",
+  };
+
+  test("the highest-numbered cycle, whatever order Convex returns", () => {
+    expect(newestCycle([cycleDoc("c1", 1), cycleDoc("c2", 2)])?.id).toBe("c2");
+    expect(newestCycle([])).toBeNull();
+  });
+
+  test("live data names Convex's cycle, not the fixture's", () => {
+    const live = newestCycle([cycleDoc("c1", 1)]);
+    expect(headerCycle(fixture, { status: "ready", cycle: live })?.number).toBe(
+      1,
+    );
+    expect(headerCycle(fixture, { status: "ready", cycle: null })).toBeNull();
+  });
+
+  test("no number while loading; the fixture's when live is off or the read failed", () => {
+    expect(headerCycle(fixture, { status: "loading" })).toBeNull();
+    expect(headerCycle(fixture, { status: "off" })?.number).toBe(5);
+    expect(headerCycle(fixture, { status: "failed" })?.number).toBe(5);
   });
 });

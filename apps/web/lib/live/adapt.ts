@@ -153,3 +153,34 @@ export function currentCycleId(
   const withFlags = cycles.find((c) => flags.some((f) => f.cycleId === c._id));
   return (withFlags ?? cycles[0])?._id ?? null;
 }
+
+/** The company's newest cycle by number, or null when it has none yet. */
+export function newestCycle(docs: Doc<"cycles">[]): Cycle | null {
+  const top = docs.reduce<Doc<"cycles"> | null>(
+    (a, d) => (!a || d.number > a.number ? d : a),
+    null,
+  );
+  return top ? toCycle(top) : null;
+}
+
+/** The header's read of cycles.list: off (no live data for this company), loading, failed, or the newest cycle. */
+export type LiveCycle =
+  | { status: "off" }
+  | { status: "loading" }
+  | { status: "failed" }
+  | { status: "ready"; cycle: Cycle | null };
+
+type PeriodCycle = { number: number; periodStart: string; periodEnd: string };
+
+/**
+ * The cycle the page header names. Live: Convex's newest cycle, and nothing while it loads, so the fixture's number
+ * never flashes. Off or failed: the fixture's, which is what the screens fall back to as well.
+ */
+export function headerCycle(
+  fixture: PeriodCycle | null,
+  live: LiveCycle,
+): PeriodCycle | null {
+  if (live.status === "ready") return live.cycle;
+  if (live.status === "loading") return null;
+  return fixture;
+}
