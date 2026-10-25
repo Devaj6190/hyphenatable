@@ -2,12 +2,14 @@
 
 import { useAction, useMutation } from "convex/react";
 import { makeFunctionReference } from "convex/server";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import { AgentActivity } from "@/components/AgentActivity";
 import { DataLabel } from "@/components/DataLabel";
 import { FlagsSource } from "@/components/FlagsList";
 import {
+  BareCard,
   type CardDecision,
   FoldedCard,
   OwnerCard,
@@ -25,6 +27,7 @@ import {
   RunPanel,
   StartPanel,
 } from "@/components/home/Panels";
+import { Progress } from "@/components/home/Progress";
 import { ManagerProgress, MoneyCard, UpNext } from "@/components/home/Rail";
 import {
   DonePanel,
@@ -39,7 +42,6 @@ import {
 } from "@/components/home/States";
 import { LiveFeed } from "@/components/LiveFeed";
 import { Money } from "@/components/Money";
-import { StageSync } from "@/components/StageSync";
 import { Button } from "@/components/ui/button";
 import { checkTitle } from "@/lib/checks";
 import { companies, isRealPayroll, REAL_PAYROLL_NOTE } from "@/lib/companies";
@@ -186,7 +188,6 @@ export function HomeBoard({
   const [next, setNext] = useState<null | "start" | "review">(null);
   const [nextHeld, setNextHeld] = useState(false);
   const [nextApproved, setNextApproved] = useState(false);
-  const [focus, setFocus] = useState<string | null>(null);
   // One question at a time: which card the focus deck shows. ← → move; the Up next list jumps.
   const [focusIdx, setFocusIdx] = useState(0);
   const deckLen = useRef(1);
@@ -572,9 +573,6 @@ export function HomeBoard({
           setDecisions(({ [id]: _, ...rest }) => rest);
 
         const asked = sent ? total : 0;
-        const stage1Open = data.cards.filter(
-          (c) => c.stage === 1 && !c.afterManager && !isDone(c),
-        ).length;
         const askDone =
           stage === "asking" && open.length === 0 && (live || replies >= total);
         const recDone = stage === "recon" && open.length === 0;
@@ -653,220 +651,242 @@ export function HomeBoard({
           "done",
         ].includes(stage);
         const r1 = data.review;
-        const showRail = stage === "asking" || stage === "recon";
 
         deckLen.current = Math.max(1, list.length);
         const deckIdx = Math.min(focusIdx, Math.max(0, list.length - 1));
-        const navBtn =
-          "rounded-control border px-2.5 py-1 text-xs font-medium text-foreground hover:bg-muted disabled:opacity-40 disabled:hover:bg-transparent";
-        // The focus deck: the cards are all built (so every handler and decision stays), one shows at a time.
-        const focusDeck = (cards: ReactNode[]) =>
-          cards.length <= 1 ? (
-            cards
-          ) : (
-            <>
-              <div className="flex items-center justify-between gap-3 text-xs text-muted-foreground">
-                <span>
-                  Question {deckIdx + 1} of {cards.length} ·{" "}
-                  <kbd className="rounded border px-1 font-sans">←</kbd>{" "}
-                  <kbd className="rounded border px-1 font-sans">→</kbd> to move
-                </span>
-                <span className="flex gap-1.5">
-                  <button
-                    type="button"
-                    className={navBtn}
-                    disabled={deckIdx === 0}
-                    onClick={() => setFocusIdx(Math.max(0, deckIdx - 1))}
-                  >
-                    ← Prev
-                  </button>
-                  <button
-                    type="button"
-                    className={navBtn}
-                    disabled={deckIdx >= cards.length - 1}
-                    onClick={() =>
-                      setFocusIdx(Math.min(cards.length - 1, deckIdx + 1))
-                    }
-                  >
-                    Next →
-                  </button>
-                </span>
-              </div>
-              <div
-                key={deckIdx}
-                className="scroll-panel lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:pr-1"
-              >
-                {cards[deckIdx]}
-              </div>
-            </>
-          );
+        const pagerBtn =
+          "grid size-9 place-items-center rounded-full border bg-card text-foreground transition-colors duration-(--dur-hover) hover:border-muted-foreground/60 disabled:opacity-40 disabled:hover:border-border";
+        // The focus card shows one question at a time. Every card is still built (so every handler and decision
+        // stays); only the current one shows, without its own frame (BareCard).
+        const focusDeck = (cards: ReactNode[]) => (
+          <BareCard.Provider value={true}>
+            <div key={deckIdx} id="focus-question" aria-live="polite">
+              {cards[deckIdx]}
+            </div>
+          </BareCard.Provider>
+        );
 
         const cardsCol = (
           <section
             aria-labelledby="todo-title"
-            className="flex min-w-0 flex-col gap-3.5 lg:min-h-0"
+            className="flex min-w-0 flex-col gap-6"
           >
-            <div className="flex items-center gap-3">
-              <span className="relative grid size-13 place-items-center">
-                <svg
-                  viewBox="0 0 52 52"
-                  className="size-13 -rotate-90"
-                  aria-hidden="true"
-                >
-                  <circle
-                    cx="26"
-                    cy="26"
-                    r="21"
-                    fill="none"
-                    stroke="var(--border)"
-                    strokeWidth="5"
-                  />
-                  <circle
-                    cx="26"
-                    cy="26"
-                    r="21"
-                    fill="none"
-                    stroke="var(--primary)"
-                    strokeWidth="5"
-                    strokeLinecap="round"
-                    strokeDasharray="131.9"
-                    strokeDashoffset={(
-                      131.9 *
-                      (1 - doneCount / Math.max(1, list.length))
-                    ).toFixed(1)}
-                    className="transition-[stroke-dashoffset] duration-500"
-                  />
-                </svg>
-                <span className="absolute text-xs font-bold tabular-nums">
-                  {doneCount}/{list.length}
-                </span>
-              </span>
-              <span className="flex flex-col">
-                <h2 id="todo-title" className="text-xl font-semibold">
-                  {stage === "recon"
-                    ? "Before commissions"
-                    : "What we need from you"}
-                </h2>
-                <span className="text-sm text-muted-foreground">
-                  {open.length
-                    ? `${open.length} left · answer in any order`
-                    : "All done"}
-                </span>
-              </span>
-            </div>
-            {open.length === 0 && (
-              <Banner
-                tone="ok"
-                kicker="All done on your side"
-                text={
-                  stage === "recon"
-                    ? "Review commissions above when you are ready."
-                    : replies < total && !live
-                      ? `Waiting on ${data.dakota.managerName.split(" ")[0]} (${shownReplies.length} of ${total}). Corrections show up here.`
-                      : "Review the draft above, then approve Gate 1."
-                }
-              />
-            )}
-            {focusDeck(
-              list.map((c, i) => {
-                const id = idOf(c);
-                const position = `${i + 1} of ${list.length}`;
-                const d = decisions[id];
-                if (c === "dakota") {
-                  return d ? (
-                    <FoldedCard
-                      key={id}
-                      title={`Send ${data.dakota.managerName.split(" ")[0]} ${asked} job questions`}
-                      value={d.label}
-                      note={`Fixture mode: nothing was texted.${excluded.size ? ` ${excluded.size} unticked ${excluded.size === 1 ? "item stays" : "items stay"} with you.` : ""}`}
-                      onUndo={sent ? undefined : () => undo(id)}
+            {/* Prototype focus card: progress ring, title, pager, then the current question. */}
+            <article className="flex flex-col gap-[22px] overflow-hidden rounded-[20px] border bg-card p-6 sm:p-7">
+              <div className="flex items-center gap-3">
+                <span className="relative grid size-11 shrink-0 place-items-center">
+                  <svg
+                    viewBox="0 0 44 44"
+                    className="size-11 -rotate-90"
+                    aria-hidden="true"
+                  >
+                    <circle
+                      cx="22"
+                      cy="22"
+                      r="18"
+                      fill="none"
+                      stroke="var(--border)"
+                      strokeWidth="3.2"
                     />
-                  ) : (
-                    <div
-                      key={id}
-                      id={`card-${id}`}
-                      className={
-                        focus === id
-                          ? "rounded-[18px] ring-2 ring-sunset-2"
-                          : undefined
+                    <circle
+                      cx="22"
+                      cy="22"
+                      r="18"
+                      fill="none"
+                      stroke="var(--ring)"
+                      strokeWidth="3.2"
+                      strokeLinecap="round"
+                      strokeDasharray="113.1"
+                      strokeDashoffset={(
+                        113.1 *
+                        (1 - doneCount / Math.max(1, list.length))
+                      ).toFixed(1)}
+                      className="transition-[stroke-dashoffset] duration-1000 ease-out-soft"
+                    />
+                  </svg>
+                  <span className="absolute text-xs font-semibold tabular-nums">
+                    {doneCount}/{list.length}
+                  </span>
+                </span>
+                <span className="flex min-w-0 flex-col">
+                  <h2 id="todo-title" className="font-medium">
+                    {stage === "recon"
+                      ? "Before commissions"
+                      : "What we need from you"}
+                  </h2>
+                  <span className="text-[13px] text-muted-foreground">
+                    {open.length ? "Answer in any order" : "All done"}
+                  </span>
+                </span>
+                {list.length > 1 && (
+                  <span className="ml-auto flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      className={pagerBtn}
+                      aria-label="Previous item"
+                      aria-controls="focus-question"
+                      disabled={deckIdx === 0}
+                      onClick={() => setFocusIdx(Math.max(0, deckIdx - 1))}
+                    >
+                      <ChevronLeft aria-hidden className="size-4" />
+                    </button>
+                    <span className="min-w-[52px] text-center text-[13px] text-muted-foreground tabular-nums">
+                      {deckIdx + 1} of {list.length}
+                    </span>
+                    <button
+                      type="button"
+                      className={pagerBtn}
+                      aria-label="Next item"
+                      aria-controls="focus-question"
+                      disabled={deckIdx >= list.length - 1}
+                      onClick={() =>
+                        setFocusIdx(Math.min(list.length - 1, deckIdx + 1))
                       }
                     >
-                      <DakotaCard
-                        review={data.dakota}
-                        position={position}
-                        excluded={excluded}
-                        onToggle={(fid) =>
-                          setExcluded((s) => {
-                            const n = new Set(s);
-                            if (n.has(fid)) n.delete(fid);
-                            else n.add(fid);
-                            return n;
-                          })
+                      <ChevronRight aria-hidden className="size-4" />
+                    </button>
+                  </span>
+                )}
+              </div>
+              {open.length === 0 && (
+                <Banner
+                  tone="ok"
+                  kicker={
+                    askDone
+                      ? "Ready for Gate 1"
+                      : recDone
+                        ? "Ready for Gate 2"
+                        : "All done on your side"
+                  }
+                  text={
+                    stage === "recon"
+                      ? "All answered. Review job profit and commissions, then approve Gate 2."
+                      : replies < total && !live
+                        ? `Waiting on ${data.dakota.managerName.split(" ")[0]} (${shownReplies.length} of ${total}). Corrections show up here.`
+                        : "Everything is answered. Review the draft, then approve Gate 1."
+                  }
+                  action={
+                    askDone ? (
+                      <Button size="lg" onClick={() => setStage("review")}>
+                        Review the draft
+                      </Button>
+                    ) : recDone ? (
+                      <Button size="lg" onClick={() => setStage("review2")}>
+                        Review commissions
+                      </Button>
+                    ) : undefined
+                  }
+                />
+              )}
+              {focusDeck(
+                list.map((c, i) => {
+                  const id = idOf(c);
+                  const position = `${i + 1} of ${list.length}`;
+                  const d = decisions[id];
+                  if (c === "dakota") {
+                    return d ? (
+                      <FoldedCard
+                        key={id}
+                        title={`Send ${data.dakota.managerName.split(" ")[0]} ${asked} job questions`}
+                        value={d.label}
+                        note={`Fixture mode: nothing was texted.${excluded.size ? ` ${excluded.size} unticked ${excluded.size === 1 ? "item stays" : "items stay"} with you.` : ""}`}
+                        onUndo={sent ? undefined : () => undo(id)}
+                      />
+                    ) : (
+                      <div key={id} id={`card-${id}`}>
+                        <DakotaCard
+                          review={data.dakota}
+                          position={position}
+                          excluded={excluded}
+                          onToggle={(fid) =>
+                            setExcluded((s) => {
+                              const n = new Set(s);
+                              if (n.has(fid)) n.delete(fid);
+                              else n.add(fid);
+                              return n;
+                            })
+                          }
+                          onSend={(n) => {
+                            setDecisions((x) => ({
+                              ...x,
+                              [id]: {
+                                label: `Sent ${n} · not texted (fixture)`,
+                                action: "primary",
+                                saved: false,
+                              },
+                            }));
+                            setSent(true);
+                            feed(
+                              `You approved the text to ${data.dakota.managerName.split(" ")[0]}: ${n} items.`,
+                            );
+                          }}
+                          pending={false}
+                          error={undefined}
+                        />
+                      </div>
+                    );
+                  }
+                  if (d || isDone(c))
+                    return (
+                      <FoldedCard
+                        key={id}
+                        title={c.title}
+                        value={
+                          d
+                            ? d.action === "primary"
+                              ? c.done
+                              : d.label
+                            : "Resolved in Convex"
                         }
-                        onSend={(n) => {
-                          setDecisions((x) => ({
-                            ...x,
-                            [id]: {
-                              label: `Sent ${n} · not texted (fixture)`,
-                              action: "primary",
-                              saved: false,
-                            },
-                          }));
-                          setSent(true);
-                          feed(
-                            `You approved the text to ${data.dakota.managerName.split(" ")[0]}: ${n} items.`,
-                          );
-                        }}
-                        pending={false}
-                        error={undefined}
+                        note={
+                          d && !d.saved
+                            ? "On this screen only: not saved."
+                            : undefined
+                        }
+                        onUndo={d && !d.saved ? () => undo(id) : undefined}
+                      />
+                    );
+                  return (
+                    <div key={id} id={`card-${id}`}>
+                      <OwnerCard
+                        card={c}
+                        position={position}
+                        picked={picks[id]}
+                        onPick={(k) => setPicks((p) => ({ ...p, [id]: k }))}
+                        fill={fills[id] ?? ""}
+                        onFill={(v) => setFills((f) => ({ ...f, [id]: v }))}
+                        onAction={(a, label) => decide(c, a, label)}
+                        pending={pendingIds.has(id)}
+                        error={errors[id]}
                       />
                     </div>
                   );
-                }
-                if (d || isDone(c))
-                  return (
-                    <FoldedCard
-                      key={id}
-                      title={c.title}
-                      value={
-                        d
-                          ? d.action === "primary"
-                            ? c.done
-                            : d.label
-                          : "Resolved in Convex"
-                      }
-                      note={
-                        d && !d.saved
-                          ? "On this screen only: not saved."
-                          : undefined
-                      }
-                      onUndo={d && !d.saved ? () => undo(id) : undefined}
-                    />
+                }),
+              )}
+            </article>
+            {list.length > 0 && (
+              <UpNext
+                items={list.map((c) => ({
+                  id: idOf(c),
+                  title:
+                    c === "dakota"
+                      ? `Send ${data.dakota.managerName.split(" ")[0]} the list`
+                      : c.title,
+                  done: isDone(c),
+                  tone: c === "dakota" ? "text" : c.tone,
+                }))}
+                onGo={(id) => {
+                  setFocusIdx(
+                    Math.max(
+                      0,
+                      list.findIndex((c) => idOf(c) === id),
+                    ),
                   );
-                return (
-                  <div
-                    key={id}
-                    id={`card-${id}`}
-                    className={
-                      focus === id
-                        ? "rounded-[18px] ring-2 ring-sunset-2"
-                        : undefined
-                    }
-                  >
-                    <OwnerCard
-                      card={c}
-                      position={position}
-                      picked={picks[id]}
-                      onPick={(k) => setPicks((p) => ({ ...p, [id]: k }))}
-                      fill={fills[id] ?? ""}
-                      onFill={(v) => setFills((f) => ({ ...f, [id]: v }))}
-                      onAction={(a, label) => decide(c, a, label)}
-                      pending={pendingIds.has(id)}
-                      error={errors[id]}
-                    />
-                  </div>
-                );
-              }),
+                  document
+                    .getElementById("focus-question")
+                    ?.scrollIntoView({ behavior: "smooth", block: "center" });
+                }}
+              />
             )}
             {loose.length + kept.length > 0 && (
               // Owner-routed flags outside the deck: one compact list instead of stacked cards. Each row says what
@@ -916,40 +936,12 @@ export function HomeBoard({
           </section>
         );
 
+        // Money, the manager's progress and the live feed: below the questions, two across on wider screens.
         const rail = (
           <aside
-            className={
-              showRail
-                ? // The rail scrolls inside the panel, so the question card on the left never moves.
-                  "scroll-panel flex min-w-0 flex-col gap-4 lg:min-h-0 lg:overflow-y-auto lg:pr-1"
-                : "grid gap-4 md:grid-cols-2"
-            }
+            aria-label="This payroll"
+            className="grid gap-4 md:grid-cols-2"
           >
-            {(stage === "asking" || stage === "recon") && list.length > 0 && (
-              <UpNext
-                items={list.map((c) => ({
-                  id: idOf(c),
-                  title:
-                    c === "dakota"
-                      ? `Send ${data.dakota.managerName.split(" ")[0]} the list`
-                      : c.title,
-                  done: isDone(c),
-                  tone: c === "dakota" ? "text" : c.tone,
-                }))}
-                onGo={(id) => {
-                  setFocus(id);
-                  setFocusIdx(
-                    Math.max(
-                      0,
-                      list.findIndex((c) => idOf(c) === id),
-                    ),
-                  );
-                  document
-                    .getElementById(`card-${id}`)
-                    ?.scrollIntoView({ behavior: "smooth", block: "center" });
-                }}
-              />
-            )}
             {stage2Money && data.stage2 ? (
               <MoneyCard
                 label="Stage 2 · job profit"
@@ -1043,7 +1035,7 @@ export function HomeBoard({
                 inboxHref={`/c/${companyId}/manager`}
               />
             )}
-            <div className={showRail ? "" : "md:col-span-2"}>
+            <div className="md:col-span-2">
               <LiveFeed
                 companyId={companyId}
                 cycleId={data.cycle?.id ?? ""}
@@ -1056,8 +1048,39 @@ export function HomeBoard({
           </aside>
         );
 
+        // Prototype home: one centered column; the review, fill and done screens get more width for their tables.
+        const narrow =
+          !next &&
+          (stage === "start" || stage === "asking" || stage === "recon");
+        const needYou =
+          (stage === "asking" || stage === "recon") && open.length > 0
+            ? ` · ${open.length} ${open.length === 1 ? "item needs" : "items need"} review before Gate ${stage === "recon" ? 2 : 1}`
+            : "";
+        // Engine figures only: gross from the workbook preview, hours as each person's engine hours added up.
+        const kpis =
+          r1 && !next
+            ? [
+                {
+                  label: "Gross pay (draft)",
+                  value: <Money cents={r1.grossCents} />,
+                },
+                { label: "People", value: data.people.total },
+                {
+                  label: "Hours",
+                  value: r1.people
+                    .reduce((n, x) => n + (x.hours ?? 0), 0)
+                    .toFixed(1),
+                },
+                data.cutoffLabel
+                  ? { label: "Hours cutoff", value: data.cutoffLabel }
+                  : { label: "Venmo", value: <Money cents={r1.venmoCents} /> },
+              ]
+            : [];
+
         return (
-          <div className="flex flex-col gap-5 lg:h-full lg:min-h-0">
+          <div
+            className={`mx-auto flex w-full flex-col gap-[26px] ${narrow ? "max-w-[720px]" : "max-w-[1040px]"}`}
+          >
             {DEMO_MODE && (
               <DemoBar
                 stageName={next ? `Next payroll · ${next}` : STAGE_NAME[stage]}
@@ -1077,15 +1100,18 @@ export function HomeBoard({
               />
             )}
 
-            <header className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-              <h1 className="font-heading text-[28px] leading-none font-normal tracking-[-0.01em]">
+            <header className="flex flex-col gap-2">
+              <h1 className="text-[clamp(30px,4vw,42px)] leading-[1.08]">
                 <Greeting timeZone={company.timezone} />
                 {data.ownerFirstName && `, ${data.ownerFirstName}`}
               </h1>
-              <span className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-                {data.cycle
-                  ? `Payroll for ${next && data.next ? data.next.periodLabel : data.periodLabel}`
-                  : "No payroll in progress"}
+              <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-base text-muted-foreground">
+                <span>
+                  {data.cycle
+                    ? `Pay period ${next && data.next ? data.next.periodLabel : data.periodLabel}`
+                    : "No payroll in progress"}
+                  {needYou}
+                </span>
                 <DataLabel
                   kind={dataKind}
                   detail={
@@ -1094,12 +1120,33 @@ export function HomeBoard({
                       : company.label
                   }
                 />
-              </span>
+              </p>
             </header>
+
+            {kpis.length > 0 && (
+              <dl
+                aria-label="Run summary"
+                className="grid grid-cols-2 border-y sm:flex"
+              >
+                {kpis.map((k) => (
+                  <div
+                    key={k.label}
+                    className="flex min-w-0 flex-1 flex-col gap-1 py-3 pr-4 sm:border-l sm:pl-4 sm:first:border-l-0 sm:first:pl-0"
+                  >
+                    <dt className="text-xs font-medium tracking-[0.08em] text-muted-foreground uppercase">
+                      {k.label}
+                    </dt>
+                    <dd className="truncate font-medium tabular-nums">
+                      {k.value}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            )}
 
             {next && data.next ? (
               <>
-                <StageSync
+                <Progress
                   companyId={companyId}
                   step={next === "start" ? -1 : 6}
                   caption={next === "review" ? "Waiting on you" : ""}
@@ -1151,12 +1198,15 @@ export function HomeBoard({
               </>
             ) : (
               <>
-                <StageSync
+                <Progress
                   companyId={companyId}
                   step={step}
                   allDone={stage === "done"}
                   caption={caption}
                   fraction={fraction}
+                  open={
+                    stage === "asking" || stage === "recon" ? open.length : 0
+                  }
                 />
 
                 {short.length > 0 && (
@@ -1233,32 +1283,6 @@ export function HomeBoard({
                   />
                 )}
 
-                {stage === "asking" && (
-                  <Banner
-                    tone={askDone ? "ok" : !sent && hasManager ? "hold" : "ask"}
-                    kicker={
-                      askDone
-                        ? "Ready for Gate 1"
-                        : !sent && hasManager
-                          ? "Action required"
-                          : `${stage1Open} left for you · ${data.dakota.managerName.split(" ")[0]} ${shownReplies.length} of ${total}`
-                    }
-                    text={
-                      askDone
-                        ? "Everything is answered. Review the draft, then approve."
-                        : !sent && hasManager
-                          ? `Send ${data.dakota.managerName.split(" ")[0]} the list so job facts get fixed in Jobber tonight.`
-                          : "Answer yours below meanwhile."
-                    }
-                    action={
-                      askDone ? (
-                        <Button size="lg" onClick={() => setStage("review")}>
-                          Review the draft
-                        </Button>
-                      ) : undefined
-                    }
-                  />
-                )}
                 {stage === "filled1" && (
                   <Banner
                     tone="ok"
@@ -1275,32 +1299,12 @@ export function HomeBoard({
                     }
                   />
                 )}
-                {stage === "recon" && (
-                  <Banner
-                    tone={recDone ? "ok" : "hold"}
-                    kicker={
-                      recDone ? "Ready for Gate 2" : "Action required · Stage 2"
-                    }
-                    text={
-                      recDone
-                        ? "All answered. Review job profit and commissions, then approve Gate 2."
-                        : "A few jobs need a look before commissions."
-                    }
-                    action={
-                      recDone ? (
-                        <Button size="lg" onClick={() => setStage("review2")}>
-                          Review commissions
-                        </Button>
-                      ) : undefined
-                    }
-                  />
-                )}
 
                 {(stage === "asking" || stage === "recon") && (
-                  <div className="grid items-start gap-5 lg:min-h-0 lg:flex-1 lg:grid-cols-[minmax(0,1.65fr)_minmax(0,1fr)] lg:items-stretch">
+                  <>
                     {cardsCol}
                     {rail}
-                  </div>
+                  </>
                 )}
 
                 {stage === "review" &&

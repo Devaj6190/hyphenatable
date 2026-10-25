@@ -5,7 +5,6 @@ import { LiveProvider } from "@/components/LiveProvider";
 import { Nav } from "@/components/Nav";
 import { RoleScope } from "@/components/RoleScope";
 import { ShellHeader } from "@/components/ShellHeader";
-import { Stepper } from "@/components/Stepper";
 import { companies } from "@/lib/companies";
 
 // Known companies are prerendered. Nav and ShellHeader read the company from useParams on the client.
@@ -32,8 +31,8 @@ async function KnownCompany({
   );
 }
 
-// The shell is the viewport: sidebar, top bar and stepper are fixed; only <main> scrolls, and only when a page's
-// content is taller than the space left. The window itself never scrolls.
+// The shell is the viewport: sidebar and top bar are fixed; only <main> scrolls, and only when a page's content is
+// taller than the space left. The window itself never scrolls. The stage track lives on the home (home/Progress).
 export default function CompanyLayout({
   children,
   params,
@@ -47,8 +46,7 @@ export default function CompanyLayout({
             <Nav />
             <div className="flex min-w-0 flex-1 flex-col">
               <ShellHeader />
-              <Stepper />
-              <main className="scroll-panel min-h-0 flex-1 overflow-y-auto px-4 py-5 pb-24 lg:px-6 lg:pb-6">
+              <main className="scroll-panel min-h-0 flex-1 overflow-y-auto px-4 pt-7 pb-24 lg:px-[max(16px,2.2vw)] lg:pb-10">
                 <Suspense
                   fallback={<p className="text-muted-foreground">Loading…</p>}
                 >

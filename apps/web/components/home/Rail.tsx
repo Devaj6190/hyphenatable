@@ -1,6 +1,6 @@
 "use client";
 
-import { Check } from "lucide-react";
+import { ArrowRight, Check } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { type DataKind, DataLabel } from "@/components/DataLabel";
@@ -35,11 +35,10 @@ export function UpNext({
   items: { id: string; title: string; done: boolean; tone: CardTone }[];
   onGo: (id: string) => void;
 }) {
+  // Prototype "Up next": a plain list under the focus card, a dot per item, the row slides and shows an arrow on hover.
   return (
-    <RailCard>
-      <span className="text-[11px] font-bold tracking-[0.07em] text-muted-foreground uppercase">
-        Up next
-      </span>
+    <section aria-label="Up next" className="flex flex-col gap-1.5">
+      <span className="text-[13px] text-muted-foreground">Up next</span>
       <ul className="flex flex-col">
         {items.map((q) => (
           <li key={q.id}>
@@ -47,35 +46,40 @@ export function UpNext({
               type="button"
               onClick={() => onGo(q.id)}
               disabled={q.done}
-              className="flex min-h-10 w-full items-center gap-2.5 rounded-[10px] px-2 text-left hover:bg-accent focus-visible:outline-2 focus-visible:outline-ring disabled:hover:bg-transparent"
+              className="group -mx-3.5 flex min-h-[52px] w-[calc(100%+28px)] items-center gap-3.5 rounded-[14px] px-3.5 text-left transition-[transform,background-color] duration-(--dur-hover) ease-out-soft hover:translate-x-2 hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring disabled:hover:translate-x-0 disabled:hover:bg-transparent"
             >
+              {q.done ? (
+                <Check
+                  aria-hidden
+                  className="size-3 shrink-0 text-ok"
+                  strokeWidth={3}
+                />
+              ) : (
+                <span
+                  aria-hidden
+                  className="size-2 shrink-0 rounded-full"
+                  style={{ background: TONE[q.tone].grad }}
+                />
+              )}
               <span
-                aria-hidden
                 className={cn(
-                  "grid size-[18px] shrink-0 place-items-center rounded-md text-white",
-                  q.done && "bg-ok",
-                )}
-                style={
-                  q.done
-                    ? undefined
-                    : { background: TONE[q.tone].grad, opacity: 0.85 }
-                }
-              >
-                {q.done && <Check className="size-3" strokeWidth={3} />}
-              </span>
-              <span
-                className={cn(
-                  "min-w-0 flex-1 truncate text-sm",
+                  "min-w-0 flex-1 truncate",
                   q.done ? "text-muted-foreground line-through" : "",
                 )}
               >
                 {q.title}
               </span>
+              {!q.done && (
+                <ArrowRight
+                  aria-hidden
+                  className="size-4 shrink-0 -translate-x-1.5 text-muted-foreground opacity-0 transition-[opacity,transform] duration-(--dur-hover) group-hover:translate-x-0 group-hover:opacity-100"
+                />
+              )}
             </button>
           </li>
         ))}
       </ul>
-    </RailCard>
+    </section>
   );
 }
 

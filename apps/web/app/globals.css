@@ -52,10 +52,10 @@
   --color-agent-messenger: var(--agent-messenger);
   --color-agent-messenger-soft: var(--agent-messenger-soft);
 
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
-  /* Display face: page titles and the greeting only. */
-  --font-heading: var(--font-instrument-serif), Georgia, serif;
+  --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-dm-mono), ui-monospace, monospace;
+  /* Titles use the UI sans too, set larger and tighter (prototype: apps/rollpay-static). */
+  --font-heading: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
 
   /* Radii: 8px controls, 10px cards, 14px overlays, pills for badges and segmented tracks. */
   --radius-sm: 6px;
@@ -79,36 +79,38 @@
 :root,
 [data-theme="light"] {
   color-scheme: light;
-  /* Warm paper, ink, hairlines; the orange accent only for the active stage, links and the primary action. */
-  --background: #f6f4ef;
+  /* Warm paper, ink, hairlines; the orange accent only for the active stage, links and the primary action.
+     Values follow the RollPay prototype (apps/rollpay-static/styles.css). */
+  --background: #f5f3ee;
   --card: #ffffff;
   --raised: #ffffff;
-  --muted: #eeebe4;
-  --foreground: #141414;
-  --muted-foreground: #6b6b66;
-  --border: #e6e2d9;
+  --muted: #ece8df;
+  --foreground: #17181a;
+  --muted-foreground: #67655e;
+  --border: #e4e0d6;
   --input: #a8a49b;
-  --primary: #141414;
+  --primary: #17181a;
   --primary-foreground: #ffffff;
-  --primary-hover: #2a2a2a;
-  --primary-edge: #141414;
-  --link: #e8743b;
-  --ring: #e8743b;
+  --primary-hover: #2c2d30;
+  --primary-edge: #17181a;
+  /* Link text is a darker orange than the accent so it passes AA (4.7:1 on the canvas). */
+  --link: #b0501c;
+  --ring: #d9692f;
   --accent: #fbeee5;
   /* Flat: the sunset utilities now paint the one accent, no gradient. */
-  --sunset-1: #e8743b;
-  --sunset-2: #e8743b;
-  --sunset-3: #e8743b;
-  --sunset-ink: #141414;
-  --destructive: #b4442f;
-  --destructive-fill: #b4442f;
-  --destructive-soft: #f7e6e1;
-  --hold: #c8902e;
-  --hold-soft: #f8efdc;
+  --sunset-1: #d9692f;
+  --sunset-2: #d9692f;
+  --sunset-3: #d9692f;
+  --sunset-ink: #17181a;
+  --destructive: #8f3524;
+  --destructive-fill: #8f3524;
+  --destructive-soft: #f6e3dd;
+  --hold: #7a520c;
+  --hold-soft: #f6ecd6;
   --ask: #3b5f8f;
   --ask-soft: #e6edf5;
-  --ok: #2f7a5b;
-  --ok-soft: #e2efe8;
+  --ok: #3f6f5e;
+  --ok-soft: #e4ede7;
   --neutral-chip: #3d3d3a;
   --agent-analyst: #5b3fa8;
   --agent-analyst-soft: #efeafb;
@@ -320,12 +322,13 @@
     @apply bg-background text-foreground antialiased;
     font-size: 1rem;
     line-height: 1.5;
-    /* Host Grotesk has no tnum feature; its default digits are already equal-width lining figures. */
     font-variant-numeric: tabular-nums lining-nums;
   }
-  /* Serif display only on page titles and the greeting; every other heading is the UI sans. */
+  /* Page titles: the UI sans, medium weight, tight tracking (prototype h1). */
   h1 {
     @apply font-heading;
+    font-weight: 500;
+    letter-spacing: -0.035em;
     text-wrap: balance;
   }
   :focus-visible {

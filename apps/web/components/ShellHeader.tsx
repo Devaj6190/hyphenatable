@@ -36,8 +36,8 @@ export function ShellHeader() {
     : company?.label;
 
   return (
-    <header className="shrink-0 border-b bg-background">
-      <div className="flex h-14 items-center gap-3 px-4 lg:px-6">
+    <header className="shrink-0 bg-background">
+      <div className="flex h-16 items-center gap-3 px-4 lg:px-[max(16px,2.2vw)]">
         <Link
           href={routes.home(companyId)}
           aria-label="RollPay home"
@@ -45,13 +45,12 @@ export function ShellHeader() {
         >
           <RollPayLogo height={18} />
         </Link>
-        <div className="flex min-w-0 items-baseline gap-2 text-sm">
+        <div className="hidden min-w-0 items-baseline gap-3 text-[15px] sm:flex">
           <span className="truncate font-medium">
             {company?.name ?? "Unknown company"}
           </span>
           {company && (
             <span className="hidden truncate text-muted-foreground sm:inline">
-              ·{" "}
               {liveCycle.status === "loading"
                 ? "Loading cycle…"
                 : cyclePeriod({ timezone: company.timezone, cycle })}
@@ -65,11 +64,12 @@ export function ShellHeader() {
             className="hidden md:inline-flex"
           />
         )}
-        <div className="ml-auto flex items-center gap-2">
+        {/* Controls keep their size; the company name truncates instead, so the role switch never overlaps. */}
+        <div className="ml-auto flex shrink-0 items-center gap-2">
           {DEMO_MODE && <RoleSwitch />}
           <nav
             aria-label="Company"
-            className="flex rounded-full border bg-card p-0.5 text-xs"
+            className="flex gap-0.5 rounded-full border bg-card p-[3px] text-xs"
           >
             {Object.keys(companies).map((id) => (
               <Link
@@ -78,7 +78,7 @@ export function ShellHeader() {
                 aria-current={id === companyId ? "page" : undefined}
                 aria-label={companies[id].label}
                 className={cn(
-                  "grid size-6 place-items-center rounded-full font-medium",
+                  "grid size-[30px] place-items-center rounded-full font-medium transition-colors duration-(--dur-hover)",
                   id === companyId
                     ? "bg-foreground text-background"
                     : "text-muted-foreground hover:text-foreground",
@@ -88,7 +88,11 @@ export function ShellHeader() {
               </Link>
             ))}
           </nav>
-          {DEMO_MODE && <ThemeToggle />}
+          {DEMO_MODE && (
+            <div className="hidden sm:block">
+              <ThemeToggle />
+            </div>
+          )}
         </div>
       </div>
       <div className="px-4 empty:hidden lg:px-6">
