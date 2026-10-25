@@ -35,5 +35,5 @@ const companies = (fixture.companies as { id: string }[]).map(
   (c) => `${c.id} → ${ids[c.id]}`,
 );
 console.log(
-  `ingested ${Object.keys(ids).length} records; companies: ${companies.join(", ")}`,
+  `ingested ${Object.values(fixture).flat().length} records; companies: ${companies.join(", ")}`,
 );

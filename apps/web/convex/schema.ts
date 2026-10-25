@@ -116,10 +116,10 @@ export default defineSchema({
     endAt: nul(v.string()),
     durationSec: v.number(),
     ticking: v.boolean(),
-    approved: v.boolean(),
+    approved: nul(v.boolean()),
     approvedBy: nul(v.string()),
-    payable: v.boolean(),
-    category: v.string(),
+    payable: nul(v.boolean()),
+    category: nul(v.string()),
     label: nul(v.string()),
     hasNote: v.boolean(),
   })
@@ -195,7 +195,7 @@ export default defineSchema({
 
   expenses: defineTable({
     companyId: v.id("companies"),
-    source: lit("qbo", "jobber"),
+    source: lit("qbo", "jobber", "venmo"),
     sourceId: v.string(),
     date: v.string(),
     amountCents: nul(v.number()),
