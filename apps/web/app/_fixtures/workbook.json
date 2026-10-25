@@ -1,0 +1,3926 @@
+{
+  "source": "engine on data/fixtures for open cycles (proposed rules treated as approved); Gusto and Venmo records for closed cycles",
+  "companies": {
+    "a": {
+      "workers": {
+        "a-w01": {
+          "name": "Avery Reed",
+          "payType": "hourly"
+        },
+        "a-w02": {
+          "name": "Jordan Ellis",
+          "payType": "hourly"
+        },
+        "a-w03": {
+          "name": "Sam Okafor",
+          "payType": "hourly"
+        },
+        "a-w04": {
+          "name": "Riley Moreno",
+          "payType": "hourly"
+        },
+        "a-w05": {
+          "name": "Casey Lindqvist",
+          "payType": "hourly"
+        },
+        "a-w06": {
+          "name": "Morgan Achebe",
+          "payType": "hourly"
+        },
+        "a-w07": {
+          "name": "Quinn Takahashi",
+          "payType": "hourly"
+        },
+        "a-w08": {
+          "name": "Rowan Castillo",
+          "payType": "salary"
+        },
+        "a-w09": {
+          "name": "Emerson Vale",
+          "payType": "contractor_venmo"
+        },
+        "a-w10": {
+          "name": "Harper Nakamura",
+          "payType": "contractor_venmo"
+        },
+        "a-w11": {
+          "name": "Dakota Brennan",
+          "payType": "salary"
+        },
+        "a-w12": {
+          "name": "Skyler Ashford",
+          "payType": "salary"
+        },
+        "a-w13": {
+          "name": "Parker Whitfield",
+          "payType": "hourly"
+        },
+        "a-w14": {
+          "name": "Reese Calloway",
+          "payType": "hourly"
+        }
+      },
+      "cycles": [
+        {
+          "cycle": {
+            "id": "a-c01",
+            "number": 1,
+            "periodStart": "2026-08-15T04:00:00.000Z",
+            "periodEnd": "2026-08-29T03:59:59.999Z",
+            "stage": "closed",
+            "questionsAsked": 1,
+            "gustoPayrollId": null
+          },
+          "syncRuns": [
+            {
+              "id": "a-sr-07",
+              "source": "jobber",
+              "object": "timeSheetEntries",
+              "pulled": 76,
+              "expected": 76,
+              "complete": true
+            }
+          ],
+          "basis": "paid",
+          "draftId": null,
+          "draftStatus": null,
+          "stage1": {
+            "lines": [
+              {
+                "workerId": "a-w01",
+                "kind": "hourly",
+                "regularHours": 80,
+                "overtimeHours": 5,
+                "rateCents": 2800,
+                "grossCents": 245000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "a-pp-101"
+              },
+              {
+                "workerId": "a-w02",
+                "kind": "hourly",
+                "regularHours": 74,
+                "overtimeHours": 2.5,
+                "rateCents": 2500,
+                "grossCents": 194375,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "a-pp-102"
+              },
+              {
+                "workerId": "a-w03",
+                "kind": "hourly",
+                "regularHours": 74,
+                "overtimeHours": 2.5,
+                "rateCents": 2400,
+                "grossCents": 186600,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "a-pp-103"
+              },
+              {
+                "workerId": "a-w04",
+                "kind": "hourly",
+                "regularHours": 55.5,
+                "overtimeHours": null,
+                "rateCents": 2400,
+                "grossCents": 133200,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "a-pp-104"
+              },
+              {
+                "workerId": "a-w05",
+                "kind": "hourly",
+                "regularHours": 74,
+                "overtimeHours": 2.5,
+                "rateCents": 2200,
+                "grossCents": 171050,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "a-pp-105"
+              },
+              {
+                "workerId": "a-w06",
+                "kind": "hourly",
+                "regularHours": 65.5,
+                "overtimeHours": 2.5,
+                "rateCents": 2200,
+                "grossCents": 152350,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "a-pp-107"
+              },
+              {
+                "workerId": "a-w07",
+                "kind": "hourly",
+                "regularHours": 74,
+                "overtimeHours": 2.5,
+                "rateCents": 2000,
+                "grossCents": 155500,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "a-pp-108"
+              },
+              {
+                "workerId": "a-w08",
+                "kind": "salary",
+                "regularHours": null,
+                "overtimeHours": null,
+                "rateCents": 6240000,
+                "grossCents": 240000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "a-pp-109"
+              },
+              {
+                "workerId": "a-w11",
+                "kind": "salary",
+                "regularHours": null,
+                "overtimeHours": null,
+                "rateCents": 7280000,
+                "grossCents": 280000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "a-pp-111"
+              },
+              {
+                "workerId": "a-w12",
+                "kind": "salary",
+                "regularHours": null,
+                "overtimeHours": null,
+                "rateCents": 9100000,
+                "grossCents": 350000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "a-pp-113"
+              },
+              {
+                "workerId": "a-w13",
+                "kind": "hourly",
+                "regularHours": 17,
+                "overtimeHours": null,
+                "rateCents": 2200,
+                "grossCents": 37400,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "a-pp-114"
+              }
+            ],
+            "totalCents": 2145475,
+            "venmo": [
+              {
+                "workerId": "a-w09",
+                "hours": 51,
+                "rateCents": 2500,
+                "amountCents": 127500,
+                "recordSystem": "Gusto",
+                "recordId": "a-pp-110"
+              }
+            ],
+            "venmoHeld": []
+          },
+          "stage2": {
+            "draftId": null,
+            "lines": [
+              {
+                "workerId": "a-w05",
+                "name": "Commission",
+                "amountCents": 38700,
+                "recordId": "a-pp-106"
+              },
+              {
+                "workerId": "a-w11",
+                "name": "Bonus",
+                "amountCents": 135498,
+                "recordId": "a-pp-112"
+              }
+            ],
+            "totalCents": 174198,
+            "held": []
+          },
+          "jobs": null,
+          "totalProfitCents": null
+        },
+        {
+          "cycle": {
+            "id": "a-c02",
+            "number": 2,
+            "periodStart": "2026-08-29T04:00:00.000Z",
+            "periodEnd": "2026-09-12T03:59:59.999Z",
+            "stage": "closed",
+            "questionsAsked": 2,
+            "gustoPayrollId": null
+          },
+          "syncRuns": [
+            {
+              "id": "a-sr-08",
+              "source": "jobber",
+              "object": "timeSheetEntries",
+              "pulled": 75,
+              "expected": 75,
+              "complete": true
+            }
+          ],
+          "basis": "paid",
+          "draftId": null,
+          "draftStatus": null,
+          "stage1": {
+            "lines": [
+              {
+                "workerId": "a-w01",
+                "kind": "hourly",
+                "regularHours": 74,
+                "overtimeHours": 2.5,
+                "rateCents": 2800,
+                "grossCents": 217700,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "a-pp-201"
+              },
+              {
+                "workerId": "a-w02",
+                "kind": "hourly",
+                "regularHours": 74,
+                "overtimeHours": 2.5,
+                "rateCents": 2500,
+                "grossCents": 194375,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "a-pp-202"
+              },
+              {
+                "workerId": "a-w03",
+                "kind": "hourly",
+                "regularHours": 74,
+                "overtimeHours": 2.5,
+                "rateCents": 2400,
+                "grossCents": 186600,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "a-pp-203"
+              },
+              {
+                "workerId": "a-w04",
+                "kind": "hourly",
+                "regularHours": 49.25,
+                "overtimeHours": 6.25,
+                "rateCents": 2400,
+                "grossCents": 140700,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "a-pp-204"
+              },
+              {
+                "workerId": "a-w05",
+                "kind": "hourly",
+                "regularHours": 74,
+                "overtimeHours": 2.5,
+                "rateCents": 2200,
+                "grossCents": 171050,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "a-pp-205"
+              },
+              {
+                "workerId": "a-w06",
+                "kind": "hourly",
+                "regularHours": 65.5,
+                "overtimeHours": 2.5,
+                "rateCents": 2200,
+                "grossCents": 152350,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "a-pp-206"
+              },
+              {
+                "workerId": "a-w07",
+                "kind": "hourly",
+                "regularHours": 74,
+                "overtimeHours": 2.5,
+                "rateCents": 2000,
+                "grossCents": 155500,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "a-pp-207"
+              },
+              {
+                "workerId": "a-w08",
+                "kind": "salary",
+                "regularHours": null,
+                "overtimeHours": null,
+                "rateCents": 6240000,
+                "grossCents": 240000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "a-pp-208"
+              },
+              {
+                "workerId": "a-w11",
+                "kind": "salary",
+                "regularHours": null,
+                "overtimeHours": null,
+                "rateCents": 7280000,
+                "grossCents": 280000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "a-pp-210"
+              },
+              {
+                "workerId": "a-w12",
+                "kind": "salary",
+                "regularHours": null,
+                "overtimeHours": null,
+                "rateCents": 9100000,
+                "grossCents": 350000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "a-pp-212"
+              },
+              {
+                "workerId": "a-w13",
+                "kind": "hourly",
+                "regularHours": 17,
+                "overtimeHours": null,
+                "rateCents": 2200,
+                "grossCents": 37400,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "a-pp-213"
+              }
+            ],
+            "totalCents": 2125675,
+            "venmo": [
+              {
+                "workerId": "a-w09",
+                "hours": 51,
+                "rateCents": 2500,
+                "amountCents": 127500,
+                "recordSystem": "Gusto",
+                "recordId": "a-pp-209"
+              }
+            ],
+            "venmoHeld": []
+          },
+          "stage2": {
+            "draftId": null,
+            "lines": [
+              {
+                "workerId": "a-w11",
+                "name": "Bonus",
+                "amountCents": 119228,
+                "recordId": "a-pp-211"
+              }
+            ],
+            "totalCents": 119228,
+            "held": []
+          },
+          "jobs": null,
+          "totalProfitCents": null
+        },
+        {
+          "cycle": {
+            "id": "a-c03",
+            "number": 3,
+            "periodStart": "2026-09-12T04:00:00.000Z",
+            "periodEnd": "2026-09-26T03:59:59.999Z",
+            "stage": "closed",
+            "questionsAsked": 2,
+            "gustoPayrollId": null
+          },
+          "syncRuns": [
+            {
+              "id": "a-sr-09",
+              "source": "jobber",
+              "object": "timeSheetEntries",
+              "pulled": 76,
+              "expected": 76,
+              "complete": true
+            }
+          ],
+          "basis": "paid",
+          "draftId": null,
+          "draftStatus": null,
+          "stage1": {
+            "lines": [
+              {
+                "workerId": "a-w01",
+                "kind": "hourly",
+                "regularHours": 80,
+                "overtimeHours": 5,
+                "rateCents": 2800,
+                "grossCents": 245000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "a-pp-301"
+              },
+              {
+                "workerId": "a-w02",
+                "kind": "hourly",
+                "regularHours": 74,
+                "overtimeHours": 2.5,
+                "rateCents": 2500,
+                "grossCents": 194375,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "a-pp-303"
+              },
+              {
+                "workerId": "a-w03",
+                "kind": "hourly",
+                "regularHours": 74,
+                "overtimeHours": 2.5,
+                "rateCents": 2400,
+                "grossCents": 186600,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "a-pp-305"
+              },
+              {
+                "workerId": "a-w04",
+                "kind": "hourly",
+                "regularHours": 55.5,
+                "overtimeHours": null,
+                "rateCents": 2400,
+                "grossCents": 133200,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "a-pp-307"
+              },
+              {
+                "workerId": "a-w05",
+                "kind": "hourly",
+                "regularHours": 74,
+                "overtimeHours": 2.5,
+                "rateCents": 2200,
+                "grossCents": 171050,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "a-pp-309"
+              },
+              {
+                "workerId": "a-w06",
+                "kind": "hourly",
+                "regularHours": 65.5,
+                "overtimeHours": 2.5,
+                "rateCents": 2200,
+                "grossCents": 152350,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "a-pp-311"
+              },
+              {
+                "workerId": "a-w07",
+                "kind": "hourly",
+                "regularHours": 74,
+                "overtimeHours": 2.5,
+                "rateCents": 2000,
+                "grossCents": 155500,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "a-pp-313"
+              },
+              {
+                "workerId": "a-w08",
+                "kind": "salary",
+                "regularHours": null,
+                "overtimeHours": null,
+                "rateCents": 6240000,
+                "grossCents": 240000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "a-pp-315"
+              },
+              {
+                "workerId": "a-w11",
+                "kind": "salary",
+                "regularHours": null,
+                "overtimeHours": null,
+                "rateCents": 7280000,
+                "grossCents": 280000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "a-pp-318"
+              },
+              {
+                "workerId": "a-w12",
+                "kind": "salary",
+                "regularHours": null,
+                "overtimeHours": null,
+                "rateCents": 9100000,
+                "grossCents": 350000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "a-pp-320"
+              },
+              {
+                "workerId": "a-w13",
+                "kind": "hourly",
+                "regularHours": 17,
+                "overtimeHours": null,
+                "rateCents": 2200,
+                "grossCents": 37400,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "a-pp-321"
+              }
+            ],
+            "totalCents": 2145475,
+            "venmo": [
+              {
+                "workerId": "a-w09",
+                "hours": 51,
+                "rateCents": 2500,
+                "amountCents": 128378,
+                "recordSystem": "Gusto",
+                "recordId": "a-pp-317"
+              }
+            ],
+            "venmoHeld": []
+          },
+          "stage2": {
+            "draftId": null,
+            "lines": [
+              {
+                "workerId": "a-w01",
+                "name": "Paycheck Tips",
+                "amountCents": 1756,
+                "recordId": "a-pp-302"
+              },
+              {
+                "workerId": "a-w02",
+                "name": "Paycheck Tips",
+                "amountCents": 1756,
+                "recordId": "a-pp-304"
+              },
+              {
+                "workerId": "a-w03",
+                "name": "Paycheck Tips",
+                "amountCents": 1756,
+                "recordId": "a-pp-306"
+              },
+              {
+                "workerId": "a-w04",
+                "name": "Paycheck Tips",
+                "amountCents": 955,
+                "recordId": "a-pp-308"
+              },
+              {
+                "workerId": "a-w05",
+                "name": "Commission",
+                "amountCents": 30200,
+                "recordId": "a-pp-310"
+              },
+              {
+                "workerId": "a-w05",
+                "name": "Paycheck Tips",
+                "amountCents": 1756,
+                "recordId": "a-pp-310"
+              },
+              {
+                "workerId": "a-w06",
+                "name": "Paycheck Tips",
+                "amountCents": 1756,
+                "recordId": "a-pp-312"
+              },
+              {
+                "workerId": "a-w07",
+                "name": "Paycheck Tips",
+                "amountCents": 1756,
+                "recordId": "a-pp-314"
+              },
+              {
+                "workerId": "a-w08",
+                "name": "Paycheck Tips",
+                "amountCents": 1756,
+                "recordId": "a-pp-316"
+              },
+              {
+                "workerId": "a-w11",
+                "name": "Bonus",
+                "amountCents": 124990,
+                "recordId": "a-pp-319"
+              },
+              {
+                "workerId": "a-w13",
+                "name": "Paycheck Tips",
+                "amountCents": 875,
+                "recordId": "a-pp-322"
+              }
+            ],
+            "totalCents": 169312,
+            "held": []
+          },
+          "jobs": null,
+          "totalProfitCents": null
+        },
+        {
+          "cycle": {
+            "id": "a-c04",
+            "number": 4,
+            "periodStart": "2026-09-26T04:00:00.000Z",
+            "periodEnd": "2026-10-10T03:59:59.999Z",
+            "stage": "closed",
+            "questionsAsked": 1,
+            "gustoPayrollId": null
+          },
+          "syncRuns": [
+            {
+              "id": "a-sr-04",
+              "source": "jobber",
+              "object": "timeSheetEntries",
+              "pulled": 75,
+              "expected": 76,
+              "complete": false
+            }
+          ],
+          "basis": "paid",
+          "draftId": null,
+          "draftStatus": null,
+          "stage1": {
+            "lines": [
+              {
+                "workerId": "a-w01",
+                "kind": "hourly",
+                "regularHours": 80,
+                "overtimeHours": 5,
+                "rateCents": 2800,
+                "grossCents": 245000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "a-pp-401"
+              },
+              {
+                "workerId": "a-w02",
+                "kind": "hourly",
+                "regularHours": 74,
+                "overtimeHours": 2.5,
+                "rateCents": 2600,
+                "grossCents": 202150,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "a-pp-402"
+              },
+              {
+                "workerId": "a-w03",
+                "kind": "hourly",
+                "regularHours": 74,
+                "overtimeHours": 2.5,
+                "rateCents": 2400,
+                "grossCents": 186600,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "a-pp-403"
+              },
+              {
+                "workerId": "a-w04",
+                "kind": "hourly",
+                "regularHours": 55.5,
+                "overtimeHours": null,
+                "rateCents": 2400,
+                "grossCents": 133200,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "a-pp-404"
+              },
+              {
+                "workerId": "a-w05",
+                "kind": "hourly",
+                "regularHours": 74,
+                "overtimeHours": 2.5,
+                "rateCents": 2200,
+                "grossCents": 171050,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "a-pp-405"
+              },
+              {
+                "workerId": "a-w06",
+                "kind": "hourly",
+                "regularHours": 65.5,
+                "overtimeHours": 2.5,
+                "rateCents": 2200,
+                "grossCents": 152350,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "a-pp-406"
+              },
+              {
+                "workerId": "a-w07",
+                "kind": "hourly",
+                "regularHours": 74,
+                "overtimeHours": 2.5,
+                "rateCents": 2000,
+                "grossCents": 155500,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "a-pp-407"
+              },
+              {
+                "workerId": "a-w08",
+                "kind": "salary",
+                "regularHours": null,
+                "overtimeHours": null,
+                "rateCents": 6760000,
+                "grossCents": 260000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "a-pp-408"
+              },
+              {
+                "workerId": "a-w11",
+                "kind": "salary",
+                "regularHours": null,
+                "overtimeHours": null,
+                "rateCents": 7280000,
+                "grossCents": 280000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "a-pp-410"
+              },
+              {
+                "workerId": "a-w12",
+                "kind": "salary",
+                "regularHours": null,
+                "overtimeHours": null,
+                "rateCents": 9100000,
+                "grossCents": 350000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "a-pp-412"
+              },
+              {
+                "workerId": "a-w13",
+                "kind": "hourly",
+                "regularHours": 17,
+                "overtimeHours": null,
+                "rateCents": 2200,
+                "grossCents": 37400,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "a-pp-413"
+              }
+            ],
+            "totalCents": 2173250,
+            "venmo": [
+              {
+                "workerId": "a-w09",
+                "hours": 51,
+                "rateCents": 2500,
+                "amountCents": 127500,
+                "recordSystem": "Gusto",
+                "recordId": "a-pp-409"
+              }
+            ],
+            "venmoHeld": []
+          },
+          "stage2": {
+            "draftId": null,
+            "lines": [
+              {
+                "workerId": "a-w11",
+                "name": "Bonus",
+                "amountCents": 132619,
+                "recordId": "a-pp-411"
+              }
+            ],
+            "totalCents": 132619,
+            "held": []
+          },
+          "jobs": null,
+          "totalProfitCents": null
+        },
+        {
+          "cycle": {
+            "id": "a-c05",
+            "number": 5,
+            "periodStart": "2026-10-10T04:00:00.000Z",
+            "periodEnd": "2026-10-24T03:59:59.999Z",
+            "stage": "setup",
+            "questionsAsked": 0,
+            "gustoPayrollId": "650734d5-e197-4b55-b2a2-03bcbff3882c"
+          },
+          "syncRuns": [
+            {
+              "id": "a-sr-01",
+              "source": "jobber",
+              "object": "timeSheetEntries",
+              "pulled": 85,
+              "expected": 85,
+              "complete": true
+            },
+            {
+              "id": "a-sr-02",
+              "source": "qbo",
+              "object": "Purchase",
+              "pulled": 6,
+              "expected": 6,
+              "complete": true
+            },
+            {
+              "id": "a-sr-03",
+              "source": "gusto",
+              "object": "employees",
+              "pulled": 12,
+              "expected": 12,
+              "complete": true
+            },
+            {
+              "id": "a-sr-05",
+              "source": "jobber",
+              "object": "expenses",
+              "pulled": 5,
+              "expected": 5,
+              "complete": true
+            },
+            {
+              "id": "a-sr-06",
+              "source": "jobber",
+              "object": "visits",
+              "pulled": 5,
+              "expected": 5,
+              "complete": true
+            }
+          ],
+          "basis": "engine",
+          "draftId": "a-c05-draft-s1",
+          "draftStatus": "computed",
+          "stage1": {
+            "lines": [
+              {
+                "workerId": "a-w01",
+                "kind": "hourly",
+                "regularHours": 80,
+                "overtimeHours": 5,
+                "rateCents": 2800,
+                "grossCents": 245000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Jobber",
+                "recordId": "a-te-0101, a-te-0110, a-te-0122, a-te-0131, a-te-0145, a-te-0157, a-te-0162, a-te-0169, a-te-0179, a-te-0183"
+              },
+              {
+                "workerId": "a-w02",
+                "kind": "hourly",
+                "regularHours": 74,
+                "overtimeHours": 11,
+                "rateCents": 2600,
+                "grossCents": 235300,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Jobber",
+                "recordId": "a-te-0106, a-te-0114, a-te-0126, a-te-0134, a-te-0141, a-te-0146, a-te-0152, a-te-0163, a-te-0165, a-te-0174"
+              },
+              {
+                "workerId": "a-w03",
+                "kind": "hourly",
+                "regularHours": 74,
+                "overtimeHours": 6.5,
+                "rateCents": 2400,
+                "grossCents": 201000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Jobber",
+                "recordId": "a-te-0102, a-te-0111, a-te-0113, a-te-0123, a-te-0147, a-te-0158, a-te-0164, a-te-0170, a-te-0175, a-te-0184"
+              },
+              {
+                "workerId": "a-w04",
+                "kind": "hourly",
+                "regularHours": 78.5,
+                "overtimeHours": 7,
+                "rateCents": 2400,
+                "grossCents": 213600,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Jobber",
+                "recordId": "a-te-0107, a-te-0117, a-te-0127, a-te-0137, a-te-0142, a-te-0153, a-te-0159, a-te-0166, a-te-0176, a-te-0185"
+              },
+              {
+                "workerId": "a-w05",
+                "kind": "hourly",
+                "regularHours": 77.08,
+                "overtimeHours": null,
+                "rateCents": 2200,
+                "grossCents": 169583,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Jobber",
+                "recordId": "a-te-0103, a-te-0108, a-te-0115, a-te-0121, a-te-0124, a-te-0132, a-te-0135, a-te-0140, a-te-0154, a-te-0171"
+              },
+              {
+                "workerId": "a-w06",
+                "kind": "hourly",
+                "regularHours": null,
+                "overtimeHours": null,
+                "rateCents": 2200,
+                "grossCents": 0,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Workbook",
+                "recordId": "a-c05-draft-s1/a-w06"
+              },
+              {
+                "workerId": "a-w07",
+                "kind": "hourly",
+                "regularHours": 78.5,
+                "overtimeHours": 2.5,
+                "rateCents": 2000,
+                "grossCents": 164500,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Jobber",
+                "recordId": "a-te-0104, a-te-0118, a-te-0128, a-te-0130, a-te-0148, a-te-0155, a-te-0160, a-te-0167, a-te-0180"
+              },
+              {
+                "workerId": "a-w08",
+                "kind": "salary",
+                "regularHours": null,
+                "overtimeHours": null,
+                "rateCents": 6760000,
+                "grossCents": 260000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Jobber",
+                "recordId": "a-te-0105, a-te-0112, a-te-0125, a-te-0133, a-te-0149, a-te-0161, a-te-0172, a-te-0181"
+              },
+              {
+                "workerId": "a-w11",
+                "kind": "salary",
+                "regularHours": null,
+                "overtimeHours": null,
+                "rateCents": 7280000,
+                "grossCents": 280000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Workbook",
+                "recordId": "a-c05-draft-s1/a-w11"
+              },
+              {
+                "workerId": "a-w12",
+                "kind": "salary",
+                "regularHours": null,
+                "overtimeHours": null,
+                "rateCents": 9100000,
+                "grossCents": 350000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Workbook",
+                "recordId": "a-c05-draft-s1/a-w12"
+              },
+              {
+                "workerId": "a-w13",
+                "kind": "hourly",
+                "regularHours": 17,
+                "overtimeHours": null,
+                "rateCents": 2200,
+                "grossCents": 37400,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Jobber",
+                "recordId": "a-te-0144, a-te-0151"
+              },
+              {
+                "workerId": "a-w14",
+                "kind": "hourly",
+                "regularHours": 34,
+                "overtimeHours": null,
+                "rateCents": 2000,
+                "grossCents": 68000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Jobber",
+                "recordId": "a-te-0168, a-te-0173, a-te-0178, a-te-0182"
+              }
+            ],
+            "totalCents": 2224383,
+            "venmo": [
+              {
+                "workerId": "a-w09",
+                "hours": 51,
+                "rateCents": 2500,
+                "amountCents": 127500,
+                "recordSystem": "Jobber",
+                "recordId": "a-te-0116, a-te-0119, a-te-0136, a-te-0138, a-te-0143, a-te-0150"
+              }
+            ],
+            "venmoHeld": [
+              {
+                "workerId": "a-w10",
+                "reason": "no Venmo rate (CHK-11): no active venmo_rate rule and venmoRateCents is null"
+              }
+            ]
+          },
+          "stage2": {
+            "draftId": "a-c05-draft-s2",
+            "lines": [],
+            "totalCents": 0,
+            "held": [
+              {
+                "workerId": "a-w11",
+                "what": "manager split on a-j02",
+                "reason": "job not complete"
+              },
+              {
+                "workerId": "a-w11",
+                "what": "manager split on a-j04",
+                "reason": "job not complete"
+              },
+              {
+                "workerId": "a-w11",
+                "what": "manager split on a-j05",
+                "reason": "job not complete"
+              },
+              {
+                "workerId": "a-w11",
+                "what": "manager split",
+                "reason": "profit unknown for a-j08 (no job total and no invoice total)"
+              }
+            ]
+          },
+          "totalProfitCents": null,
+          "jobs": [
+            {
+              "jobId": "a-j01",
+              "jobNumber": 101,
+              "title": "Front yard sod install - Larkspur Ln",
+              "revenueCents": 814000,
+              "laborCents": 424350,
+              "jobCostCents": 68250,
+              "profitCents": 321400,
+              "marginPct": 39.48,
+              "low": false,
+              "provisional": false,
+              "hints": []
+            },
+            {
+              "jobId": "a-j02",
+              "jobNumber": 102,
+              "title": "Backyard patio and drainage - Birchwood Ave",
+              "revenueCents": 524000,
+              "laborCents": 301258,
+              "jobCostCents": 41500,
+              "profitCents": 181242,
+              "marginPct": 34.59,
+              "low": false,
+              "provisional": true,
+              "hints": []
+            },
+            {
+              "jobId": "a-j03",
+              "jobNumber": 103,
+              "title": "Hedge trim and cleanup - Juniper Way",
+              "revenueCents": 587000,
+              "laborCents": 318525,
+              "jobCostCents": 6420,
+              "profitCents": 262055,
+              "marginPct": 44.64,
+              "low": false,
+              "provisional": false,
+              "hints": []
+            },
+            {
+              "jobId": "a-j04",
+              "jobNumber": 104,
+              "title": "Retaining wall rebuild - Foxglove Ct",
+              "revenueCents": 711000,
+              "laborCents": 356350,
+              "jobCostCents": 131540,
+              "profitCents": 223110,
+              "marginPct": 31.38,
+              "low": false,
+              "provisional": true,
+              "hints": []
+            },
+            {
+              "jobId": "a-j05",
+              "jobNumber": 105,
+              "title": "Irrigation system install - Alder Run",
+              "revenueCents": 405000,
+              "laborCents": 345800,
+              "jobCostCents": 31172,
+              "profitCents": 28028,
+              "marginPct": 6.92,
+              "low": true,
+              "provisional": true,
+              "hints": [
+                "unmatched job-cost expense a-ex-0003 on 2026-10-21",
+                "stale Jobber rate for a-w08: 3000¢/h vs 3250¢/h (a-rule-23)"
+              ]
+            },
+            {
+              "jobId": "a-j07",
+              "jobNumber": 107,
+              "title": "Drip line repair - Sorrel St",
+              "revenueCents": 48000,
+              "laborCents": 0,
+              "jobCostCents": 0,
+              "profitCents": 48000,
+              "marginPct": 100,
+              "low": false,
+              "provisional": false,
+              "hints": []
+            },
+            {
+              "jobId": "a-j08",
+              "jobNumber": 108,
+              "title": "Disposal run - Foxglove Ct",
+              "revenueCents": null,
+              "laborCents": 0,
+              "jobCostCents": 14250,
+              "profitCents": null,
+              "marginPct": null,
+              "low": false,
+              "provisional": false,
+              "hints": []
+            },
+            {
+              "jobId": "a-j09",
+              "jobNumber": 109,
+              "title": "Paver walkway - Hawthorn Pl",
+              "revenueCents": 400000,
+              "laborCents": 0,
+              "jobCostCents": 0,
+              "profitCents": 400000,
+              "marginPct": 100,
+              "low": false,
+              "provisional": false,
+              "hints": []
+            }
+          ],
+          "lowMarginPct": 20
+        }
+      ]
+    },
+    "b": {
+      "workers": {
+        "b-w01": {
+          "name": "Marisol Thackeray",
+          "payType": "salary"
+        },
+        "b-w02": {
+          "name": "Desmond Quill",
+          "payType": "salary"
+        },
+        "b-w03": {
+          "name": "Imogen Strand",
+          "payType": "salary"
+        },
+        "b-w04": {
+          "name": "Tobias Wren",
+          "payType": "hourly"
+        },
+        "b-w05": {
+          "name": "Anika Holloway",
+          "payType": "hourly"
+        },
+        "b-w06": {
+          "name": "Beckett Navarro",
+          "payType": "hourly"
+        },
+        "b-w07": {
+          "name": "Celeste Ibarra",
+          "payType": "hourly"
+        },
+        "b-w08": {
+          "name": "Dorian Pike",
+          "payType": "hourly"
+        },
+        "b-w09": {
+          "name": "Esme Calder",
+          "payType": "hourly"
+        },
+        "b-w10": {
+          "name": "Fintan Oduya",
+          "payType": "hourly"
+        },
+        "b-w11": {
+          "name": "Gemma Laurier",
+          "payType": "hourly"
+        },
+        "b-w12": {
+          "name": "Hollis Varga",
+          "payType": "hourly"
+        },
+        "b-w13": {
+          "name": "Ines Marchetti",
+          "payType": "hourly"
+        },
+        "b-w14": {
+          "name": "Jasper Kowalczyk",
+          "payType": "hourly"
+        },
+        "b-w15": {
+          "name": "Kenji Abernathy",
+          "payType": "hourly"
+        },
+        "b-w16": {
+          "name": "Leona Fairbanks",
+          "payType": "hourly"
+        },
+        "b-w17": {
+          "name": "Mateo Lindgren",
+          "payType": "hourly"
+        },
+        "b-w18": {
+          "name": "Nadia Osei",
+          "payType": "hourly"
+        },
+        "b-w19": {
+          "name": "Orrin Delacroix",
+          "payType": "hourly"
+        },
+        "b-w20": {
+          "name": "Priya Halvorsen",
+          "payType": "hourly"
+        },
+        "b-w21": {
+          "name": "Quentin Mbeki",
+          "payType": "hourly"
+        },
+        "b-w22": {
+          "name": "Rosalind Achterberg",
+          "payType": "hourly"
+        },
+        "b-w23": {
+          "name": "Silas Okonkwo",
+          "payType": "hourly"
+        },
+        "b-w24": {
+          "name": "Talia Brandvold",
+          "payType": "hourly"
+        },
+        "b-w25": {
+          "name": "Ulric Santangelo",
+          "payType": "hourly"
+        },
+        "b-w26": {
+          "name": "Vera Moss-Halden",
+          "payType": "hourly"
+        },
+        "b-w27": {
+          "name": "Wesley Tran-Oyelaran",
+          "payType": "hourly"
+        },
+        "b-w28": {
+          "name": "Xiomara Gallant",
+          "payType": "hourly"
+        },
+        "b-w29": {
+          "name": "Yusuf Pemberton",
+          "payType": "commission"
+        },
+        "b-w30": {
+          "name": "Zara Whitlock",
+          "payType": "commission"
+        }
+      },
+      "cycles": [
+        {
+          "cycle": {
+            "id": "b-c01",
+            "number": 1,
+            "periodStart": "2026-09-20T07:00:00.000Z",
+            "periodEnd": "2026-09-27T06:59:59.999Z",
+            "stage": "closed",
+            "questionsAsked": 1,
+            "gustoPayrollId": null
+          },
+          "syncRuns": [
+            {
+              "id": "b-sr-06",
+              "source": "jobber",
+              "object": "timeSheetEntries",
+              "pulled": 190,
+              "expected": 190,
+              "complete": true
+            }
+          ],
+          "basis": "paid",
+          "draftId": null,
+          "draftStatus": null,
+          "stage1": {
+            "lines": [
+              {
+                "workerId": "b-w01",
+                "kind": "salary",
+                "regularHours": null,
+                "overtimeHours": null,
+                "rateCents": 12480000,
+                "grossCents": 240000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-101"
+              },
+              {
+                "workerId": "b-w02",
+                "kind": "salary",
+                "regularHours": null,
+                "overtimeHours": null,
+                "rateCents": 8840000,
+                "grossCents": 170000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-102"
+              },
+              {
+                "workerId": "b-w03",
+                "kind": "salary",
+                "regularHours": null,
+                "overtimeHours": null,
+                "rateCents": 8580000,
+                "grossCents": 165000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-103"
+              },
+              {
+                "workerId": "b-w04",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 2600,
+                "grossCents": 113750,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-104"
+              },
+              {
+                "workerId": "b-w05",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 3800,
+                "grossCents": 166250,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-105"
+              },
+              {
+                "workerId": "b-w06",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 3000,
+                "grossCents": 131250,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-106"
+              },
+              {
+                "workerId": "b-w07",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 3000,
+                "grossCents": 131250,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-107"
+              },
+              {
+                "workerId": "b-w08",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 2400,
+                "grossCents": 105000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-108"
+              },
+              {
+                "workerId": "b-w09",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 7.5,
+                "rateCents": 3800,
+                "grossCents": 194750,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-109"
+              },
+              {
+                "workerId": "b-w10",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 7.5,
+                "rateCents": 3000,
+                "grossCents": 153750,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-110"
+              },
+              {
+                "workerId": "b-w11",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 7.5,
+                "rateCents": 2800,
+                "grossCents": 143500,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-111"
+              },
+              {
+                "workerId": "b-w12",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 7.5,
+                "rateCents": 2400,
+                "grossCents": 123000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-112"
+              },
+              {
+                "workerId": "b-w13",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 3800,
+                "grossCents": 166250,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-113"
+              },
+              {
+                "workerId": "b-w14",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 3000,
+                "grossCents": 131250,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-114"
+              },
+              {
+                "workerId": "b-w15",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 2800,
+                "grossCents": 122500,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-115"
+              },
+              {
+                "workerId": "b-w16",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 2400,
+                "grossCents": 105000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-116"
+              },
+              {
+                "workerId": "b-w17",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 3600,
+                "grossCents": 157500,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-117"
+              },
+              {
+                "workerId": "b-w18",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 6.5,
+                "rateCents": 3400,
+                "grossCents": 169150,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-118"
+              },
+              {
+                "workerId": "b-w19",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 3400,
+                "grossCents": 148750,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-119"
+              },
+              {
+                "workerId": "b-w20",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 3200,
+                "grossCents": 140000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-120"
+              },
+              {
+                "workerId": "b-w21",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 3200,
+                "grossCents": 140000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-121"
+              },
+              {
+                "workerId": "b-w22",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 3200,
+                "grossCents": 140000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-122"
+              },
+              {
+                "workerId": "b-w23",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 3000,
+                "grossCents": 131250,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-123"
+              },
+              {
+                "workerId": "b-w24",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 3000,
+                "grossCents": 131250,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-124"
+              },
+              {
+                "workerId": "b-w25",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 2800,
+                "grossCents": 122500,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-125"
+              },
+              {
+                "workerId": "b-w26",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 2800,
+                "grossCents": 122500,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-126"
+              },
+              {
+                "workerId": "b-w27",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 2600,
+                "grossCents": 113750,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-127"
+              },
+              {
+                "workerId": "b-w28",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 2600,
+                "grossCents": 113750,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-128"
+              },
+              {
+                "workerId": "b-w29",
+                "kind": "salary",
+                "regularHours": null,
+                "overtimeHours": null,
+                "rateCents": 4160000,
+                "grossCents": 80000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-129"
+              },
+              {
+                "workerId": "b-w30",
+                "kind": "salary",
+                "regularHours": null,
+                "overtimeHours": null,
+                "rateCents": 4160000,
+                "grossCents": 80000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-131"
+              }
+            ],
+            "totalCents": 4152900,
+            "venmo": [],
+            "venmoHeld": []
+          },
+          "stage2": {
+            "draftId": null,
+            "lines": [
+              {
+                "workerId": "b-w29",
+                "name": "Commission",
+                "amountCents": 90023,
+                "recordId": "b-pp-130"
+              },
+              {
+                "workerId": "b-w30",
+                "name": "Commission",
+                "amountCents": 110908,
+                "recordId": "b-pp-132"
+              }
+            ],
+            "totalCents": 200931,
+            "held": []
+          },
+          "jobs": null,
+          "totalProfitCents": null
+        },
+        {
+          "cycle": {
+            "id": "b-c02",
+            "number": 2,
+            "periodStart": "2026-09-27T07:00:00.000Z",
+            "periodEnd": "2026-10-04T06:59:59.999Z",
+            "stage": "closed",
+            "questionsAsked": 1,
+            "gustoPayrollId": null
+          },
+          "syncRuns": [
+            {
+              "id": "b-sr-07",
+              "source": "jobber",
+              "object": "timeSheetEntries",
+              "pulled": 191,
+              "expected": 191,
+              "complete": true
+            }
+          ],
+          "basis": "paid",
+          "draftId": null,
+          "draftStatus": null,
+          "stage1": {
+            "lines": [
+              {
+                "workerId": "b-w01",
+                "kind": "salary",
+                "regularHours": null,
+                "overtimeHours": null,
+                "rateCents": 12480000,
+                "grossCents": 240000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-201"
+              },
+              {
+                "workerId": "b-w02",
+                "kind": "salary",
+                "regularHours": null,
+                "overtimeHours": null,
+                "rateCents": 8840000,
+                "grossCents": 170000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-202"
+              },
+              {
+                "workerId": "b-w03",
+                "kind": "salary",
+                "regularHours": null,
+                "overtimeHours": null,
+                "rateCents": 8580000,
+                "grossCents": 165000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-203"
+              },
+              {
+                "workerId": "b-w04",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 2600,
+                "grossCents": 113750,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-204"
+              },
+              {
+                "workerId": "b-w05",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 3800,
+                "grossCents": 166250,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-205"
+              },
+              {
+                "workerId": "b-w06",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 3000,
+                "grossCents": 131250,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-206"
+              },
+              {
+                "workerId": "b-w07",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 3000,
+                "grossCents": 131250,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-207"
+              },
+              {
+                "workerId": "b-w08",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 2400,
+                "grossCents": 105000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-208"
+              },
+              {
+                "workerId": "b-w09",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 3800,
+                "grossCents": 166250,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-209"
+              },
+              {
+                "workerId": "b-w10",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 3000,
+                "grossCents": 131250,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-210"
+              },
+              {
+                "workerId": "b-w11",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 2800,
+                "grossCents": 122500,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-211"
+              },
+              {
+                "workerId": "b-w12",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 2400,
+                "grossCents": 105000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-212"
+              },
+              {
+                "workerId": "b-w13",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 7.5,
+                "rateCents": 3800,
+                "grossCents": 194750,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-213"
+              },
+              {
+                "workerId": "b-w14",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 7.5,
+                "rateCents": 3000,
+                "grossCents": 153750,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-214"
+              },
+              {
+                "workerId": "b-w15",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 7.5,
+                "rateCents": 2800,
+                "grossCents": 143500,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-215"
+              },
+              {
+                "workerId": "b-w16",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 7.5,
+                "rateCents": 2400,
+                "grossCents": 123000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-216"
+              },
+              {
+                "workerId": "b-w17",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 3600,
+                "grossCents": 157500,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-217"
+              },
+              {
+                "workerId": "b-w18",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 3400,
+                "grossCents": 148750,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-218"
+              },
+              {
+                "workerId": "b-w19",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 6.5,
+                "rateCents": 3400,
+                "grossCents": 169150,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-219"
+              },
+              {
+                "workerId": "b-w20",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 3200,
+                "grossCents": 140000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-220"
+              },
+              {
+                "workerId": "b-w21",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 3200,
+                "grossCents": 140000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-221"
+              },
+              {
+                "workerId": "b-w22",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 3200,
+                "grossCents": 140000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-222"
+              },
+              {
+                "workerId": "b-w23",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 3000,
+                "grossCents": 131250,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-223"
+              },
+              {
+                "workerId": "b-w24",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 3000,
+                "grossCents": 131250,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-224"
+              },
+              {
+                "workerId": "b-w25",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 2800,
+                "grossCents": 122500,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-225"
+              },
+              {
+                "workerId": "b-w26",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 2800,
+                "grossCents": 122500,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-226"
+              },
+              {
+                "workerId": "b-w27",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 6,
+                "rateCents": 2600,
+                "grossCents": 130000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-227"
+              },
+              {
+                "workerId": "b-w28",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 2600,
+                "grossCents": 113750,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-228"
+              },
+              {
+                "workerId": "b-w29",
+                "kind": "salary",
+                "regularHours": null,
+                "overtimeHours": null,
+                "rateCents": 4160000,
+                "grossCents": 80000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-229"
+              },
+              {
+                "workerId": "b-w30",
+                "kind": "salary",
+                "regularHours": null,
+                "overtimeHours": null,
+                "rateCents": 4160000,
+                "grossCents": 80000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-231"
+              }
+            ],
+            "totalCents": 4169150,
+            "venmo": [],
+            "venmoHeld": []
+          },
+          "stage2": {
+            "draftId": null,
+            "lines": [
+              {
+                "workerId": "b-w29",
+                "name": "Commission",
+                "amountCents": 104942,
+                "recordId": "b-pp-230"
+              },
+              {
+                "workerId": "b-w30",
+                "name": "Commission",
+                "amountCents": 122971,
+                "recordId": "b-pp-232"
+              }
+            ],
+            "totalCents": 227913,
+            "held": []
+          },
+          "jobs": null,
+          "totalProfitCents": null
+        },
+        {
+          "cycle": {
+            "id": "b-c03",
+            "number": 3,
+            "periodStart": "2026-10-04T07:00:00.000Z",
+            "periodEnd": "2026-10-11T06:59:59.999Z",
+            "stage": "closed",
+            "questionsAsked": 1,
+            "gustoPayrollId": null
+          },
+          "syncRuns": [
+            {
+              "id": "b-sr-08",
+              "source": "jobber",
+              "object": "timeSheetEntries",
+              "pulled": 190,
+              "expected": 190,
+              "complete": true
+            }
+          ],
+          "basis": "paid",
+          "draftId": null,
+          "draftStatus": null,
+          "stage1": {
+            "lines": [
+              {
+                "workerId": "b-w01",
+                "kind": "salary",
+                "regularHours": null,
+                "overtimeHours": null,
+                "rateCents": 12480000,
+                "grossCents": 240000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-301"
+              },
+              {
+                "workerId": "b-w02",
+                "kind": "salary",
+                "regularHours": null,
+                "overtimeHours": null,
+                "rateCents": 8840000,
+                "grossCents": 170000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-302"
+              },
+              {
+                "workerId": "b-w03",
+                "kind": "salary",
+                "regularHours": null,
+                "overtimeHours": null,
+                "rateCents": 8580000,
+                "grossCents": 165000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-303"
+              },
+              {
+                "workerId": "b-w04",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 2600,
+                "grossCents": 113750,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-304"
+              },
+              {
+                "workerId": "b-w05",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 7.5,
+                "rateCents": 3800,
+                "grossCents": 194750,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-305"
+              },
+              {
+                "workerId": "b-w06",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 7.5,
+                "rateCents": 3000,
+                "grossCents": 153750,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-306"
+              },
+              {
+                "workerId": "b-w07",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 7.5,
+                "rateCents": 3000,
+                "grossCents": 153750,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-307"
+              },
+              {
+                "workerId": "b-w08",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 7.5,
+                "rateCents": 2400,
+                "grossCents": 123000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-308"
+              },
+              {
+                "workerId": "b-w09",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 3800,
+                "grossCents": 166250,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-309"
+              },
+              {
+                "workerId": "b-w10",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 3000,
+                "grossCents": 131250,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-310"
+              },
+              {
+                "workerId": "b-w11",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 2800,
+                "grossCents": 122500,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-311"
+              },
+              {
+                "workerId": "b-w12",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 2400,
+                "grossCents": 105000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-312"
+              },
+              {
+                "workerId": "b-w13",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 3800,
+                "grossCents": 166250,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-313"
+              },
+              {
+                "workerId": "b-w14",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 3000,
+                "grossCents": 131250,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-314"
+              },
+              {
+                "workerId": "b-w15",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 2800,
+                "grossCents": 122500,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-315"
+              },
+              {
+                "workerId": "b-w16",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 2400,
+                "grossCents": 105000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-316"
+              },
+              {
+                "workerId": "b-w17",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 3600,
+                "grossCents": 157500,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-317"
+              },
+              {
+                "workerId": "b-w18",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 3400,
+                "grossCents": 148750,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-318"
+              },
+              {
+                "workerId": "b-w19",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 3400,
+                "grossCents": 148750,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-319"
+              },
+              {
+                "workerId": "b-w20",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 6.5,
+                "rateCents": 3200,
+                "grossCents": 159200,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-320"
+              },
+              {
+                "workerId": "b-w21",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 3200,
+                "grossCents": 140000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-321"
+              },
+              {
+                "workerId": "b-w22",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 3200,
+                "grossCents": 140000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-322"
+              },
+              {
+                "workerId": "b-w23",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 3000,
+                "grossCents": 131250,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-323"
+              },
+              {
+                "workerId": "b-w24",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 3000,
+                "grossCents": 131250,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-324"
+              },
+              {
+                "workerId": "b-w25",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 2800,
+                "grossCents": 122500,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-325"
+              },
+              {
+                "workerId": "b-w26",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 2800,
+                "grossCents": 122500,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-326"
+              },
+              {
+                "workerId": "b-w27",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 2600,
+                "grossCents": 113750,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-327"
+              },
+              {
+                "workerId": "b-w28",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 2600,
+                "grossCents": 113750,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-328"
+              },
+              {
+                "workerId": "b-w29",
+                "kind": "salary",
+                "regularHours": null,
+                "overtimeHours": null,
+                "rateCents": 4160000,
+                "grossCents": 80000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-329"
+              },
+              {
+                "workerId": "b-w30",
+                "kind": "salary",
+                "regularHours": null,
+                "overtimeHours": null,
+                "rateCents": 4160000,
+                "grossCents": 80000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-331"
+              }
+            ],
+            "totalCents": 4153200,
+            "venmo": [],
+            "venmoHeld": []
+          },
+          "stage2": {
+            "draftId": null,
+            "lines": [
+              {
+                "workerId": "b-w29",
+                "name": "Commission",
+                "amountCents": 122760,
+                "recordId": "b-pp-330"
+              },
+              {
+                "workerId": "b-w30",
+                "name": "Commission",
+                "amountCents": 121356,
+                "recordId": "b-pp-332"
+              }
+            ],
+            "totalCents": 244116,
+            "held": []
+          },
+          "jobs": null,
+          "totalProfitCents": null
+        },
+        {
+          "cycle": {
+            "id": "b-c04",
+            "number": 4,
+            "periodStart": "2026-10-11T07:00:00.000Z",
+            "periodEnd": "2026-10-18T06:59:59.999Z",
+            "stage": "closed",
+            "questionsAsked": 1,
+            "gustoPayrollId": null
+          },
+          "syncRuns": [
+            {
+              "id": "b-sr-09",
+              "source": "jobber",
+              "object": "timeSheetEntries",
+              "pulled": 191,
+              "expected": 191,
+              "complete": true
+            }
+          ],
+          "basis": "paid",
+          "draftId": null,
+          "draftStatus": null,
+          "stage1": {
+            "lines": [
+              {
+                "workerId": "b-w01",
+                "kind": "salary",
+                "regularHours": null,
+                "overtimeHours": null,
+                "rateCents": 12480000,
+                "grossCents": 240000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-401"
+              },
+              {
+                "workerId": "b-w02",
+                "kind": "salary",
+                "regularHours": null,
+                "overtimeHours": null,
+                "rateCents": 8840000,
+                "grossCents": 170000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-402"
+              },
+              {
+                "workerId": "b-w03",
+                "kind": "salary",
+                "regularHours": null,
+                "overtimeHours": null,
+                "rateCents": 8580000,
+                "grossCents": 165000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-403"
+              },
+              {
+                "workerId": "b-w04",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 2600,
+                "grossCents": 113750,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-404"
+              },
+              {
+                "workerId": "b-w05",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 3800,
+                "grossCents": 166250,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-405"
+              },
+              {
+                "workerId": "b-w06",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 3000,
+                "grossCents": 131250,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-406"
+              },
+              {
+                "workerId": "b-w07",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 3000,
+                "grossCents": 131250,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-407"
+              },
+              {
+                "workerId": "b-w08",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 2400,
+                "grossCents": 105000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-408"
+              },
+              {
+                "workerId": "b-w09",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 7.5,
+                "rateCents": 3800,
+                "grossCents": 194750,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-409"
+              },
+              {
+                "workerId": "b-w10",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 7.5,
+                "rateCents": 3000,
+                "grossCents": 153750,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-410"
+              },
+              {
+                "workerId": "b-w11",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 7.5,
+                "rateCents": 2800,
+                "grossCents": 143500,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-411"
+              },
+              {
+                "workerId": "b-w12",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 7.5,
+                "rateCents": 2400,
+                "grossCents": 123000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-412"
+              },
+              {
+                "workerId": "b-w13",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 3800,
+                "grossCents": 166250,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-413"
+              },
+              {
+                "workerId": "b-w14",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 3000,
+                "grossCents": 131250,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-414"
+              },
+              {
+                "workerId": "b-w15",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 2800,
+                "grossCents": 122500,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-415"
+              },
+              {
+                "workerId": "b-w16",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 2400,
+                "grossCents": 105000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-416"
+              },
+              {
+                "workerId": "b-w17",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 3600,
+                "grossCents": 157500,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-417"
+              },
+              {
+                "workerId": "b-w18",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 3400,
+                "grossCents": 148750,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-418"
+              },
+              {
+                "workerId": "b-w19",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 3400,
+                "grossCents": 148750,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-419"
+              },
+              {
+                "workerId": "b-w20",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 3200,
+                "grossCents": 140000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-420"
+              },
+              {
+                "workerId": "b-w21",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 6.5,
+                "rateCents": 3200,
+                "grossCents": 159200,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-421"
+              },
+              {
+                "workerId": "b-w22",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 3200,
+                "grossCents": 140000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-422"
+              },
+              {
+                "workerId": "b-w23",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 3000,
+                "grossCents": 131250,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-423"
+              },
+              {
+                "workerId": "b-w24",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 3000,
+                "grossCents": 131250,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-424"
+              },
+              {
+                "workerId": "b-w25",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 6,
+                "rateCents": 2800,
+                "grossCents": 140000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-425"
+              },
+              {
+                "workerId": "b-w26",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 2800,
+                "grossCents": 122500,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-426"
+              },
+              {
+                "workerId": "b-w27",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 2600,
+                "grossCents": 113750,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-427"
+              },
+              {
+                "workerId": "b-w28",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 2600,
+                "grossCents": 113750,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-428"
+              },
+              {
+                "workerId": "b-w29",
+                "kind": "salary",
+                "regularHours": null,
+                "overtimeHours": null,
+                "rateCents": 4160000,
+                "grossCents": 80000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-429"
+              },
+              {
+                "workerId": "b-w30",
+                "kind": "salary",
+                "regularHours": null,
+                "overtimeHours": null,
+                "rateCents": 4160000,
+                "grossCents": 80000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Gusto",
+                "recordId": "b-pp-431"
+              }
+            ],
+            "totalCents": 4169200,
+            "venmo": [],
+            "venmoHeld": []
+          },
+          "stage2": {
+            "draftId": null,
+            "lines": [
+              {
+                "workerId": "b-w29",
+                "name": "Commission",
+                "amountCents": 114604,
+                "recordId": "b-pp-430"
+              },
+              {
+                "workerId": "b-w30",
+                "name": "Commission",
+                "amountCents": 86190,
+                "recordId": "b-pp-432"
+              }
+            ],
+            "totalCents": 200794,
+            "held": []
+          },
+          "jobs": null,
+          "totalProfitCents": null
+        },
+        {
+          "cycle": {
+            "id": "b-c05",
+            "number": 5,
+            "periodStart": "2026-10-18T07:00:00.000Z",
+            "periodEnd": "2026-10-25T06:59:59.999Z",
+            "stage": "setup",
+            "questionsAsked": 0,
+            "gustoPayrollId": null
+          },
+          "syncRuns": [
+            {
+              "id": "b-sr-01",
+              "source": "jobber",
+              "object": "timeSheetEntries",
+              "pulled": 192,
+              "expected": 192,
+              "complete": true
+            },
+            {
+              "id": "b-sr-02",
+              "source": "jobber",
+              "object": "visits",
+              "pulled": 88,
+              "expected": 88,
+              "complete": true
+            },
+            {
+              "id": "b-sr-03",
+              "source": "jobber",
+              "object": "expenses",
+              "pulled": 10,
+              "expected": 10,
+              "complete": true
+            },
+            {
+              "id": "b-sr-04",
+              "source": "qbo",
+              "object": "Purchase",
+              "pulled": 26,
+              "expected": 26,
+              "complete": true
+            },
+            {
+              "id": "b-sr-05",
+              "source": "gusto",
+              "object": "employees",
+              "pulled": 30,
+              "expected": 30,
+              "complete": true
+            }
+          ],
+          "basis": "engine",
+          "draftId": "b-c05-draft-s1",
+          "draftStatus": "computed",
+          "stage1": {
+            "lines": [
+              {
+                "workerId": "b-w01",
+                "kind": "salary",
+                "regularHours": null,
+                "overtimeHours": null,
+                "rateCents": 12480000,
+                "grossCents": 240000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Workbook",
+                "recordId": "b-c05-draft-s1/b-w01"
+              },
+              {
+                "workerId": "b-w02",
+                "kind": "salary",
+                "regularHours": null,
+                "overtimeHours": null,
+                "rateCents": 8840000,
+                "grossCents": 170000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Workbook",
+                "recordId": "b-c05-draft-s1/b-w02"
+              },
+              {
+                "workerId": "b-w03",
+                "kind": "salary",
+                "regularHours": null,
+                "overtimeHours": null,
+                "rateCents": 8580000,
+                "grossCents": 165000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Workbook",
+                "recordId": "b-c05-draft-s1/b-w03"
+              },
+              {
+                "workerId": "b-w04",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 2600,
+                "grossCents": 113750,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Jobber",
+                "recordId": "b-te-5013, b-te-5050, b-te-5087, b-te-5125, b-te-5162"
+              },
+              {
+                "workerId": "b-w05",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 3800,
+                "grossCents": 166250,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Jobber",
+                "recordId": "b-te-5001, b-te-5038, b-te-5076, b-te-5113, b-te-5150"
+              },
+              {
+                "workerId": "b-w06",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 3000,
+                "grossCents": 131250,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Jobber",
+                "recordId": "b-te-5002, b-te-5039, b-te-5077, b-te-5114, b-te-5151"
+              },
+              {
+                "workerId": "b-w07",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 6,
+                "rateCents": 3000,
+                "grossCents": 153000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Jobber",
+                "recordId": "b-te-5003, b-te-5040, b-te-5075, b-te-5115, b-te-5152"
+              },
+              {
+                "workerId": "b-w08",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 2400,
+                "grossCents": 105000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Jobber",
+                "recordId": "b-te-5004, b-te-5041, b-te-5078, b-te-5116, b-te-5153"
+              },
+              {
+                "workerId": "b-w09",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 3800,
+                "grossCents": 166250,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Jobber",
+                "recordId": "b-te-5005, b-te-5042, b-te-5079, b-te-5117, b-te-5154"
+              },
+              {
+                "workerId": "b-w10",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 3000,
+                "grossCents": 131250,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Jobber",
+                "recordId": "b-te-5006, b-te-5043, b-te-5080, b-te-5118, b-te-5155"
+              },
+              {
+                "workerId": "b-w11",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 2800,
+                "grossCents": 122500,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Jobber",
+                "recordId": "b-te-5007, b-te-5044, b-te-5081, b-te-5119, b-te-5156"
+              },
+              {
+                "workerId": "b-w12",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 22.5,
+                "rateCents": 2400,
+                "grossCents": 177000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Jobber",
+                "recordId": "b-te-5008, b-te-5045, b-te-5082, b-te-5120, b-te-5157, b-te-5187"
+              },
+              {
+                "workerId": "b-w13",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 7.5,
+                "rateCents": 3800,
+                "grossCents": 194750,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Jobber",
+                "recordId": "b-te-5009, b-te-5046, b-te-5083, b-te-5121, b-te-5158, b-te-5188"
+              },
+              {
+                "workerId": "b-w14",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 7.5,
+                "rateCents": 3000,
+                "grossCents": 153750,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Jobber",
+                "recordId": "b-te-5010, b-te-5047, b-te-5084, b-te-5122, b-te-5159, b-te-5189"
+              },
+              {
+                "workerId": "b-w15",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 7.5,
+                "rateCents": 2800,
+                "grossCents": 143500,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Jobber",
+                "recordId": "b-te-5011, b-te-5048, b-te-5085, b-te-5123, b-te-5160, b-te-5190"
+              },
+              {
+                "workerId": "b-w16",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 7.5,
+                "rateCents": 2400,
+                "grossCents": 123000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Jobber",
+                "recordId": "b-te-5012, b-te-5049, b-te-5086, b-te-5124, b-te-5161, b-te-5191"
+              },
+              {
+                "workerId": "b-w17",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 3600,
+                "grossCents": 157500,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Jobber",
+                "recordId": "b-te-5014, b-te-5026, b-te-5051, b-te-5063, b-te-5088, b-te-5100, b-te-5126, b-te-5139, b-te-5163, b-te-5175"
+              },
+              {
+                "workerId": "b-w18",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 4,
+                "rateCents": 3400,
+                "grossCents": 156400,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Jobber",
+                "recordId": "b-te-5015, b-te-5027, b-te-5052, b-te-5064, b-te-5089, b-te-5101, b-te-5112, b-te-5127, b-te-5140, b-te-5164, b-te-5176"
+              },
+              {
+                "workerId": "b-w19",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 3400,
+                "grossCents": 148750,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Jobber",
+                "recordId": "b-te-5016, b-te-5028, b-te-5053, b-te-5065, b-te-5090, b-te-5102, b-te-5128, b-te-5141, b-te-5165, b-te-5177"
+              },
+              {
+                "workerId": "b-w20",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 3200,
+                "grossCents": 140000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Jobber",
+                "recordId": "b-te-5017, b-te-5029, b-te-5054, b-te-5066, b-te-5091, b-te-5103, b-te-5129, b-te-5142, b-te-5166, b-te-5178"
+              },
+              {
+                "workerId": "b-w21",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 3.5,
+                "rateCents": 3200,
+                "grossCents": 144800,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Jobber",
+                "recordId": "b-te-5018, b-te-5030, b-te-5055, b-te-5067, b-te-5092, b-te-5104, b-te-5130, b-te-5138, b-te-5167, b-te-5179"
+              },
+              {
+                "workerId": "b-w22",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 6.5,
+                "rateCents": 3200,
+                "grossCents": 159200,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Jobber",
+                "recordId": "b-te-5019, b-te-5031, b-te-5056, b-te-5068, b-te-5093, b-te-5105, b-te-5131, b-te-5143, b-te-5168, b-te-5180, b-te-5192"
+              },
+              {
+                "workerId": "b-w23",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 3000,
+                "grossCents": 131250,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Jobber",
+                "recordId": "b-te-5020, b-te-5032, b-te-5057, b-te-5069, b-te-5094, b-te-5106, b-te-5132, b-te-5144, b-te-5169, b-te-5181"
+              },
+              {
+                "workerId": "b-w24",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 3000,
+                "grossCents": 131250,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Jobber",
+                "recordId": "b-te-5021, b-te-5033, b-te-5058, b-te-5070, b-te-5095, b-te-5107, b-te-5133, b-te-5145, b-te-5170, b-te-5182"
+              },
+              {
+                "workerId": "b-w25",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 2800,
+                "grossCents": 122500,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Jobber",
+                "recordId": "b-te-5022, b-te-5034, b-te-5059, b-te-5071, b-te-5096, b-te-5108, b-te-5134, b-te-5146, b-te-5171, b-te-5183"
+              },
+              {
+                "workerId": "b-w26",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 2800,
+                "grossCents": 122500,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Jobber",
+                "recordId": "b-te-5023, b-te-5035, b-te-5060, b-te-5072, b-te-5097, b-te-5109, b-te-5135, b-te-5147, b-te-5172, b-te-5184"
+              },
+              {
+                "workerId": "b-w27",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 2600,
+                "grossCents": 113750,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Jobber",
+                "recordId": "b-te-5024, b-te-5036, b-te-5061, b-te-5073, b-te-5098, b-te-5110, b-te-5136, b-te-5148, b-te-5173, b-te-5185"
+              },
+              {
+                "workerId": "b-w28",
+                "kind": "hourly",
+                "regularHours": 40,
+                "overtimeHours": 2.5,
+                "rateCents": 2600,
+                "grossCents": 113750,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Jobber",
+                "recordId": "b-te-5025, b-te-5037, b-te-5062, b-te-5074, b-te-5099, b-te-5111, b-te-5137, b-te-5149, b-te-5174, b-te-5186"
+              },
+              {
+                "workerId": "b-w29",
+                "kind": "salary",
+                "regularHours": null,
+                "overtimeHours": null,
+                "rateCents": 4160000,
+                "grossCents": 80000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Workbook",
+                "recordId": "b-c05-draft-s1/b-w29"
+              },
+              {
+                "workerId": "b-w30",
+                "kind": "salary",
+                "regularHours": null,
+                "overtimeHours": null,
+                "rateCents": 4160000,
+                "grossCents": 80000,
+                "held": false,
+                "reason": null,
+                "heldFlagIds": [],
+                "recordSystem": "Workbook",
+                "recordId": "b-c05-draft-s1/b-w30"
+              }
+            ],
+            "totalCents": 4257900,
+            "venmo": [],
+            "venmoHeld": []
+          },
+          "stage2": {
+            "draftId": "b-c05-draft-s2",
+            "lines": [
+              {
+                "workerId": "b-w29",
+                "name": "Commission",
+                "amountCents": 142014,
+                "recordId": "b-c05-draft-s2"
+              },
+              {
+                "workerId": "b-w30",
+                "name": "Commission",
+                "amountCents": 122150,
+                "recordId": "b-c05-draft-s2"
+              }
+            ],
+            "totalCents": 264164,
+            "held": []
+          },
+          "totalProfitCents": 4866414,
+          "jobs": [
+            {
+              "jobId": "b-j081",
+              "jobNumber": 4081,
+              "title": "Ductless mini-split install - Silverado Trl",
+              "revenueCents": 1639000,
+              "laborCents": 207400,
+              "jobCostCents": 825036,
+              "profitCents": 606564,
+              "marginPct": 37.01,
+              "low": false,
+              "provisional": false,
+              "hints": []
+            },
+            {
+              "jobId": "b-j082",
+              "jobNumber": 4082,
+              "title": "Rooftop unit swap - Cypress Bend",
+              "revenueCents": 1250000,
+              "laborCents": 324600,
+              "jobCostCents": 437948,
+              "profitCents": 487452,
+              "marginPct": 39,
+              "low": false,
+              "provisional": false,
+              "hints": []
+            },
+            {
+              "jobId": "b-j083",
+              "jobNumber": 4083,
+              "title": "Rooftop unit swap - Harrow Ln",
+              "revenueCents": 1450000,
+              "laborCents": 320400,
+              "jobCostCents": 549617,
+              "profitCents": 579983,
+              "marginPct": 40,
+              "low": false,
+              "provisional": false,
+              "hints": []
+            },
+            {
+              "jobId": "b-j084",
+              "jobNumber": 4084,
+              "title": "Heat pump install - Lupine Loop",
+              "revenueCents": 1235000,
+              "laborCents": 237600,
+              "jobCostCents": 553063,
+              "profitCents": 444337,
+              "marginPct": 35.98,
+              "low": false,
+              "provisional": false,
+              "hints": []
+            },
+            {
+              "jobId": "b-j085",
+              "jobNumber": 4085,
+              "title": "Ductless mini-split install - Boulder Creek Rd",
+              "revenueCents": 1220000,
+              "laborCents": 204000,
+              "jobCostCents": 540030,
+              "profitCents": 475970,
+              "marginPct": 39.01,
+              "low": false,
+              "provisional": false,
+              "hints": []
+            },
+            {
+              "jobId": "b-j086",
+              "jobNumber": 4086,
+              "title": "Air handler replacement - Starling St",
+              "revenueCents": 1814000,
+              "laborCents": 366000,
+              "jobCostCents": 740262,
+              "profitCents": 707738,
+              "marginPct": 39.02,
+              "low": false,
+              "provisional": false,
+              "hints": []
+            },
+            {
+              "jobId": "b-j087",
+              "jobNumber": 4087,
+              "title": "Condenser fan motor repair - Oakmont Ter",
+              "revenueCents": 305000,
+              "laborCents": 129500,
+              "jobCostCents": 10767,
+              "profitCents": 164733,
+              "marginPct": 54.01,
+              "low": false,
+              "provisional": false,
+              "hints": []
+            },
+            {
+              "jobId": "b-j088",
+              "jobNumber": 4088,
+              "title": "No-heat call - Pebble Beach Ct",
+              "revenueCents": 239000,
+              "laborCents": 118900,
+              "jobCostCents": 18808,
+              "profitCents": 101292,
+              "marginPct": 42.38,
+              "low": false,
+              "provisional": false,
+              "hints": []
+            },
+            {
+              "jobId": "b-j089",
+              "jobNumber": 4089,
+              "title": "Furnace tune-up - Wildrye Ave",
+              "revenueCents": 245000,
+              "laborCents": 102000,
+              "jobCostCents": 27078,
+              "profitCents": 115922,
+              "marginPct": 47.32,
+              "low": false,
+              "provisional": false,
+              "hints": []
+            },
+            {
+              "jobId": "b-j090",
+              "jobNumber": 4090,
+              "title": "Maintenance agreement visit - Coyote Run",
+              "revenueCents": 210000,
+              "laborCents": 119800,
+              "jobCostCents": 0,
+              "profitCents": 90200,
+              "marginPct": 42.95,
+              "low": false,
+              "provisional": false,
+              "hints": []
+            },
+            {
+              "jobId": "b-j091",
+              "jobNumber": 4091,
+              "title": "Thermostat replacement - Granite Pass",
+              "revenueCents": 242500,
+              "laborCents": 119000,
+              "jobCostCents": 11029,
+              "profitCents": 112471,
+              "marginPct": 46.38,
+              "low": false,
+              "provisional": false,
+              "hints": []
+            },
+            {
+              "jobId": "b-j092",
+              "jobNumber": 4092,
+              "title": "Condenser fan motor repair - Redwood Terrace",
+              "revenueCents": 267500,
+              "laborCents": 105100,
+              "jobCostCents": 17023,
+              "profitCents": 145377,
+              "marginPct": 54.35,
+              "low": false,
+              "provisional": false,
+              "hints": []
+            },
+            {
+              "jobId": "b-j093",
+              "jobNumber": 4093,
+              "title": "No-heat call - Kestrel Court",
+              "revenueCents": 237000,
+              "laborCents": 115100,
+              "jobCostCents": 16923,
+              "profitCents": 104977,
+              "marginPct": 44.29,
+              "low": false,
+              "provisional": false,
+              "hints": []
+            },
+            {
+              "jobId": "b-j094",
+              "jobNumber": 4094,
+              "title": "Condenser fan motor repair - Mesa Verde Dr",
+              "revenueCents": 266000,
+              "laborCents": 118700,
+              "jobCostCents": 0,
+              "profitCents": 147300,
+              "marginPct": 55.38,
+              "low": false,
+              "provisional": false,
+              "hints": []
+            },
+            {
+              "jobId": "b-j095",
+              "jobNumber": 4095,
+              "title": "No-heat call - Osprey Lane",
+              "revenueCents": 173000,
+              "laborCents": 102200,
+              "jobCostCents": 0,
+              "profitCents": 70800,
+              "marginPct": 40.92,
+              "low": false,
+              "provisional": false,
+              "hints": []
+            },
+            {
+              "jobId": "b-j096",
+              "jobNumber": 4096,
+              "title": "Thermostat replacement - Driftwood Ave",
+              "revenueCents": 208500,
+              "laborCents": 118000,
+              "jobCostCents": 0,
+              "profitCents": 90500,
+              "marginPct": 43.41,
+              "low": false,
+              "provisional": false,
+              "hints": []
+            },
+            {
+              "jobId": "b-j097",
+              "jobNumber": 4097,
+              "title": "Condenser fan motor repair - Canyon Wren Rd",
+              "revenueCents": 177000,
+              "laborCents": 105400,
+              "jobCostCents": 0,
+              "profitCents": 71600,
+              "marginPct": 40.45,
+              "low": false,
+              "provisional": false,
+              "hints": []
+            },
+            {
+              "jobId": "b-j098",
+              "jobNumber": 4098,
+              "title": "Condenser fan motor repair - Ironbark St",
+              "revenueCents": 192000,
+              "laborCents": 103800,
+              "jobCostCents": 0,
+              "profitCents": 88200,
+              "marginPct": 45.94,
+              "low": false,
+              "provisional": false,
+              "hints": []
+            },
+            {
+              "jobId": "b-j099",
+              "jobNumber": 4099,
+              "title": "AC repair - Sandpiper Way",
+              "revenueCents": 255000,
+              "laborCents": 115600,
+              "jobCostCents": 6002,
+              "profitCents": 133398,
+              "marginPct": 52.31,
+              "low": false,
+              "provisional": false,
+              "hints": []
+            },
+            {
+              "jobId": "b-j100",
+              "jobNumber": 4100,
+              "title": "Thermostat replacement - Bluebell Ct",
+              "revenueCents": 234500,
+              "laborCents": 106900,
+              "jobCostCents": 0,
+              "profitCents": 127600,
+              "marginPct": 54.41,
+              "low": false,
+              "provisional": false,
+              "hints": []
+            }
+          ],
+          "lowMarginPct": 20
+        }
+      ]
+    }
+  }
+}
