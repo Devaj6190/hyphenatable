@@ -31,6 +31,7 @@ import type * as onboarding from "../onboarding.js";
 import type * as probe from "../probe.js";
 import type * as probeNode from "../probeNode.js";
 import type * as questions from "../questions.js";
+import type * as roster from "../roster.js";
 import type * as rules from "../rules.js";
 import type * as sync from "../sync.js";
 
@@ -64,6 +65,7 @@ declare const fullApi: ApiFromModules<{
   probe: typeof probe;
   probeNode: typeof probeNode;
   questions: typeof questions;
+  roster: typeof roster;
   rules: typeof rules;
   sync: typeof sync;
 }>;

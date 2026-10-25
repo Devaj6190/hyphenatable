@@ -32,6 +32,7 @@ export function FlagDetail({
   dataKind,
   timezone,
   roleOf,
+  source = FIXTURE_SOURCE,
   viewerRole,
 }: {
   companyId: string;
@@ -41,6 +42,8 @@ export function FlagDetail({
   roleOf: Record<string, string>;
   dataKind: DataKind;
   timezone: string;
+  /** Where the numbers on this page come from; the fixture file unless the page is live. */
+  source?: string;
   viewerRole?: ViewerRole;
 }) {
   const { role } = useRole();
@@ -258,7 +261,7 @@ export function FlagDetail({
           Jobber, QuickBooks or Gusto records.
         </p>
         <p className="text-xs">
-          Source: {FIXTURE_SOURCE} · {dataKind}
+          Source: {source} · {dataKind}
         </p>
       </footer>
     </div>

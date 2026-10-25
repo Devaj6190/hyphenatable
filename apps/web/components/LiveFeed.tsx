@@ -1,12 +1,9 @@
 "use client";
 
-import { useQuery } from "convex/react";
-import { makeFunctionReference } from "convex/server";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { AgentChip } from "@/components/AgentChip";
-import { LiveBoundary } from "@/components/LiveBoundary";
 import { useRole } from "@/components/RoleProvider";
 import { SimulatedChip } from "@/components/SimulatedChip";
 import { forViewerEvents, isSimulated } from "@/lib/audit";
@@ -14,13 +11,6 @@ import { clock } from "@/lib/home";
 import { AUDIT_FIXTURE_SOURCE } from "@/lib/sources";
 import type { AuditEvent } from "@/lib/types";
 import { cn } from "@/lib/utils";
-
-// By name so this builds before B's generated api has audit.list.
-const auditList = makeFunctionReference<
-  "query",
-  { companyId: string; cycleId?: string; limit: number },
-  AuditEvent[]
->("audit:list");
 
 const hasConvex = Boolean(process.env.NEXT_PUBLIC_CONVEX_URL);
 const SHOWN = 6;
@@ -31,32 +21,17 @@ type Render = (
   live: boolean,
 ) => ReactNode;
 
-function Live({
-  companyId,
-  cycleId,
-  children,
-}: {
-  companyId: string;
-  cycleId: string;
-  children: Render;
-}) {
-  const events = useQuery(auditList, { companyId, cycleId, limit: 30 });
-  if (events === undefined)
-    return <p className="text-sm text-muted-foreground">Loading…</p>;
-  return children(events, "Convex audit.list, live", true);
-}
-
 // Messenger, Auditor and controller events for the cycle: a Convex subscription when audit.list is
 // deployed, the audit fixture otherwise. `extra` holds this screen's own unsaved actions in fixture mode.
 export function LiveFeed({
   companyId,
-  cycleId,
   timeZone,
   fixtureEvents,
   visibleFlagIds,
   extra = [],
 }: {
   companyId: string;
+  /** Not read until audit.list takes a viewer (see below); callers keep passing it. */
   cycleId: string;
   timeZone: string;
   /** The cycle's audit fixture, already filtered and redacted on the server for this viewer. */
@@ -78,13 +53,12 @@ export function LiveFeed({
       visibleFlagIds={visibleFlagIds}
     />
   );
-  if (!hasConvex) return fixture("Convex not configured");
-  return (
-    <LiveBoundary fallback={fixture("audit.list not live yet")}>
-      <Live companyId={companyId} cycleId={cycleId}>
-        {render}
-      </Live>
-    </LiveBoundary>
+  // audit.list is not read yet. It takes a Convex company id and a page size, and it has no viewerId, so it cannot
+  // withhold a manager's pay effects. Until it does, the feed stays on the fixture and says so.
+  return fixture(
+    hasConvex
+      ? "audit.list is not read yet: it has no viewer, so it can't withhold pay from a manager"
+      : "Convex not configured",
   );
 }
 

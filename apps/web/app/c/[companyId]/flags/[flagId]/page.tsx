@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { FlagDetail } from "@/components/FlagDetail";
+import { FlagDetailSource } from "@/components/FlagDetailSource";
 import { companies } from "@/lib/companies";
 import {
   allFlagParams,
@@ -34,8 +34,9 @@ async function Flag({
   // Like Convex flags.get({ flagId, viewerId }) in #15: null when the flag is missing or not this viewer's.
   const viewer = await currentViewer(companyId);
   return (
-    <FlagDetail
+    <FlagDetailSource
       companyId={companyId}
+      flagId={flagId}
       data={flagDetail(viewer, companyId, flagId)}
       flagIds={homeFlags(viewer, companyId).map((f) => f.id)}
       roleOf={{
