@@ -16,6 +16,7 @@ import type * as checks from "../checks.js";
 import type * as controller_cycle from "../controller/cycle.js";
 import type * as controller_recompute from "../controller/recompute.js";
 import type * as corrections from "../corrections.js";
+import type * as creao from "../creao.js";
 import type * as crons from "../crons.js";
 import type * as cycles from "../cycles.js";
 import type * as demo from "../demo.js";
@@ -53,6 +54,7 @@ declare const fullApi: ApiFromModules<{
   "controller/cycle": typeof controller_cycle;
   "controller/recompute": typeof controller_recompute;
   corrections: typeof corrections;
+  creao: typeof creao;
   crons: typeof crons;
   cycles: typeof cycles;
   demo: typeof demo;
