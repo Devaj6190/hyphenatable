@@ -60,7 +60,7 @@ test("Company A: ingest → onboarding proposes rules from history with evidence
   const f = fixture();
   expect(Object.keys(ids).sort()).toEqual(
     [...f.companies, ...f.workers, ...f.cycles]
-      .map((r) => r.id as string)
+      .map((r) => (r as { id: string }).id)
       .sort(),
   );
 
