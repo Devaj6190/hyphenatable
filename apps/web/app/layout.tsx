@@ -23,7 +23,7 @@ const hostGrotesk = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "PayrollPilot",
+  title: "RollPay",
   description: "It checks the pay before the paycheck.",
 };
 

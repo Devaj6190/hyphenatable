@@ -1,35 +1,28 @@
-import type { ReactNode } from "react";
+"use client";
+
+import { ChevronRight } from "lucide-react";
+import { type ReactNode, useState } from "react";
 import { Money } from "@/components/Money";
 import { SourceChip } from "@/components/SourceChip";
-import { StatusBadge } from "@/components/StatusBadge";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { checkTitle } from "@/lib/checks";
-import type { SourceSystem } from "@/lib/types";
+import { formatCents } from "@/lib/money";
 import { cn } from "@/lib/utils";
 import {
   type CycleWorkbook,
-  type JobRow,
+  type EarningLine,
   type Names,
-  type Stage1Line,
+  type WageGroup,
+  type WageRow,
+  type WeekHours,
+  wageRows,
   workerLabel,
 } from "./data";
 
-// Workbook tables. Every amount is a stored value (engine draft or Gusto record) shown through <Money>;
-// nothing here adds, multiplies or rounds pay.
+// Wages, person by person. Every amount is a stored value (engine draft or Gusto record) shown through
+// <Money>; nothing here adds, multiplies or rounds pay. Bar widths are hours over a display scale, nothing more.
 
-const num = "text-right tabular-nums";
-const hours = (h: number | null) => (h === null ? "—" : h.toFixed(2));
-
-/** "Gusto" for what was paid in a closed cycle, "Workbook" for the engine's draft. */
-const sourceOf = (wb: CycleWorkbook): SourceSystem =>
-  wb.basis === "paid" ? "Gusto" : "Workbook";
+/** "42.5 h", "77.08 h", "85 h". */
+export const fmtHours = (h: number) => `${Number(h.toFixed(2))} h`;
 
 /** Closed-cycle totals are summed from Gusto records by the fixture script, not read from one Gusto record. */
 export function PaidSum({ records }: { records: number }) {
@@ -50,9 +43,6 @@ export function PreviewNote() {
   );
 }
 
-const offCycleRecords = (wb: CycleWorkbook) =>
-  new Set(wb.stage2.lines.map((l) => l.recordId)).size;
-
 /** Turns "no Venmo rate (CHK-11): …" into a plain title, keeping the engine's words as the detail. */
 export function HoldReason({ reason }: { reason: string }) {
   const chk = reason.match(/CHK-\d+/)?.[0];
@@ -64,391 +54,496 @@ export function HoldReason({ reason }: { reason: string }) {
   );
 }
 
-function SectionTitle({
-  title,
-  aside,
-  children,
+const GROUP_TITLE: Record<WageGroup, string> = {
+  hourly: "Hourly · in the Gusto draft",
+  salary: "Salary · in the Gusto draft",
+  venmo: "Venmo · paid outside Gusto",
+  held: "Held out of the draft",
+};
+const GROUP_TITLE_PAID: Record<WageGroup, string> = {
+  hourly: "Hourly · paid in Gusto",
+  salary: "Salary · paid in Gusto",
+  venmo: "Venmo · paid outside Gusto",
+  held: "Held out of the draft",
+};
+const KIND: Record<WageGroup, string> = {
+  hourly: "Hourly",
+  salary: "Salary",
+  venmo: "Venmo",
+  held: "Held",
+};
+
+const initials = (name: string) =>
+  name
+    .split(/\s+/)
+    .map((w) => w[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+
+/** A plain note under the name, from the stored line only. */
+function noteOf(r: WageRow): string | null {
+  if (r.group === "venmo")
+    return r.held
+      ? "Not paid until you add a rate. We never guess."
+      : "Paid on Venmo, listed here, never sent to Gusto";
+  if (r.held) return "Held for you, not in this draft";
+  if (r.group === "salary") return "Gusto pays the salary; no hourly line";
+  if (r.grossCents === 0 && !r.hours) return "No hours this cycle";
+  return null;
+}
+
+const DAY = new Intl.DateTimeFormat("en-US", {
+  month: "short",
+  day: "numeric",
+  timeZone: "UTC",
+});
+const dayOnly = new Intl.DateTimeFormat("en-US", {
+  day: "numeric",
+  timeZone: "UTC",
+});
+/** "Oct 10–16", from local YYYY-MM-DD days. */
+function weekRange(w: WeekHours) {
+  const a = new Date(`${w.start}T00:00:00Z`);
+  const b = new Date(`${w.end}T00:00:00Z`);
+  return a.getUTCMonth() === b.getUTCMonth()
+    ? `${DAY.format(a)}–${dayOnly.format(b)}`
+    : `${DAY.format(a)} – ${DAY.format(b)}`;
+}
+
+function weekCaption(w: WeekHours) {
+  if (w.hours === 0) return "No hours";
+  if (w.overtimeHours === 0 && w.doubleOvertimeHours === 0)
+    return "All regular";
+  const n = (h: number) => Number(h.toFixed(2));
+  return [
+    `${n(w.regularHours)} regular`,
+    w.overtimeHours > 0 && `${n(w.overtimeHours)} overtime`,
+    w.doubleOvertimeHours > 0 && `${n(w.doubleOvertimeHours)} double overtime`,
+  ]
+    .filter(Boolean)
+    .join(" + ");
+}
+
+function WeekCard({
+  w,
+  index,
+  scale,
+  threshold,
 }: {
-  title: string;
-  aside?: ReactNode;
-  children?: ReactNode;
+  w: WeekHours;
+  index: number;
+  scale: number;
+  threshold: number | null;
 }) {
+  const pct = (h: number) => `${Math.min(100, (h / scale) * 100)}%`;
   return (
-    <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-1">
-      <div>
-        <h3 className="text-lg font-semibold">{title}</h3>
-        {children && (
-          <p className="text-sm text-muted-foreground">{children}</p>
+    <div className="flex flex-col gap-2 rounded-control border bg-card px-4 py-3.5">
+      <span className="flex items-baseline justify-between gap-2">
+        <span className="text-sm text-muted-foreground">
+          Week {index + 1} · {weekRange(w)}
+        </span>
+        <b className="text-lg font-semibold tabular-nums">
+          {fmtHours(w.hours)}
+        </b>
+      </span>
+      <span
+        role="img"
+        aria-label={`${fmtHours(w.hours)}: ${weekCaption(w)}`}
+        className="relative flex h-2.5 overflow-hidden rounded-full bg-muted"
+      >
+        <span
+          className="block h-full bg-primary"
+          style={{ width: pct(w.regularHours) }}
+        />
+        <span
+          className="block h-full bg-linear-to-r from-sunset-1 to-sunset-2"
+          style={{ width: pct(w.overtimeHours) }}
+        />
+        <span
+          className="block h-full bg-sunset-3"
+          style={{ width: pct(w.doubleOvertimeHours) }}
+        />
+        {threshold !== null && (
+          <span
+            aria-hidden
+            className="absolute inset-y-0 w-0.5 bg-card"
+            style={{ left: pct(threshold) }}
+          />
+        )}
+      </span>
+      <span className="text-xs text-muted-foreground">{weekCaption(w)}</span>
+    </div>
+  );
+}
+
+const EARNING_LABEL: Record<string, string> = {
+  "Regular Hours": "Regular",
+  Overtime: "Overtime",
+  "Double Overtime": "Double overtime",
+  "Venmo Hours": "Hours",
+  Hours: "Hours",
+};
+
+function formula(e: EarningLine, r: WageRow): string {
+  if (e.name === "Salary") {
+    if (!r.salary) return "From the Gusto record";
+    const rate = formatCents(r.salary.rateCents);
+    return r.salary.unit === "Year"
+      ? `${rate} a year ÷ ${r.salary.periodsPerYear}`
+      : `${rate} per ${r.salary.unit.toLowerCase()}, ${r.salary.periodsPerYear} pay periods a year`;
+  }
+  if (e.hours === null || e.hourRateCents === null) return "Fixed amount";
+  const mult = e.multiplier && e.multiplier !== 1 ? ` (${e.multiplier}×)` : "";
+  return `${fmtHours(e.hours)} × ${formatCents(e.hourRateCents)}${mult}`;
+}
+
+function Tile({ k, f, v }: { k: string; f: string; v: ReactNode }) {
+  return (
+    <div className="flex min-w-0 flex-[1_1_180px] flex-col gap-0.5 rounded-control bg-muted/70 px-3.5 py-3">
+      <span className="text-xs font-semibold text-muted-foreground">{k}</span>
+      <span className="text-sm text-foreground/80">{f}</span>
+      <b className="text-[1.0625rem] font-semibold">{v}</b>
+    </div>
+  );
+}
+
+function Breakdown({ r, threshold }: { r: WageRow; threshold: number | null }) {
+  const weeks = r.weeks ?? [];
+  // 50 h scale with the 40 h line at 80%; a longer week widens the scale so nothing is cut.
+  const longest = Math.max(0, ...weeks.map((w) => w.hours));
+  const scale = longest > 50 ? Math.ceil(longest / 10) * 10 : 50;
+  return (
+    <div className="flex flex-col gap-3 bg-accent/50 px-4 pt-1 pb-4 sm:px-5">
+      {weeks.length > 0 && (
+        <div className="grid gap-3 sm:grid-cols-2">
+          {weeks.map((w, i) => (
+            <WeekCard
+              key={w.start}
+              w={w}
+              index={i}
+              scale={scale}
+              threshold={threshold}
+            />
+          ))}
+        </div>
+      )}
+      <div className="flex flex-wrap gap-3">
+        {r.earnings.map((e) => (
+          <Tile
+            key={e.name}
+            k={EARNING_LABEL[e.name] ?? e.name}
+            f={formula(e, r)}
+            v={<Money cents={e.amountCents} />}
+          />
+        ))}
+        {r.earnings.length === 0 && (
+          <Tile
+            k="Hours"
+            f={
+              r.hours === null
+                ? "No hours logged"
+                : r.held && r.group === "venmo"
+                  ? `${fmtHours(r.hours)} × no rate on file`
+                  : `${fmtHours(r.hours)} logged`
+            }
+            v="—"
+          />
+        )}
+        <div className="flex flex-[1_1_170px] sm:flex-[0_1_170px] flex-col justify-center gap-0.5 rounded-control bg-primary px-4 py-3 text-primary-foreground">
+          <span className="text-xs font-semibold opacity-75">Gross</span>
+          <b className="text-xl font-semibold">
+            {r.grossCents === null ? (
+              "Not paid"
+            ) : (
+              <Money cents={r.grossCents} />
+            )}
+          </b>
+        </div>
+      </div>
+      <span className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2 text-sm text-muted-foreground">
+        <span className="flex min-w-0 flex-col gap-1">
+          {noteOf(r) && <span>{noteOf(r)}</span>}
+          {r.reason && <HoldReason reason={r.reason} />}
+        </span>
+        {r.recordSystem && r.recordId && (
+          <SourceChip system={r.recordSystem} recordId={r.recordId} />
+        )}
+      </span>
+    </div>
+  );
+}
+
+function Row({
+  r,
+  name,
+  open,
+  onToggle,
+  threshold,
+}: {
+  r: WageRow;
+  name: string;
+  open: boolean;
+  onToggle: () => void;
+  threshold: number | null;
+}) {
+  const id = `wage-${r.workerId}`;
+  const note = noteOf(r);
+  return (
+    <>
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-expanded={open}
+        aria-controls={id}
+        className={cn(
+          "grid min-h-14 w-full items-center gap-3 border-t px-4 py-2 text-left outline-none sm:px-5",
+          "grid-cols-[32px_minmax(0,1fr)_auto_20px] sm:grid-cols-[32px_minmax(0,1fr)_90px_110px_120px_20px]",
+          "transition-colors duration-(--dur-hover) hover:bg-accent/40 focus-visible:bg-accent/40 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring",
+          open && "bg-accent/50",
+        )}
+      >
+        <span
+          aria-hidden
+          className={cn(
+            "flex size-8 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground",
+            r.held && "opacity-55",
+          )}
+        >
+          {initials(name)}
+        </span>
+        <span className="flex min-w-0 flex-col">
+          <span className="truncate font-semibold">{name}</span>
+          <span className="text-xs text-muted-foreground sm:hidden">
+            {KIND[r.group]}
+            {r.hours !== null && ` · ${fmtHours(r.hours)}`}
+            {r.overtimeHours ? ` · ${Number(r.overtimeHours)} OT` : ""}
+          </span>
+          {note && !open && (
+            <span className="truncate text-xs text-muted-foreground max-sm:hidden">
+              {note}
+            </span>
+          )}
+        </span>
+        <span className="text-sm text-muted-foreground max-sm:hidden">
+          {KIND[r.group]}
+        </span>
+        <span className="text-right tabular-nums max-sm:hidden">
+          {r.hours === null ? "—" : fmtHours(r.hours)}
+          {r.overtimeHours ? (
+            <span className="block text-xs font-semibold text-link">
+              {Number(r.overtimeHours)} OT
+            </span>
+          ) : null}
+        </span>
+        <span
+          className={cn(
+            "text-right font-semibold",
+            r.grossCents === null
+              ? r.group === "venmo"
+                ? "text-destructive"
+                : "text-muted-foreground"
+              : r.held && "text-muted-foreground",
+          )}
+        >
+          {r.grossCents === null ? (
+            r.group === "venmo" ? (
+              "No rate"
+            ) : (
+              "Not paid"
+            )
+          ) : (
+            <Money cents={r.grossCents} />
+          )}
+        </span>
+        <ChevronRight
+          aria-hidden
+          className={cn(
+            "size-4 text-muted-foreground transition-transform duration-(--dur-hover) ease-out-soft motion-reduce:transition-none",
+            open && "rotate-90",
+          )}
+        />
+      </button>
+      {open && (
+        <div id={id} className="motion-safe:animate-in motion-safe:fade-in-0">
+          <Breakdown r={r} threshold={threshold} />
+        </div>
+      )}
+    </>
+  );
+}
+
+/** "Overtime: after 40 h in a workweek, 1.5× · after 8 h a day 1.5×, after 12 h a day 2×". */
+function overtimeLine(wb: CycleWorkbook): string | null {
+  const ot = wb.stage1.overtime;
+  if (!ot) return null;
+  const parts = [
+    ot.weekly &&
+      `after ${ot.weekly.overHours} h in a workweek, ${ot.weekly.multiplier}×`,
+    ...ot.daily.map((d) => `after ${d.overHours} h a day, ${d.multiplier}×`),
+  ].filter(Boolean);
+  return `Overtime: ${parts.join(" · ")} (rule ${ot.ruleId})`;
+}
+
+export function WageTable({ names, wb }: { names: Names; wb: CycleWorkbook }) {
+  const rows = wageRows(wb);
+  const [open, setOpen] = useState<string | null>(null);
+  const titles = wb.basis === "paid" ? GROUP_TITLE_PAID : GROUP_TITLE;
+  const threshold = wb.stage1.overtime?.weekly?.overHours ?? null;
+  const ot = overtimeLine(wb);
+
+  return (
+    <section
+      aria-labelledby="wages-title"
+      className="overflow-hidden rounded-card border bg-card shadow-card"
+    >
+      <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 px-4 py-4 sm:px-5">
+        <h2 id="wages-title" className="text-lg font-semibold">
+          {wb.basis === "paid" ? "Wages paid, per person" : "Wages, per person"}
+        </h2>
+        <span className="text-sm text-muted-foreground">
+          Tap anyone to see the math
+        </span>
+        {ot && (
+          <span className="text-sm text-muted-foreground sm:ml-auto">{ot}</span>
         )}
       </div>
-      {aside}
-    </div>
-  );
-}
-
-export function Stage1Table({
-  names,
-  wb,
-}: {
-  names: Names;
-  wb: CycleWorkbook;
-}) {
-  const cleared = wb.stage1.lines.filter((l) => !l.held);
-  const held = wb.stage1.lines.filter((l) => l.held);
-  const row = (l: Stage1Line) => (
-    <TableRow
-      key={l.workerId}
-      className={cn(l.held && "bg-hold-soft/50 hover:bg-hold-soft/70")}
-    >
-      <TableCell className="font-medium">
-        {workerLabel(names, l.workerId)}
-        <span className="block text-xs font-normal text-muted-foreground">
-          {l.workerId}
-        </span>
-      </TableCell>
-      <TableCell className={num}>
-        {l.kind === "salary" ? "Salaried" : hours(l.regularHours)}
-      </TableCell>
-      <TableCell className={num}>{hours(l.overtimeHours)}</TableCell>
-      <TableCell className={num}>
-        {l.rateCents === null ? (
-          "—"
-        ) : (
-          <>
-            <Money cents={l.rateCents} />
-            <span className="text-muted-foreground">
-              {l.kind === "salary" ? "/yr" : "/h"}
-            </span>
-          </>
-        )}
-      </TableCell>
-      <TableCell className={cn(num, "font-semibold")}>
-        {l.grossCents === null ? (
-          <span className="font-normal text-muted-foreground">Not paid</span>
-        ) : (
-          <Money cents={l.grossCents} />
-        )}
-      </TableCell>
-      <TableCell className="max-w-72">
-        <span className="flex items-start justify-between gap-3">
-          {l.held ? (
-            <span className="flex min-w-0 flex-col gap-1">
-              <StatusBadge status="held" />
-              <HoldReason
-                reason={l.reason ?? `held by ${l.heldFlagIds.join(", ")}`}
-              />
-            </span>
-          ) : (
-            <span className="text-sm whitespace-normal text-muted-foreground">
-              {l.kind === "hourly" &&
-              l.regularHours === null &&
-              l.grossCents === 0
-                ? "No hours this cycle"
-                : ""}
-            </span>
-          )}
-          <SourceChip system={l.recordSystem} recordId={l.recordId} />
-        </span>
-      </TableCell>
-    </TableRow>
-  );
-
-  return (
-    <div className="flex flex-col gap-3">
-      <SectionTitle
-        title={
-          wb.basis === "paid"
-            ? "Wages paid in Gusto"
-            : "Stage 1 · Wages in Gusto"
-        }
-        aside={
-          <span className="flex flex-col items-end gap-1">
-            <span className="flex items-center gap-2">
-              <Money
-                cents={wb.stage1.totalCents}
-                className="text-xl font-semibold"
-              />
-              {wb.draftId && (
-                <SourceChip system="Workbook" recordId={wb.draftId} />
-              )}
-            </span>
-            {wb.basis === "paid" ? (
-              <PaidSum records={wb.stage1.lines.length} />
-            ) : (
-              <PreviewNote />
-            )}
-          </span>
-        }
+      <div
+        aria-hidden
+        className="grid grid-cols-[32px_minmax(0,1fr)_auto_20px] gap-3 border-t bg-muted/50 px-4 py-2 text-[11px] font-bold tracking-wider text-muted-foreground uppercase sm:grid-cols-[32px_minmax(0,1fr)_90px_110px_120px_20px] sm:px-5"
       >
-        {cleared.length} cleared
-        {held.length > 0 && ` · ${held.length} held, kept out of the draft`}
-      </SectionTitle>
-      <Table className="text-[0.9375rem]">
-        <TableHeader>
-          <TableRow className="hover:bg-transparent">
-            <TableHead>Worker</TableHead>
-            <TableHead className={num}>Hours</TableHead>
-            <TableHead className={num}>Overtime</TableHead>
-            <TableHead className={num}>Rate</TableHead>
-            <TableHead className={num}>Gross</TableHead>
-            <TableHead>Notes and source</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {cleared.map(row)}
-          {held.length > 0 && (
-            <TableRow className="hover:bg-transparent">
-              <TableCell
-                colSpan={6}
-                className="pt-5 text-xs font-semibold tracking-wide text-hold uppercase"
-              >
-                Held · not in this draft until someone answers
-              </TableCell>
-            </TableRow>
-          )}
-          {held.map(row)}
-        </TableBody>
-      </Table>
-    </div>
-  );
-}
-
-export function VenmoList({ names, wb }: { names: Names; wb: CycleWorkbook }) {
-  const { venmo, venmoHeld } = wb.stage1;
-  if (venmo.length === 0 && venmoHeld.length === 0) return null;
-  return (
-    <div className="flex flex-col gap-3 rounded-card border border-dashed p-4">
-      <SectionTitle title="Paid outside payroll">
-        Venmo · never sent to Gusto
-      </SectionTitle>
-      <ul className="flex flex-col divide-y">
-        {venmo.map((v) => (
-          <li
-            key={v.workerId}
-            className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 py-2"
-          >
-            <span className="font-medium">
-              {workerLabel(names, v.workerId)}
-            </span>
-            <span className="flex items-center gap-3 text-sm">
-              <span className="text-muted-foreground tabular-nums">
-                {hours(v.hours)} h
-                {v.rateCents !== null && (
-                  <>
-                    {" × "}
-                    <Money cents={v.rateCents} />
-                  </>
-                )}
-              </span>
-              <Money cents={v.amountCents} className="font-semibold" />
-              <SourceChip system={v.recordSystem} recordId={v.recordId} />
-            </span>
-          </li>
-        ))}
-        {venmoHeld.map((v) => (
-          <li
-            key={v.workerId}
-            className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2 py-2"
-          >
-            <span className="font-medium">
-              {workerLabel(names, v.workerId)}
-            </span>
-            <span className="flex max-w-md items-start gap-2">
-              <HoldReason reason={v.reason} />
-              <StatusBadge status="held" label="Held · needs a rate" />
-            </span>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-export function Stage2Table({
-  names,
-  wb,
-}: {
-  names: Names;
-  wb: CycleWorkbook;
-}) {
-  const system = sourceOf(wb);
-  return (
-    <div className="flex flex-col gap-3">
-      <SectionTitle
-        title={
-          wb.basis === "paid"
-            ? "Off-cycle pay in Gusto"
-            : "Stage 2 · Commissions and splits"
-        }
-        aside={
-          <span className="flex flex-col items-end gap-1">
-            <span className="flex items-center gap-2">
-              <Money
-                cents={wb.stage2.totalCents}
-                className="text-xl font-semibold"
-              />
-              {wb.stage2.draftId && (
-                <SourceChip system="Workbook" recordId={wb.stage2.draftId} />
-              )}
-            </span>
-            {wb.basis === "paid" ? (
-              <PaidSum records={offCycleRecords(wb)} />
-            ) : (
-              <PreviewNote />
-            )}
-          </span>
-        }
-      >
-        Commission, tips and the manager split, each from its rule
-      </SectionTitle>
-      {wb.stage2.lines.length === 0 ? (
-        <p className="rounded-control bg-muted px-4 py-3 text-sm text-muted-foreground">
-          Nothing to pay in Stage 2 this cycle
-          {wb.stage2.held.length > 0 ? "; the items below are held." : "."}
+        <span />
+        <span>Person</span>
+        <span className="max-sm:hidden">Type</span>
+        <span className="text-right max-sm:hidden">Hours</span>
+        <span className="text-right">Gross</span>
+        <span />
+      </div>
+      {rows.length === 0 && (
+        <p className="border-t px-5 py-4 text-muted-foreground">
+          No wage lines in this cycle.
         </p>
-      ) : (
-        <Table className="text-[0.9375rem]">
-          <TableHeader>
-            <TableRow className="hover:bg-transparent">
-              <TableHead>Worker</TableHead>
-              <TableHead>Earning</TableHead>
-              <TableHead className={num}>Amount</TableHead>
-              <TableHead>Source</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {wb.stage2.lines.map((s) => (
-              <TableRow key={`${s.recordId}-${s.workerId}-${s.name}`}>
-                <TableCell className="font-medium">
-                  {workerLabel(names, s.workerId)}
-                </TableCell>
-                <TableCell>
-                  {s.name}
-                  {s.name === "Cash Tips" && (
-                    <span className="block text-xs text-muted-foreground">
-                      Venmo, never sent to Gusto
-                    </span>
-                  )}
-                </TableCell>
-                <TableCell className={cn(num, "font-semibold")}>
-                  <Money cents={s.amountCents} />
-                </TableCell>
-                <TableCell>
-                  <SourceChip system={system} recordId={s.recordId} />
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
       )}
-      {wb.stage2.held.length > 0 && (
-        <ul className="flex flex-col divide-y rounded-control border border-hold/40 bg-hold-soft/40">
-          {wb.stage2.held.map((h) => (
-            <li
-              key={`${h.workerId}-${h.what}`}
-              className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 py-2.5"
-            >
-              <span className="flex flex-col">
-                <span className="font-medium first-letter:uppercase">
-                  {h.what}
-                </span>
-                <span className="text-sm text-muted-foreground">
-                  {h.workerId ? workerLabel(names, h.workerId) : "—"} ·{" "}
-                  {h.reason}
-                </span>
-              </span>
-              <StatusBadge status="held" />
-            </li>
-          ))}
-        </ul>
-      )}
+      {rows.map((r, i) => (
+        <div key={`${r.group}-${r.workerId}`}>
+          {r.group !== rows[i - 1]?.group && (
+            <h3 className="border-t px-4 pt-3 pb-1.5 text-[11px] font-bold tracking-wider text-muted-foreground uppercase sm:px-5">
+              {titles[r.group]}
+            </h3>
+          )}
+          <Row
+            r={r}
+            name={workerLabel(names, r.workerId)}
+            open={open === r.workerId}
+            onToggle={() =>
+              setOpen((o) => (o === r.workerId ? null : r.workerId))
+            }
+            threshold={threshold}
+          />
+        </div>
+      ))}
+      <div className="flex flex-wrap justify-between gap-x-4 gap-y-1 border-t bg-muted/50 px-4 py-3 text-sm text-muted-foreground sm:px-5">
+        <span>Gusto calculates taxes after the draft is filled.</span>
+        <span className="font-medium text-foreground">
+          Draft only. RollPay never submits payroll.
+        </span>
+      </div>
+    </section>
+  );
+}
+
+function SummaryTile({
+  label,
+  bar,
+  children,
+  note,
+}: {
+  label: string;
+  bar: string;
+  children: ReactNode;
+  note: ReactNode;
+}) {
+  return (
+    <div className="overflow-hidden rounded-card border bg-card shadow-card">
+      <div aria-hidden className={cn("h-1", bar)} />
+      <div className="flex flex-col gap-1 px-4 py-3.5">
+        <span className="text-sm text-muted-foreground">{label}</span>
+        <span className="text-[1.625rem] leading-tight font-semibold tabular-nums">
+          {children}
+        </span>
+        <span className="text-xs text-muted-foreground">{note}</span>
+      </div>
     </div>
   );
 }
 
-const cents = (c: number | null) => (c === null ? "—" : <Money cents={c} />);
+export function WageSummary({
+  names,
+  wb,
+  previous,
+}: {
+  names: Names;
+  wb: CycleWorkbook;
+  previous: CycleWorkbook | null;
+}) {
+  const rows = wageRows(wb);
+  const inGusto = rows.filter(
+    (r) => (r.group === "hourly" || r.group === "salary") && !r.held,
+  ).length;
+  const heldRows = rows.filter((r) => r.held);
+  const venmoHeld = wb.stage1.venmoHeld;
+  const firstNames = (ids: string[]) =>
+    ids.map((id) => workerLabel(names, id).split(" ")[0]).join(", ");
+  const { totals } = wb.stage1;
 
-export function ReconTable({ wb }: { wb: CycleWorkbook }) {
-  if (!wb.jobs)
-    return (
-      <p className="rounded-control bg-muted px-4 py-3 text-sm text-muted-foreground">
-        The reconciliation report is kept for the open cycle only. Closed cycles
-        show what Gusto paid.
-      </p>
-    );
-  const low = wb.jobs.filter((j) => j.low).length;
   return (
-    <div className="flex flex-col gap-3">
-      <SectionTitle
-        title="Reconciliation · job profit"
-        aside={
-          low > 0 ? (
-            <StatusBadge
-              status="needs-you"
-              label={`${low} below your ${wb.lowMarginPct}% margin line`}
-            />
-          ) : null
+    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <SummaryTile
+        label={wb.basis === "paid" ? "Paid in Gusto" : "Gusto gross"}
+        bar="bg-primary"
+        note={
+          <>
+            {inGusto} {inGusto === 1 ? "person" : "people"}
+            {previous && (
+              <>
+                {" · last "}
+                <Money cents={previous.stage1.totalCents} />
+              </>
+            )}
+          </>
         }
       >
-        Revenue minus labor and job costs, per job
-      </SectionTitle>
-      <Table className="text-[0.9375rem]">
-        <TableHeader>
-          <TableRow className="hover:bg-transparent">
-            <TableHead>Job</TableHead>
-            <TableHead className={num}>Revenue</TableHead>
-            <TableHead className={num}>Labor</TableHead>
-            <TableHead className={num}>Job costs</TableHead>
-            <TableHead className={num}>Profit</TableHead>
-            <TableHead className={num}>Margin</TableHead>
-            <TableHead>Likely reasons</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {wb.jobs.map((j: JobRow) => (
-            <TableRow
-              key={j.jobId}
-              className={cn(j.low && "bg-hold-soft/50 hover:bg-hold-soft/70")}
-            >
-              <TableCell className="max-w-56 whitespace-normal">
-                <span className="font-medium">
-                  Job {j.jobNumber ?? j.jobId}
-                </span>
-                <span className="block text-xs text-muted-foreground">
-                  {j.title}
-                </span>
-              </TableCell>
-              <TableCell className={num}>{cents(j.revenueCents)}</TableCell>
-              <TableCell className={num}>{cents(j.laborCents)}</TableCell>
-              <TableCell className={num}>{cents(j.jobCostCents)}</TableCell>
-              <TableCell className={cn(num, "font-semibold")}>
-                {cents(j.profitCents)}
-              </TableCell>
-              <TableCell className={num}>
-                {j.marginPct === null ? "—" : `${j.marginPct}%`}
-              </TableCell>
-              <TableCell className="max-w-80 text-sm whitespace-normal">
-                <span className="flex flex-col gap-1">
-                  {j.low && (
-                    <StatusBadge status="needs-you" label="Low profit" />
-                  )}
-                  {j.hints.map((h) => (
-                    <span key={h}>{h}</span>
-                  ))}
-                  {j.provisional && (
-                    <span className="text-muted-foreground">
-                      Provisional: the job is still in progress
-                    </span>
-                  )}
-                  <span className="flex flex-wrap gap-1">
-                    <SourceChip system="Jobber" recordId={j.jobId} />
-                  </span>
-                </span>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+        <Money cents={wb.stage1.totalCents} />
+      </SummaryTile>
+      <SummaryTile
+        label={wb.basis === "paid" ? "Hours paid" : "Hours in the draft"}
+        bar="bg-linear-to-r from-sunset-1 to-sunset-2"
+        note={`${Number(totals.overtimeHours)} overtime`}
+      >
+        {Number(totals.hours.toFixed(2))}
+      </SummaryTile>
+      <SummaryTile
+        label="Venmo (outside Gusto)"
+        bar="bg-ask"
+        note={
+          venmoHeld.length > 0
+            ? `${firstNames(venmoHeld.map((v) => v.workerId))} not paid · no rate`
+            : "Never sent to Gusto"
+        }
+      >
+        <Money cents={totals.venmoCents} />
+      </SummaryTile>
+      <SummaryTile
+        label="Held out"
+        bar="bg-hold"
+        note={
+          heldRows.length > 0
+            ? firstNames(heldRows.map((r) => r.workerId))
+            : "Nobody is held"
+        }
+      >
+        {heldRows.length} {heldRows.length === 1 ? "person" : "people"}
+      </SummaryTile>
     </div>
   );
 }
