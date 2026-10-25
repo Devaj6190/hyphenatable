@@ -4,6 +4,41 @@ import type { SourceSystem } from "@/lib/types";
 // Workbook values come from app/_fixtures/workbook.json (scripts/workbook-fixture.ts) through
 // workbookView in lib/server/fixtures.ts until drafts.get is live. Nothing here computes pay: amounts are read
 // as stored. Only records are counted.
+
+/** One earning as the engine (open cycle) or Gusto (closed cycle) stored it. */
+export type EarningLine = {
+  name: string;
+  /** Unrounded seconds behind the hours; null for salary and for Gusto records. */
+  seconds: number | null;
+  hours: number | null;
+  /** What one hour of this earning pays (rate × multiplier); null for salary and fixed amounts. */
+  hourRateCents: number | null;
+  /** 1.5 for overtime; null when the record doesn't say (Gusto) or for salary. */
+  multiplier: number | null;
+  amountCents: number;
+};
+
+/** One workweek of an hourly line, split by the engine's overtime rule. Days are local YYYY-MM-DD. */
+export type WeekHours = {
+  start: string;
+  end: string;
+  seconds: number;
+  hours: number;
+  regularSeconds: number;
+  regularHours: number;
+  overtimeSeconds: number;
+  overtimeHours: number;
+  doubleOvertimeSeconds: number;
+  doubleOvertimeHours: number;
+};
+
+/** Where a salary line's amount comes from: the yearly (or other unit) rate over the pay periods. */
+export type SalaryBasis = {
+  rateCents: number;
+  unit: string;
+  periodsPerYear: number;
+};
+
 export type Stage1Line = {
   workerId: string;
   kind: "hourly" | "salary";
@@ -18,7 +53,15 @@ export type Stage1Line = {
   /** Time entries (Jobber), the draft line (Workbook) or the paid record (Gusto). Ids are ", "-joined. */
   recordSystem: SourceSystem;
   recordId: string;
+  /** Hours logged in the period (information for salary and held lines). */
+  loggedHours: number | null;
+  earnings: EarningLine[];
+  /** Per-workweek split for hourly lines in an open cycle; null otherwise. */
+  weeks: WeekHours[] | null;
+  salary: SalaryBasis | null;
 };
+
+export type OvertimeTier = { overHours: number; multiplier: number };
 
 export type JobRow = {
   jobId: string;
@@ -59,6 +102,14 @@ export type CycleWorkbook = {
   stage1: {
     lines: Stage1Line[];
     totalCents: number;
+    /** The overtime rule the engine applied; null for closed cycles. */
+    overtime: {
+      ruleId: string;
+      weekly: OvertimeTier | null;
+      daily: OvertimeTier[];
+    } | null;
+    /** Summed by the fixture script from the engine's (or Gusto's) numbers. */
+    totals: { hours: number; overtimeHours: number; venmoCents: number };
     venmo: {
       workerId: string;
       hours: number | null;
@@ -67,7 +118,7 @@ export type CycleWorkbook = {
       recordSystem: SourceSystem;
       recordId: string;
     }[];
-    venmoHeld: { workerId: string; reason: string }[];
+    venmoHeld: { workerId: string; reason: string; hours: number | null }[];
   };
   stage2: {
     /** The Stage 2 off-cycle draft; null for a closed cycle. */
@@ -103,6 +154,95 @@ export function periodLabel(
     timeZone,
   });
   return `${f.format(new Date(c.periodStart))} – ${f.format(new Date(c.periodEnd))}`;
+}
+
+export type WageGroup = "hourly" | "salary" | "venmo" | "held";
+
+/** One person in the wages table. Every value is read from the stored line; nothing is added or multiplied. */
+export type WageRow = {
+  workerId: string;
+  group: WageGroup;
+  /** Hours shown in the row: logged hours, or the Venmo list's hours. Null for salary. */
+  hours: number | null;
+  overtimeHours: number | null;
+  /** Null when the engine pays nothing because something is unknown. */
+  grossCents: number | null;
+  held: boolean;
+  /** The engine's own words for a hold or exclusion. */
+  reason: string | null;
+  earnings: EarningLine[];
+  weeks: WeekHours[] | null;
+  salary: SalaryBasis | null;
+  recordSystem: SourceSystem | null;
+  recordId: string | null;
+};
+
+const GROUP_ORDER: WageGroup[] = ["hourly", "salary", "venmo", "held"];
+
+/** The wages table, grouped Hourly / Salary / Venmo / Held, in the stored order inside each group. */
+export function wageRows(wb: CycleWorkbook): WageRow[] {
+  const rows: WageRow[] = [
+    ...wb.stage1.lines.map(
+      (l): WageRow => ({
+        workerId: l.workerId,
+        group: l.held ? "held" : l.kind,
+        hours: l.kind === "salary" ? null : l.loggedHours,
+        overtimeHours: l.overtimeHours,
+        grossCents: l.grossCents,
+        held: l.held,
+        reason: l.held
+          ? (l.reason ?? `held by ${l.heldFlagIds.join(", ")}`)
+          : null,
+        earnings: l.earnings,
+        weeks: l.weeks,
+        salary: l.salary,
+        recordSystem: l.recordSystem,
+        recordId: l.recordId,
+      }),
+    ),
+    ...wb.stage1.venmo.map(
+      (v): WageRow => ({
+        workerId: v.workerId,
+        group: "venmo",
+        hours: v.hours,
+        overtimeHours: null,
+        grossCents: v.amountCents,
+        held: false,
+        reason: null,
+        earnings: [
+          {
+            name: "Venmo Hours",
+            seconds: null,
+            hours: v.hours,
+            hourRateCents: v.rateCents,
+            multiplier: null,
+            amountCents: v.amountCents,
+          },
+        ],
+        weeks: null,
+        salary: null,
+        recordSystem: v.recordSystem,
+        recordId: v.recordId,
+      }),
+    ),
+    ...wb.stage1.venmoHeld.map(
+      (v): WageRow => ({
+        workerId: v.workerId,
+        group: "venmo",
+        hours: v.hours,
+        overtimeHours: null,
+        grossCents: null,
+        held: true,
+        reason: v.reason,
+        earnings: [],
+        weeks: null,
+        salary: null,
+        recordSystem: null,
+        recordId: null,
+      }),
+    ),
+  ];
+  return GROUP_ORDER.flatMap((g) => rows.filter((r) => r.group === g));
 }
 
 export type Hold = {
