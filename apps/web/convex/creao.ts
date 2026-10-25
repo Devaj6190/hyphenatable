@@ -116,13 +116,13 @@ export const TOOLS = [
   {
     name: "get_routed_flags",
     description:
-      "Messenger: open flags routed to a person that no template question covers, with the worker's role.",
+      "Messenger: open flags routed to a person that no template question covers, with the worker's role, the job's number and title, and each entry's day and hours. Texts name jobs as Job <number> and entries by day; never ids.",
     inputSchema: cycleArg,
   },
   {
     name: "propose_questions",
     description:
-      "Messenger: draft one short question per flag. proposals: [{ flagId, draft: { text ≤240, options ≤4 (≤40 chars each) or null, kind: text|poll, toRole: owner|manager|employee, reason ≤160 } }]. Never money; the owner or manager approves before anything is sent.",
+      "Messenger: draft one short question per flag. proposals: [{ flagId, draft: { text ≤240, options ≤4 (≤40 chars each) or null, kind: text|poll, toRole: owner|manager|employee, reason ≤160 } }]. Never money, never record ids (say Job <number> or the day); the owner or manager approves before anything is sent.",
     inputSchema: withList("proposals"),
   },
   {

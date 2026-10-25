@@ -1,11 +1,30 @@
 import { v } from "convex/values";
-import { query } from "./_generated/server";
+import type { Doc } from "./_generated/dataModel";
+import { type QueryCtx, query } from "./_generated/server";
+import { readableSeen } from "./lib/labels";
 import {
   canSee,
   redactCorrection,
   redactFlag,
   resolveViewer,
+  type Viewer,
 } from "./lib/viewer";
+
+/** What a viewer gets for a flag: pay dropped for a manager, and the sentence in words, not record ids. */
+async function present(
+  ctx: QueryCtx,
+  viewer: Viewer,
+  flag: Doc<"flags">,
+  timezone: string,
+) {
+  return {
+    ...redactFlag(viewer, flag),
+    seen: await readableSeen(ctx, flag.seen, timezone, viewer.role !== "owner"),
+  };
+}
+
+const timezoneOf = async (ctx: QueryCtx, flag: Doc<"flags">) =>
+  (await ctx.db.get(flag.companyId))?.timezone ?? "UTC";
 
 const status = v.union(
   v.literal("open"),
@@ -35,14 +54,17 @@ export const list = query({
           .query("flags")
           .withIndex("by_company", (q) => q.eq("companyId", companyId))
           .collect();
-    return rows
-      .filter(
-        (f) =>
-          f.companyId === companyId &&
-          (!status || f.status === status) &&
-          canSee(viewer, f),
-      )
-      .map((f) => redactFlag(viewer, f));
+    const timezone = (await ctx.db.get(companyId))?.timezone ?? "UTC";
+    return Promise.all(
+      rows
+        .filter(
+          (f) =>
+            f.companyId === companyId &&
+            (!status || f.status === status) &&
+            canSee(viewer, f),
+        )
+        .map((f) => present(ctx, viewer, f, timezone)),
+    );
   },
 });
 
@@ -57,7 +79,7 @@ export const get = query({
       ? await ctx.db.get(flag.correctionId)
       : null;
     return {
-      flag: redactFlag(viewer, flag),
+      flag: await present(ctx, viewer, flag, await timezoneOf(ctx, flag)),
       question: flag.questionId ? await ctx.db.get(flag.questionId) : null,
       correction: correction && redactCorrection(viewer, correction),
     };
