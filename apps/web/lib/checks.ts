@@ -1,4 +1,5 @@
-// Plain titles for CHK ids (docs/plans/00-shared-context.md section 9).
+// Plain titles for every flag id: CHK ids (docs/plans/00-shared-context.md section 9) plus the two flags
+// that aren't deterministic checks, AGT-01 and LRN-01 (contract PR #82).
 export const checkTitles: Record<string, string> = {
   "CHK-01": "Hours with no job",
   "CHK-02": "Timer still running",
@@ -23,6 +24,10 @@ export const checkTitles: Record<string, string> = {
   "CHK-21": "Low profit on a job",
   "CHK-22": "Gross pay changed more than usual",
   "CHK-23": "A system pull is incomplete",
+  // The Auditor flagged a vague case: always a question to the owner, never blocking.
+  "AGT-01": "Unusual case, needs your decision",
+  // A new answer contradicts a rule that is already active.
+  "LRN-01": "Answer contradicts a rule",
 };
 
 export const checkTitle = (id: string) => checkTitles[id] ?? id;

@@ -11,9 +11,17 @@ bun run run.ts --flags <eval.summary export>    # real flags, once B's export ex
 bun run test                                    # vitest
 ```
 
-## Flags: a stand-in until B's checks run
+## Flags: the checks engine
 
-`fixtures/flags.json` comes from `naive-checks.ts`, a deliberately simple reading of the section 9 catalogue over the fixtures. **It is not B's checks engine.** It was written by someone who knows the fixtures, so its M1 score shows the scoring code works, not that the product does. `results.json.flagsSource` says which flags were scored. The readiness screen and PROOF.md show M1 only from real flags (B's `eval.summary` or a Convex export).
+`engine.ts` runs the product's checks (`runAll` from `packages/engine`) over the fixtures with onboarding's rules (`rules.json`) owner-approved, then applies the backend's settling step (`settlingRule`, `precedentFor`, as `apps/web/convex/checks.ts` does). `results.json.flagsSource` says so; `--flags <export.json>` scores an exported set instead. `m1ByCycle` scores every current cycle.
+
+`fixtures/flags.json` (from `naive-checks.ts`) is the old stand-in that tested the scoring code before the engine existed; `stand-in.test.ts` still checks it.
+
+## Learning curve (M3)
+
+`m3-learning.ts` runs cycle 2 three times: no rules, onboarding's rules, and onboarding plus the rules cycle 1's answers teach. Each flag ends **settled** (an owner-approved rule decides it), **rule-backed** (a rule is cited, one tap for the owner), a **note**, or **needs a person**. `LEARNED_A` is the oracle step (what a correct Analyst writes from each cycle-1 answer-key row); the dedupe, backtest over past cycles, approval, checks and routing are the product's code. `results.json.learning` holds the curve, each learned rule's backtest, and what happened to every row the answer key marks rule-resolvable.
+
+`__tests__/engine.test.ts` is the regression gate CI runs on every PR: cycle 1 catches every planted error with no false alarm, cycle 2 misses only the known CHK-08 gap (a-ak-72), every learned rule passes its backtest, cycle 2 needs a person less at each step, and all 9 rule-resolvable rows are handled by a rule.
 
 ## Metrics
 
@@ -51,6 +59,33 @@ Both runners print counts only. Everything they read and write stays under `data
 ```bash
 bun run m2-run.ts   # "M2: N of M onboarding rules match the owner's runbook; K differ; J were not learned"
 ```
+
+### Sealed grading protocol (M2)
+
+This lets onboarding run blind, with the owner's runbook encrypted until the agent's answers are fixed.
+
+1. **Seal the key (owner, once).** Write `data/private/r/runbook-key.json` as `[{ id, ruleType, params, statement, scope, sourceSection }]` (`ruleType` is a RuleType or `"other"`). Encrypt it to `runbook-key.json.enc` and delete the plain file. Either way works:
+   - `openssl enc -aes-256-cbc -pbkdf2 [-iter N] [-a] -in runbook-key.json -out runbook-key.json.enc`. `m2-grade` tries the openssl default of 10000 iterations, then 200000; pass `--iter N` for any other count.
+   - `bun run m2-seal.ts encrypt` (AES-256-GCM, scrypt-derived key, authenticated).
+   - **Unstated values:** if the owner didn't state a value, set that param to `null`. A proposal then matches only with `null` or by leaving the param out (asking the question), never with a value.
+   - **Passphrase:** set `RUNBOOK_KEY_PASS` (or `M2_KEY_PASSPHRASE`), or you'll get a hidden prompt. It is never taken from the command line, logged or written.
+2. **Run onboarding blind (Devaj's agent).** It writes its proposed rules to a file in either shape:
+   - an array of **Proposals** (`packages/engine/src/lessons/history.ts`: `{ type, params, statement, evidence, seenInCycles, ofCycles, confidence }`). These get ids `proposal-<n>` by position.
+   - an array of **Rule rows** (`{ id | _id, type, params, provenance.evidence, backtest, confidence }`).
+
+   Every rule needs at least one evidence id.
+3. **Freeze before unsealing.** Run `bun run m2-freeze.ts --rules <file>`. It validates the file, writes `out/m2-freeze.json` = `{ sha256, count, frozenAt }` and prints the hash. (`eval/out/` ignores its own contents.)
+4. **Grade.** Run `bun run m2-grade.ts --rules <file> --key data/private/r/runbook-key.json.enc [--write-grading]`.
+   - **Refusals:** it refuses without the freeze file, and refuses if the rules file's sha256 differs from it, so answers can't change after unsealing.
+   - **Key handling:** the key is decrypted in memory only.
+   - **Headline: the typed rules only.** These are the key rules with a specific `ruleType`, matched deterministically: proposed `type` = key `ruleType`, and the key's params are equal within a per-type tolerance (`TOLERANCE` in `m2-match.ts`). Strings are compared case-insensitively, and extra params in a proposal are not penalized.
+     - **Verdicts:** `match`, `differs` (a wrong value; the params are named in the private detail) or `not_learned` (no proposal of that type).
+     - **Reported numbers:**
+       - recall = match / typed key rules
+       - precision = match / (match + differs + extra)
+       - the wrong-value count, plus not learned and extra
+   - **`"other"` rules (free-text statements) are never in the headline.** Each one is reported as `needs_human_review`. If `ANTHROPIC_API_KEY` is set, the engine's model adapter suggests the closest unused proposal. It sees types and params only, never the statement, and input that fails the model-input scrub is not sent. The suggestion goes in the private detail for the person reviewing.
+   - **Output:** stdout gets counts only. The per-rule detail goes **only** to `data/private/r/m2-grade-<time>.json`. `--write-grading` also writes `data/private/r/rule-grading.json` (typed rules only), which `run.ts` reads for `results.json`.
 
 ### M4 setup from the owner's facts: `m4-rules-build.ts`
 

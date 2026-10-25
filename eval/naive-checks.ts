@@ -84,7 +84,7 @@ export function naiveFlags(fx: Fixtures, cycleId: string): FlagLike[] {
     if (
       !e.jobId &&
       !e.visitId &&
-      !["BREAK", "OFFICE", "DRIVING"].includes(e.category)
+      !["BREAK", "OFFICE", "DRIVING"].includes(e.category ?? "")
     )
       add(
         "CHK-01",

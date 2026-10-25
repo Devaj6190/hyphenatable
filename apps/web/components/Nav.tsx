@@ -1,75 +1,246 @@
 "use client";
 
 import {
-  BookOpen,
+  Building2,
+  Ellipsis,
   FlaskConical,
-  Gauge,
-  ListChecks,
+  House,
   type LucideIcon,
+  PanelLeftClose,
+  PanelLeftOpen,
   ScrollText,
   Table2,
   Users,
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import { RollPayLogo, RollPayMonogram } from "@/components/RollPayLogo";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import { DEMO_MODE } from "@/lib/demo";
+import { routes } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 
-const demoOn = process.env.NEXT_PUBLIC_DEMO_MODE === "1";
+type Item = {
+  label: string;
+  href: (companyId: string) => string;
+  icon: LucideIcon;
+  /** Sub-routes that highlight this item (Inputs and problem detail sit under Home; Onboarding and the old
+   * Rules URLs under Company). */
+  owns?: string[];
+  /** Shown in the phone tab bar; the rest go under More. */
+  tab?: boolean;
+};
 
-type Item = { label: string; path: string; icon: LucideIcon; built: boolean };
-
+// Mockup nav: Home, Company, Workbook, Audit, Manager, Demo. Phone tabs: Home, Company, Workbook, Audit, More.
 const items: Item[] = [
-  { label: "Home", path: "", icon: Gauge, built: true },
-  { label: "Manager", path: "/manager", icon: Users, built: true },
-  { label: "Onboarding", path: "/onboarding", icon: ListChecks, built: false },
-  { label: "Rules", path: "/rules", icon: BookOpen, built: false },
-  { label: "Workbook", path: "/workbook", icon: Table2, built: false },
-  { label: "Audit", path: "/audit", icon: ScrollText, built: true },
-  ...(demoOn
-    ? [{ label: "Demo", path: "/demo", icon: FlaskConical, built: false }]
+  {
+    label: "Home",
+    href: routes.home,
+    icon: House,
+    owns: ["/inputs", "/flags"],
+    tab: true,
+  },
+  {
+    label: "Company",
+    href: (id) => routes.company(id),
+    icon: Building2,
+    owns: ["/onboarding", "/rules"],
+    tab: true,
+  },
+  { label: "Workbook", href: routes.workbook, icon: Table2, tab: true },
+  { label: "Audit", href: routes.audit, icon: ScrollText, tab: true },
+  { label: "Manager", href: routes.manager, icon: Users },
+  ...(DEMO_MODE
+    ? [{ label: "Demo", href: routes.demo, icon: FlaskConical }]
     : []),
 ];
 
-export function Nav({ companyId }: { companyId: string }) {
+function isActive(pathname: string, companyId: string, item: Item) {
+  const base = routes.home(companyId);
+  const own = item.href(companyId);
+  const prefixes = (item.owns ?? []).map((p) => base + p);
+  if (own === base)
+    return pathname === base || prefixes.some((p) => pathname.startsWith(p));
+  return [own, ...prefixes].some(
+    (p) => pathname === p || pathname.startsWith(`${p}/`),
+  );
+}
+
+const COLLAPSED_KEY = "pp_nav_collapsed";
+
+export function Nav() {
+  const { companyId } = useParams<{ companyId: string }>();
   const pathname = usePathname();
-  const base = `/c/${companyId}`;
+  const [moreOpen, setMoreOpen] = useState(false);
+  // Expanded on the server and first paint; the saved choice applies after mount so hydration matches.
+  const [collapsed, setCollapsed] = useState(false);
+  useEffect(() => {
+    try {
+      setCollapsed(localStorage.getItem(COLLAPSED_KEY) === "1");
+    } catch {}
+  }, []);
+  const toggle = () => {
+    setCollapsed((c) => {
+      try {
+        localStorage.setItem(COLLAPSED_KEY, c ? "0" : "1");
+      } catch {}
+      return !c;
+    });
+  };
+  const more = items.filter((i) => !i.tab);
+  const moreActive = more.some((i) => isActive(pathname, companyId, i));
+
   return (
-    <nav
-      aria-label="Main"
-      className="fixed inset-x-0 bottom-0 z-10 flex border-t bg-card lg:static lg:w-52 lg:flex-col lg:gap-1 lg:border-t-0 lg:bg-transparent lg:p-4"
-    >
-      {items.map(({ label, path, icon: Icon, built }) => {
-        const href = base + path;
-        const active = pathname === href;
-        const cls = cn(
-          "flex flex-1 flex-col items-center gap-1 px-1 py-2 text-xs lg:flex-none lg:flex-row lg:gap-3 lg:rounded-lg lg:px-3 lg:text-sm",
-          active
-            ? "font-semibold text-primary lg:bg-muted"
-            : "text-muted-foreground",
-          !built && "opacity-50",
-        );
-        return built ? (
-          <Link
-            key={label}
-            href={href}
-            className={cls}
-            aria-current={active ? "page" : undefined}
+    <>
+      {/* Desktop: light sidebar, 240px, collapsible to 64px */}
+      <nav
+        aria-label="Main"
+        data-collapsed={collapsed || undefined}
+        className={cn(
+          "hidden h-full shrink-0 flex-col border-r bg-background transition-[width] duration-(--dur-tab) ease-out-soft lg:flex",
+          collapsed ? "w-16 px-2" : "w-60 px-3",
+        )}
+      >
+        <Link
+          href={routes.home(companyId)}
+          aria-label="RollPay home"
+          className={cn(
+            "flex h-14 items-center",
+            collapsed ? "justify-center" : "px-2",
+          )}
+        >
+          {collapsed ? (
+            <RollPayMonogram size={28} />
+          ) : (
+            <RollPayLogo height={22} />
+          )}
+        </Link>
+        <ul className="mt-2 flex flex-col gap-0.5">
+          {items.map((item) => {
+            const active = isActive(pathname, companyId, item);
+            const Icon = item.icon;
+            return (
+              <li key={item.label}>
+                <Link
+                  href={item.href(companyId)}
+                  aria-current={active ? "page" : undefined}
+                  title={collapsed ? item.label : undefined}
+                  className={cn(
+                    "flex h-9 items-center gap-3 rounded-control text-sm transition-colors duration-(--dur-hover)",
+                    collapsed ? "justify-center px-0" : "px-2.5",
+                    active
+                      ? "bg-card font-medium text-foreground shadow-card ring-1 ring-border"
+                      : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                  )}
+                >
+                  <Icon aria-hidden className="size-4 shrink-0" />
+                  {!collapsed && item.label}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+        <div className="mt-auto flex flex-col gap-2 pb-3">
+          {!collapsed && (
+            <p className="px-2.5 text-[11px] leading-snug text-muted-foreground">
+              Draft only. RollPay never submits payroll.
+            </p>
+          )}
+          <button
+            type="button"
+            onClick={toggle}
+            aria-pressed={collapsed}
+            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            className={cn(
+              "flex h-9 items-center gap-3 rounded-control text-sm text-muted-foreground hover:bg-muted hover:text-foreground",
+              collapsed ? "justify-center" : "px-2.5",
+            )}
           >
-            <Icon className="size-5 lg:size-4" />
-            {label}
-          </Link>
-        ) : (
-          <span
-            key={label}
-            className={cls}
-            aria-disabled="true"
-            title="Not built yet"
-          >
-            <Icon className="size-5 lg:size-4" />
-            {label}
-          </span>
-        );
-      })}
-    </nav>
+            {collapsed ? (
+              <PanelLeftOpen aria-hidden className="size-4" />
+            ) : (
+              <>
+                <PanelLeftClose aria-hidden className="size-4" />
+                Collapse
+              </>
+            )}
+          </button>
+        </div>
+      </nav>
+
+      {/* Phone: bottom tabs (mockup HomePhone board: Home, Company, Workbook, Audit, More) */}
+      <nav
+        aria-label="Main"
+        className="frosted fixed inset-x-0 bottom-0 z-40 flex border-t pb-[env(safe-area-inset-bottom)] lg:hidden"
+      >
+        {items
+          .filter((i) => i.tab)
+          .map((item) => {
+            const active = isActive(pathname, companyId, item);
+            const Icon = item.icon;
+            return (
+              <Link
+                key={item.label}
+                href={item.href(companyId)}
+                aria-current={active ? "page" : undefined}
+                className={cn(
+                  "flex min-h-14 flex-1 flex-col items-center justify-center gap-0.5 text-xs font-medium",
+                  active ? "text-foreground" : "text-muted-foreground",
+                )}
+              >
+                <Icon aria-hidden className="size-5" />
+                {item.label}
+              </Link>
+            );
+          })}
+        <button
+          type="button"
+          onClick={() => setMoreOpen(true)}
+          aria-haspopup="dialog"
+          className={cn(
+            "flex min-h-14 flex-1 flex-col items-center justify-center gap-0.5 text-xs font-medium",
+            moreActive ? "text-foreground" : "text-muted-foreground",
+          )}
+        >
+          <Ellipsis aria-hidden className="size-5" />
+          More
+        </button>
+      </nav>
+      <Sheet open={moreOpen} onOpenChange={setMoreOpen}>
+        <SheetContent side="bottom">
+          <SheetHeader>
+            <SheetTitle>More</SheetTitle>
+          </SheetHeader>
+          <ul className="flex flex-col gap-1 px-3 pb-6">
+            {more.map((item) => {
+              const Icon = item.icon;
+              const active = isActive(pathname, companyId, item);
+              return (
+                <li key={item.label}>
+                  <Link
+                    href={item.href(companyId)}
+                    onClick={() => setMoreOpen(false)}
+                    aria-current={active ? "page" : undefined}
+                    className={cn(
+                      "flex h-12 items-center gap-3 rounded-control px-3 font-medium",
+                      active ? "bg-accent" : "hover:bg-muted",
+                    )}
+                  >
+                    <Icon aria-hidden className="size-5" />
+                    {item.label}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </SheetContent>
+      </Sheet>
+    </>
   );
 }

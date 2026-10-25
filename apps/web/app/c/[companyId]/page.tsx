@@ -1,30 +1,29 @@
-import { notFound } from "next/navigation";
-import { FlagsList } from "@/components/FlagsList";
+import { notFound, redirect } from "next/navigation";
+import { Suspense } from "react";
+import { HomeBoard } from "@/components/HomeBoard";
 import { companies } from "@/lib/companies";
-import { currentViewer, homeFlags } from "@/lib/server/fixtures";
+import { currentViewer } from "@/lib/server/fixtures";
+import { homeBoardView } from "@/lib/server/views/home";
 
-export default async function OwnerHome({
-  params,
-}: PageProps<"/c/[companyId]">) {
+// Next 16 instant navigation: the page shell must not await params; read them inside a Suspense child.
+export default function OwnerHome({ params }: PageProps<"/c/[companyId]">) {
+  return (
+    <Suspense>
+      <Home params={params} />
+    </Suspense>
+  );
+}
+
+async function Home({ params }: Pick<PageProps<"/c/[companyId]">, "params">) {
   const { companyId } = await params;
-  const company = companies[companyId];
-  if (!company) notFound();
+  if (!companies[companyId]) notFound();
   // Fixture mode: the server picks the viewer from the role cookie and strips pay before anything is sent.
   const viewer = await currentViewer(companyId);
+  // The home holds the owner's approve actions; a manager works from their own inbox.
+  if (viewer.role === "manager") redirect(`/c/${companyId}/manager`);
+  const data = homeBoardView(viewer, companyId);
+  if (!data) redirect(`/c/${companyId}/manager`);
   return (
-    <div className="flex flex-col gap-4">
-      <div>
-        <h1 className="text-2xl font-semibold">Here’s what we need from you</h1>
-        <p className="text-sm text-muted-foreground">
-          Flags for this pay cycle. Details are one click away.
-        </p>
-      </div>
-      <FlagsList
-        companyId={companyId}
-        dataKind={company.kind}
-        flags={homeFlags(viewer, companyId)}
-        viewerId={viewer.workerId}
-      />
-    </div>
+    <HomeBoard companyId={companyId} viewerId={viewer.workerId} data={data} />
   );
 }

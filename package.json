@@ -10,10 +10,13 @@
   "scripts": {
     "dev": "bun run --filter web dev",
     "test": "bun run --filter '*' test",
-    "check": "biome check . && bun run --filter '*' typecheck"
+    "check": "biome check . && bun run --filter '*' typecheck",
+    "courier": "sh apps/courier/scripts/demo.sh",
+    "e2e": "playwright test"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.2",
+    "@playwright/test": "1.64",
     "typescript": "^5"
   }
 }

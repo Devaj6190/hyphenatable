@@ -25,6 +25,9 @@ export function viewerFor(
   return { role, workerId, crew: new Set(crew) };
 }
 
+/** Pay amounts (rates, totals, plain words that state them) are for the owner only. */
+export const canSeePay = (viewer: Viewer) => viewer.role === "owner";
+
 /**
  * A manager sees manager-routed flags about their crew, plus manager-routed job flags that name no worker.
  * Owner-routed flags are money or policy and stay with the owner.
@@ -42,13 +45,16 @@ export function redactFlag(viewer: Viewer, flag: Flag): Flag {
   return { ...flag, affects: { ...flag.affects, dollarsCents: null } };
 }
 
+/** A corrected field that is itself money or a pay rate: its before/after values are owner-only. */
+export const isMoneyField = (field: string) => /cents|rate/i.test(field);
+
 /** Drops the pay and profit effect, and before/after when the corrected field is itself money or a rate. */
 export function redactCorrection(
   viewer: Viewer,
   correction: Correction,
 ): Correction {
   if (viewer.role === "owner") return correction;
-  const moneyField = /cents|rate/i.test(correction.target.field);
+  const moneyField = isMoneyField(correction.target.field);
   return {
     ...correction,
     effectPayCents: null,

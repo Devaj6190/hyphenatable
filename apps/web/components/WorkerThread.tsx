@@ -5,19 +5,29 @@ import { formatWhen } from "@/lib/time";
 import { cn } from "@/lib/utils";
 import type { ThreadView } from "@/lib/view-types";
 
-// Texts only: worker, time, words. No pay, no phone numbers.
+// Texts only: worker, time, words. No pay, no phone numbers. Keyed by questionId (not the first message), so a
+// question with no server messages yet still renders once replies for it arrive. Nothing to show → nothing rendered.
 export function WorkerThread({
   thread,
+  questionId = thread?.messages[0]?.questionId,
+  workerName,
   title,
   dataKind,
   timezone,
 }: {
-  thread: ThreadView;
+  thread: ThreadView | null;
+  questionId?: string;
+  /** Header name when the server has no thread yet. */
+  workerName?: string;
   title: string;
   dataKind: DataKind;
   timezone: string;
 }) {
-  const { workerName: who, messages } = thread;
+  const who = thread?.workerName ?? workerName ?? "Recipient";
+  const messages = (thread?.messages ?? []).filter(
+    (m) => m.questionId === questionId,
+  );
+  if (messages.length === 0) return null;
   return (
     <Card>
       <CardContent className="flex flex-col gap-3">
@@ -37,7 +47,7 @@ export function WorkerThread({
             >
               <span>{m.text}</span>
               <span className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                {m.direction === "out" ? "PayrollPilot" : who} ·{" "}
+                {m.direction === "out" ? "RollPay" : who} ·{" "}
                 {formatWhen(m.at, timezone)} · {dataKind}
                 {m.simulated && (
                   <Badge

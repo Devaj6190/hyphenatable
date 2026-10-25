@@ -15,6 +15,8 @@ export const Results = z.object({
   cycle: z.string(),
   flagsSource: z.string(),
   synthetic: z.boolean(),
+  /** How to read the numbers (e.g. what M1 counts). */
+  notes: z.array(z.string()),
   m1: z.object({
     keyRows: z.number().int(),
     flags: z.number().int(),
@@ -28,6 +30,8 @@ export const Results = z.object({
     unmatchedFlags: z.array(
       z.object({ id: z.string(), checkId: z.string(), seen: z.string() }),
     ),
+    /** Flags that are not planted-error checks (AGT-01, LRN-01, ...), by checkId; not in precision. */
+    otherFlags: z.record(z.string(), z.number().int()),
   }),
   m2: z.union([
     z.object({ status: z.literal("pending"), reason: z.string() }),
@@ -98,5 +102,65 @@ export const Results = z.object({
     withRuleOrModel: Ratio,
     untraceableFlagIds: z.array(z.string()),
   }),
+  /** M1 on every current cycle, when the flags come from the checks engine. */
+  m1ByCycle: z
+    .array(
+      z.object({
+        cycleId: z.string(),
+        recall: Ratio,
+        precision: Ratio,
+        missedKeyRowIds: z.array(z.string()),
+      }),
+    )
+    .optional(),
+  /** M3 learning curve (m3-learning.ts): what still needs a person as the rules grow. */
+  learning: z
+    .object({
+      extraction: z.string(),
+      curve: z.array(
+        z.object({
+          scenario: z.enum(["day0", "onboarding", "learned"]),
+          cycleId: z.string(),
+          rules: z.number().int(),
+          flags: z.number().int(),
+          outcomes: z.object({
+            needs_person: z.number().int(),
+            rule_backed: z.number().int(),
+            settled: z.number().int(),
+            note: z.number().int(),
+          }),
+        }),
+      ),
+      learned: z.array(
+        z.object({
+          fromKeyRow: z.string(),
+          type: z.string(),
+          verdict: z.enum(["approved", "duplicate", "rejected_by_backtest"]),
+          ruleId: z.string().nullable(),
+          backtest: z
+            .object({
+              cycles: z.number().int(),
+              agree: z.number().int(),
+              disagree: z.number().int(),
+            })
+            .nullable(),
+        }),
+      ),
+      resolvedRows: z.array(
+        z.object({
+          id: z.string(),
+          checkId: z.string(),
+          expected: z.string(),
+          outcome: z.enum([
+            "needs_person",
+            "rule_backed",
+            "settled",
+            "note",
+            "not_flagged",
+          ]),
+        }),
+      ),
+    })
+    .optional(),
 });
 export type Results = z.infer<typeof Results>;

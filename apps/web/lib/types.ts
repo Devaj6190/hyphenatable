@@ -106,7 +106,7 @@ export type Correction = {
   effectPayCents: number | null;
   effectProfitCents: number | null;
   status: "proposed" | "approved" | "applied" | "rejected";
-  source: "reply" | "owner" | "rule";
+  source: "reply" | "owner" | "rule" | "agent";
   approvedBy: string | null;
   approvedAt: string | null;
 };

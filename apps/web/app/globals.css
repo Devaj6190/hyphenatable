@@ -2,101 +2,353 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
+/* Theme lives on <html data-theme="light|dark">; the inline script in app/layout.tsx resolves "system" before paint. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 @theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--foreground);
+  --color-raised: var(--raised);
+  --color-popover: var(--raised);
+  --color-popover-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-edge: var(--primary-edge);
+  --color-secondary: var(--muted);
+  --color-secondary-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--foreground);
+  --color-link: var(--link);
+  --color-destructive: var(--destructive);
+  --color-destructive-soft: var(--destructive-soft);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  /* Semantic states. Green ok means done only; verified uses ok + icon + word. */
   --color-hold: var(--hold);
   --color-hold-soft: var(--hold-soft);
   --color-ask: var(--ask);
   --color-ask-soft: var(--ask-soft);
   --color-ok: var(--ok);
   --color-ok-soft: var(--ok-soft);
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-inter);
-  --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
-  --color-ring: var(--ring);
-  --color-input: var(--input);
-  --color-border: var(--border);
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-  --color-card-foreground: var(--card-foreground);
-  --color-card: var(--card);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
+  --color-sync-error: var(--destructive);
+  --color-sync-error-soft: var(--destructive-soft);
+  --color-neutral-chip: var(--neutral-chip);
+  /* Sunset: accents and progress only, never a status. */
+  --color-sunset-1: var(--sunset-1);
+  --color-sunset-2: var(--sunset-2);
+  --color-sunset-3: var(--sunset-3);
+  --color-sunset-ink: var(--sunset-ink);
+  /* Agent hues (audit log, timelines). */
+  --color-agent-analyst: var(--agent-analyst);
+  --color-agent-analyst-soft: var(--agent-analyst-soft);
+  --color-agent-auditor: var(--agent-auditor);
+  --color-agent-auditor-soft: var(--agent-auditor-soft);
+  --color-agent-messenger: var(--agent-messenger);
+  --color-agent-messenger-soft: var(--agent-messenger-soft);
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  /* Display face: page titles and the greeting only. */
+  --font-heading: var(--font-instrument-serif), Georgia, serif;
+
+  /* Radii: 8px controls, 10px cards, 14px overlays, pills for badges and segmented tracks. */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 10px;
+  --radius-2xl: 14px;
+  --radius-control: 8px;
+  --radius-card: 10px;
+  --radius-overlay: 14px;
+
+  --shadow-card: var(--shadow-card);
+  --shadow-raised: var(--shadow-raised);
+  --shadow-overlay: var(--shadow-overlay);
+
+  --ease-out-soft: cubic-bezier(0.22, 0.8, 0.24, 1);
 }
 
-/* PayrollPilot tokens: docs/plans/C-product-messaging-demo.md section 4.1 */
-:root {
-  --background: #fafaf7;
-  --foreground: #141a1f;
+/* Light. Values from docs/plans/design-style-handoff.md; status pairs and input boundary contrast-checked (README). */
+/* Light: RollPay navy ink on a warm canvas, Sunset for accents and progress. Contrast ratios in components/README.md. */
+:root,
+[data-theme="light"] {
+  color-scheme: light;
+  /* Warm paper, ink, hairlines; the orange accent only for the active stage, links and the primary action. */
+  --background: #f6f4ef;
   --card: #ffffff;
-  --card-foreground: #141a1f;
-  --popover: #ffffff;
-  --popover-foreground: #141a1f;
-  --primary: #0f5c4a;
+  --raised: #ffffff;
+  --muted: #eeebe4;
+  --foreground: #141414;
+  --muted-foreground: #6b6b66;
+  --border: #e6e2d9;
+  --input: #a8a49b;
+  --primary: #141414;
   --primary-foreground: #ffffff;
-  --secondary: #f1f2ee;
-  --secondary-foreground: #141a1f;
-  --muted: #f1f2ee;
-  --muted-foreground: #5f6b73;
-  --accent: #f1f2ee;
-  --accent-foreground: #141a1f;
-  --destructive: #b3261e;
-  --border: #e4e6e1;
-  --input: #e4e6e1;
-  --ring: #0f5c4a;
-  --radius: 12px;
-  --hold: #9a6700;
-  --hold-soft: #fff4d6;
-  --ask: #1d4ed8;
-  --ask-soft: #e8eeff;
-  --ok: #0f5c4a;
-  --ok-soft: #ddf4e7;
-  --sidebar: #ffffff;
-  --sidebar-foreground: #141a1f;
-  --sidebar-primary: #0f5c4a;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #f1f2ee;
-  --sidebar-accent-foreground: #141a1f;
-  --sidebar-border: #e4e6e1;
-  --sidebar-ring: #0f5c4a;
+  --primary-hover: #2a2a2a;
+  --primary-edge: #141414;
+  --link: #e8743b;
+  --ring: #e8743b;
+  --accent: #fbeee5;
+  /* Flat: the sunset utilities now paint the one accent, no gradient. */
+  --sunset-1: #e8743b;
+  --sunset-2: #e8743b;
+  --sunset-3: #e8743b;
+  --sunset-ink: #141414;
+  --destructive: #b4442f;
+  --destructive-fill: #b4442f;
+  --destructive-soft: #f7e6e1;
+  --hold: #c8902e;
+  --hold-soft: #f8efdc;
+  --ask: #3b5f8f;
+  --ask-soft: #e6edf5;
+  --ok: #2f7a5b;
+  --ok-soft: #e2efe8;
+  --neutral-chip: #3d3d3a;
+  --agent-analyst: #5b3fa8;
+  --agent-analyst-soft: #efeafb;
+  --agent-auditor: #0b6b63;
+  --agent-auditor-soft: #dff3f0;
+  --agent-messenger: #a02860;
+  --agent-messenger-soft: #fbe8f0;
+  --scrim: rgb(20 20 20 / 0.24);
+  /* Cards sit flat on hairlines; shadows only for floating layers. */
+  --shadow-card: 0 0 0 0 transparent;
+  --shadow-raised:
+    0 1px 2px rgb(20 20 20 / 0.04), 0 12px 32px -16px rgb(20 20 20 / 0.14);
+  --shadow-overlay:
+    0 2px 6px rgb(20 20 20 / 0.05), 0 32px 72px -24px rgb(20 20 20 / 0.22);
+}
+
+/* Motion (design-style-handoff.md timing table). Theme-independent. */
+:root {
+  --dur-hover: 140ms;
+  --dur-press: 100ms;
+  --dur-tab: 210ms;
+  --dur-sheet: 280ms;
+  --dur-archive: 480ms;
+  --dur-success: 190ms;
+  --press-scale: 0.985;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --background: #141414;
+  --card: #1c1c1b;
+  --raised: #242423;
+  --muted: #232322;
+  --foreground: #f3f1ea;
+  --muted-foreground: #a3a29c;
+  --border: #2b2b29;
+  --input: #6f6e69;
+  /* Inverted: a paper button on ink keeps the primary action the highest-contrast thing on screen. */
+  --primary: #f3f1ea;
+  --primary-foreground: #141414;
+  --primary-hover: #e4e1d8;
+  --primary-edge: #f3f1ea;
+  --link: #f08a55;
+  --ring: #f08a55;
+  --accent: #2b221c;
+  --sunset-1: #f08a55;
+  --sunset-2: #f08a55;
+  --sunset-3: #f08a55;
+  --sunset-ink: #141414;
+  --destructive: #f7a396;
+  --destructive-fill: #b42318;
+  --destructive-soft: #421e1a;
+  --hold: #f1c26a;
+  --hold-soft: #3a2d12;
+  --ask: #a3c1f7;
+  --ask-soft: #1c2a45;
+  --ok: #93d7a6;
+  --ok-soft: #1c3a26;
+  --neutral-chip: #ccd0de;
+  --agent-analyst: #c8b6f5;
+  --agent-analyst-soft: #2c2445;
+  --agent-auditor: #8cdcd1;
+  --agent-auditor-soft: #173a36;
+  --agent-messenger: #f3a6c8;
+  --agent-messenger-soft: #3f1d2d;
+  --scrim: rgb(5 7 15 / 0.55);
+  --shadow-card:
+    inset 0 1px 0 rgb(255 255 255 / 0.04), 0 1px 2px rgb(0 0 0 / 0.3);
+  --shadow-raised:
+    inset 0 1px 0 rgb(255 255 255 / 0.06), 0 12px 32px -16px rgb(0 0 0 / 0.6);
+  --shadow-overlay:
+    inset 0 1px 0 rgb(255 255 255 / 0.07), 0 32px 72px -24px rgb(0 0 0 / 0.75);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-hover: 0ms;
+    --dur-press: 0ms;
+    --dur-tab: 0ms;
+    --dur-sheet: 120ms;
+    --dur-archive: 120ms;
+    --dur-success: 0ms;
+    --press-scale: 1;
+  }
+  /* Sheets and dialogs fade in place instead of sliding. */
+  [data-slot="sheet-content"]:is([data-starting-style], [data-ending-style]) {
+    /* biome-ignore lint/complexity/noImportantStyles: beats the side-specific slide utilities */
+    translate: 0 0 !important;
+  }
+  [data-slot="dialog-content"]:is([data-starting-style], [data-ending-style]) {
+    /* biome-ignore lint/complexity/noImportantStyles: keeps the dialog centered while it fades */
+    translate: -50% -50% !important;
+  }
+  /* Third-party enter/exit animations (tw-animate, Base UI) become an instant change. */
+  *,
+  *::before,
+  *::after {
+    /* biome-ignore lint/complexity/noImportantStyles: reduced motion must beat component animation classes */
+    animation-duration: 0.01ms !important;
+    /* biome-ignore lint/complexity/noImportantStyles: reduced motion must beat component animation classes */
+    animation-iteration-count: 1 !important;
+    /* biome-ignore lint/complexity/noImportantStyles: reduced motion must beat component animation classes */
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Static 1.5% monochrome grain for the canvas or archive material. Keep it off dense data surfaces. */
+@utility grain {
+  position: relative;
+  isolation: isolate;
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.015;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  [data-theme="dark"] &::before {
+    opacity: 0.02;
+    filter: invert(1);
+  }
+}
+
+/* Frosted overlay surface with an opaque fallback; text stays readable whatever is behind it. */
+@utility frosted {
+  background-color: var(--raised);
+  @supports (backdrop-filter: blur(1px)) {
+    background-color: color-mix(in srgb, var(--raised) 78%, transparent);
+    backdrop-filter: blur(18px) saturate(1.2);
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    background-color: var(--raised);
+    backdrop-filter: none;
+  }
+}
+
+/* Frosted page scrim behind sheets and dialogs. */
+@utility frosted-scrim {
+  background-color: var(--scrim);
+  @supports (backdrop-filter: blur(1px)) {
+    backdrop-filter: blur(6px);
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    backdrop-filter: none;
+  }
+}
+
+/* Sunset accent fill (135°). Navy ink text on it passes AA at every stop (4.8:1 minimum, on pink). */
+@utility bg-sunset {
+  background-image: linear-gradient(
+    135deg,
+    var(--sunset-1),
+    var(--sunset-2) 50%,
+    var(--sunset-3)
+  );
+}
+
+/* Current progress step: the Sunset gradient drifts left to right. Static under reduced motion. */
+@utility bg-sunset-flow {
+  background-image: linear-gradient(
+    90deg,
+    var(--sunset-1),
+    var(--sunset-2),
+    var(--sunset-3),
+    var(--sunset-2),
+    var(--sunset-1)
+  );
+  background-size: 200% 100%;
+  animation: sunset-flow 2.4s linear infinite;
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+    background-position: 0 0;
+  }
+}
+
+@keyframes sunset-flow {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}
+
+/* Press response: at most 1.5% compression, no layout shift. */
+@utility pressable {
+  transition-property:
+    color, background-color, border-color, box-shadow, transform;
+  transition-duration:
+    var(--dur-hover), var(--dur-hover), var(--dur-hover), var(--dur-hover),
+    var(--dur-press);
+  transition-timing-function: var(--ease-out-soft);
+  &:active:not(:disabled, [aria-disabled="true"]) {
+    transform: scale(var(--press-scale));
+  }
 }
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground tabular-nums;
+    @apply border-border;
   }
   html {
     @apply font-sans;
+    font-size: 100%;
   }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-size: 1rem;
+    line-height: 1.5;
+    /* Host Grotesk has no tnum feature; its default digits are already equal-width lining figures. */
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+  /* Serif display only on page titles and the greeting; every other heading is the UI sans. */
+  h1 {
+    @apply font-heading;
+    text-wrap: balance;
+  }
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+  ::selection {
+    background-color: var(--accent);
+    color: var(--foreground);
+  }
+}
+
+/* Panels scroll, the window never does. Thin, quiet scrollbars on the panels that do. */
+.scroll-panel {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+.scroll-panel::-webkit-scrollbar {
+  width: 8px;
+}
+.scroll-panel::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
 }
