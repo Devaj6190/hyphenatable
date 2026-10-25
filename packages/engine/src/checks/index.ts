@@ -11,6 +11,16 @@ import CHK09 from "./CHK-09";
 import CHK10 from "./CHK-10";
 import CHK11 from "./CHK-11";
 import CHK12 from "./CHK-12";
+import CHK13 from "./CHK-13";
+import CHK14 from "./CHK-14";
+import CHK15 from "./CHK-15";
+import CHK16 from "./CHK-16";
+import CHK17 from "./CHK-17";
+import CHK18 from "./CHK-18";
+import CHK19 from "./CHK-19";
+import CHK20 from "./CHK-20";
+import CHK21 from "./CHK-21";
+import CHK22 from "./CHK-22";
 import CHK23 from "./CHK-23";
 import { cmp } from "./flag";
 import type { Check, CheckInput } from "./types";
@@ -29,6 +39,16 @@ export const checks: Check[] = [
   CHK10,
   CHK11,
   CHK12,
+  CHK13,
+  CHK14,
+  CHK15,
+  CHK16,
+  CHK17,
+  CHK18,
+  CHK19,
+  CHK20,
+  CHK21,
+  CHK22,
   CHK23,
 ];
 

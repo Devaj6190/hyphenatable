@@ -58,12 +58,27 @@ export type Proposal = {
 
 const unique = <T>(xs: T[]) => [...new Set(xs)];
 
+/**
+ * Gusto's API says "Regular Hours"; its payroll exports say "Regular". Same earning, any case or spacing.
+ * The bare "Hours" stays as is: the contract keeps it for Venmo rows.
+ */
+const EARNING = new Map([
+  ["regular", "Regular Hours"],
+  ["regular hours", "Regular Hours"],
+  ["overtime", "Overtime"],
+  ["overtime hours", "Overtime"],
+  ["double overtime", "Double Overtime"],
+  ["double overtime hours", "Double Overtime"],
+]);
+export const earningName = (name: string) =>
+  EARNING.get(name.trim().replace(/\s+/g, " ").toLowerCase()) ?? name;
+
 /** Paid rate per worker for one earning name, with the rows that show it. */
 function paidRates(paid: PaidRow[], name: string) {
   const out = new Map<string, { rates: Set<number>; rows: PaidRow[] }>();
   for (const row of paid)
     for (const e of row.earnings) {
-      if (e.name !== name || !e.hours || !e.rateCents) continue;
+      if (earningName(e.name) !== name || !e.hours || !e.rateCents) continue;
       const cur = out.get(row.workerId) ?? { rates: new Set(), rows: [] };
       cur.rates.add(e.rateCents);
       cur.rows.push(row);
@@ -100,7 +115,7 @@ export function summarize(h: HistoryInput) {
     })),
     overtimePaid: h.paid.flatMap((p) =>
       p.earnings
-        .filter((e) => e.name === "Overtime")
+        .filter((e) => earningName(e.name) === "Overtime")
         .map((e) => ({
           payrollId: p.id,
           cycleId: p.cycleId,
@@ -176,8 +191,12 @@ export function proposeFromHistory(h: HistoryInput): Proposal[] {
   }
 
   const ratios = h.paid.flatMap((p) => {
-    const reg = p.earnings.find((e) => e.name === "Regular Hours")?.rateCents;
-    const ot = p.earnings.find((e) => e.name === "Overtime")?.rateCents;
+    const reg = p.earnings.find(
+      (e) => earningName(e.name) === "Regular Hours",
+    )?.rateCents;
+    const ot = p.earnings.find(
+      (e) => earningName(e.name) === "Overtime",
+    )?.rateCents;
     return reg && ot
       ? [{ row: p, ratio: Math.round((ot / reg) * 100) / 100 }]
       : [];

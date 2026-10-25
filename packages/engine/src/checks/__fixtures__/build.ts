@@ -4,10 +4,16 @@ import { sample } from "../../__fixtures__/sample";
 import {
   Company,
   Cycle,
+  Expense,
   Flag,
+  Invoice,
+  Job,
+  Payment,
+  Quote,
   Rule,
   SyncRun,
   TimeEntry,
+  Visit,
   Worker,
 } from "../../schemas";
 import type { CheckInput } from "../types";
@@ -124,5 +130,94 @@ export const syncRun = (over: Partial<SyncRun> = {}): SyncRun =>
     complete: false,
     method: "fixture",
     error: null,
+    ...over,
+  });
+
+/** A top-level job running on 2026-10-07. */
+export const job = (over: Partial<Job> & { id: string }): Job =>
+  Job.parse({
+    companyId: "co_a",
+    sourceId: `jobber_${over.id}`,
+    jobNumber: 1,
+    title: "Front yard sod install - Larkspur Ln",
+    clientRef: "cl_1",
+    status: "active",
+    salespersonWorkerId: null,
+    quoteId: null,
+    parentJobId: null,
+    startAt: "2026-10-07T15:00:00Z",
+    endAt: "2026-10-07T23:00:00Z",
+    totalCents: 100000,
+    ...over,
+  });
+
+/** A completed visit on job_01, 2026-10-07 08:00-16:00 PDT, crew w_01. */
+export const visit = (over: Partial<Visit> & { id: string }): Visit =>
+  Visit.parse({
+    companyId: "co_a",
+    jobId: "job_01",
+    sourceId: `jobber_${over.id}`,
+    startAt: "2026-10-07T15:00:00Z",
+    endAt: "2026-10-07T23:00:00Z",
+    isComplete: true,
+    assignedWorkerIds: ["w_01"],
+    ...over,
+  });
+
+/** A QuickBooks $214.37 materials purchase on 2026-10-07 matched to job_01. */
+export const expense = (over: Partial<Expense> & { id: string }): Expense =>
+  Expense.parse({
+    companyId: "co_a",
+    source: "qbo",
+    sourceId: `qbo_${over.id}`,
+    date: "2026-10-07",
+    amountCents: 21437,
+    vendor: "Cedar Creek Supply",
+    description: "PVC fittings",
+    accountName: "Materials",
+    customerRef: null,
+    paymentType: "CreditCard",
+    kind: "job_cost",
+    matchedJobId: "job_01",
+    matchConfidence: 1,
+    reimbursableToWorkerId: null,
+    reimbursementStatus: null,
+    ...over,
+  });
+
+export const quote = (over: Partial<Quote> & { id: string }): Quote =>
+  Quote.parse({
+    companyId: "co_a",
+    sourceId: `jobber_${over.id}`,
+    jobId: "job_01",
+    salespersonWorkerId: "w_01",
+    sentAt: "2026-10-06T17:00:00Z",
+    status: "converted",
+    amountCents: 100000,
+    ...over,
+  });
+
+export const invoice = (over: Partial<Invoice> & { id: string }): Invoice =>
+  Invoice.parse({
+    companyId: "co_a",
+    sourceId: `jobber_${over.id}`,
+    jobId: "job_01",
+    issuedDate: "2026-10-08",
+    dueDate: "2026-10-22",
+    status: "paid",
+    totalCents: 100000,
+    ...over,
+  });
+
+export const payment = (over: Partial<Payment> & { id: string }): Payment =>
+  Payment.parse({
+    companyId: "co_a",
+    sourceId: `jobber_${over.id}`,
+    invoiceId: "inv_1",
+    quoteId: null,
+    entryDate: "2026-10-09",
+    amountCents: 100000,
+    paymentType: "check",
+    kind: "final",
     ...over,
   });

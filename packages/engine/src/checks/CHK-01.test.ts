@@ -32,6 +32,14 @@ describe("CHK-01 hours_no_job", () => {
     ]);
   });
 
+  test("an unknown category (real export) is not exempt", () => {
+    const flags = run(
+      input([entry({ id: "te_1", ...noJob, category: null })]),
+      [],
+    );
+    expect(flags.map((f) => f.id)).toEqual(["CHK-01:cy_1:te_1"]);
+  });
+
   test("one flag per entry", () => {
     const flags = run(
       input([entry({ id: "te_1", ...noJob }), entry({ id: "te_2", ...noJob })]),

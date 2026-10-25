@@ -67,7 +67,8 @@ export const recordRun = internalMutation({
 /**
  * Loads one company's fixture (data/fixtures/<co>/*.json, section 6 shapes with fixture ids) into Convex.
  * Public so seed scripts can call it over HTTP; refuses without INGEST_KEY. Validators run on every insert,
- * so a fixture that drifts from the contract fails loudly here. Returns fixture id → Convex id.
+ * so a fixture that drifts from the contract fails loudly here. Returns fixture id → Convex id for companies,
+ * workers and cycles only: every row would pass Convex's 1024-field limit on a real company.
  */
 export const ingestFixture = mutation({
   args: {
@@ -78,7 +79,15 @@ export const ingestFixture = mutation({
     if (!process.env.INGEST_KEY || ingestKey !== process.env.INGEST_KEY) {
       throw new ConvexError("bad ingest key");
     }
-    return ingestRows(ctx, fixture as Fixture);
+    const ids = await ingestRows(ctx, fixture as Fixture);
+    const named = new Set(
+      (["companies", "workers", "cycles"] as const).flatMap((t) =>
+        (fixture[t] ?? []).map((r) => (r as { id: string }).id),
+      ),
+    );
+    return Object.fromEntries(
+      Object.entries(ids).filter(([id]) => named.has(id)),
+    );
   },
 });
 
