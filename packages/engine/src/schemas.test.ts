@@ -74,6 +74,19 @@ describe("contract rules", () => {
     ).toThrow();
   });
 
+  test("real exports: approved, payable and category may be unknown; Venmo is an expense source", () => {
+    const e = {
+      ...sample.timeEntries[0],
+      approved: null,
+      payable: null,
+      category: null,
+    };
+    expect(s.TimeEntry.parse(e)).toEqual(e);
+    expect(
+      s.Expense.parse({ ...sample.expenses[0], source: "venmo" }).source,
+    ).toBe("venmo");
+  });
+
   test("instants must be UTC", () => {
     expect(() =>
       s.TimeEntry.parse({
