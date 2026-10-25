@@ -29,6 +29,7 @@ const MIRRORS: Record<string, z.ZodObject> = {
   pastPayrolls: zs.PastPayroll,
   auditEvents: zs.AuditEvent,
   accessEvents: zs.AccessEvent,
+  creaoRuns: zs.CreaoRun,
 };
 
 /** Union members: literals merge into one enum(...), the rest sort, so member order never matters. */
