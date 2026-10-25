@@ -64,8 +64,21 @@ export type Classification = {
   reason: string;
 };
 
-const same = (a: unknown, b: unknown) =>
-  JSON.stringify(a) === JSON.stringify(b);
+/** JSON with object keys sorted, so the same params compare equal however they were stored. */
+export function canonical(v: unknown): string {
+  if (Array.isArray(v)) return `[${v.map(canonical).join(",")}]`;
+  if (v && typeof v === "object")
+    return `{${Object.keys(v)
+      .sort()
+      .map(
+        (k) =>
+          `${JSON.stringify(k)}:${canonical((v as Record<string, unknown>)[k])}`,
+      )
+      .join(",")}}`;
+  return JSON.stringify(v) ?? "null";
+}
+
+const same = (a: unknown, b: unknown) => canonical(a) === canonical(b);
 
 /** The key that makes two rules of one type about the same thing (e.g. routing for one check). */
 const KEY: Partial<Record<RuleType, string[]>> = {
@@ -186,7 +199,7 @@ const CHECK_TYPES: RuleType[] = [
 ];
 
 const flagKey = (f: { checkId: string; subject: unknown }) =>
-  JSON.stringify([f.checkId, f.subject]);
+  canonical([f.checkId, f.subject]);
 
 /**
  * Runs a candidate rule over past cycles. A pay rule agrees in a cycle when every worker whose pay
