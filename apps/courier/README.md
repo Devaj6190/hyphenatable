@@ -47,7 +47,7 @@ curl -s 127.0.0.1:3210/messages
 
 With Photon connected, `/reply` is off: reply from the real phone instead.
 
-The manager's summary text, built from `data/fixtures/<company>/flags.json` for the current cycle. Wording and issue phrases are at the top of `packages/engine/src/messages/templates.ts`; the greeting uses `MANAGER_DISPLAY_NAME` (else the fixture's fake name) and the link uses `DASHBOARD_URL` (unset: a placeholder from the same file):
+The manager's summary text, built from `data/fixtures/<company>/flags.json` for the current cycle. Wording and issue phrases are at the top of `packages/engine/src/messages/templates.ts`; the greeting uses `MANAGER_DISPLAY_NAME` (else the fixture's fake name) and the link uses `DASHBOARD_URL` (unset: the "Details here" line is left out):
 
 ```bash
 # see the text without sending it
@@ -55,6 +55,28 @@ curl -s -X POST 127.0.0.1:3210/summary -d '{"dryRun":true}'
 # queue it for the manager phone (contact:a-w11 by default; companyId "a", current cycle)
 curl -s -X POST 127.0.0.1:3210/summary -d '{}'
 ```
+
+## Running the courier for the demo
+
+**Start it before any text is sent or expected.** Photon only streams messages that arrive while the courier is connected; a text sent while it is down is lost (found in H4).
+
+```bash
+bun run courier        # from the repo root
+```
+
+- This runs `apps/courier/scripts/demo.sh`: it keeps the Mac awake while the courier runs (`caffeinate -i`, macOS only) and restarts the courier 3 s after it drops.
+- **Connected:** wait for `connected to Photon, listening for texts`. If it says `no Photon credentials` instead, `apps/courier/.env` is missing `SPECTRUM_PROJECT_ID` / `SPECTRUM_PROJECT_SECRET`.
+- **Disconnected:** if Photon's message stream ends or errors, it prints `WARNING: DISCONNECTED from Photon (...)`; the launcher restarts it and you should see the connected line again within a few seconds. spectrum-ts has no connection events, so a network drop that leaves the stream silently open is not detected. That is why the checklist below sends a real test text.
+- **Check it is working:** a text from a registered phone shows `relayed inbound sha256:… (text)` within a few seconds. In stub mode, `curl -s 127.0.0.1:3210/messages` lists what arrived.
+- **Stop:** Ctrl+C in its terminal (prints `stopping`), or `pkill -f apps/courier/src/index.ts` from another terminal. Both are clean stops, so the launcher exits instead of restarting.
+
+**30-second pre-demo checklist**
+
+1. Mac plugged in, lid open. `caffeinate -i` stops idle sleep, not lid-closed sleep on battery.
+2. Wi-Fi on and working: open any web page.
+3. `bun run courier`, then wait for `connected to Photon, listening for texts`.
+4. From the demo phone, text "test" to the project's Photon number (each Photon user has their own number; use the one this project sends from).
+5. Confirm `relayed inbound … (text)` appears within a few seconds. If it doesn't, Ctrl+C, run `bun run courier` again, and repeat step 4 before going on.
 
 ## Test
 
