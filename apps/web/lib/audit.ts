@@ -1,20 +1,40 @@
+import { type AgentKind, agentFromActor } from "@/components/AgentChip";
 import { canSeeAuditEvent, redactAuditEvent, viewerFor } from "@/lib/policy";
-import type { AuditEvent, ViewerRole } from "@/lib/types";
+import type { AuditEvent, SourceSystem, ViewerRole } from "@/lib/types";
 
-// Type prefixes the plan's filter offers (docs/plans/C-product-messaging-demo.md, C-10).
-export const AUDIT_PREFIXES = [
-  "sync",
-  "check",
-  "message",
-  "correction",
-  "rule",
-  "draft",
-  "demo",
+// Filter chips (docs/plans/C-product-messaging-demo.md, C-10), with Shannin's "Answers" split out of messages.
+export const AUDIT_TYPES = [
+  { value: "sync", label: "Pulls", one: "Pull" },
+  { value: "check", label: "Flags", one: "Flag" },
+  { value: "message", label: "Messages", one: "Message" },
+  { value: "answer", label: "Answers", one: "Answer" },
+  { value: "correction", label: "Corrections", one: "Correction" },
+  { value: "rule", label: "Rules", one: "Rule" },
+  { value: "draft", label: "Drafts", one: "Draft" },
+  { value: "demo", label: "Demo", one: "Demo" },
 ] as const;
 
 export const typePrefix = (e: AuditEvent) => e.type.split(".")[0];
 
+export const category = (e: AuditEvent) =>
+  e.type === "message.received" || e.type === "message.interpreted"
+    ? "answer"
+    : typePrefix(e);
+
+export const categoryLabel = (e: AuditEvent) =>
+  AUDIT_TYPES.find((t) => t.value === category(e))?.one ?? typePrefix(e);
+
 export const isSimulated = (e: AuditEvent) => e.data?.simulated === true;
+
+// Users are owner or manager by their worker role (the server passes the manager ids); everyone else maps as
+// AgentChip does.
+export function actorKind(
+  actor: AuditEvent["actor"],
+  managerIds: ReadonlySet<string>,
+): AgentKind {
+  if (actor.kind !== "user") return agentFromActor(actor);
+  return actor.id && managerIds.has(actor.id) ? "manager" : "owner";
+}
 
 // Every row says where it came from. B's events may not carry data.source yet, so fall back to the actor.
 export function eventSource(e: AuditEvent): string {
@@ -23,6 +43,33 @@ export function eventSource(e: AuditEvent): string {
   if (e.actor.agent) return `${e.actor.agent} agent (Claude)`;
   return "PayrollPilot engine";
 }
+
+// Which outside system owns a record, by the ref key. Our own ids (syncRunId, flagId, draftId, questionId,
+// correctionId, ruleId) are never chipped as Jobber/QuickBooks/Gusto records. No fixture event carries a Gusto
+// record id yet; add its key here when one does.
+const EXTERNAL_REF: Record<string, SourceSystem> = {
+  entryId: "Jobber",
+  expenseId: "QuickBooks",
+};
+
+/** The first outside record this event names, as a SourceChip. */
+export function sourceRecord(
+  e: AuditEvent,
+): { system: SourceSystem; recordId: string } | null {
+  for (const [key, recordId] of Object.entries(e.refs)) {
+    const system = EXTERNAL_REF[key];
+    if (system) return { system, recordId };
+  }
+  return null;
+}
+
+/** The demo persona says which seat it played ("persona:owner" → "Simulated owner"). */
+export function actorLabel(actor: AuditEvent["actor"]): string | undefined {
+  const persona = actor.id.match(/^persona:(\w+)/)?.[1];
+  return persona ? `Simulated ${persona}` : undefined;
+}
+
+export const isLocal = (e: AuditEvent) => e.id.startsWith("local-");
 
 // Company A's two demo cycles (docs/DEMO.md): Cycle 1 is a-c05, Cycle 2 is a-c06. Other ids show as they are,
 // because the digits in an id are not the cycle number (a-c01 to a-c04 are past history cycles).
