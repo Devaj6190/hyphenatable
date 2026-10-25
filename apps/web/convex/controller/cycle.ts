@@ -209,3 +209,44 @@ export const startDue = internalMutation({
     }
   },
 });
+
+/** Removes a cycle that holds nothing (a mistaken cycles.start); refuses if any record points at it. */
+export const discardEmpty = internalMutation({
+  args: { cycleId: v.id("cycles") },
+  handler: async (ctx, { cycleId }) => {
+    const cycle = await ctx.db.get(cycleId);
+    if (!cycle) throw new ConvexError("cycle not found");
+    const used =
+      (await ctx.db
+        .query("timeEntries")
+        .withIndex("by_cycle", (q) => q.eq("cycleId", cycleId))
+        .first()) ??
+      (await ctx.db
+        .query("flags")
+        .withIndex("by_cycle", (q) => q.eq("cycleId", cycleId))
+        .first()) ??
+      (await ctx.db
+        .query("questions")
+        .withIndex("by_cycle", (q) => q.eq("cycleId", cycleId))
+        .first()) ??
+      (await ctx.db
+        .query("syncRuns")
+        .withIndex("by_cycle", (q) => q.eq("cycleId", cycleId))
+        .first()) ??
+      (await ctx.db
+        .query("drafts")
+        .withIndex("by_cycle", (q) => q.eq("cycleId", cycleId))
+        .first());
+    if (used) throw new ConvexError("cycle has records; it is not empty");
+    await ctx.db.delete(cycleId);
+    await write(ctx, {
+      companyId: cycle.companyId,
+      cycleId: null,
+      actor: { kind: "system", id: "controller", agent: null },
+      type: "cycle.discarded",
+      summary: `Empty cycle ${cycle.number} (${cycle.periodStart.slice(0, 10)}) removed`,
+      refs: {},
+      data: { cycleId },
+    });
+  },
+});

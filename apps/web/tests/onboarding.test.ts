@@ -131,3 +131,62 @@ test("Company A: the ingested current cycle runs its checks and drafts questions
     expect(q.text).not.toMatch(/\$/);
   void internal;
 });
+
+test("Company A: demo reset restores the snapshot exactly, twice in a row, keeping company and worker ids", async () => {
+  const t = convexTest(schema, modules);
+  const ids = await t.mutation(api.sync.ingestFixture, {
+    ingestKey: "test-ingest",
+    fixture: fixture(),
+  });
+  const companyId = ids.a as Id<"companies">;
+  const counts = () =>
+    t.run(async (ctx) => {
+      const out: Record<string, number> = {};
+      for (const table of [
+        "workers",
+        "cycles",
+        "timeEntries",
+        "flags",
+        "questions",
+        "rules",
+        "corrections",
+        "pastPayrolls",
+      ] as const)
+        out[table] = (await ctx.db.query(table).collect()).length;
+      return out;
+    });
+  await t.action(internal.controller.snapshot.take, {
+    companyId,
+    label: "a:1",
+  });
+  const before = await counts();
+
+  // The demo changes things: onboarding adds rules, an entry loses its job.
+  await t.action(api.onboarding.run, { companyId });
+  await t.run(async (ctx) => {
+    const e = (await ctx.db.query("timeEntries").collect())[0];
+    await ctx.db.patch(e._id, { jobId: null });
+  });
+  expect((await counts()).rules).toBeGreaterThan(before.rules);
+
+  for (let i = 0; i < 2; i++) {
+    await t.mutation(api.demo.reset, { companyKey: "a", toCycle: 1 });
+    vi.advanceTimersByTime(1);
+    await t.finishInProgressScheduledFunctions();
+    expect(await counts()).toEqual(before);
+  }
+  const after = await t.run(async (ctx) => ({
+    company: await ctx.db.get(companyId),
+    owner: await ctx.db.get(ids["a-w12"] as Id<"workers">),
+    resets: (await ctx.db.query("auditEvents").collect()).filter(
+      (e) => e.type === "demo.reset",
+    ).length,
+  }));
+  expect(after.company?.name).toBeDefined();
+  expect(after.owner?.role).toBe("owner");
+  expect(after.resets).toBe(2);
+
+  const summary = await t.query(api.eval.summary, { companyId });
+  expect(summary.m1).toBeNull();
+  expect(summary.m5?.total).toBeGreaterThan(0);
+});
