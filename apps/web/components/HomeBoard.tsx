@@ -2,9 +2,9 @@
 
 import { useAction, useMutation } from "convex/react";
 import { makeFunctionReference } from "convex/server";
-import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
+import { type ReactNode, useEffect, useRef, useState } from "react";
 import { DataLabel } from "@/components/DataLabel";
-import { FlagCard } from "@/components/FlagCard";
 import { FlagsSource } from "@/components/FlagsList";
 import {
   type CardDecision,
@@ -38,7 +38,7 @@ import {
 } from "@/components/home/States";
 import { LiveFeed } from "@/components/LiveFeed";
 import { Money } from "@/components/Money";
-import { StageTracker } from "@/components/StageTracker";
+import { StageSync } from "@/components/StageSync";
 import { Button } from "@/components/ui/button";
 import { checkTitle } from "@/lib/checks";
 import { companies, isRealPayroll, REAL_PAYROLL_NOTE } from "@/lib/companies";
@@ -186,6 +186,24 @@ export function HomeBoard({
   const [nextHeld, setNextHeld] = useState(false);
   const [nextApproved, setNextApproved] = useState(false);
   const [focus, setFocus] = useState<string | null>(null);
+  // One question at a time: which card the focus deck shows. ← → move; the Up next list jumps.
+  const [focusIdx, setFocusIdx] = useState(0);
+  const deckLen = useRef(1);
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const t = e.target as HTMLElement | null;
+      if (
+        t &&
+        (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))
+      )
+        return;
+      if (e.key === "ArrowRight")
+        setFocusIdx((i) => Math.min(deckLen.current - 1, i + 1));
+      if (e.key === "ArrowLeft") setFocusIdx((i) => Math.max(0, i - 1));
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
   function feed(
     summary: string,
@@ -636,10 +654,56 @@ export function HomeBoard({
         const r1 = data.review;
         const showRail = stage === "asking" || stage === "recon";
 
+        deckLen.current = Math.max(1, list.length);
+        const deckIdx = Math.min(focusIdx, Math.max(0, list.length - 1));
+        const navBtn =
+          "rounded-control border px-2.5 py-1 text-xs font-medium text-foreground hover:bg-muted disabled:opacity-40 disabled:hover:bg-transparent";
+        // The focus deck: the cards are all built (so every handler and decision stays), one shows at a time.
+        const focusDeck = (cards: ReactNode[]) =>
+          cards.length <= 1 ? (
+            cards
+          ) : (
+            <>
+              <div className="flex items-center justify-between gap-3 text-xs text-muted-foreground">
+                <span>
+                  Question {deckIdx + 1} of {cards.length} ·{" "}
+                  <kbd className="rounded border px-1 font-sans">←</kbd>{" "}
+                  <kbd className="rounded border px-1 font-sans">→</kbd> to move
+                </span>
+                <span className="flex gap-1.5">
+                  <button
+                    type="button"
+                    className={navBtn}
+                    disabled={deckIdx === 0}
+                    onClick={() => setFocusIdx(Math.max(0, deckIdx - 1))}
+                  >
+                    ← Prev
+                  </button>
+                  <button
+                    type="button"
+                    className={navBtn}
+                    disabled={deckIdx >= cards.length - 1}
+                    onClick={() =>
+                      setFocusIdx(Math.min(cards.length - 1, deckIdx + 1))
+                    }
+                  >
+                    Next →
+                  </button>
+                </span>
+              </div>
+              <div
+                key={deckIdx}
+                className="scroll-panel lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:pr-1"
+              >
+                {cards[deckIdx]}
+              </div>
+            </>
+          );
+
         const cardsCol = (
           <section
             aria-labelledby="todo-title"
-            className="flex min-w-0 flex-col gap-3.5"
+            className="flex min-w-0 flex-col gap-3.5 lg:min-h-0"
           >
             <div className="flex items-center gap-3">
               <span className="relative grid size-13 place-items-center">
@@ -702,20 +766,83 @@ export function HomeBoard({
                 }
               />
             )}
-            {list.map((c, i) => {
-              const id = idOf(c);
-              const position = `${i + 1} of ${list.length}`;
-              const d = decisions[id];
-              if (c === "dakota") {
-                return d ? (
-                  <FoldedCard
-                    key={id}
-                    title={`Send ${data.dakota.managerName.split(" ")[0]} ${asked} job questions`}
-                    value={d.label}
-                    note={`Fixture mode: nothing was texted.${excluded.size ? ` ${excluded.size} unticked ${excluded.size === 1 ? "item stays" : "items stay"} with you.` : ""}`}
-                    onUndo={sent ? undefined : () => undo(id)}
-                  />
-                ) : (
+            {focusDeck(
+              list.map((c, i) => {
+                const id = idOf(c);
+                const position = `${i + 1} of ${list.length}`;
+                const d = decisions[id];
+                if (c === "dakota") {
+                  return d ? (
+                    <FoldedCard
+                      key={id}
+                      title={`Send ${data.dakota.managerName.split(" ")[0]} ${asked} job questions`}
+                      value={d.label}
+                      note={`Fixture mode: nothing was texted.${excluded.size ? ` ${excluded.size} unticked ${excluded.size === 1 ? "item stays" : "items stay"} with you.` : ""}`}
+                      onUndo={sent ? undefined : () => undo(id)}
+                    />
+                  ) : (
+                    <div
+                      key={id}
+                      id={`card-${id}`}
+                      className={
+                        focus === id
+                          ? "rounded-[18px] ring-2 ring-sunset-2"
+                          : undefined
+                      }
+                    >
+                      <DakotaCard
+                        review={data.dakota}
+                        position={position}
+                        excluded={excluded}
+                        onToggle={(fid) =>
+                          setExcluded((s) => {
+                            const n = new Set(s);
+                            if (n.has(fid)) n.delete(fid);
+                            else n.add(fid);
+                            return n;
+                          })
+                        }
+                        onSend={(n) => {
+                          setDecisions((x) => ({
+                            ...x,
+                            [id]: {
+                              label: `Sent ${n} · not texted (fixture)`,
+                              action: "primary",
+                              saved: false,
+                            },
+                          }));
+                          setSent(true);
+                          feed(
+                            `You approved the text to ${data.dakota.managerName.split(" ")[0]}: ${n} items.`,
+                          );
+                        }}
+                        pending={false}
+                        error={undefined}
+                      />
+                    </div>
+                  );
+                }
+                if (d || isDone(c))
+                  return (
+                    <FoldedCard
+                      key={id}
+                      title={c.title}
+                      value={
+                        d
+                          ? d.action === "primary"
+                            ? c.done
+                            : d.label
+                          : "Resolved in Convex"
+                      }
+                      note={
+                        d && !d.saved
+                          ? "On this screen only: not saved."
+                          : undefined
+                      }
+                      onUndo={d && !d.saved ? () => undo(id) : undefined}
+                    />
+                  );
+                return (
                   <div
                     key={id}
                     id={`card-${id}`}
@@ -725,103 +852,66 @@ export function HomeBoard({
                         : undefined
                     }
                   >
-                    <DakotaCard
-                      review={data.dakota}
+                    <OwnerCard
+                      card={c}
                       position={position}
-                      excluded={excluded}
-                      onToggle={(fid) =>
-                        setExcluded((s) => {
-                          const n = new Set(s);
-                          if (n.has(fid)) n.delete(fid);
-                          else n.add(fid);
-                          return n;
-                        })
-                      }
-                      onSend={(n) => {
-                        setDecisions((x) => ({
-                          ...x,
-                          [id]: {
-                            label: `Sent ${n} · not texted (fixture)`,
-                            action: "primary",
-                            saved: false,
-                          },
-                        }));
-                        setSent(true);
-                        feed(
-                          `You approved the text to ${data.dakota.managerName.split(" ")[0]}: ${n} items.`,
-                        );
-                      }}
-                      pending={false}
-                      error={undefined}
+                      picked={picks[id]}
+                      onPick={(k) => setPicks((p) => ({ ...p, [id]: k }))}
+                      fill={fills[id] ?? ""}
+                      onFill={(v) => setFills((f) => ({ ...f, [id]: v }))}
+                      onAction={(a, label) => decide(c, a, label)}
+                      pending={pendingIds.has(id)}
+                      error={errors[id]}
                     />
                   </div>
                 );
-              }
-              if (d || isDone(c))
-                return (
-                  <FoldedCard
-                    key={id}
-                    title={c.title}
-                    value={
-                      d
-                        ? d.action === "primary"
-                          ? c.done
-                          : d.label
-                        : "Resolved in Convex"
-                    }
-                    note={
-                      d && !d.saved
-                        ? "On this screen only: not saved."
-                        : undefined
-                    }
-                    onUndo={d && !d.saved ? () => undo(id) : undefined}
-                  />
-                );
-              return (
-                <div
-                  key={id}
-                  id={`card-${id}`}
-                  className={
-                    focus === id
-                      ? "rounded-[18px] ring-2 ring-sunset-2"
-                      : undefined
-                  }
-                >
-                  <OwnerCard
-                    card={c}
-                    position={position}
-                    picked={picks[id]}
-                    onPick={(k) => setPicks((p) => ({ ...p, [id]: k }))}
-                    fill={fills[id] ?? ""}
-                    onFill={(v) => setFills((f) => ({ ...f, [id]: v }))}
-                    onAction={(a, label) => decide(c, a, label)}
-                    pending={pendingIds.has(id)}
-                    error={errors[id]}
-                  />
-                </div>
-              );
-            })}
-            {loose.map((f) => (
-              <FlagCard
-                key={f.id}
-                flag={f}
-                dataKind={dataKind}
-                viewerRole="owner"
-                headline={checkTitle(f.checkId)}
-                affectsLabel={affectsLabel(f.checkId)}
-              />
-            ))}
-            {kept.map((f) => (
-              <FlagCard
-                key={f.id}
-                flag={f}
-                dataKind={dataKind}
-                viewerRole="owner"
-                headline={`Kept with you: ${checkTitle(f.checkId)}`}
-                affectsLabel={affectsLabel(f.checkId)}
-                href={null}
-              />
-            ))}
+              }),
+            )}
+            {loose.length + kept.length > 0 && (
+              // Owner-routed flags outside the deck: one compact list instead of stacked cards. Each row says what
+              // it affects; a loose flag opens its page, a kept one stays here.
+              <section
+                aria-label="Also with you"
+                className="rounded-card border bg-card"
+              >
+                <header className="flex items-center justify-between gap-3 border-b px-4 py-2.5 text-xs">
+                  <span className="font-medium tracking-[0.08em] text-muted-foreground uppercase">
+                    Also with you · {loose.length + kept.length}
+                  </span>
+                  <DataLabel kind={dataKind} />
+                </header>
+                <ul className="divide-y">
+                  {loose.map((f) => (
+                    <li key={f.id}>
+                      <Link
+                        href={`/c/${companyId}/flags/${f.id}`}
+                        className="flex items-center justify-between gap-3 px-4 py-2.5 text-sm hover:bg-muted"
+                      >
+                        <span className="truncate">
+                          {checkTitle(f.checkId)}
+                        </span>
+                        <span className="shrink-0 text-xs text-muted-foreground">
+                          {affectsLabel(f.checkId)} ›
+                        </span>
+                      </Link>
+                    </li>
+                  ))}
+                  {kept.map((f) => (
+                    <li
+                      key={f.id}
+                      className="flex items-center justify-between gap-3 px-4 py-2.5 text-sm"
+                    >
+                      <span className="truncate">
+                        Kept with you: {checkTitle(f.checkId)}
+                      </span>
+                      <span className="shrink-0 text-xs text-muted-foreground">
+                        {affectsLabel(f.checkId)}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
           </section>
         );
 
@@ -829,7 +919,8 @@ export function HomeBoard({
           <aside
             className={
               showRail
-                ? "flex min-w-0 flex-col gap-4"
+                ? // The rail scrolls inside the panel, so the question card on the left never moves.
+                  "scroll-panel flex min-w-0 flex-col gap-4 lg:min-h-0 lg:overflow-y-auto lg:pr-1"
                 : "grid gap-4 md:grid-cols-2"
             }
           >
@@ -846,6 +937,12 @@ export function HomeBoard({
                 }))}
                 onGo={(id) => {
                   setFocus(id);
+                  setFocusIdx(
+                    Math.max(
+                      0,
+                      list.findIndex((c) => idOf(c) === id),
+                    ),
+                  );
                   document
                     .getElementById(`card-${id}`)
                     ?.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -959,7 +1056,7 @@ export function HomeBoard({
         );
 
         return (
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-5 lg:h-full lg:min-h-0">
             {DEMO_MODE && (
               <DemoBar
                 stageName={next ? `Next payroll · ${next}` : STAGE_NAME[stage]}
@@ -979,12 +1076,12 @@ export function HomeBoard({
               />
             )}
 
-            <header className="flex flex-wrap items-end gap-x-4 gap-y-1">
-              <h1 className="text-[2.25rem] leading-[1.05] font-semibold tracking-[-0.02em] sm:text-5xl">
+            <header className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+              <h1 className="font-heading text-[28px] leading-none font-normal tracking-[-0.01em]">
                 <Greeting timeZone={company.timezone} />
                 {data.ownerFirstName && `, ${data.ownerFirstName}`}
               </h1>
-              <span className="flex flex-wrap items-center gap-2 pb-1 text-muted-foreground">
+              <span className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
                 {data.cycle
                   ? `Payroll for ${next && data.next ? data.next.periodLabel : data.periodLabel}`
                   : "No payroll in progress"}
@@ -1001,7 +1098,8 @@ export function HomeBoard({
 
             {next && data.next ? (
               <>
-                <StageTracker
+                <StageSync
+                  companyId={companyId}
                   step={next === "start" ? -1 : 6}
                   caption={next === "review" ? "Waiting on you" : ""}
                   fraction={0.4}
@@ -1052,7 +1150,8 @@ export function HomeBoard({
               </>
             ) : (
               <>
-                <StageTracker
+                <StageSync
+                  companyId={companyId}
                   step={step}
                   allDone={stage === "done"}
                   caption={caption}
@@ -1197,7 +1296,7 @@ export function HomeBoard({
                 )}
 
                 {(stage === "asking" || stage === "recon") && (
-                  <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.65fr)_minmax(0,1fr)]">
+                  <div className="grid items-start gap-5 lg:min-h-0 lg:flex-1 lg:grid-cols-[minmax(0,1.65fr)_minmax(0,1fr)] lg:items-stretch">
                     {cardsCol}
                     {rail}
                   </div>

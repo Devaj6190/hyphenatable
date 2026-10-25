@@ -52,18 +52,20 @@
   --color-agent-messenger: var(--agent-messenger);
   --color-agent-messenger-soft: var(--agent-messenger-soft);
 
-  --font-sans: var(--font-host-grotesk), ui-sans-serif, system-ui, sans-serif;
-  --font-heading: var(--font-sans);
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  /* Display face: page titles and the greeting only. */
+  --font-heading: var(--font-instrument-serif), Georgia, serif;
 
-  /* Radii: 10px controls, 16px cards, 20px overlays, pills for badges and segmented tracks. */
+  /* Radii: 8px controls, 10px cards, 14px overlays, pills for badges and segmented tracks. */
   --radius-sm: 6px;
   --radius-md: 8px;
   --radius-lg: 10px;
-  --radius-xl: 16px;
-  --radius-2xl: 20px;
-  --radius-control: 10px;
-  --radius-card: 16px;
-  --radius-overlay: 20px;
+  --radius-xl: 10px;
+  --radius-2xl: 14px;
+  --radius-control: 8px;
+  --radius-card: 10px;
+  --radius-overlay: 14px;
 
   --shadow-card: var(--shadow-card);
   --shadow-raised: var(--shadow-raised);
@@ -77,48 +79,50 @@
 :root,
 [data-theme="light"] {
   color-scheme: light;
-  --background: #faf7f4;
+  /* Warm paper, ink, hairlines; the orange accent only for the active stage, links and the primary action. */
+  --background: #f6f4ef;
   --card: #ffffff;
   --raised: #ffffff;
-  --muted: #f4efe9;
-  --foreground: #1a1f36;
-  --muted-foreground: #62667a;
-  --border: #ede5dd;
-  --input: #858999;
-  --primary: #1a1f36;
+  --muted: #eeebe4;
+  --foreground: #141414;
+  --muted-foreground: #6b6b66;
+  --border: #e6e2d9;
+  --input: #a8a49b;
+  --primary: #141414;
   --primary-foreground: #ffffff;
-  --primary-hover: #0f1324;
-  --primary-edge: #1a1f36;
-  --link: #c2410c;
-  --ring: #c2410c;
-  --accent: #fff4ea;
-  --sunset-1: #ffb547;
-  --sunset-2: #ff7a3d;
-  --sunset-3: #f5459b;
-  --sunset-ink: #1a1f36;
-  --destructive: #b42318;
-  --destructive-fill: #b42318;
-  --destructive-soft: #fdebe8;
-  --hold: #8a5300;
-  --hold-soft: #fcefd4;
-  --ask: #1e4fb0;
-  --ask-soft: #e5edfb;
-  --ok: #1c6b36;
-  --ok-soft: #dff2e4;
-  --neutral-chip: #3f4459;
+  --primary-hover: #2a2a2a;
+  --primary-edge: #141414;
+  --link: #e8743b;
+  --ring: #e8743b;
+  --accent: #fbeee5;
+  /* Flat: the sunset utilities now paint the one accent, no gradient. */
+  --sunset-1: #e8743b;
+  --sunset-2: #e8743b;
+  --sunset-3: #e8743b;
+  --sunset-ink: #141414;
+  --destructive: #b4442f;
+  --destructive-fill: #b4442f;
+  --destructive-soft: #f7e6e1;
+  --hold: #c8902e;
+  --hold-soft: #f8efdc;
+  --ask: #3b5f8f;
+  --ask-soft: #e6edf5;
+  --ok: #2f7a5b;
+  --ok-soft: #e2efe8;
+  --neutral-chip: #3d3d3a;
   --agent-analyst: #5b3fa8;
   --agent-analyst-soft: #efeafb;
   --agent-auditor: #0b6b63;
   --agent-auditor-soft: #dff3f0;
   --agent-messenger: #a02860;
   --agent-messenger-soft: #fbe8f0;
-  --scrim: rgb(15 19 36 / 0.28);
-  --shadow-card:
-    0 1px 2px rgb(26 31 54 / 0.04), 0 12px 32px -16px rgb(26 31 54 / 0.12);
+  --scrim: rgb(20 20 20 / 0.24);
+  /* Cards sit flat on hairlines; shadows only for floating layers. */
+  --shadow-card: 0 0 0 0 transparent;
   --shadow-raised:
-    0 1px 2px rgb(26 31 54 / 0.05), 0 16px 40px -18px rgb(26 31 54 / 0.18);
+    0 1px 2px rgb(20 20 20 / 0.04), 0 12px 32px -16px rgb(20 20 20 / 0.14);
   --shadow-overlay:
-    0 2px 6px rgb(26 31 54 / 0.06), 0 32px 72px -24px rgb(26 31 54 / 0.28);
+    0 2px 6px rgb(20 20 20 / 0.05), 0 32px 72px -24px rgb(20 20 20 / 0.22);
 }
 
 /* Motion (design-style-handoff.md timing table). Theme-independent. */
@@ -134,26 +138,26 @@
 
 [data-theme="dark"] {
   color-scheme: dark;
-  --background: #0f1324;
-  --card: #1a1f36;
-  --raised: #242a44;
-  --muted: #20253d;
-  --foreground: #f4efe9;
-  --muted-foreground: #a9adc0;
-  --border: #2f3552;
-  --input: #737995;
-  /* Inverted: a light button on navy keeps the primary action the highest-contrast thing on screen. */
-  --primary: #faf7f4;
-  --primary-foreground: #1a1f36;
-  --primary-hover: #ede5dd;
-  --primary-edge: #faf7f4;
-  --link: #ff9a5c;
-  --ring: #ff9a5c;
-  --accent: #2e2638;
-  --sunset-1: #ffb547;
-  --sunset-2: #ff7a3d;
-  --sunset-3: #f5459b;
-  --sunset-ink: #1a1f36;
+  --background: #141414;
+  --card: #1c1c1b;
+  --raised: #242423;
+  --muted: #232322;
+  --foreground: #f3f1ea;
+  --muted-foreground: #a3a29c;
+  --border: #2b2b29;
+  --input: #6f6e69;
+  /* Inverted: a paper button on ink keeps the primary action the highest-contrast thing on screen. */
+  --primary: #f3f1ea;
+  --primary-foreground: #141414;
+  --primary-hover: #e4e1d8;
+  --primary-edge: #f3f1ea;
+  --link: #f08a55;
+  --ring: #f08a55;
+  --accent: #2b221c;
+  --sunset-1: #f08a55;
+  --sunset-2: #f08a55;
+  --sunset-3: #f08a55;
+  --sunset-ink: #141414;
   --destructive: #f7a396;
   --destructive-fill: #b42318;
   --destructive-soft: #421e1a;
@@ -319,9 +323,8 @@
     /* Host Grotesk has no tnum feature; its default digits are already equal-width lining figures. */
     font-variant-numeric: tabular-nums lining-nums;
   }
-  h1,
-  h2,
-  h3 {
+  /* Serif display only on page titles and the greeting; every other heading is the UI sans. */
+  h1 {
     @apply font-heading;
     text-wrap: balance;
   }
@@ -333,4 +336,19 @@
     background-color: var(--accent);
     color: var(--foreground);
   }
+}
+
+/* Panels scroll, the window never does. Thin, quiet scrollbars on the panels that do. */
+.scroll-panel {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+.scroll-panel::-webkit-scrollbar {
+  width: 8px;
+}
+.scroll-panel::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
 }
