@@ -120,3 +120,23 @@ describe("effectOf", () => {
     expect(changed).toMatchObject({ endAt, durationSec: 3600, ticking: false });
   });
 });
+
+describe("changeFor never proposes a change that changes nothing", () => {
+  it("an overlap pick whose entry is already dropped is no change", () => {
+    const dropped = entries.map((e) =>
+      e.id === entry.id ? { ...e, payable: false } : e,
+    );
+    const r = changeFor(
+      "overlap",
+      {
+        kind: "change",
+        optionIndex: 1,
+        values: { dropEntryId: entry.id },
+        confidence: 1,
+      },
+      { entryIds: [entry.id], expenseIds: [] },
+      { entries: dropped, expenses: [], jobIdByNumber: new Map() },
+    );
+    expect(r).toBeNull();
+  });
+});

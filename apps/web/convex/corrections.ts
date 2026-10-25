@@ -29,7 +29,9 @@ export const proposeFromReply = internalMutation({
     const flag = question && (await ctx.db.get(question.flagIds[0]));
     if (!it || !question || !flag) return;
     const template = TEMPLATE_FOR[flag.checkId];
-    if (!template) return;
+    // A flag already settled never gets a second proposal.
+    if (!template || flag.status === "corrected" || flag.status === "dismissed")
+      return;
     const audit = (type: string, summary: string, data: unknown = null) =>
       write(ctx, {
         companyId: flag.companyId,
