@@ -104,7 +104,7 @@ export function StartPanel({
             </dl>
           )}
         </div>
-        <div className="relative flex flex-wrap items-center gap-4 md:max-w-[60%]">
+        <div className="phone-actions relative flex flex-wrap items-center gap-4 md:max-w-[60%]">
           <Button
             size="lg"
             className="h-12 px-6 text-base"

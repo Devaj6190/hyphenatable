@@ -27,13 +27,16 @@ export function DemoBar({
   nextOn: boolean;
   onNextPayroll: () => void;
 }) {
+  // Phone: one compact, horizontally scrolling row of 32 px controls (demo-only, so it stays out of the way).
+  const compact = "max-sm:h-8";
   const toggle = (on: boolean) =>
-    cn(on && "border-sunset-2 bg-accent text-link");
+    cn(compact, on && "border-sunset-2 bg-accent text-link");
   return (
     <div
       role="toolbar"
       aria-label="Demo controls"
-      className="flex flex-wrap items-center gap-2 rounded-[14px] border border-dashed bg-card/70 px-3 py-2 text-sm"
+      data-compact
+      className="flex flex-wrap items-center gap-2 rounded-[14px] border border-dashed bg-card/70 px-3 py-2 text-sm max-sm:gap-1.5 max-sm:text-xs"
     >
       <span className="rounded-full bg-primary px-2 py-0.5 text-xs font-bold text-primary-foreground">
         Demo mode
@@ -41,11 +44,21 @@ export function DemoBar({
       <span className="text-muted-foreground">
         Stage: <b className="text-foreground">{stageName}</b>
       </span>
-      <span className="ml-auto flex flex-wrap gap-1.5">
-        <Button size="sm" variant="secondary" onClick={onBack}>
+      <span className="ml-auto flex flex-wrap gap-1.5 max-sm:-mx-3 max-sm:w-[calc(100%+1.5rem)] max-sm:flex-nowrap max-sm:overflow-x-auto max-sm:px-3 max-sm:[scrollbar-width:none]">
+        <Button
+          size="sm"
+          variant="secondary"
+          className={compact}
+          onClick={onBack}
+        >
           ‹ Back
         </Button>
-        <Button size="sm" variant="secondary" onClick={onNext}>
+        <Button
+          size="sm"
+          variant="secondary"
+          className={compact}
+          onClick={onNext}
+        >
           Next stage ›
         </Button>
         <Button
@@ -75,7 +88,7 @@ export function DemoBar({
         >
           Next payroll
         </Button>
-        <Button size="sm" variant="quiet" onClick={onReset}>
+        <Button size="sm" variant="quiet" className={compact} onClick={onReset}>
           Reset
         </Button>
       </span>

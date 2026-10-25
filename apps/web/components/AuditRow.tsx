@@ -108,7 +108,7 @@ export function AuditRow({
   const payRecord = e.refs.correctionId ?? e.refs.draftId;
   return (
     <tr className="border-b align-top transition-colors duration-(--dur-hover) last:border-0 hover:bg-muted/40">
-      <td className="py-3 pr-2 pl-4 text-muted-foreground tabular-nums md:pr-3 md:whitespace-nowrap">
+      <td className="hidden py-3 pr-3 pl-4 whitespace-nowrap text-muted-foreground tabular-nums md:table-cell">
         <time dateTime={e.at}>{formatWhen(e.at, timezone)}</time>
         <div className="text-xs">{cycleLabel(e.cycleId)}</div>
       </td>
@@ -116,11 +116,16 @@ export function AuditRow({
       <td className="hidden px-3 py-3 whitespace-nowrap md:table-cell">
         {categoryLabel(e)}
       </td>
-      <td className="px-3 py-3">
-        <div className="mb-1.5 flex flex-wrap items-center gap-1.5 md:hidden">
+      <td className="px-4 py-3 md:px-3">
+        {/* Phone: the row stacks into a card, so time, cycle, actor and type lead the summary. */}
+        <div className="mb-1.5 flex flex-wrap items-center gap-x-1.5 gap-y-1 md:hidden">
           {chip}
           <span className="text-xs text-muted-foreground">
             {categoryLabel(e)}
+          </span>
+          <span className="ml-auto text-xs text-muted-foreground tabular-nums">
+            <time dateTime={e.at}>{formatWhen(e.at, timezone)}</time> ·{" "}
+            {cycleLabel(e.cycleId)}
           </span>
         </div>
         <p className="text-[0.9375rem] text-foreground">

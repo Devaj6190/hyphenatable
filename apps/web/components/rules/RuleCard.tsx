@@ -237,7 +237,7 @@ export function RuleCard({
           )}
         </div>
         {owner && (
-          <div className="flex shrink-0 flex-wrap items-center gap-2 lg:justify-end">
+          <div className="flex shrink-0 flex-wrap items-center gap-2 max-sm:w-full lg:justify-end max-sm:[&>[data-slot=button]]:flex-1">
             {rule.status === "proposed" && (
               <>
                 {awaitingRestatement ? (

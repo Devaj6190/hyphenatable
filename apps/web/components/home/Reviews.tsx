@@ -28,7 +28,7 @@ function ReviewHead({
   action: ReactNode;
 }) {
   return (
-    <div className="flex flex-wrap items-center gap-x-6 gap-y-4 rounded-[16px] bg-sunset px-6 py-6 text-sunset-ink shadow-[0_18px_40px_-22px_rgb(194_65_12/0.55)] sm:px-7">
+    <div className="phone-actions flex flex-wrap items-center gap-x-6 gap-y-4 rounded-[16px] bg-sunset px-6 py-6 text-sunset-ink shadow-[0_18px_40px_-22px_rgb(194_65_12/0.55)] sm:px-7">
       <div className="flex min-w-[14rem] flex-1 flex-col gap-1">
         <span className="text-[11px] font-extrabold tracking-[0.07em] uppercase">
           {kicker}
@@ -85,7 +85,7 @@ export function ReviewDraft({
         title="Here's what this payroll looks like"
         sub={`${inDraft} people in the regular draft · Venmo listed separately`}
         action={
-          <span className="flex flex-col items-end gap-1">
+          <span className="phone-actions flex flex-col items-end gap-1 max-sm:w-full max-sm:items-stretch">
             <Button
               size="lg"
               onClick={onApprove}

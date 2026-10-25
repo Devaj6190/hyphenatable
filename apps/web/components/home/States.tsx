@@ -62,7 +62,7 @@ export function SyncIncompleteBanner({
         full ? "border-ok/30 bg-ok-soft/50" : "border-hold/40 bg-hold-soft/50",
       )}
     >
-      <div className="flex flex-wrap items-start gap-4">
+      <div className="phone-actions flex flex-wrap items-start gap-4">
         <span
           aria-hidden
           className={cn(
@@ -201,7 +201,7 @@ export function GustoBanner({
           : "border-destructive/30 bg-destructive-soft/60",
       )}
     >
-      <div className="flex flex-wrap items-start gap-4">
+      <div className="phone-actions flex flex-wrap items-start gap-4">
         <SystemMark system="Gusto" size={40} />
         <div className="flex min-w-0 flex-1 flex-col gap-1">
           <span

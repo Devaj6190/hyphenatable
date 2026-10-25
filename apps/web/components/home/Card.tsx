@@ -171,7 +171,7 @@ export function CardShell({
       {children && (
         <div className="flex flex-col gap-3 px-5 pb-4 sm:px-6">{children}</div>
       )}
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-2 border-t bg-muted/40 px-5 py-3.5 sm:px-6">
+      <div className="phone-actions flex flex-wrap items-center gap-x-3 gap-y-2 border-t bg-muted/40 px-5 py-3.5 sm:px-6">
         {actions}
       </div>
     </article>

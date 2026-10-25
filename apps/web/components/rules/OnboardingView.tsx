@@ -296,7 +296,7 @@ export function OnboardingView({
   };
 
   const nav = (next = "Continue") => (
-    <div className="flex flex-wrap items-center gap-3 border-t pt-5">
+    <div className="phone-actions flex flex-wrap items-center gap-3 border-t pt-5">
       <Button onClick={() => go(step + 1)}>{next} ›</Button>
       {step > 0 && (
         <Button variant="ghost" onClick={() => go(step - 1)}>
@@ -561,7 +561,7 @@ export function OnboardingView({
                   );
                 })}
               </div>
-              <div className="flex flex-wrap items-center gap-3 border-t pt-5">
+              <div className="phone-actions flex flex-wrap items-center gap-3 border-t pt-5">
                 <Button onClick={() => go(step + 1)}>Continue ›</Button>
                 {approverId && factsDone < facts.length && (
                   <Button
@@ -761,13 +761,16 @@ export function OnboardingView({
               <div className="flex flex-wrap gap-3">
                 <Link
                   href={routes.home(companyId)}
-                  className={buttonVariants()}
+                  className={buttonVariants({ className: "max-sm:w-full" })}
                 >
                   Run your first payroll ›
                 </Link>
                 <Link
                   href={routes.company(companyId, "rules")}
-                  className={buttonVariants({ variant: "secondary" })}
+                  className={buttonVariants({
+                    variant: "secondary",
+                    className: "max-sm:w-full",
+                  })}
                 >
                   See rules in Company
                 </Link>

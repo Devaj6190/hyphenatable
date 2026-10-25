@@ -58,7 +58,9 @@ function DialogContent({
       <DialogPrimitive.Popup
         data-slot="dialog-content"
         className={cn(
-          "fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-overlay border bg-raised p-6 text-popover-foreground shadow-overlay outline-none transition-[opacity,translate,scale] duration-(--dur-sheet) ease-out-soft sm:max-w-lg data-ending-style:translate-y-[calc(-50%+8px)] data-ending-style:opacity-0 data-starting-style:translate-y-[calc(-50%+8px)] data-starting-style:opacity-0",
+          // Phone (< sm): a bottom sheet with a grabber and safe-area padding. sm and up: the centered dialog.
+          "fixed inset-x-0 bottom-0 z-50 grid max-h-[90dvh] w-full gap-4 overflow-y-auto rounded-t-overlay border-t bg-raised p-5 pt-7 pb-[max(1.25rem,env(safe-area-inset-bottom))] text-popover-foreground shadow-overlay outline-none transition-[opacity,translate,scale] duration-(--dur-sheet) ease-out-soft before:absolute before:top-2.5 before:left-1/2 before:h-1.5 before:w-10 before:-translate-x-1/2 before:rounded-full before:bg-border data-ending-style:translate-y-10 data-ending-style:opacity-0 data-starting-style:translate-y-10 data-starting-style:opacity-0",
+          "sm:inset-x-auto sm:top-1/2 sm:bottom-auto sm:left-1/2 sm:max-h-none sm:max-w-lg sm:-translate-x-1/2 sm:-translate-y-1/2 sm:overflow-visible sm:rounded-overlay sm:border sm:p-6 sm:before:hidden sm:data-ending-style:translate-y-[calc(-50%+8px)] sm:data-starting-style:translate-y-[calc(-50%+8px)]",
           className,
         )}
         {...props}
@@ -106,7 +108,7 @@ function DialogFooter({
     <div
       data-slot="dialog-footer"
       className={cn(
-        "-mx-6 -mb-6 flex flex-col-reverse gap-2 rounded-b-overlay border-t bg-muted/60 px-6 py-4 sm:flex-row sm:justify-end",
+        "-mx-5 -mb-[max(1.25rem,env(safe-area-inset-bottom))] flex flex-col-reverse gap-2 border-t bg-muted/60 px-5 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:-mx-6 sm:-mb-6 sm:flex-row sm:justify-end sm:rounded-b-overlay sm:px-6 sm:py-4",
         className,
       )}
       {...props}

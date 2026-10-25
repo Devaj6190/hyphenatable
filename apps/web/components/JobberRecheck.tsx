@@ -94,7 +94,7 @@ export function JobberRecheck({
 
       <div
         aria-live="polite"
-        className="flex flex-wrap items-center justify-between gap-3 px-(--card-spacing)"
+        className="phone-actions flex flex-wrap items-center justify-between gap-3 px-(--card-spacing)"
       >
         <p className="max-w-prose flex-[999_1_20rem] text-sm text-muted-foreground">
           {recheckSentence(recheck, recordIds, checkId, timeZone)}
