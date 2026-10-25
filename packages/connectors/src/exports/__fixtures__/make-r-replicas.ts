@@ -5,19 +5,24 @@
 export const JOBBER_TIMESHEETS_CSV = [
   "Totals",
   "",
-  "Total Hours,25.25",
-  "Avery Reed Team Leader,12.50",
-  "Jordan Ellis ,9.25",
+  // totals come from exact seconds, rows are rounded to 0.01 h: totals may be off by rounding drift
+  "Total Hours,27.26",
+  "Avery Reed Team Leader,12.51",
+  // one person, two Jobber accounts (name variants), each with its own total line
+  "Jordan Ellis,4.25",
+  "Jordan Ellis ,5.00",
   "Sam Okafor,3.50",
   "",
   "Name,Date,Start time,End time,Hours,Working on,Note,Client name",
   'Avery Reed Team Leader,"Aug 31, 2026", 9:30AM,12:00PM,2.50,Job #518 - Brookside Dental,"",Brookside Dental',
-  'Avery Reed ,"Sep 1, 2026", 7:00AM,5:00PM,10.00,General,"",',
+  'Avery Reed Team Leader,"Sep 1, 2026", 7:00AM,5:00PM,10.00,General,"",',
   'Jordan Ellis,"Sep 1, 2026", 8:00AM,12:15PM,4.25,Driving,"",',
   'Jordan Ellis ,"Sep 2, 2026", 1:00PM,6:00PM,5.00,Maple Grove HOA - Off-Site,"gate code fake",Maple Grove HOA',
-  'Sam Okafor,"Sep 2, 2026", 9:00AM, 9:00AM,0.0,Request for hedge quote,"",Maple Grove HOA',
+  // a second Jobber account of Sam ("Sam Okafor ") that has NO line in the totals block
+  'Sam Okafor ,"Sep 2, 2026", 9:00AM, 9:00AM,0.0,Request for hedge quote,"",Maple Grove HOA',
   'Sam Okafor,"Sep 3, 2026", 8:00AM,11:30AM,3.50,Job #521 - Maple Grove HOA,"",Maple Grove HOA',
-  "Report totals:,,,,25.25,,,",
+  'Sam Okafor ,"Sep 4, 2026", 8:00AM,10:00AM,2.00,Job #521 - Maple Grove HOA,"",Maple Grove HOA',
+  "Report totals:,,,,27.26,,,",
 ].join("\n");
 
 export const JOURNAL_HEADER = [
@@ -97,9 +102,16 @@ const person = (
     Donations: "5.55",
     ...pay,
   });
-const pay = (type: string, hours: string, rate: string, amount: string) =>
+/** a pay line: Job is a role ("Landscaper"), "" or "Totals" (a per-pay-type subtotal, never to be added) */
+const pay = (
+  job: string,
+  type: string,
+  hours: string,
+  rate: string,
+  amount: string,
+) =>
   line({
-    Job: "Crew",
+    Job: job,
     "Pay Type": type,
     Hours: hours,
     Rate: rate,
@@ -115,39 +127,65 @@ export const GUSTO_JOURNAL_SECTIONED_CSV = [
   "Pay period, 08/29/2026 - 09/11/2026",
   "Pay day, 09/16/2026",
   JOURNAL_HEADER.join(","),
-  person("Reed", "Avery", "Paid by the hour", "1112.50", {
-    Job: "Crew",
+  // Payment is the payment METHOD, never money. Earnings itemized per job, each with its own rate, then a
+  // "Totals" subtotal per pay type, then the Gross line.
+  person("Reed", "Avery", "Paid by the hour", "Direct Deposit", {
+    Job: "Landscaper",
     "Pay Type": "Regular",
-    Hours: "40.000",
+    Hours: "30.000",
     Rate: "25.00",
-    Amount: "1,000.00",
+    Amount: "750.00",
   }),
-  pay("Overtime", "2.000", "37.50", "75.00"),
-  pay("Overtime (adjustment 08/15/26 - 08/28/26)", "1.000", "37.50", "37.50"),
-  pay("Gross", "", "", "1,112.50"),
-  person("Okafor", "Sam", "Owner’s draw", "2000.00"),
-  pay("Owner's Draw", "", "", "2,000.00"),
-  pay("Gross", "", "", "2,000.00"),
+  pay("Team Leader", "Regular", "10.000", "30.00", "300.00"),
+  // blank-Job lines inherit the job above (Team Leader) ...
+  pay("", "Overtime", "2.000", "37.50", "75.00"),
+  pay(
+    "",
+    "Overtime (adjustment 08/15/26 - 08/28/26)",
+    "1.000",
+    "37.50",
+    "37.50",
+  ),
+  // ... and after "Totals" they are subtotals: the same Overtime lines repeat in the subtotal block
+  pay("Totals", "Regular", "40.000", "", "1050.00"),
+  pay("", "Overtime", "2.000", "", "75.00"),
+  pay("", "Overtime (adjustment 08/15/26 - 08/28/26)", "1.000", "", "37.50"),
+  pay("", "Gross", "", "", "1162.50"),
+  person("Okafor", "Sam", "Owner’s draw", "Check"),
+  // the owner draw appears ONLY as a Totals line (no itemized line)
+  pay("Totals", "Owner's Draw", "", "", "2000.00"),
+  // Gusto's Gross excludes owner draws
+  pay("Totals", "Gross", "", "", "0.00"),
   line({
     "Last Name": "Payroll Totals",
-    Payment: "3112.50",
     "Employee Taxes": "3333.33",
     "Net Pay": "9999.99",
-    "Pay Type": "Gross",
-    Amount: "3,112.50",
+    Job: "Landscaper",
+    "Pay Type": "Regular",
+    Amount: "750.00",
   }),
+  pay("Team Leader", "Regular", "", "", "300.00"),
+  pay("", "Overtime", "", "", "75.00"),
+  pay("", "Overtime (adjustment 08/15/26 - 08/28/26)", "", "", "37.50"),
+  pay("Totals", "Regular", "", "", "1050.00"),
+  pay("", "Overtime", "", "", "75.00"),
+  pay("", "Overtime (adjustment 08/15/26 - 08/28/26)", "", "", "37.50"),
+  pay("Totals", "Owner's Draw", "", "", "2000.00"),
+  // Gusto's Gross excludes owner draws
+  pay("Totals", "Gross", "", "", "1162.50"),
   "",
   "Off-Cycle (Bonus)",
   "Pay period, 08/29/2026 - 09/11/2026",
   "Pay day, 09/18/2026",
   JOURNAL_HEADER.join(","),
-  person("Reed", "Avery", "Paid by the hour", "200.00"),
-  pay("Commission", "", "", "150.00"),
-  pay("Additional Earnings", "", "", "50.00"),
-  pay("Gross", "", "", "200.00"),
+  person("Reed", "Avery", "Paid by the hour", ""),
+  pay("", "Commission", "", "", "150.00"),
+  pay("", "Additional Earnings", "", "", "50.00"),
+  pay("", "Gross", "", "", "200.00"),
+  // the totals amount on the Payroll Totals row itself (no pay type)
   line({
     "Last Name": "Payroll Totals",
-    Payment: "200.00",
+    Amount: "200.00",
     "Net Pay": "150.00",
   }),
   "",
@@ -155,14 +193,30 @@ export const GUSTO_JOURNAL_SECTIONED_CSV = [
   "Pay period, 09/12/2026 - 09/25/2026",
   "Pay day, 09/30/2026",
   JOURNAL_HEADER.join(","),
-  person("Reed", "Avery", "Paid by the hour", "1000.00"),
-  pay("Regular", "40.000", "25.00", "1,000.00"),
-  pay("Gross", "", "", "1,000.00"),
-  person("Ellis", "Jordan", "Paid by the hour", "660.00"),
-  pay("Regular", "30.000", "22.00", "660.00"),
-  pay("Gross", "", "", "660.00"),
-  line({ "Last Name": "Payroll Totals", Payment: "1660.00" }),
-  line({ "Pay Type": "Gross", Amount: "1,660.00" }),
+  // no Gross line: the itemized sum is the gross
+  person("Reed", "Avery", "Paid by the hour", "Direct Deposit", {
+    Job: "Landscaper",
+    "Pay Type": "Regular",
+    Hours: "40.000",
+    Rate: "25.00",
+    Amount: "1000.00",
+  }),
+  person("Ellis", "Jordan", "Paid by the hour", "Direct Deposit"),
+  pay("Truck Hauling", "Regular", "30.000", "22.00", "660.00"),
+  pay("Totals", "Regular", "30.000", "", "660.00"),
+  // an employee on a single row with no pay lines (only zero tax columns): gross 0 from the source
+  line({
+    "Last Name": "Quinlan",
+    "First Name": "Pat",
+    "Work Address": "2 Fake Street",
+    "Employee Type": "Paid by the hour",
+    Payment: "Direct Deposit",
+    "Employee Taxes": "0.00",
+    "Federal Income Tax": "0.00",
+    "Net Pay": "0.00",
+  }),
+  line({ "Last Name": "Payroll Totals" }),
+  pay("Totals", "Gross", "", "", "1660.00"),
 ].join("\n");
 
 if (import.meta.main) {

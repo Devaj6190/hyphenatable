@@ -6,34 +6,45 @@ Regular
 Pay period, 08/29/2026 - 09/11/2026
 Pay day, 09/16/2026
 Last Name,First Name,Work Address,Employee Type,Payment,Employee Taxes,Federal Income Tax,Social Security,Medicare,State Income Tax,State Disability,Local Tax,Additional Medicare,Other Employee Tax,Employer Taxes,Social Security (ER),Medicare (ER),FUTA,SUTA,One Time Reimbursement,Net Pay,Reimbursements,Donations,Check Amount,Employer Cost,Job,Pay Type,Hours,Rate,Amount
-Reed,Avery,"1 Fake Street, Faketown",Paid by the hour,1112.50,1234.56,901.11,902.22,903.33,904.44,905.55,906.66,907.77,908.88,2345.67,911.11,912.22,913.33,914.44,,777.77,,5.55,777.77,8888.88,Crew,Regular,40.000,25.00,"1,000.00"
-,,,,,,,,,,,,,,,,,,,,,,,,,Crew,Overtime,2.000,37.50,75.00
-,,,,,,,,,,,,,,,,,,,,,,,,,Crew,Overtime (adjustment 08/15/26 - 08/28/26),1.000,37.50,37.50
-,,,,,,,,,,,,,,,,,,,,,,,,,Crew,Gross,,,"1,112.50"
-Okafor,Sam,"1 Fake Street, Faketown",Owner’s draw,2000.00,1234.56,901.11,902.22,903.33,904.44,905.55,906.66,907.77,908.88,2345.67,911.11,912.22,913.33,914.44,,777.77,,5.55,777.77,8888.88,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,Crew,Owner's Draw,,,"2,000.00"
-,,,,,,,,,,,,,,,,,,,,,,,,,Crew,Gross,,,"2,000.00"
-Payroll Totals,,,,3112.50,3333.33,,,,,,,,,,,,,,,9999.99,,,,,,Gross,,,"3,112.50"
+Reed,Avery,"1 Fake Street, Faketown",Paid by the hour,Direct Deposit,1234.56,901.11,902.22,903.33,904.44,905.55,906.66,907.77,908.88,2345.67,911.11,912.22,913.33,914.44,,777.77,,5.55,777.77,8888.88,Landscaper,Regular,30.000,25.00,750.00
+,,,,,,,,,,,,,,,,,,,,,,,,,Team Leader,Regular,10.000,30.00,300.00
+,,,,,,,,,,,,,,,,,,,,,,,,,,Overtime,2.000,37.50,75.00
+,,,,,,,,,,,,,,,,,,,,,,,,,,Overtime (adjustment 08/15/26 - 08/28/26),1.000,37.50,37.50
+,,,,,,,,,,,,,,,,,,,,,,,,,Totals,Regular,40.000,,1050.00
+,,,,,,,,,,,,,,,,,,,,,,,,,,Overtime,2.000,,75.00
+,,,,,,,,,,,,,,,,,,,,,,,,,,Overtime (adjustment 08/15/26 - 08/28/26),1.000,,37.50
+,,,,,,,,,,,,,,,,,,,,,,,,,,Gross,,,1162.50
+Okafor,Sam,"1 Fake Street, Faketown",Owner’s draw,Check,1234.56,901.11,902.22,903.33,904.44,905.55,906.66,907.77,908.88,2345.67,911.11,912.22,913.33,914.44,,777.77,,5.55,777.77,8888.88,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,Totals,Owner's Draw,,,2000.00
+,,,,,,,,,,,,,,,,,,,,,,,,,Totals,Gross,,,0.00
+Payroll Totals,,,,,3333.33,,,,,,,,,,,,,,,9999.99,,,,,Landscaper,Regular,,,750.00
+,,,,,,,,,,,,,,,,,,,,,,,,,Team Leader,Regular,,,300.00
+,,,,,,,,,,,,,,,,,,,,,,,,,,Overtime,,,75.00
+,,,,,,,,,,,,,,,,,,,,,,,,,,Overtime (adjustment 08/15/26 - 08/28/26),,,37.50
+,,,,,,,,,,,,,,,,,,,,,,,,,Totals,Regular,,,1050.00
+,,,,,,,,,,,,,,,,,,,,,,,,,,Overtime,,,75.00
+,,,,,,,,,,,,,,,,,,,,,,,,,,Overtime (adjustment 08/15/26 - 08/28/26),,,37.50
+,,,,,,,,,,,,,,,,,,,,,,,,,Totals,Owner's Draw,,,2000.00
+,,,,,,,,,,,,,,,,,,,,,,,,,Totals,Gross,,,1162.50
 
 Off-Cycle (Bonus)
 Pay period, 08/29/2026 - 09/11/2026
 Pay day, 09/18/2026
 Last Name,First Name,Work Address,Employee Type,Payment,Employee Taxes,Federal Income Tax,Social Security,Medicare,State Income Tax,State Disability,Local Tax,Additional Medicare,Other Employee Tax,Employer Taxes,Social Security (ER),Medicare (ER),FUTA,SUTA,One Time Reimbursement,Net Pay,Reimbursements,Donations,Check Amount,Employer Cost,Job,Pay Type,Hours,Rate,Amount
-Reed,Avery,"1 Fake Street, Faketown",Paid by the hour,200.00,1234.56,901.11,902.22,903.33,904.44,905.55,906.66,907.77,908.88,2345.67,911.11,912.22,913.33,914.44,,777.77,,5.55,777.77,8888.88,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,Crew,Commission,,,150.00
-,,,,,,,,,,,,,,,,,,,,,,,,,Crew,Additional Earnings,,,50.00
-,,,,,,,,,,,,,,,,,,,,,,,,,Crew,Gross,,,200.00
-Payroll Totals,,,,200.00,,,,,,,,,,,,,,,,150.00,,,,,,,,,
+Reed,Avery,"1 Fake Street, Faketown",Paid by the hour,,1234.56,901.11,902.22,903.33,904.44,905.55,906.66,907.77,908.88,2345.67,911.11,912.22,913.33,914.44,,777.77,,5.55,777.77,8888.88,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,Commission,,,150.00
+,,,,,,,,,,,,,,,,,,,,,,,,,,Additional Earnings,,,50.00
+,,,,,,,,,,,,,,,,,,,,,,,,,,Gross,,,200.00
+Payroll Totals,,,,,,,,,,,,,,,,,,,,150.00,,,,,,,,,200.00
 
 Regular (Sep 12 - Sep 25)
 Pay period, 09/12/2026 - 09/25/2026
 Pay day, 09/30/2026
 Last Name,First Name,Work Address,Employee Type,Payment,Employee Taxes,Federal Income Tax,Social Security,Medicare,State Income Tax,State Disability,Local Tax,Additional Medicare,Other Employee Tax,Employer Taxes,Social Security (ER),Medicare (ER),FUTA,SUTA,One Time Reimbursement,Net Pay,Reimbursements,Donations,Check Amount,Employer Cost,Job,Pay Type,Hours,Rate,Amount
-Reed,Avery,"1 Fake Street, Faketown",Paid by the hour,1000.00,1234.56,901.11,902.22,903.33,904.44,905.55,906.66,907.77,908.88,2345.67,911.11,912.22,913.33,914.44,,777.77,,5.55,777.77,8888.88,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,Crew,Regular,40.000,25.00,"1,000.00"
-,,,,,,,,,,,,,,,,,,,,,,,,,Crew,Gross,,,"1,000.00"
-Ellis,Jordan,"1 Fake Street, Faketown",Paid by the hour,660.00,1234.56,901.11,902.22,903.33,904.44,905.55,906.66,907.77,908.88,2345.67,911.11,912.22,913.33,914.44,,777.77,,5.55,777.77,8888.88,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,Crew,Regular,30.000,22.00,660.00
-,,,,,,,,,,,,,,,,,,,,,,,,,Crew,Gross,,,660.00
-Payroll Totals,,,,1660.00,,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,,,Gross,,,"1,660.00"
+Reed,Avery,"1 Fake Street, Faketown",Paid by the hour,Direct Deposit,1234.56,901.11,902.22,903.33,904.44,905.55,906.66,907.77,908.88,2345.67,911.11,912.22,913.33,914.44,,777.77,,5.55,777.77,8888.88,Landscaper,Regular,40.000,25.00,1000.00
+Ellis,Jordan,"1 Fake Street, Faketown",Paid by the hour,Direct Deposit,1234.56,901.11,902.22,903.33,904.44,905.55,906.66,907.77,908.88,2345.67,911.11,912.22,913.33,914.44,,777.77,,5.55,777.77,8888.88,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,Truck Hauling,Regular,30.000,22.00,660.00
+,,,,,,,,,,,,,,,,,,,,,,,,,Totals,Regular,30.000,,660.00
+Quinlan,Pat,2 Fake Street,Paid by the hour,Direct Deposit,0.00,0.00,,,,,,,,,,,,,,0.00,,,,,,,,,
+Payroll Totals,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,Totals,Gross,,,1660.00

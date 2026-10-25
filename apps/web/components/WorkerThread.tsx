@@ -1,32 +1,33 @@
 import type { DataKind } from "@/components/DataLabel";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { fixtureMessages, workerName } from "@/lib/fixtures";
+import { formatWhen } from "@/lib/time";
 import { cn } from "@/lib/utils";
+import type { ThreadView } from "@/lib/view-types";
 
-const when = new Intl.DateTimeFormat("en-US", {
-  month: "short",
-  day: "numeric",
-  hour: "numeric",
-  minute: "2-digit",
-  timeZone: "America/Los_Angeles",
-});
-
-// Texts only: worker, time, words. No pay, no phone numbers.
+// Texts only: worker, time, words. No pay, no phone numbers. Keyed by questionId (not the first message), so a
+// question with no server messages yet still renders once replies for it arrive. Nothing to show → nothing rendered.
 export function WorkerThread({
-  questionId,
+  thread,
+  questionId = thread?.messages[0]?.questionId,
+  workerName,
   title,
   dataKind,
+  timezone,
 }: {
-  questionId: string;
+  thread: ThreadView | null;
+  questionId?: string;
+  /** Header name when the server has no thread yet. */
+  workerName?: string;
   title: string;
   dataKind: DataKind;
+  timezone: string;
 }) {
-  const messages = fixtureMessages
-    .filter((m) => m.questionId === questionId)
-    .sort((a, b) => a.at.localeCompare(b.at));
+  const who = thread?.workerName ?? workerName ?? "Recipient";
+  const messages = (thread?.messages ?? []).filter(
+    (m) => m.questionId === questionId,
+  );
   if (messages.length === 0) return null;
-  const who = workerName(messages[0].workerId);
   return (
     <Card>
       <CardContent className="flex flex-col gap-3">
@@ -47,7 +48,7 @@ export function WorkerThread({
               <span>{m.text}</span>
               <span className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                 {m.direction === "out" ? "PayrollPilot" : who} ·{" "}
-                {when.format(new Date(m.at))} · {dataKind}
+                {formatWhen(m.at, timezone)} · {dataKind}
                 {m.simulated && (
                   <Badge
                     variant="outline"

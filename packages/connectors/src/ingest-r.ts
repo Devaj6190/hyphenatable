@@ -72,6 +72,8 @@ export interface IngestCounts {
   paidRows: number;
   /** worker x pay period rows for M4 (regular gross; off-cycle apart) */
   paidPeriods: number;
+  /** paid rows that are owner draws (excluded from the wage comparison) */
+  ownerDrawRows: number;
   /** of those, how many carry off-cycle gross */
   paidPeriodsWithOffCycle: number;
   expenses: number;
@@ -265,6 +267,7 @@ export async function ingestR(o: IngestOptions): Promise<IngestCounts> {
     timeEntries: bundle.timeEntries.length,
     paidRows: bundle.paid.length,
     paidPeriods: bundle.paidByPeriod.length,
+    ownerDrawRows: bundle.paid.filter((p) => p.payKind === "owner_draw").length,
     paidPeriodsWithOffCycle: bundle.paidByPeriod.filter(
       (p) => p.offCycleGrossCents !== 0,
     ).length,

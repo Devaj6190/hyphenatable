@@ -8,7 +8,7 @@ import { validateDir } from "../validate";
 
 // Update only when the a-c06 extension changes on purpose. The base hash (EXPECTED_SHA256_A) must not move.
 const EXPECTED_SHA256_A06 =
-  "8a8ddaac299bd683e0f1e45eab2a3badb0937531847e8fb01bd69db05e416458";
+  "7ae79309b1a8691216f16823a0b79ead98d642d2fefc1112575178d93591b4b1";
 
 type R = Record<string, unknown>;
 const ext = generateExtensions("a")["a-c06"];
