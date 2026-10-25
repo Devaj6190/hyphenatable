@@ -176,3 +176,23 @@ test.describe("owner view (control)", () => {
     expect(shown.length).toBeGreaterThan(0);
   });
 });
+
+test.describe("the manager's texted link", () => {
+  // A phone opening the link has no role cookie. ?as=manager must land it in the manager view, so Home never shows pay.
+  test("opens the inbox as the manager, and Home stays pay-free", async ({
+    page,
+    baseURL,
+  }) => {
+    const id = companyIds[0];
+    await page.goto(`/c/${id}/manager?as=manager`, {
+      waitUntil: "networkidle",
+    });
+    expect(new URL(page.url()).search).toBe("");
+    const cookies = await page.context().cookies(baseURL);
+    expect(cookies.find((c) => c.name === ROLE_COOKIE)?.value).toBe("manager");
+    const inbox = await visibleText(page, `/c/${id}/manager`);
+    expect(inbox).toContain("Manager view. Pay amounts are never shown here.");
+    const home = await visibleText(page, `/c/${id}`);
+    expect(home).not.toMatch(PAY);
+  });
+});

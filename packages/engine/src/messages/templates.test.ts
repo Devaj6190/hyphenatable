@@ -31,7 +31,7 @@ const longest: Record<TemplateKey, Record<string, string>> = {
     range: "Sep 26–Oct 9",
     count: "12",
     issue: "purchases not sorted as job cost or overhead",
-    link: "https://rollpay-dashboard-preview.vercel.app/c/a/manager",
+    link: "https://rollpay-dashboard-preview.vercel.app/c/a/manager?as=manager",
   },
   managerSummaryNoLink: {
     name: "Alexandria",
@@ -48,7 +48,7 @@ const longest: Record<TemplateKey, Record<string, string>> = {
     name: "Alexandria",
     range: "Sep 26–Oct 9",
     issue: "a purchase not sorted as job cost or overhead",
-    link: "https://rollpay-dashboard-preview.vercel.app/c/a/manager",
+    link: "https://rollpay-dashboard-preview.vercel.app/c/a/manager?as=manager",
   },
   ownerPage: {
     n: "12",
