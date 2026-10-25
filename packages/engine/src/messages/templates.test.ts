@@ -5,6 +5,8 @@ import {
 import { describe, expect, test } from "vitest";
 import {
   audience,
+  endTimeWording,
+  friendlyDate,
   isStop,
   MAX_FOLLOW_UPS,
   MAX_LEN,
@@ -68,6 +70,7 @@ const longest: Record<TemplateKey, Record<string, string>> = {
   },
   openTimer: { who: "Casey Lindqvist", date: "Wed Oct 22", start: "7:30am" },
   longShift: { who: "Casey Lindqvist", date: "Wed Oct 22", hours: "13.5" },
+  endTime: { who: "Casey Lindqvist", date: "Wed Oct 22" },
   expenseNoJob: {
     who: "Dakota Brennan",
     vendor: "Home Depot",
@@ -240,5 +243,94 @@ describe("option numbering is 0-based, as in the contract", () => {
     for (const kind of InterpretationKind.options) {
       expect(steps.has(nextStep({ kind, confidence: 0.9 }, 0))).toBe(true);
     }
+  });
+});
+
+describe("end-time question", () => {
+  test("asks for the time the worker stopped, in the agreed words", () => {
+    expect(render("endTime", { who: "Casey", date: "Wed Oct 14" })).toBe(
+      "Casey, what time did you stop on Wed Oct 14? Reply the time, e.g. 4:30pm",
+    );
+  });
+
+  test("its wording is the one editable constant at the top of the file", () => {
+    expect(templates.endTime).toBe(endTimeWording);
+  });
+
+  test("it asks for a time, not a numbered choice, and goes to the employee", () => {
+    const text = render("endTime", longest.endTime);
+    expect(text).not.toMatch(/(?:^|\s)\d /);
+    expect(text.trim().endsWith("4:30pm")).toBe(true);
+    expect(audience.endTime).toBe("employee");
+  });
+
+  test("render refuses a dollar amount in any filled value", () => {
+    expect(() =>
+      render("endTime", { who: "Casey $5", date: "Wed Oct 14" }),
+    ).toThrow(/dollar/);
+    expect(() =>
+      render("endTime", { who: "Casey", date: "Wed Oct 14, 20 dollars" }),
+    ).toThrow(/dollar/);
+  });
+
+  test("render refuses text over 240 characters", () => {
+    expect(() =>
+      render("endTime", { who: "x".repeat(MAX_LEN), date: "Wed Oct 14" }),
+    ).toThrow(/240/);
+  });
+
+  test("render refuses a missing {who} or {date}", () => {
+    expect(() => render("endTime", { who: "Casey" })).toThrow(/\{date\}/);
+    expect(() => render("endTime", { date: "Wed Oct 14" })).toThrow(/\{who\}/);
+  });
+});
+
+describe("friendlyDate", () => {
+  test('writes the day the way a text does: "Wed Oct 14"', () => {
+    expect(friendlyDate("2026-10-14T14:00:00.000Z", "America/New_York")).toBe(
+      "Wed Oct 14",
+    );
+  });
+
+  test("uses the company's timezone: an evening shift is still that evening's date there", () => {
+    // 02:30 UTC on Oct 15 is 10:30 pm on Oct 14 in New York, 7:30 pm in Los Angeles.
+    const iso = "2026-10-15T02:30:00.000Z";
+    expect(friendlyDate(iso, "America/New_York")).toBe("Wed Oct 14");
+    expect(friendlyDate(iso, "America/Los_Angeles")).toBe("Wed Oct 14");
+    expect(friendlyDate(iso, "UTC")).toBe("Thu Oct 15");
+  });
+
+  test("a morning shift on the far side of the date line is the next day there", () => {
+    expect(friendlyDate("2026-10-14T20:00:00.000Z", "Pacific/Auckland")).toBe(
+      "Thu Oct 15",
+    );
+  });
+
+  test("a one-digit day has no zero padding, and the clocks changing does not shift the day", () => {
+    expect(friendlyDate("2026-11-02T15:00:00.000Z", "America/New_York")).toBe(
+      "Mon Nov 2",
+    );
+    // Clocks went back at 2 am on Nov 1: 00:30 EDT (04:30 UTC) is still Sunday Nov 1.
+    expect(friendlyDate("2026-11-01T04:30:00.000Z", "America/New_York")).toBe(
+      "Sun Nov 1",
+    );
+  });
+
+  test("fills {date} so the whole text reads right, and stays under the limit", () => {
+    const date = friendlyDate("2026-10-15T02:30:00.000Z", "America/New_York");
+    const text = render("endTime", { who: "Casey Lindqvist", date });
+    expect(text).toBe(
+      "Casey Lindqvist, what time did you stop on Wed Oct 14? Reply the time, e.g. 4:30pm",
+    );
+    expect(text.length).toBeLessThanOrEqual(MAX_LEN);
+  });
+
+  test("refuses a value that is not a date, or a timezone that does not exist", () => {
+    expect(() => friendlyDate("not a date", "America/New_York")).toThrow(
+      /not a date/,
+    );
+    expect(() =>
+      friendlyDate("2026-10-14T14:00:00.000Z", "Mars/Olympus"),
+    ).toThrow(RangeError);
   });
 });

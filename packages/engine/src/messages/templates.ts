@@ -87,6 +87,13 @@ export const issuePhrases: Record<CheckId, { one: string; many: string }> = {
   },
   "CHK-23": { one: "an incomplete data pull", many: "incomplete data pulls" },
 };
+
+// ── End-time question: edit wording here ───────────────────────────────────────────────────────────────
+// Asked when a worker's reply to the long-shift question says it "ended earlier" or that they "forgot to clock out".
+// {date} is the day the shift started, in the company's timezone, from friendlyDate() below ("Wed Oct 14").
+// It asks for a time, not a choice, so there are no numbered options.
+export const endTimeWording =
+  "{who}, what time did you stop on {date}? Reply the time, e.g. 4:30pm";
 // ────────────────────────────────────────────────────────────────────────────────────────────────────────
 
 // Text templates for every message (C-03); the product name comes from brand.ts. One short question per text, numbered options,
@@ -107,6 +114,8 @@ export const templates = {
     "{who}, your timer from {date} {start} is still running. When did you stop? Reply the time, e.g. 4:30pm",
   longShift:
     "{who}, {date} shows a {hours}h shift. Is that right? 1 yes 2 no, it ended earlier 3 forgot to clock out",
+  // Follow-up to longShift options 2 and 3. Wording lives in endTimeWording at the top of this file.
+  endTime: endTimeWording,
   expenseNoJob:
     "{who}, a {vendor} purchase on {date} has no job. Which job? 1 {jobA} 2 {jobB} 3 overhead 4 not sure",
   venmoRate: `Which rate should ${PRODUCT_NAME} use for {who}? Reply the hourly rate as a number.`,
@@ -133,6 +142,7 @@ export const audience: Record<
   overlap: "employee",
   openTimer: "employee",
   longShift: "employee",
+  endTime: "employee",
   expenseNoJob: "manager",
   venmoRate: "owner",
   followUp: "recipient",
@@ -143,6 +153,31 @@ export const audience: Record<
 export const MAX_LEN = 240;
 
 const DOLLAR_AMOUNT = /\$|\b\d[\d,]*(\.\d+)?\s*(dollars?|usd|bucks)\b/i;
+
+// "Wed Oct 14": the day an entry started, in the company's own timezone (not the server's, and not UTC, which can be
+// a different day for an evening shift). Use it for {date}: render("endTime", { who, date: friendlyDate(entry.startAt,
+// company.timezone) }). Built from Intl's parts, so the words and spaces never depend on the runtime's locale glue.
+// Throws on a value that is not a date or a timezone that does not exist, rather than texting a wrong day.
+const dayFormatters = new Map<string, Intl.DateTimeFormat>();
+
+export function friendlyDate(iso: string, timezone: string): string {
+  const when = new Date(iso);
+  if (Number.isNaN(when.getTime()))
+    throw new Error(`friendlyDate: not a date: ${iso}`);
+  let formatter = dayFormatters.get(timezone);
+  if (!formatter) {
+    formatter = new Intl.DateTimeFormat("en-US", {
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+      timeZone: timezone,
+    });
+    dayFormatters.set(timezone, formatter);
+  }
+  const part: Record<string, string> = {};
+  for (const p of formatter.formatToParts(when)) part[p.type] = p.value;
+  return `${part.weekday} ${part.month} ${part.day}`;
+}
 
 // Placeholders filled in, with no checks; render() is what goes to a phone.
 export function fill(key: TemplateKey, vars: Record<string, string>): string {
