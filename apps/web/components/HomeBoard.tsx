@@ -162,6 +162,8 @@ export function HomeBoard({
 }) {
   const company = companies[companyId];
   const dataKind = company.kind;
+  // A real company's Gusto is real payroll: RollPay shows the draft but never fills it (plan A-16).
+  const realPayroll = dataKind === "real, anonymized";
   const m = useMutations();
   const initial: BoardStage = data.cycle
     ? boardStageOf[data.cycle.stage]
@@ -282,11 +284,13 @@ export function HomeBoard({
     : data.states.incomplete;
   const syncState: SyncBannerState = syncDemo ?? "partial";
   const syncBlocks = short.length > 0 && syncState !== "full";
-  const gateLock = gustoDown
-    ? "Locked until Gusto is reconnected"
-    : syncBlocks
-      ? "Locked until the sync is complete"
-      : null;
+  const gateLock = realPayroll
+    ? `Locked: ${company.label} is real payroll, so RollPay never fills its Gusto draft`
+    : gustoDown
+      ? "Locked until Gusto is reconnected"
+      : syncBlocks
+        ? "Locked until the sync is complete"
+        : null;
 
   function reset() {
     setStage(initial);
@@ -332,9 +336,11 @@ export function HomeBoard({
   async function gate(n: 1 | 2) {
     setModal(null);
     feed(`You approved Gate ${n}.`);
-    let note =
-      "Fixture mode: nothing was recorded or filled in Gusto. Showing the demo fill.";
-    if (m && data.cycle)
+    let note = realPayroll
+      ? `${company.label} is real payroll: nothing was approved or filled in Gusto.`
+      : "Fixture mode: nothing was recorded or filled in Gusto. Showing the demo fill.";
+    // The gate is locked for a real company; this is the second guard, in case the lock is ever bypassed.
+    if (m && data.cycle && !realPayroll)
       try {
         await m.approveGate({
           cycleId: data.cycle.id,

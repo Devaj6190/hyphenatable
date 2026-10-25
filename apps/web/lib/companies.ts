@@ -40,9 +40,10 @@ export const companies: Record<string, CompanyInfo> = {
     name: "Company R",
     label: "Company R",
     kind: "real, anonymized",
-    // No fixture file and no documented zone (the ingest takes it as a parameter). UTC is named on every time,
-    // so it is never silently wrong. Replace with the company row's timezone once live.
-    timezone: "UTC",
+    // The Company R package's zone: seed/lib/r-package.ts writes America/New_York unless the owner's rules name
+    // another (Shanin to confirm). Replace with the company row's timezone once live. No fixture cycle: Company R's
+    // real data is never committed, so every Company R page reads Convex.
+    timezone: "America/New_York",
     cycle: null,
   },
 };
