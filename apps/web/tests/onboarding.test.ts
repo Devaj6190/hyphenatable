@@ -56,6 +56,13 @@ test("Company A: ingest → onboarding proposes rules from history with evidence
     fixture: fixture(),
   });
   const companyId = ids.a as Id<"companies">;
+  // Only companies, workers and cycles come back (a real company has more rows than Convex's 1024 fields).
+  const f = fixture();
+  expect(Object.keys(ids).sort()).toEqual(
+    [...f.companies, ...f.workers, ...f.cycles]
+      .map((r) => r.id as string)
+      .sort(),
+  );
 
   const result = await t.action(api.onboarding.run, { companyId });
   expect(result.analyst).toMatch(/not run/);
