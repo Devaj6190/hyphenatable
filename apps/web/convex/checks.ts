@@ -40,6 +40,24 @@ export const run = mutation({
   handler: (ctx, { cycleId }) => runChecks(ctx, cycleId),
 });
 
+/** After the owner turns a rule on or off: the checks again on every cycle still being checked or asked about. */
+export const recheckCompany = internalMutation({
+  args: { companyId: v.id("companies") },
+  handler: async (ctx, { companyId }) => {
+    const cycles = await ctx.db
+      .query("cycles")
+      .withIndex("by_company", (q) => q.eq("companyId", companyId))
+      .collect();
+    for (const c of cycles)
+      if (c.stage === "checking" || c.stage === "asking")
+        await runChecks(ctx, c._id, {
+          kind: "system",
+          id: "rules.changed",
+          agent: null,
+        });
+  },
+});
+
 /** The controller's call after a sync (controller/cycle.ts afterSync). */
 export const runInternal = internalMutation({
   args: { cycleId: v.id("cycles") },
@@ -149,17 +167,53 @@ async function runChecks(
     } as unknown as CheckInput;
     const pastFlags = companyFlags.map(toEngine) as unknown as Flag[];
 
-    const existing = new Set(
-      companyFlags.filter((f) => f.cycleId === cycleId).map(dedupeKey),
+    const existing = new Map(
+      companyFlags
+        .filter((f) => f.cycleId === cycleId)
+        .map((f) => [dedupeKey(f), f] as const),
     );
+    const settle = (
+      flagId: Id<"flags">,
+      rule: { id: string; type: string },
+      checkId: string,
+    ) =>
+      write(ctx, {
+        companyId,
+        cycleId,
+        actor,
+        type: "flag.settled_by_rule",
+        summary: `${checkId} settled by owner-approved rule ${rule.id}`,
+        refs: { flagId, ruleId: rule.id },
+        data: { ruleType: rule.type },
+      });
     const created: Id<"flags">[] = [];
     const byCheck: Record<string, number> = {};
-    for (const flag of runAll(input)) {
+    const found = runAll(input);
+    for (const flag of found) {
       const key = dedupeKey(flag);
-      if (existing.has(key)) continue;
-      existing.add(key);
       // An owner-approved rule that already decides this rate settles the flag: kept, cited, not asked.
       const settledBy = settlingRule(flag, input);
+      const had = existing.get(key);
+      if (had) {
+        // A rule approved since the flag was raised settles it the same way, if nobody has been texted yet.
+        const question = had.questionId
+          ? await ctx.db.get(had.questionId)
+          : null;
+        if (
+          settledBy &&
+          had.status === "open" &&
+          (!question || question.status === "draft")
+        ) {
+          if (question) await ctx.db.patch(question._id, { status: "denied" });
+          await ctx.db.patch(had._id, {
+            status: "dismissed",
+            // Engine ids are this deployment's ids (input is built from its docs), as the insert below trusts.
+            precedent: rulePrecedent(settledBy) as Doc<"flags">["precedent"],
+          });
+          await settle(had._id, settledBy, flag.checkId);
+        }
+        continue;
+      }
       const { id: _engineId, ...doc } = {
         ...flag,
         status: settledBy ? ("dismissed" as const) : flag.status,
@@ -173,16 +227,35 @@ async function runChecks(
       );
       created.push(flagId);
       byCheck[flag.checkId] = (byCheck[flag.checkId] ?? 0) + 1;
-      if (settledBy)
-        await write(ctx, {
-          companyId,
-          cycleId,
-          actor,
-          type: "flag.settled_by_rule",
-          summary: `${flag.checkId} settled by owner-approved rule ${settledBy.id}`,
-          refs: { flagId, ruleId: settledBy.id },
-          data: { ruleType: settledBy.type },
-        });
+      if (settledBy) await settle(flagId, settledBy, flag.checkId);
+    }
+
+    // A re-run after the rules changed (rules.approve / toggle): an open engine flag the checks no longer raise is
+    // closed, with why. Only before anyone was texted: a sent question or an answer stays for a person to settle.
+    const raised = new Set(found.map(dedupeKey));
+    const retracted: Id<"flags">[] = [];
+    for (const f of companyFlags) {
+      if (
+        f.cycleId !== cycleId ||
+        f.status !== "open" ||
+        !f.checkId.startsWith("CHK-") ||
+        raised.has(dedupeKey(f))
+      )
+        continue;
+      const question = f.questionId ? await ctx.db.get(f.questionId) : null;
+      if (question && question.status !== "draft") continue;
+      if (question) await ctx.db.patch(question._id, { status: "denied" });
+      await ctx.db.patch(f._id, { status: "dismissed" });
+      retracted.push(f._id);
+      await write(ctx, {
+        companyId,
+        cycleId,
+        actor,
+        type: "flag.retracted",
+        summary: `${f.checkId} is no longer raised by the checks under the rules now in force`,
+        refs: { flagId: f._id },
+        data: { questionDenied: question?._id ?? null },
+      });
     }
 
     const advanced = cycle.stage === "checking";
@@ -193,8 +266,13 @@ async function runChecks(
         cycleId,
       });
     // creao-plan S3: after the checks, the Creao Auditor explains flags, proposes matches and writes
-    // the morning brief. Only when Creao is configured; the run row guards against a double start.
-    if (process.env.CREAO_API_KEY && actor.kind === "system")
+    // the morning brief. Only when Creao is configured, and not on a re-run after a rule change; the run row guards
+    // against a double start.
+    if (
+      process.env.CREAO_API_KEY &&
+      actor.kind === "system" &&
+      actor.id !== "rules.changed"
+    )
       await startRun(ctx, companyId, cycleId, "auditor", "checks finished");
 
     await write(ctx, {
@@ -202,14 +280,15 @@ async function runChecks(
       cycleId,
       actor,
       type: "checks.run",
-      summary: `${created.length} new flags${advanced ? "; cycle moved to asking" : ""}`,
+      summary: `${created.length} new flags${retracted.length ? `, ${retracted.length} no longer raised` : ""}${advanced ? "; cycle moved to asking" : ""}`,
       refs: { cycleId },
       data: {
         created: created.length,
+        retracted: retracted.length,
         byCheck,
         stage: advanced ? "asking" : cycle.stage,
       },
     });
-    return { created, byCheck };
+    return { created, retracted, byCheck };
   }
 }

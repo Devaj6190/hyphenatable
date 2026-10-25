@@ -127,10 +127,21 @@ async function checkEvidence(
   return { ok, cycles: cycles.size };
 }
 
-const sameParams = (a: Record<string, unknown>, b: Record<string, unknown>) => {
-  const strip = ({ statement: _s, ...rest }: Record<string, unknown>) => rest;
-  return canonical(strip(a)) === canonical(strip(b));
-};
+// "2200" and 2200 are the same rate: the Analyst's params come back from key/value pairs.
+const value = (v: unknown) =>
+  canonical(typeof v === "string" && /^-?\d+(\.\d+)?$/.test(v) ? Number(v) : v);
+
+/**
+ * A proposal adds nothing when a rule of the same type already states every param it gives, with the same values.
+ * Code's pay_rate carries paymentUnit and a cost rate the Analyst often leaves out; that is the same rule, not a new one.
+ */
+const covers = (
+  rule: Record<string, unknown>,
+  proposal: Record<string, unknown>,
+) =>
+  Object.entries(proposal).every(
+    ([k, v]) => k === "statement" || (k in rule && value(rule[k]) === value(v)),
+  );
 
 /** Validates, recounts, backtests and stores proposals; the same rule never lands twice. */
 async function storeProposals(
@@ -150,9 +161,7 @@ async function storeProposals(
     if (
       existing.some(
         (r) =>
-          r.status !== "off" &&
-          r.type === p.type &&
-          sameParams(r.params, p.params),
+          r.status !== "off" && r.type === p.type && covers(r.params, p.params),
       )
     )
       continue;
@@ -189,6 +198,8 @@ async function storeProposals(
       confidence: p.confidence,
     });
     stored.push(ruleId);
+    // The same batch can say one rule twice.
+    existing.push((await ctx.db.get(ruleId)) as (typeof existing)[number]);
     await write(ctx, {
       companyId,
       cycleId: null,
