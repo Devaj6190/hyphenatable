@@ -12,7 +12,7 @@ export default function LearnedPage({
   return (
     <>
       <PageHeader
-        title="What PayrollPilot learned"
+        title="What RollPay learned"
         description="Questions per cycle, the rules that changed, and what it learned from."
       />
       <Suspense>

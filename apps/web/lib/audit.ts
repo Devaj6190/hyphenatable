@@ -41,7 +41,7 @@ export function eventSource(e: AuditEvent): string {
   if (e.data?.source) return e.data.source;
   if (e.actor.kind === "user") return "Dashboard";
   if (e.actor.agent) return `${e.actor.agent} agent (Claude)`;
-  return "PayrollPilot engine";
+  return "RollPay engine";
 }
 
 // Which outside system owns a record, by the ref key. Our own ids (syncRunId, flagId, draftId, questionId,

@@ -176,7 +176,7 @@ export function CorrectionDiff({
         edited ? (
           <p className="mx-(--card-spacing) rounded-control border border-dashed px-4 py-3 text-sm text-muted-foreground">
             You changed the value, so the effect on pay and profit is out of
-            date. PayrollPilot recalculates it when the change is saved. Fixture
+            date. RollPay recalculates it when the change is saved. Fixture
             mode: not recalculated.
           </p>
         ) : (

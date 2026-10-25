@@ -59,7 +59,7 @@ export function WorkbookView({
     );
     const a = document.createElement("a");
     a.href = url;
-    a.download = `payrollpilot-workbook-${wb.cycle.id}.csv`;
+    a.download = `rollpay-workbook-${wb.cycle.id}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   };

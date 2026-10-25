@@ -125,7 +125,7 @@ export function ReadyView({
             <GateBlockers companyId={companyId} readiness={wb.readiness} />
           )}
           <p className="flex flex-wrap items-center gap-2 font-medium">
-            Draft only. PayrollPilot never submits payroll.
+            Draft only. RollPay never submits payroll.
             {wb.cycle.gustoPayrollId && (
               <SourceChip system="Gusto" recordId={wb.cycle.gustoPayrollId} />
             )}
@@ -228,7 +228,7 @@ export function ReadyView({
         </Card>
 
         <p className="text-sm text-muted-foreground">
-          Prepared by PayrollPilot from Jobber, QuickBooks and Gusto records.{" "}
+          Prepared by RollPay from Jobber, QuickBooks and Gusto records.{" "}
           <Link
             href={`/c/${companyId}/inputs`}
             className="text-link underline-offset-4 hover:underline"

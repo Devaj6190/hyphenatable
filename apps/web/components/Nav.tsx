@@ -77,7 +77,7 @@ export function Nav() {
           href={base}
           className="mb-5 px-3 text-lg font-semibold tracking-tight text-link"
         >
-          PayrollPilot
+          RollPay
         </Link>
         {items.map((item) => {
           const active = isActive(pathname, base, item);
