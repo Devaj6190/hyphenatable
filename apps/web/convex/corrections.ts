@@ -9,6 +9,7 @@ import {
 import type { TimeEntry } from "@payrollpilot/engine/payroll/types";
 import { TEMPLATE_FOR } from "@payrollpilot/engine/questions/questions";
 import { ConvexError, v } from "convex/values";
+import { internal } from "./_generated/api";
 import type { Doc, Id } from "./_generated/dataModel";
 import {
   internalMutation,
@@ -29,7 +30,9 @@ export const proposeFromReply = internalMutation({
     const flag = question && (await ctx.db.get(question.flagIds[0]));
     if (!it || !question || !flag) return;
     const template = TEMPLATE_FOR[flag.checkId];
-    if (!template) return;
+    // A flag already settled never gets a second proposal.
+    if (!template || flag.status === "corrected" || flag.status === "dismissed")
+      return;
     const audit = (type: string, summary: string, data: unknown = null) =>
       write(ctx, {
         companyId: flag.companyId,
@@ -51,10 +54,21 @@ export const proposeFromReply = internalMutation({
         "flag.confirmed",
         "The person asked confirmed the record is right; nothing changes",
       );
+      await ctx.scheduler.runAfter(0, internal.controller.cycle.gate1Check, {
+        cycleId: flag.cycleId,
+      });
+      // Learning contract step 1: a confirmed answer is a lesson too.
+      await ctx.scheduler.runAfter(0, internal.agents.learn.recordLesson, {
+        companyId: flag.companyId,
+        from: { kind: "confirm", interpretationId },
+      });
       return;
     }
 
-    const p = await payrollInput(ctx, flag.cycleId);
+    const p = await payrollInput(ctx, flag.cycleId, {
+      holdUnresolved: true,
+      except: flag._id,
+    });
     const jobs = await ctx.db
       .query("jobs")
       .withIndex("by_company", (q) => q.eq("companyId", flag.companyId))
@@ -226,6 +240,11 @@ export const approve = mutation({
       },
     });
     await recomputeDraft(ctx, c.cycleId, { correctionId });
+    // Learning contract step 1: every approved correction is evaluated into a lesson.
+    await ctx.scheduler.runAfter(0, internal.agents.learn.recordLesson, {
+      companyId: c.companyId,
+      from: { kind: "correction", correctionId },
+    });
   },
 });
 
