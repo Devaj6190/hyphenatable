@@ -34,14 +34,23 @@ export function duplicateKey(e: TimeEntry): string {
   ]);
 }
 
+const dayFormats = new Map<string, Intl.DateTimeFormat>();
+
 /** Calendar day of an instant in the company's timezone, e.g. 2026-10-07. */
 export function day(input: CheckInput, at: string | number): string {
-  return new Intl.DateTimeFormat("en-CA", {
-    timeZone: input.company.timezone,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(new Date(at));
+  const tz = input.company.timezone;
+  let f = dayFormats.get(tz);
+  if (!f) {
+    // Building a formatter is slow; backtests run every check many times.
+    f = new Intl.DateTimeFormat("en-CA", {
+      timeZone: tz,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    });
+    dayFormats.set(tz, f);
+  }
+  return f.format(new Date(at));
 }
 
 /** Seconds as hours for a sentence, e.g. "8.00 h". */
