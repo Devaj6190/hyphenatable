@@ -33,7 +33,8 @@ export type Change =
       table: "timeEntries";
       id: string;
       field: "payable";
-      before: boolean;
+      /** null: the source never said (real exports). */
+      before: boolean | null;
       after: false;
     }
   | {
@@ -52,10 +53,24 @@ export type Change =
     };
 
 /**
- * The one field an answer changes, or null when the answer changes nothing (a confirm) or
- * cannot be mapped (an unknown job number: never guessed).
+ * The one field an answer changes, or null when the answer changes nothing (a confirm, or the record
+ * already holds the answer) or cannot be mapped (an unknown job number: never guessed).
  */
 export function changeFor(
+  template: QuestionTemplate,
+  r: ReplyResult,
+  subject: { entryIds: string[]; expenseIds: string[] },
+  records: {
+    entries: TimeEntry[];
+    expenses: Expense[];
+    jobIdByNumber: Map<number, string>;
+  },
+): Change | null {
+  const c = changeForRaw(template, r, subject, records);
+  return c && c.before !== c.after ? c : null;
+}
+
+function changeForRaw(
   template: QuestionTemplate,
   r: ReplyResult,
   subject: { entryIds: string[]; expenseIds: string[] },
@@ -200,7 +215,8 @@ function costOn(
   jobId: string,
 ): { cents: number | null; note: string | null } {
   if ("workerId" in record) {
-    if (record.jobId !== jobId || !record.payable)
+    // Unknown payable (null) counts, as in payroll hours: hours are never trimmed.
+    if (record.jobId !== jobId || record.payable === false)
       return { cents: 0, note: null };
     const w = p.workers.find((x) => x.id === record.workerId);
     const rate = w ? payRate(w, p.rules) : null;

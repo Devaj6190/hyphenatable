@@ -38,6 +38,7 @@ const sourceWord: Record<Correction["source"], string> = {
   reply: "From the reply",
   owner: "From you",
   rule: "From a rule",
+  agent: "Proposed by the Auditor",
 };
 
 const statusBadge: Record<

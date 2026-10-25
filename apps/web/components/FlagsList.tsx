@@ -1,80 +1,128 @@
 "use client";
 
-import { useQuery } from "convex/react";
-import { makeFunctionReference } from "convex/server";
 import Link from "next/link";
 import { type ReactNode, useState } from "react";
 import { AgentChip } from "@/components/AgentChip";
 import { ConfidenceBadge } from "@/components/ConfidenceBadge";
 import { type DataKind, DataLabel } from "@/components/DataLabel";
-import { LiveBoundary } from "@/components/LiveBoundary";
+import { errorReason, LiveBoundary } from "@/components/LiveBoundary";
+import { useLive } from "@/components/LiveProvider";
 import { PrecedentBadge } from "@/components/PrecedentBadge";
+import { useRole } from "@/components/RoleProvider";
 import { Segmented } from "@/components/Segmented";
 import { flagStatus, StatusBadge } from "@/components/StatusBadge";
+import type { Id } from "@/convex/_generated/dataModel";
 import { checkTitle } from "@/lib/checks";
 import { affectsLabel, infoFor } from "@/lib/home";
+import { useLiveFlags, useLiveInfo } from "@/lib/live/hooks";
+import type { LiveContext } from "@/lib/live/ids";
 import { FIXTURE_SOURCE } from "@/lib/sources";
 import type { Flag } from "@/lib/types";
-import type { FlagInfo } from "@/lib/view-types";
+import type { Cycle, FlagInfo } from "@/lib/view-types";
 
-// Function refs by name so this builds before B's generated api exists.
-const cyclesList = makeFunctionReference<
-  "query",
-  { companyId: string },
-  { id?: string; _id?: string }[]
->("cycles:list");
-// TODO(#15): flags.list takes a required `viewerId` and redacts pay on the server; pass it once #15 merges.
-const flagsList = makeFunctionReference<"query", { cycleId: string }, Flag[]>(
-  "flags:list",
-);
+/** What a live read adds to the flags: the live cycle, the question behind each flag, and who is looking. */
+export type FlagsExtras = {
+  live: boolean;
+  /** Questions for the live flags, by flag id; null for fixture flags (the screen has its own fixture info). */
+  info: Record<string, FlagInfo> | null;
+  /** The worker looking (a Convex worker id when live); null for fixtures. */
+  viewerId: string | null;
+  cycle: Cycle | null;
+  names: Record<string, string>;
+};
 
-const hasConvex = Boolean(process.env.NEXT_PUBLIC_CONVEX_URL);
+const NO_FLAGS: Flag[] = [];
 
-type Render = (flags: Flag[], source: string) => ReactNode;
+const FIXTURE_EXTRAS: FlagsExtras = {
+  live: false,
+  info: null,
+  viewerId: null,
+  cycle: null,
+  names: {},
+};
+
+type Render = (flags: Flag[], source: string, extras: FlagsExtras) => ReactNode;
 
 function LiveFlags({
-  companyId,
+  ctx,
+  note,
   fixtureFlags,
   children,
 }: {
-  companyId: string;
+  ctx: LiveContext;
+  note: string | null;
   fixtureFlags: Flag[];
   children: Render;
 }) {
-  const cycles = useQuery(cyclesList, { companyId });
-  const cycleId = cycles?.[0] ? (cycles[0].id ?? cycles[0]._id) : undefined;
-  const flags = useQuery(flagsList, cycleId ? { cycleId } : "skip");
-  if (cycles === undefined || (cycleId && flags === undefined)) {
+  const { role } = useRole();
+  const live = useLiveFlags(ctx, role);
+  const ready = live.status === "ready";
+  // Hooks run on every render, so the info lookup always runs; with no flags yet it asks for nothing.
+  const { info, loading } = useLiveInfo(
+    ctx,
+    (ready ? live.viewerId : ctx.ids.ownerId) as Id<"workers">,
+    ready ? live.flags : NO_FLAGS,
+  );
+  if (live.status === "no-viewer")
+    return children(
+      fixtureFlags,
+      `${FIXTURE_SOURCE} (Convex has no ${role} for this company)`,
+      FIXTURE_EXTRAS,
+    );
+  if (live.status === "loading" || loading)
     return <p className="text-muted-foreground">Loading…</p>;
-  }
-  // Empty deployment before B-02 seeds data: show the fixture so the screen is never blank.
-  if (!cycleId || !flags)
+  // Convex has no cycles yet: show the fixture so the screen is never blank.
+  if (!live.cycle)
     return children(
       fixtureFlags,
       `${FIXTURE_SOURCE} (no cycles in Convex yet)`,
+      FIXTURE_EXTRAS,
     );
-  return children(flags, "Convex flags.list");
+  return children(
+    live.flags,
+    `Convex flags.list as the ${role}${note ? ` (${note})` : ""}`,
+    {
+      live: true,
+      info,
+      viewerId: live.viewerId,
+      cycle: live.cycle,
+      names: ctx.names,
+    },
+  );
 }
 
 /**
- * The cycle's flags from Convex flags.list, or `fixtureFlags` (filtered and redacted on the server for this
- * viewer) when Convex or the function isn't there.
+ * The cycle's flags from Convex flags.list for the role looking, or `fixtureFlags` (filtered and redacted on the
+ * server for this viewer) when Convex is off, not reachable, or a live read fails. The source string says which, and
+ * why. `live={false}` keeps a screen on fixtures when its other data (e.g. the roster) is still fixture-keyed.
  */
 export function FlagsSource({
   companyId,
   fixtureFlags,
+  live = true,
   children,
 }: {
   companyId: string;
   fixtureFlags: Flag[];
+  live?: boolean;
   children: Render;
 }) {
+  const state = useLive();
   const fixture = (note: string) =>
-    children(fixtureFlags, `${FIXTURE_SOURCE} (${note})`);
-  if (!hasConvex) return fixture("Convex not configured");
+    children(fixtureFlags, `${FIXTURE_SOURCE} (${note})`, FIXTURE_EXTRAS);
+  if (state.status === "off") return fixture("Convex not configured");
+  if (!live) return fixture("this screen's roster is still a fixture");
+  if (state.status === "loading")
+    return <p className="text-muted-foreground">Loading…</p>;
+  if (state.status === "unavailable")
+    return fixture(`live Convex unavailable: ${state.reason}`);
+  if (state.ctx.companyKey !== companyId)
+    return fixture(`no live data for company ${companyId.toUpperCase()}`);
   return (
-    <LiveBoundary fallback={fixture("Convex flags.list not live yet")}>
-      <LiveFlags companyId={companyId} fixtureFlags={fixtureFlags}>
+    <LiveBoundary
+      fallback={(e) => fixture(`live Convex failed: ${errorReason(e)}`)}
+    >
+      <LiveFlags ctx={state.ctx} note={state.note} fixtureFlags={fixtureFlags}>
         {children}
       </LiveFlags>
     </LiveBoundary>
@@ -127,7 +175,8 @@ export function FlagsList({
   const [group, setGroup] = useState<Group>("all");
   return (
     <FlagsSource companyId={companyId} fixtureFlags={fixtureFlags}>
-      {(flags, source) => {
+      {(flags, source, x) => {
+        const rowInfo = x.info ?? info;
         const n = (g: Group) => flags.filter(groups[g]).length;
         const shown = flags.filter(groups[group]);
         return (
@@ -157,7 +206,11 @@ export function FlagsList({
             ) : (
               <ul className="flex flex-col overflow-hidden rounded-card border bg-card">
                 {shown.map((f) => (
-                  <ProblemRow key={f.id} flag={f} info={infoFor(info, f.id)} />
+                  <ProblemRow
+                    key={f.id}
+                    flag={f}
+                    info={infoFor(rowInfo, f.id)}
+                  />
                 ))}
               </ul>
             )}

@@ -1,12 +1,22 @@
+import { pastGross } from "@payrollpilot/engine/checks/CHK-22";
 import { runAll } from "@payrollpilot/engine/checks/index";
-import { precedentFor } from "@payrollpilot/engine/checks/precedent";
+import {
+  precedentFor,
+  rulePrecedent,
+  settlingRule,
+} from "@payrollpilot/engine/checks/precedent";
 import type { CheckInput } from "@payrollpilot/engine/checks/types";
 import type { Flag } from "@payrollpilot/engine/schemas";
 import { ConvexError, v } from "convex/values";
 import { internal } from "./_generated/api";
 import type { Doc, Id } from "./_generated/dataModel";
-import { mutation } from "./_generated/server";
-import { write } from "./audit";
+import {
+  internalMutation,
+  type MutationCtx,
+  mutation,
+} from "./_generated/server";
+import { type AuditInput, write } from "./audit";
+import { startRun } from "./creaoRuns";
 
 /** A Convex doc in the engine's shape: `_id` becomes `id`. */
 function toEngine<T extends { _id: string; _creationTime: number }>(doc: T) {
@@ -27,7 +37,32 @@ const dedupeKey = (f: Pick<Flag, "checkId" | "subject">) =>
 /** Runs every deterministic check over one cycle, stores new flags, moves `checking → asking`. */
 export const run = mutation({
   args: { cycleId: v.id("cycles") },
-  handler: async (ctx, { cycleId }) => {
+  handler: (ctx, { cycleId }) => runChecks(ctx, cycleId),
+});
+
+/** The controller's call after a sync (controller/cycle.ts afterSync). */
+export const runInternal = internalMutation({
+  args: { cycleId: v.id("cycles") },
+  handler: (ctx, { cycleId }) => runChecks(ctx, cycleId),
+});
+
+/** The same run started by a Creao agent through /agent/run_checks (B-19); the audit log names it. */
+export const runAsAgent = internalMutation({
+  args: { cycleId: v.id("cycles") },
+  handler: (ctx, { cycleId }) =>
+    runChecks(ctx, cycleId, { kind: "agent", id: "auditor", agent: "auditor" }),
+});
+
+async function runChecks(
+  ctx: MutationCtx,
+  cycleId: Id<"cycles">,
+  actor: AuditInput["actor"] = {
+    kind: "system",
+    id: "checks.run",
+    agent: null,
+  },
+) {
+  {
     const cycle = await ctx.db.get(cycleId);
     if (!cycle) throw new ConvexError("cycle not found");
     const company = await ctx.db.get(cycle.companyId);
@@ -73,6 +108,17 @@ export const run = mutation({
       .query("timeEntries")
       .withIndex("by_cycle", (q) => q.eq("cycleId", cycleId))
       .collect();
+    // CHK-22 history: regular + Venmo gross of the last 3 earlier cycles with payroll rows.
+    const [cycles, pastPayrolls] = await Promise.all([
+      ctx.db
+        .query("cycles")
+        .withIndex("by_company", (q) => q.eq("companyId", companyId))
+        .collect(),
+      ctx.db
+        .query("pastPayrolls")
+        .withIndex("by_company", (q) => q.eq("companyId", companyId))
+        .collect(),
+    ]);
     const syncRuns = await ctx.db
       .query("syncRuns")
       .withIndex("by_cycle", (q) => q.eq("cycleId", cycleId))
@@ -95,8 +141,9 @@ export const run = mutation({
       invoices: invoices.map(toEngine),
       payments: payments.map(toEngine),
       expenses: expenses.map(toEngine),
-      // ponytail: CHK-22 is not in the registry yet; it fills this from pastPayrolls when it lands.
-      pastCycles: { gross: {} },
+      pastCycles: {
+        gross: pastGross(cycle, cycles.map(toEngine), pastPayrolls),
+      },
       rules: rules.map(toEngine),
       syncRuns: syncRuns.map(toEngine),
     } as unknown as CheckInput;
@@ -111,17 +158,31 @@ export const run = mutation({
       const key = dedupeKey(flag);
       if (existing.has(key)) continue;
       existing.add(key);
+      // An owner-approved rule that already decides this rate settles the flag: kept, cited, not asked.
+      const settledBy = settlingRule(flag, input);
       const { id: _engineId, ...doc } = {
         ...flag,
-        precedent: precedentFor(flag, { rules: input.rules, pastFlags }),
+        status: settledBy ? ("dismissed" as const) : flag.status,
+        precedent: settledBy
+          ? rulePrecedent(settledBy)
+          : precedentFor(flag, { rules: input.rules, pastFlags }),
       };
-      created.push(
-        await ctx.db.insert(
-          "flags",
-          doc as unknown as Omit<Doc<"flags">, "_id" | "_creationTime">,
-        ),
+      const flagId = await ctx.db.insert(
+        "flags",
+        doc as unknown as Omit<Doc<"flags">, "_id" | "_creationTime">,
       );
+      created.push(flagId);
       byCheck[flag.checkId] = (byCheck[flag.checkId] ?? 0) + 1;
+      if (settledBy)
+        await write(ctx, {
+          companyId,
+          cycleId,
+          actor,
+          type: "flag.settled_by_rule",
+          summary: `${flag.checkId} settled by owner-approved rule ${settledBy.id}`,
+          refs: { flagId, ruleId: settledBy.id },
+          data: { ruleType: settledBy.type },
+        });
     }
 
     const advanced = cycle.stage === "checking";
@@ -131,11 +192,15 @@ export const run = mutation({
       await ctx.scheduler.runAfter(0, internal.questions.draftForCycle, {
         cycleId,
       });
+    // creao-plan S3: after the checks, the Creao Auditor explains flags, proposes matches and writes
+    // the morning brief. Only when Creao is configured; the run row guards against a double start.
+    if (process.env.CREAO_API_KEY && actor.kind === "system")
+      await startRun(ctx, companyId, cycleId, "auditor", "checks finished");
 
     await write(ctx, {
       companyId,
       cycleId,
-      actor: { kind: "system", id: "checks.run", agent: null },
+      actor,
       type: "checks.run",
       summary: `${created.length} new flags${advanced ? "; cycle moved to asking" : ""}`,
       refs: { cycleId },
@@ -146,5 +211,5 @@ export const run = mutation({
       },
     });
     return { created, byCheck };
-  },
-});
+  }
+}

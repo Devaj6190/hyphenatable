@@ -56,6 +56,10 @@ export const CheckId = z.enum([
   "CHK-21",
   "CHK-22",
   "CHK-23",
+  // Not deterministic checks: an Auditor flag for a vague case (always a question to the owner, never
+  // blocking) and a learned lesson that contradicts an active rule (plan B 4.5).
+  "AGT-01",
+  "LRN-01",
 ]);
 export const FlagStatus = z.enum([
   "open",
@@ -91,7 +95,7 @@ export const CorrectionStatus = z.enum([
   "applied",
   "rejected",
 ]);
-export const CorrectionSource = z.enum(["reply", "owner", "rule"]);
+export const CorrectionSource = z.enum(["reply", "owner", "rule", "agent"]);
 export const RuleType = z.enum([
   "overtime_policy",
   "pay_rate",
@@ -228,11 +232,12 @@ export const TimeEntry = z.object({
   endAt: nul(Instant),
   durationSec: z.number().int(),
   ticking: z.boolean(),
-  approved: z.boolean(),
+  /** null: not in the source (a real company's Timesheets export has no approval, payable or category column). */
+  approved: nul(z.boolean()),
   approvedBy: nul(z.string()),
-  payable: z.boolean(),
+  payable: nul(z.boolean()),
   /** Jobber timeSheetCategory: BREAK, DRIVING, OFFICE, SUPPLIES, GENERAL, CUSTOM. */
-  category: z.string(),
+  category: nul(z.string()),
   label: nul(z.string()),
   hasNote: z.boolean(),
 });
@@ -304,7 +309,8 @@ export const Payment = z.object({
 export const Expense = z.object({
   id: Id,
   companyId: Id,
-  source: z.enum(["qbo", "jobber"]),
+  /** venmo: a real company's Venmo reimbursements. */
+  source: z.enum(["qbo", "jobber", "venmo"]),
   sourceId: z.string(),
   date: Day,
   amountCents: nul(Cents),
@@ -551,6 +557,33 @@ export const AccessEvent = z.object({
   what: z.string(),
 });
 
+/**
+ * One Creao agent run started by the controller (creao-plan.md B-19). Creao's run API has no
+ * idempotency key, so this row is checked before a run is started; the webhook's token is checked and
+ * the run re-fetched before its status is trusted.
+ */
+export const CreaoRun = z.object({
+  id: Id,
+  companyId: Id,
+  cycleId: nul(Id),
+  agent: z.enum(["auditor", "messenger", "analyst"]),
+  attempt: z.number().int().min(1),
+  runId: nul(z.string()),
+  status: z.enum([
+    "starting",
+    "pending",
+    "running",
+    "completed",
+    "failed",
+    "cancelled",
+  ]),
+  callbackToken: z.string(),
+  startedAt: Instant,
+  finishedAt: nul(Instant),
+  credits: nul(z.number()),
+  error: nul(z.string()),
+});
+
 // ── Agent outputs (plan B 4.4); every one is a proposal, never an action ─────
 // Structured outputs only accept closed objects: a z.record becomes `{}` and the model could never fill
 // it. Open key/value maps are therefore lists of pairs here; `pairsToRecord` turns them back after parse.
@@ -674,6 +707,7 @@ export type Draft = z.infer<typeof Draft>;
 export type PastPayroll = z.infer<typeof PastPayroll>;
 export type AuditEvent = z.infer<typeof AuditEvent>;
 export type AccessEvent = z.infer<typeof AccessEvent>;
+export type CreaoRun = z.infer<typeof CreaoRun>;
 export type CheckId = z.infer<typeof CheckId>;
 export type ProposedRule = z.infer<typeof ProposedRule>;
 export type ProposedRules = z.infer<typeof ProposedRules>;

@@ -40,19 +40,28 @@ export const companies: Record<string, CompanyInfo> = {
     name: "Company R",
     label: "Company R",
     kind: "real, anonymized",
-    // No fixture file and no documented zone (the ingest takes it as a parameter). UTC is named on every time,
-    // so it is never silently wrong. Replace with the company row's timezone once live.
-    timezone: "UTC",
+    // The Company R package's default zone (seed/lib/r-package.ts) until Shanin confirms it; replace with the
+    // company row's timezone once live.
+    timezone: "America/New_York",
     cycle: null,
   },
 };
 
 export const DEFAULT_COMPANY = "a";
 
+// A real company's payroll is never written: RollPay fills a Gusto draft for synthetic companies only (plan A-16).
+// The UI hides every fill action for these; Convex should refuse it too (asked of B).
+export const REAL_PAYROLL_NOTE =
+  "Real company: RollPay never fills its Gusto draft";
+export const isRealPayroll = (companyId: string): boolean =>
+  companies[companyId]?.kind === "real, anonymized";
+
 export const SEATS_LINE =
   "RollPay fills the seat of the person who prepares and checks payroll before it is submitted.";
 
-export function cyclePeriod(c: CompanyInfo): string {
+export function cyclePeriod(
+  c: Pick<CompanyInfo, "timezone" | "cycle">,
+): string {
   if (!c.cycle) return "No cycle loaded yet";
   const f = new Intl.DateTimeFormat("en-US", {
     month: "short",

@@ -116,10 +116,10 @@ export default defineSchema({
     endAt: nul(v.string()),
     durationSec: v.number(),
     ticking: v.boolean(),
-    approved: v.boolean(),
+    approved: nul(v.boolean()),
     approvedBy: nul(v.string()),
-    payable: v.boolean(),
-    category: v.string(),
+    payable: nul(v.boolean()),
+    category: nul(v.string()),
     label: nul(v.string()),
     hasNote: v.boolean(),
   })
@@ -195,7 +195,7 @@ export default defineSchema({
 
   expenses: defineTable({
     companyId: v.id("companies"),
-    source: lit("qbo", "jobber"),
+    source: lit("qbo", "jobber", "venmo"),
     sourceId: v.string(),
     date: v.string(),
     amountCents: nul(v.number()),
@@ -329,7 +329,7 @@ export default defineSchema({
     effectPayCents: v.number(),
     effectProfitCents: v.number(),
     status: lit("proposed", "approved", "applied", "rejected"),
-    source: lit("reply", "owner", "rule"),
+    source: lit("reply", "owner", "rule", "agent"),
     approvedBy: nul(v.string()),
     approvedAt: nul(v.string()),
   })
@@ -489,6 +489,30 @@ export default defineSchema({
     action: lit("view", "export"),
     what: v.string(),
   }).index("by_company", ["companyId", "at"]),
+
+  creaoRuns: defineTable({
+    companyId: v.id("companies"),
+    cycleId: nul(v.id("cycles")),
+    agent: lit("auditor", "messenger", "analyst"),
+    attempt: v.number(),
+    runId: nul(v.string()),
+    status: lit(
+      "starting",
+      "pending",
+      "running",
+      "completed",
+      "failed",
+      "cancelled",
+    ),
+    callbackToken: v.string(),
+    startedAt: v.string(),
+    finishedAt: nul(v.string()),
+    credits: nul(v.number()),
+    error: nul(v.string()),
+  })
+    .index("by_company", ["companyId"])
+    .index("by_cycle", ["cycleId", "agent"])
+    .index("by_run", ["runId"]),
 
   // B-01 probe tables (H5, H7); not part of the section 6 contract.
   ping: defineTable({ note: v.string(), at: v.string() }),

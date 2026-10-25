@@ -1,12 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import { DataLabel } from "@/components/DataLabel";
+import { useLive } from "@/components/LiveProvider";
 import { RoleNotice, RoleSwitch } from "@/components/RoleSwitch";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { companies, cyclePeriod } from "@/lib/companies";
 import { DEMO_MODE } from "@/lib/demo";
+import { headerCycle, headerReadsLive } from "@/lib/live/adapt";
+import { useLiveCycle } from "@/lib/live/hooks";
 import { routes } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 
@@ -16,8 +19,20 @@ import { cn } from "@/lib/utils";
 export function ShellHeader() {
   const { companyId } = useParams<{ companyId: string }>();
   const company = companies[companyId];
-  const detail = company?.cycle
-    ? `${company.label}, cycle ${company.cycle.number}`
+  // The header names the same cycle as the page under it: Convex's newest on a live page, the fixture's elsewhere.
+  // A company with no fixture cycle (Company R) is live on every page.
+  const pathname = usePathname();
+  const live = useLive();
+  const liveCycle = useLiveCycle(
+    live.status === "ready" &&
+      live.ctx.companyKey === companyId &&
+      headerReadsLive(pathname, company?.cycle ?? null)
+      ? live.ctx
+      : null,
+  );
+  const cycle = company ? headerCycle(company.cycle, liveCycle) : null;
+  const detail = cycle
+    ? `${company?.label}, cycle ${cycle.number}`
     : company?.label;
 
   return (
@@ -35,7 +50,9 @@ export function ShellHeader() {
           </span>
           {company && (
             <span className="text-sm text-muted-foreground">
-              {cyclePeriod(company)}
+              {liveCycle.status === "loading"
+                ? "Loading cycle…"
+                : cyclePeriod({ timezone: company.timezone, cycle })}
             </span>
           )}
         </div>

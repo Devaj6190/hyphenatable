@@ -1,5 +1,7 @@
 import { ConvexError, v } from "convex/values";
-import { action, mutation, query } from "./_generated/server";
+import { internal } from "./_generated/api";
+import { action, internalQuery, mutation, query } from "./_generated/server";
+import { approveGate1 } from "./controller/cycle";
 import { notYet } from "./lib/stub";
 import { stage, userId } from "./lib/validators";
 import { resolveViewer } from "./lib/viewer";
@@ -21,14 +23,39 @@ export const get = query({
   },
 });
 
-/** Owner only; refuses on incomplete syncs (B-11). */
+/** Owner only; refuses on incomplete syncs (B-11). Stage 2 (the off-cycle draft) is P1 (B-17). */
 export const approveGate = mutation({
   args: { cycleId: v.id("cycles"), stage, userId },
-  handler: () => notYet("B-11"),
+  handler: async (ctx, { cycleId, stage, userId }) => {
+    if (stage === 2) return notYet("B-17");
+    return approveGate1(ctx, cycleId, userId);
+  },
 });
 
-/** prepare, update, calculate. There is no submit, here or anywhere (B-12). */
+export const companyKind = internalQuery({
+  args: { cycleId: v.id("cycles") },
+  handler: async (ctx, { cycleId }) => {
+    const cycle = await ctx.db.get(cycleId);
+    const company = cycle && (await ctx.db.get(cycle.companyId));
+    return company?.kind ?? null;
+  },
+});
+
+/**
+ * prepare, update, calculate. There is no submit, here or anywhere (B-12).
+ * Synthetic companies only: a real company's Gusto payroll is never written, whoever calls this.
+ */
 export const fillGusto = action({
   args: { cycleId: v.id("cycles"), stage },
-  handler: () => notYet("B-12"),
+  handler: async (ctx, { cycleId }): Promise<never> => {
+    const kind: "synthetic" | "real" | null = await ctx.runQuery(
+      internal.drafts.companyKind,
+      { cycleId },
+    );
+    if (kind !== "synthetic")
+      throw new ConvexError(
+        "Gusto is filled for synthetic companies only; this company's payroll is never written",
+      );
+    return notYet("B-12");
+  },
 });

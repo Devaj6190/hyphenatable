@@ -51,6 +51,8 @@ export function packageFiles(p: RPackage): Files {
     for (const [f, rows] of Object.entries(tables))
       files[`${folder}/${f}`] = j(rows);
   files["extras/blocked.json"] = j(p.blocked);
+  files["extras/afterCurrentCycle.json"] = j(p.afterCurrentCycle);
+  files["extras/unresolved.json"] = j(p.unresolved);
   files["extras/ownerDraws.json"] = j(p.ownerDraws);
   const byTable = new Map<string, RPackage["unloadable"]>();
   for (const u of p.unloadable)
@@ -98,8 +100,12 @@ ${table(p.current)}
 ## Not loaded
 - Blocked workers (role or pay type unknown; never guessed): ${p.blocked.length}. Reasons: ${JSON.stringify(Object.fromEntries(p.blocked.reduce((m, b) => m.set(b.reason, (m.get(b.reason) ?? 0) + 1), new Map<string, number>())))}
 - Owner draws (not wages): ${p.ownerDraws.length} rows (extras/ownerDraws.json)
-- Personal Venmo rows excluded: ${p.excluded.personalVenmo}
-- Venmo rows with no contract table (tip, commission, referral, ...): ${JSON.stringify(p.excluded.venmoNotWage)}
+- Venmo \`personal_or_unknown\` rows excluded: ${p.excluded.personalOrUnknownVenmo}
+- Venmo rows with no contract table (tip, commission, unknown, ...): ${JSON.stringify(p.excluded.venmoNotLoaded)}
+- Jobs that came only from Gusto journal labels (not Jobber jobs, not emitted): ${p.excluded.journalLabelJobs}
+- Jobber "invoice" transactions (not payments, not emitted): ${p.excluded.invoiceTransactions}
+- Time entries after the current cycle (not an error; extras/afterCurrentCycle.json): ${p.afterCurrentCycle.length}
+- Nullable references set to null because the worker is blocked (extras/unresolved.json): ${JSON.stringify(Object.fromEntries(Object.entries(p.unresolved).map(([k, v]) => [k, v.length])))}
 - Duplicate ids across bundles (first kept): ${p.excluded.duplicateIds}
 - Unloadable rows: ${p.unloadable.length}, by reason:
 ${
@@ -167,6 +173,12 @@ if (import.meta.main) {
     const roles = values.roles
       ? JSON.parse(readFileSync(values.roles, "utf8"))
       : undefined;
+    // owner-facts.json holds real first names: only whether `salaried` is empty is read, nothing else
+    const factsPath = join(R_DIR, "owner-facts.json");
+    const noSalaried = existsSync(factsPath)
+      ? (JSON.parse(readFileSync(factsPath, "utf8")).salaried ?? []).length ===
+        0
+      : undefined;
     const num = (k: string) =>
       values[k as keyof typeof values] === undefined
         ? undefined
@@ -175,6 +187,7 @@ if (import.meta.main) {
     const p = buildRPackage(bundles, rules, {
       current: { start: cs, end: ce },
       roles,
+      noSalaried,
       settings: {
         lowMarginPct: num("low-margin-pct"),
         longShiftHours: num("long-shift-hours"),
@@ -217,7 +230,7 @@ if (import.meta.main) {
     console.log(`history: ${JSON.stringify(counts(p.history))}`);
     console.log(`current: ${JSON.stringify(counts(p.current))}`);
     console.log(
-      `blocked workers ${p.blocked.length}, unloadable rows ${p.unloadable.length}, owner draws ${p.ownerDraws.length}, personal Venmo excluded ${p.excluded.personalVenmo}`,
+      `blocked workers ${p.blocked.length}, unloadable rows ${p.unloadable.length}, after current cycle ${p.afterCurrentCycle.length}, owner draws ${p.ownerDraws.length}, personal_or_unknown Venmo excluded ${p.excluded.personalOrUnknownVenmo}`,
     );
     if (p.companyMissing.length)
       console.log(

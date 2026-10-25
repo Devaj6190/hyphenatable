@@ -1,6 +1,6 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
-import { notYet } from "./lib/stub";
+import { startCycle } from "./controller/cycle";
 
 export const start = mutation({
   args: {
@@ -8,7 +8,8 @@ export const start = mutation({
     periodStart: v.string(),
     periodEnd: v.string(),
   },
-  handler: () => notYet("B-11"),
+  handler: (ctx, { companyId, periodStart, periodEnd }) =>
+    startCycle(ctx, companyId, periodStart, periodEnd),
 });
 
 export const get = query({

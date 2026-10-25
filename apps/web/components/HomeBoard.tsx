@@ -41,7 +41,7 @@ import { Money } from "@/components/Money";
 import { StageTracker } from "@/components/StageTracker";
 import { Button } from "@/components/ui/button";
 import { checkTitle } from "@/lib/checks";
-import { companies } from "@/lib/companies";
+import { companies, isRealPayroll, REAL_PAYROLL_NOTE } from "@/lib/companies";
 import { DEMO_MODE } from "@/lib/demo";
 import {
   affectsLabel,
@@ -162,6 +162,7 @@ export function HomeBoard({
 }) {
   const company = companies[companyId];
   const dataKind = company.kind;
+  const realPayroll = isRealPayroll(companyId);
   const m = useMutations();
   const initial: BoardStage = data.cycle
     ? boardStageOf[data.cycle.stage]
@@ -282,11 +283,13 @@ export function HomeBoard({
     : data.states.incomplete;
   const syncState: SyncBannerState = syncDemo ?? "partial";
   const syncBlocks = short.length > 0 && syncState !== "full";
-  const gateLock = gustoDown
-    ? "Locked until Gusto is reconnected"
-    : syncBlocks
-      ? "Locked until the sync is complete"
-      : null;
+  const gateLock = realPayroll
+    ? REAL_PAYROLL_NOTE
+    : gustoDown
+      ? "Locked until Gusto is reconnected"
+      : syncBlocks
+        ? "Locked until the sync is complete"
+        : null;
 
   function reset() {
     setStage(initial);
@@ -327,10 +330,14 @@ export function HomeBoard({
 
   // Opened from a plain button, not a Dialog trigger: open after this click has finished, or Base UI reads the
   // same click as a press outside the new dialog and closes it at once.
-  const openGate = (n: 1 | 2) => setTimeout(() => setModal(n), 0);
+  // A real company never reaches "Approve and fill": no dialog, no approveGate, no fillGusto.
+  const openGate = (n: 1 | 2) => {
+    if (!realPayroll) setTimeout(() => setModal(n), 0);
+  };
 
   async function gate(n: 1 | 2) {
     setModal(null);
+    if (realPayroll) return;
     feed(`You approved Gate ${n}.`);
     let note =
       "Fixture mode: nothing was recorded or filled in Gusto. Showing the demo fill.";
