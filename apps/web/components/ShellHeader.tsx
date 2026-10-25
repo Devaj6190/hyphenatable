@@ -36,8 +36,8 @@ export function ShellHeader() {
     : company?.label;
 
   return (
-    <header className="shrink-0 border-b bg-background">
-      <div className="flex h-14 items-center gap-3 px-4 lg:px-6">
+    <header className="shrink-0 bg-background">
+      <div className="flex h-16 items-center gap-3 px-4 lg:px-[max(16px,2.2vw)]">
         <Link
           href={routes.home(companyId)}
           aria-label="RollPay home"
@@ -45,13 +45,12 @@ export function ShellHeader() {
         >
           <RollPayLogo height={18} />
         </Link>
-        <div className="flex min-w-0 items-baseline gap-2 text-sm">
+        <div className="flex min-w-0 items-baseline gap-3 text-[15px]">
           <span className="truncate font-medium">
             {company?.name ?? "Unknown company"}
           </span>
           {company && (
             <span className="hidden truncate text-muted-foreground sm:inline">
-              ·{" "}
               {liveCycle.status === "loading"
                 ? "Loading cycle…"
                 : cyclePeriod({ timezone: company.timezone, cycle })}
@@ -69,7 +68,7 @@ export function ShellHeader() {
           {DEMO_MODE && <RoleSwitch />}
           <nav
             aria-label="Company"
-            className="flex rounded-full border bg-card p-0.5 text-xs"
+            className="flex gap-0.5 rounded-full border bg-card p-[3px] text-xs"
           >
             {Object.keys(companies).map((id) => (
               <Link
@@ -78,7 +77,7 @@ export function ShellHeader() {
                 aria-current={id === companyId ? "page" : undefined}
                 aria-label={companies[id].label}
                 className={cn(
-                  "grid size-6 place-items-center rounded-full font-medium",
+                  "grid size-[30px] place-items-center rounded-full font-medium transition-colors duration-(--dur-hover)",
                   id === companyId
                     ? "bg-foreground text-background"
                     : "text-muted-foreground hover:text-foreground",

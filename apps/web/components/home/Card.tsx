@@ -1,7 +1,13 @@
 "use client";
 
 import { Check, Undo2 } from "lucide-react";
-import { type ReactNode, useEffect, useRef } from "react";
+import {
+  createContext,
+  type ReactNode,
+  useContext,
+  useEffect,
+  useRef,
+} from "react";
 import { Money } from "@/components/Money";
 import { SourceChip } from "@/components/SourceChip";
 import { Button } from "@/components/ui/button";
@@ -11,32 +17,44 @@ import type { CardTone, HomeCard } from "@/lib/view-types/home";
 // The mockup's card templates (Cards board): a tone bar, an icon tile, kicker, title, why, a body that depends on
 // the kind (pick, fill, facts, bars, diff), then one primary action. An answered card folds to one line with Undo.
 
-export const TONE: Record<CardTone, { grad: string; kicker: string }> = {
+export const TONE: Record<
+  CardTone,
+  { grad: string; kicker: string; chip: string }
+> = {
   text: {
     grad: "var(--ask)",
     kicker: "text-ask",
+    chip: "bg-ask-soft text-ask",
   },
   sunset: {
     grad: "var(--link)",
     kicker: "text-link",
+    chip: "bg-accent text-link",
   },
   gold: {
     grad: "var(--hold)",
     kicker: "text-hold",
+    chip: "bg-hold-soft text-hold",
   },
   coral: {
     grad: "var(--destructive)",
     kicker: "text-destructive",
+    chip: "bg-destructive-soft text-destructive",
   },
   sky: {
     grad: "var(--ask)",
     kicker: "text-ask",
+    chip: "bg-ask-soft text-ask",
   },
   green: {
     grad: "var(--ok)",
     kicker: "text-ok",
+    chip: "bg-ok-soft text-ok",
   },
 };
+
+/** Inside the home's focus card a question drops its own frame: tag chip, big title, then its body and actions. */
+export const BareCard = createContext(false);
 
 const MARK: Record<string, { letter: string; color: string; round: boolean }> =
   {
@@ -139,6 +157,35 @@ export function CardShell({
   className?: string;
 }) {
   const t = TONE[tone];
+  const bare = useContext(BareCard);
+  if (bare)
+    return (
+      <article
+        className={cn(
+          "flex flex-col gap-5 motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-1",
+          className,
+        )}
+      >
+        <span
+          className={cn(
+            "w-fit rounded-full px-2.5 py-0.5 text-xs font-medium tracking-[0.04em] uppercase",
+            t.chip,
+          )}
+        >
+          {kicker}
+        </span>
+        <div className="flex flex-col gap-2">
+          <h3 className="text-[clamp(22px,2.6vw,27px)] leading-[1.2] font-medium tracking-[-0.02em]">
+            {title}
+          </h3>
+          <p className="text-muted-foreground">{sub}</p>
+        </div>
+        {children && <div className="flex flex-col gap-3">{children}</div>}
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+          {actions}
+        </div>
+      </article>
+    );
   return (
     <article
       className={cn(
@@ -192,6 +239,37 @@ export function FoldedCard({
 }) {
   const undo = useRef<HTMLButtonElement>(null);
   useEffect(() => undo.current?.focus({ preventScroll: true }), []);
+  const bare = useContext(BareCard);
+  if (bare)
+    return (
+      <output className="flex flex-col gap-5 motion-safe:animate-in motion-safe:fade-in">
+        <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-ok-soft px-2.5 py-0.5 text-xs font-medium tracking-[0.04em] text-ok uppercase">
+          <Check aria-hidden className="size-3" strokeWidth={3} />
+          Resolved
+        </span>
+        <div className="flex flex-col gap-2">
+          <span className="text-[clamp(22px,2.6vw,27px)] leading-[1.2] font-medium tracking-[-0.02em]">
+            {title}
+          </span>
+          <span className="text-muted-foreground">{value}</span>
+          {note && (
+            <span className="text-sm text-muted-foreground">{note}</span>
+          )}
+        </div>
+        {onUndo && (
+          <Button
+            ref={undo}
+            variant="secondary"
+            size="lg"
+            className="w-fit"
+            onClick={onUndo}
+          >
+            <Undo2 aria-hidden />
+            Undo
+          </Button>
+        )}
+      </output>
+    );
   return (
     <output className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-card border bg-card px-4 py-3 motion-safe:animate-in motion-safe:fade-in">
       <span

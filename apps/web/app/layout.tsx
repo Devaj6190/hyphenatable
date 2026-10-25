@@ -1,17 +1,20 @@
-import { GeistMono } from "geist/font/mono";
-import { GeistSans } from "geist/font/sans";
 import type { Metadata } from "next";
-import { Instrument_Serif } from "next/font/google";
+import { DM_Mono, DM_Sans } from "next/font/google";
 import { THEME_SCRIPT } from "@/lib/theme";
 import "./globals.css";
 import { Providers } from "./providers";
 
-// Geist (UI and numbers) ships with the `geist` package, so the build needs no network for it. Instrument Serif is
-// the display face for page titles and the greeting only.
-const instrumentSerif = Instrument_Serif({
-  weight: "400",
+// DM Sans for everything, titles included; DM Mono for figures that line up (the RollPay prototype's faces).
+const dmSans = DM_Sans({
+  weight: ["400", "500", "600"],
   subsets: ["latin"],
-  variable: "--font-instrument-serif",
+  variable: "--font-dm-sans",
+  display: "swap",
+});
+const dmMono = DM_Mono({
+  weight: ["400", "500"],
+  subsets: ["latin"],
+  variable: "--font-dm-mono",
   display: "swap",
 });
 
@@ -25,7 +28,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     // data-theme is set by THEME_SCRIPT before paint, so React must not own it.
     <html
       lang="en"
-      className={`${GeistSans.variable} ${GeistMono.variable} ${instrumentSerif.variable}`}
+      className={`${dmSans.variable} ${dmMono.variable}`}
       suppressHydrationWarning
     >
       <head>

@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/sheet";
 import { DEMO_MODE } from "@/lib/demo";
 import { routes } from "@/lib/routes";
+import { useStageState } from "@/lib/stageStore";
 import { cn } from "@/lib/utils";
 
 type Item = {
@@ -95,24 +96,27 @@ export function Nav() {
   };
   const more = items.filter((i) => !i.tab);
   const moreActive = more.some((i) => isActive(pathname, companyId, i));
+  // Items still waiting on the owner, as the home last published them for this company.
+  const stage = useStageState();
+  const open = stage && stage.companyId === companyId ? stage.open : 0;
 
   return (
     <>
-      {/* Desktop: light sidebar, 240px, collapsible to 64px */}
+      {/* Desktop: light sidebar, 216px, collapsible to 64px (prototype side nav: text items, soft active fill) */}
       <nav
         aria-label="Main"
         data-collapsed={collapsed || undefined}
         className={cn(
-          "hidden h-full shrink-0 flex-col border-r bg-background transition-[width] duration-(--dur-tab) ease-out-soft lg:flex",
-          collapsed ? "w-16 px-2" : "w-60 px-3",
+          "hidden h-full shrink-0 flex-col gap-8 border-r bg-background pt-[26px] transition-[width] duration-(--dur-tab) ease-out-soft lg:flex",
+          collapsed ? "w-16 px-2" : "w-[216px] px-3.5",
         )}
       >
         <Link
           href={routes.home(companyId)}
           aria-label="RollPay home"
           className={cn(
-            "flex h-14 items-center",
-            collapsed ? "justify-center" : "px-2",
+            "flex items-center",
+            collapsed ? "justify-center" : "px-2.5",
           )}
         >
           {collapsed ? (
@@ -121,10 +125,11 @@ export function Nav() {
             <RollPayLogo height={22} />
           )}
         </Link>
-        <ul className="mt-2 flex flex-col gap-0.5">
+        <ul className="flex flex-col gap-0.5">
           {items.map((item) => {
             const active = isActive(pathname, companyId, item);
             const Icon = item.icon;
+            const badge = item.href === routes.home && open > 0 ? open : null;
             return (
               <li key={item.label}>
                 <Link
@@ -132,15 +137,27 @@ export function Nav() {
                   aria-current={active ? "page" : undefined}
                   title={collapsed ? item.label : undefined}
                   className={cn(
-                    "flex h-9 items-center gap-3 rounded-control text-sm transition-colors duration-(--dur-hover)",
-                    collapsed ? "justify-center px-0" : "px-2.5",
+                    "flex h-10 items-center gap-3 rounded-[10px] text-[15px] transition-[color,background-color,transform] duration-(--dur-hover) ease-out-soft",
+                    collapsed ? "justify-center px-0" : "px-3",
                     active
-                      ? "bg-card font-medium text-foreground shadow-card ring-1 ring-border"
-                      : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                      ? "bg-muted font-medium text-foreground"
+                      : "text-muted-foreground hover:translate-x-1 hover:text-foreground",
                   )}
                 >
-                  <Icon aria-hidden className="size-4 shrink-0" />
-                  {!collapsed && item.label}
+                  {collapsed ? (
+                    <Icon aria-hidden className="size-4 shrink-0" />
+                  ) : (
+                    <>
+                      <span className="flex-1">{item.label}</span>
+                      {badge !== null && (
+                        <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-foreground px-1.5 text-[11px] font-semibold text-background tabular-nums">
+                          <span className="sr-only">, </span>
+                          {badge}
+                          <span className="sr-only"> waiting on you</span>
+                        </span>
+                      )}
+                    </>
+                  )}
                 </Link>
               </li>
             );
@@ -148,7 +165,7 @@ export function Nav() {
         </ul>
         <div className="mt-auto flex flex-col gap-2 pb-3">
           {!collapsed && (
-            <p className="px-2.5 text-[11px] leading-snug text-muted-foreground">
+            <p className="px-3 text-xs leading-normal text-muted-foreground">
               Draft only. RollPay never submits payroll.
             </p>
           )}
