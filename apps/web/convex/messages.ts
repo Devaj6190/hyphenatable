@@ -455,6 +455,9 @@ async function decide(
     }
     case "hold": {
       await ctx.db.patch(flag._id, { status: "held" });
+      await ctx.scheduler.runAfter(0, internal.controller.cycle.gate1Check, {
+        cycleId: question.cycleId,
+      });
       return audit(
         "reply.held",
         "Still unclear after one follow-up: item held for a person",
@@ -572,6 +575,9 @@ export const expire = internalMutation({
     await ctx.db.patch(questionId, { status: "expired" });
     for (const flagId of q.flagIds)
       await ctx.db.patch(flagId, { status: "held", routeTo: "owner" });
+    await ctx.scheduler.runAfter(0, internal.controller.cycle.gate1Check, {
+      cycleId: q.cycleId,
+    });
     await write(ctx, {
       companyId: q.companyId,
       cycleId: q.cycleId,

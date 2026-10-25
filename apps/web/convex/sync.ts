@@ -1,4 +1,5 @@
 import { ConvexError, v } from "convex/values";
+import { internal } from "./_generated/api";
 import type { Id, TableNames } from "./_generated/dataModel";
 import { internalMutation, mutation } from "./_generated/server";
 import {
@@ -42,15 +43,21 @@ export const recordRun = internalMutation({
     method: v.string(),
     error: v.union(v.string(), v.null()),
   },
-  handler: (ctx, run) =>
-    ctx.db.insert("syncRuns", {
+  handler: async (ctx, run) => {
+    const id = await ctx.db.insert("syncRuns", {
       ...run,
       // Complete only when the source gave a total and we pulled exactly that many, with no error.
       complete:
         run.error === null &&
         run.expected !== null &&
         run.pulled === run.expected,
-    }),
+    });
+    if (run.cycleId)
+      await ctx.scheduler.runAfter(0, internal.controller.cycle.afterSync, {
+        cycleId: run.cycleId,
+      });
+    return id;
+  },
 });
 
 /**
@@ -100,6 +107,13 @@ export const ingestFixture = mutation({
           );
         }
       }
+    }
+    // The controller picks up every ingested cycle that is still open, as after a live sync.
+    for (const row of rows.cycles ?? []) {
+      if (row.stage !== "setup" && row.stage !== "syncing") continue;
+      await ctx.scheduler.runAfter(0, internal.controller.cycle.afterSync, {
+        cycleId: ids.get(row.id as string) as Id<"cycles">,
+      });
     }
     return Object.fromEntries(ids);
   },
