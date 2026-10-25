@@ -9,6 +9,7 @@ import {
   newestCycle,
   pageHasLiveCycle,
   recipientLabel,
+  toAuditEvent,
   toCorrection,
   toFlag,
 } from "./adapt";
@@ -206,5 +207,39 @@ describe("headerReadsLive", () => {
     expect(headerReadsLive("/c/a/flags/k57abc", fixture)).toBe(true);
     for (const path of ["/c/a", "/c/a/manager", "/c/a/workbook"])
       expect(headerReadsLive(path, fixture)).toBe(false);
+  });
+});
+
+describe("toAuditEvent", () => {
+  const doc = {
+    _id: "k1audit",
+    _creationTime: 1,
+    companyId: "j1company",
+    cycleId: null,
+    at: "2026-10-18T22:00:00.000Z",
+    actor: { kind: "agent", id: "auditor", agent: "auditor" },
+    type: "check.flagged",
+    summary: "Two entries overlap",
+    refs: { flagId: "k1flag" },
+    data: { source: "Convex checks.run" },
+  } as unknown as Doc<"auditEvents">;
+
+  test("keeps the row as stored, keyed by the dashboard's company letter", () => {
+    expect(toAuditEvent(doc, "r")).toEqual({
+      id: "k1audit",
+      companyId: "r",
+      cycleId: null,
+      at: "2026-10-18T22:00:00.000Z",
+      actor: { kind: "agent", id: "auditor", agent: "auditor" },
+      type: "check.flagged",
+      summary: "Two entries overlap",
+      refs: { flagId: "k1flag" },
+      data: { source: "Convex checks.run" },
+    });
+  });
+
+  test("missing data is null, not undefined", () => {
+    const bare = { ...doc, data: undefined } as unknown as Doc<"auditEvents">;
+    expect(toAuditEvent(bare, "r").data).toBeNull();
   });
 });

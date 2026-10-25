@@ -1,6 +1,13 @@
 import type { AgentKind } from "@/components/AgentChip";
 import type { Doc } from "@/convex/_generated/dataModel";
-import type { Correction, Flag, Question, SourceSystem } from "@/lib/types";
+import type {
+  AuditData,
+  AuditEvent,
+  Correction,
+  Flag,
+  Question,
+  SourceSystem,
+} from "@/lib/types";
 import type { Cycle, FlagInfo } from "@/lib/view-types";
 
 // Convex documents → the shapes the screens already render. Ids stay Convex row ids (strings) so links and
@@ -202,4 +209,22 @@ export function headerReadsLive(
   fixtureCycle: PeriodCycle | null,
 ): boolean {
   return fixtureCycle === null || pageHasLiveCycle(pathname);
+}
+
+/** A Convex audit row as the audit log renders it. companyId becomes the dashboard's key, as toFlag does. */
+export function toAuditEvent(
+  doc: Doc<"auditEvents">,
+  companyKey: string,
+): AuditEvent {
+  return {
+    id: doc._id,
+    companyId: companyKey,
+    cycleId: doc.cycleId ?? null,
+    at: doc.at,
+    actor: doc.actor,
+    type: doc.type,
+    summary: doc.summary,
+    refs: doc.refs,
+    data: (doc.data as AuditData | null) ?? null,
+  };
 }

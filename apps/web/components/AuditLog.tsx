@@ -66,6 +66,7 @@ export function AuditLog({
   companyId,
   companyLabel,
   managerIds,
+  source = AUDIT_FIXTURE_SOURCE,
 }: {
   data: AuditViewData;
   dataKind: DataKind;
@@ -73,6 +74,8 @@ export function AuditLog({
   companyId: string;
   companyLabel: string;
   managerIds: string[];
+  /** Where the events come from; the fixture file unless the page is live. */
+  source?: string;
 }) {
   const { role } = useRole();
   const local = useDemoLocal();
@@ -180,7 +183,7 @@ export function AuditLog({
         </span>
         <span aria-hidden>·</span>
         <span>
-          Source: {AUDIT_FIXTURE_SOURCE}
+          Source: {source}
           {localCount > 0 &&
             `. Demo rows come from the demo panel and inbox, ${LOCAL_SOURCE}, and are not part of the log`}
         </span>
