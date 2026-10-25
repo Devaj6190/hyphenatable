@@ -1,27 +1,44 @@
-# PayrollPilot (working name)
+# Rollpay
 
-PayrollPilot is the agent a small service company hires to prepare and check payroll before a person submits it: it syncs Jobber, QuickBooks and Gusto with completeness checks, runs a deterministic checks engine, and texts the right manager or employee one short question when something is missing or contradictory. People approve every message, correction and rule, and each answer becomes a backtested rule the owner approves, so the next cycle asks less; PayrollPilot fills the Gusto draft and never submits it.
+Rollpay (formerly PayrollPilot) is the product name. Some code identifiers, env vars and URLs still use the old name.
 
-Built for the Cal Hacks 13.0 Hyphenate track ("The Hyphenated Enterprise: Autonomous Systems for Finance").
+Rollpay is the agent a small service company hires to prepare and check payroll before a person submits it: it syncs Jobber, QuickBooks and Gusto with completeness checks, runs a deterministic checks engine, and texts the right manager or employee one short question when something is missing or contradictory. People approve every message, correction and rule, and each answer becomes a backtested rule the owner approves, so the next cycle asks less; Rollpay fills the Gusto draft and never submits it.
+
+Built for the Cal Hacks 13.0 Hyphenate track ("The Hyphenated Enterprise: Autonomous Systems for Finance"). We also enter the Creao track, **Best One-Person Company**.
 
 - **Demo script and shot list:** [docs/DEMO.md](docs/DEMO.md)
 - **What's real, what's simulated, and the measured numbers:** [docs/PROOF.md](docs/PROOF.md)
 
-## What's real and what's synthetic
+## What's real and what's simulated
 
-The full table, with what was measured and when, is in [docs/PROOF.md](docs/PROOF.md) section 1. In short:
+Every number below comes from [docs/PROOF.md](docs/PROOF.md); the section is named in the Source column. Numbers on Company A and Company B are synthetic. Anything marked "measured at G3" has not been measured yet, and no target is shown as a result.
 
-| System | Real | Synthetic |
-|---|---|---|
-| Jobber (trial account) | users, clients, properties, jobs, visits, quotes, invoices and expenses, seeded and read back through the API | time entries and payment records, loaded from `data/fixtures/a/` because the Jobber API has no write for them |
-| Gusto (demo company) | employees mapped to Company A, their compensations, and the current unprocessed payroll | Company A's past payrolls; PayrollPilot only prepares, updates and calculates, and the code has no submit |
-| QuickBooks (sandbox) | [TODO: waiting on sandbox credentials] | [TODO] |
-| Company R | a real company's past pay cycles, anonymized at ingest, for the backtest [TODO: measured at G3] | none; names, notes and client names stay in the gitignored `data/private/` |
-| Texts | [TODO: real iMessage/SMS through Photon once the round trip is proven] | anything the simulated-manager persona writes is labelled **Simulated** |
+| Item | Real or simulated | Number | Synthetic? | Source |
+|---|---|---|---|---|
+| Jobber trial account | users, clients, properties, jobs, visits, quotes, invoices and expenses are real records in a trial account; time entries and payment records are loaded from fixtures because the Jobber API cannot create them | none quoted | Company A is synthetic | PROOF.md section 1 |
+| Gusto demo company | employees, compensations and the current unprocessed payroll are real in the demo; past payrolls come from fixtures; the code has no submit | none quoted | Company A is synthetic | PROOF.md section 1 |
+| QuickBooks sandbox | real records in our own sandbox, read back | purchases for cycle 1 match 6 of 6 | synthetic | PROOF.md section 1 |
+| Company A | a seeded landscaping crew | 14 worker records, of which 12 are the crew | synthetic | PROOF.md section 2 |
+| Company R | real past timesheets and pay, anonymized at ingest, kept in the gitignored `data/private/` | 283 timesheet entries, 188 payroll rows, 8 pay periods | real, anonymized | PROOF.md section 3 |
+| Backtest on Company R | Stage 1 gross compared with what was actually paid | 35 of 46 worker pay periods match to the cent; 44 of 46 are within $1 | real, anonymized | PROOF.md section 4 |
+| Backtest self-check on Company B | payroll math on four past weekly cycles, including California daily overtime | 120 of 120 worker-cycles match to the cent | synthetic | PROOF.md section 4 |
+| Planted-error precision and recall, questions per cycle, rules vs the owner's runbook, completeness, traceability | not yet measured | measured at G3 | synthetic (Company A) | PROOF.md section 5 |
+| Creao agent runs | the Auditor, Messenger and Analyst run as saved Creao agents started by our controller | not yet measured: the Creao spike (H9) is unverified | agent ids and run share link are TODO(S7) | [docs/INTEGRATIONS.md](docs/INTEGRATIONS.md) row H9 |
+| Texts | real iMessage through Photon on registered demo phones; replies written by the simulated-manager persona are labelled **Simulated** | measured at G3 | demo personas are fake | PROOF.md section 1; round-trip log in [docs/INTEGRATIONS.md](docs/INTEGRATIONS.md) rows H4, H5 |
 
 Company A is a synthetic landscaping crew in Pennsylvania, paid biweekly, with planted errors and an answer key for checks CHK-01 to CHK-22 in each of two cycles. The model never sees the answer key. Every name on screen, in this repo and in the video is fake.
 
-Measured results, all **[TODO: measured at G3]**: planted-error precision and recall, questions asked in cycle 1 vs cycle 2, learned rules vs the owner's runbook, and the Company R backtest to the cent.
+## How Creao fits
+
+Three batch agents, the **Auditor**, the **Messenger** and the **Analyst**, run as saved agents on Creao behind our Convex controller. The controller starts each run; the agents never start each other or themselves. They read work from Rollpay's own HTTP API and return proposals only. Every proposal is validated, stored as `proposed` or `draft`, and waits for a person to approve it. Plain code owns the money, the checks, the holds and the approvals. The live reply path (reading a worker's text) stays in our own code, because a Creao run takes minutes.
+
+**Creao only ever sees ids.** No names, phone numbers, notes or pay amounts are sent to a Creao agent or accepted back from one.
+
+> Remove the agent, and this product dies. Without the Analyst there are no rules learned from history; without the Auditor, no fuzzy matches or morning list; without the Messenger, no questions. What's left is a calculator.
+
+- Agent ids: TODO(S7) Auditor, TODO(S7) Messenger, TODO(S7) Analyst
+- Shared run link: TODO(S7)
+- Status of the integration: [docs/INTEGRATIONS.md](docs/INTEGRATIONS.md) row H9. Design and the go/no-go spike: [docs/plans/creao-plan.md](docs/plans/creao-plan.md).
 
 ## Architecture
 
@@ -33,7 +50,7 @@ Jobber · QuickBooks · Gusto ──(connectors, read-only + completeness)──
 ```
 
 - **Dashboard** (`apps/web`, Next.js 16, Tailwind, shadcn): the owner home (stage, "what we need from you", one-tap approve / edit / deny), problem detail, manager inbox, onboarding, rules, workbook and readiness, audit log. It reads Convex live and renders from fixtures when no deployment is configured. Manager views never show pay.
-- **Convex** (`apps/web/convex`): the database, scheduler and live queries; the controller that owns each cycle's state and approvals; sync, the checks runner, three Claude agents (Analyst, Auditor, Messenger) that only return validated proposals, the learning loop, the Gusto draft writer, and an append-only audit log.
+- **Convex** (`apps/web/convex`): the database, scheduler and live queries; the controller that owns each cycle's state and approvals; sync, the checks runner, three batch agents (Analyst, Auditor, Messenger) that run on Creao behind the controller and only return validated proposals, the learning loop, the Gusto draft writer, and an append-only audit log.
 - **Courier** (`apps/courier`, Bun + Photon `spectrum-ts`): the only process that touches phones. It sends what Convex approved and relays replies; Convex sees a sha256 key, never a phone number.
 - **Engine** (`packages/engine`, pure TypeScript, no IO, Vitest): the contract schemas, the 23 checks (CHK-01 to CHK-23), Stage 1 and Stage 2 payroll math in integer cents, and the message templates (under 240 characters, never a pay amount).
 - **Connectors** (`packages/connectors`): Jobber GraphQL, QuickBooks Online and Gusto readers, each reporting pulled vs expected. Also `seed/` (synthetic companies, answer keys, sandbox pushers) and `eval/` (the metrics behind PROOF.md).

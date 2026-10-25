@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { AgentOrgChart } from "@/components/AgentOrgChart";
 import { AuditLog } from "@/components/AuditLog";
 import { PageHeader } from "@/components/PageHeader";
 import { companies } from "@/lib/companies";
@@ -29,14 +30,18 @@ async function Body({
   const company = companies[companyId];
   if (!company) notFound();
   const viewer = await currentViewer(companyId);
+  const data = auditView(viewer, companyId);
   return (
-    <AuditLog
-      data={auditView(viewer, companyId)}
-      dataKind={company.kind}
-      timezone={company.timezone}
-      companyId={companyId}
-      companyLabel={`${company.label}${company.cycle ? `, cycle ${company.cycle.number}` : ""}`}
-      managerIds={managerIds(companyId)}
-    />
+    <>
+      <AgentOrgChart events={data.events} />
+      <AuditLog
+        data={data}
+        dataKind={company.kind}
+        timezone={company.timezone}
+        companyId={companyId}
+        companyLabel={`${company.label}${company.cycle ? `, cycle ${company.cycle.number}` : ""}`}
+        managerIds={managerIds(companyId)}
+      />
+    </>
   );
 }

@@ -1,10 +1,13 @@
 {
-  "generatedAt": "2026-10-24T19:04:39.016Z",
-  "gitSha": "9c15732cf3337ff4518c22c0d0a662d11a77a0f0",
+  "generatedAt": "2026-10-25T02:10:49.704Z",
+  "gitSha": "a90536eff9caf16bcbc50f230f3f39c64fa74ac8",
   "company": "a",
   "cycle": "a-c05",
   "flagsSource": "naive-fixture-checker (stand-in, not B's checks engine)",
   "synthetic": true,
+  "notes": [
+    "M1 scores only section 9 checks (CHK-01..CHK-23); CHK-23 on a sync run is an expected extra with no key row"
+  ],
   "m1": {
     "keyRows": 29,
     "flags": 30,
@@ -303,7 +306,8 @@
         "checkId": "CHK-23",
         "seen": "a-sr-04 jobber timeSheetEntries pulled 75 of 76"
       }
-    ]
+    ],
+    "otherFlags": {}
   },
   "m2": {
     "status": "pending",

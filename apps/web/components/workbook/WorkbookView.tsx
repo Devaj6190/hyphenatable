@@ -7,17 +7,10 @@ import { useState } from "react";
 import { DataLabel } from "@/components/DataLabel";
 import { PageHeader } from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { companies } from "@/lib/companies";
 import { CycleArchive } from "./CycleArchive";
 import { periodLabel, type WorkbookData, workbookCsv } from "./data";
-import { ReadinessCard } from "./ReadinessCard";
-import {
-  ReconTable,
-  Stage1Table,
-  Stage2Table,
-  VenmoList,
-} from "./WorkbookTable";
+import { PaidSum, PreviewNote, WageSummary, WageTable } from "./WorkbookTable";
 
 const PANEL_ID = "workbook-cycle-panel";
 
@@ -32,12 +25,14 @@ export function WorkbookView({
   const company = companies[companyId];
   const [picked, setPicked] = useState(params.get("cycle"));
   const { cycles, names } = data;
-  const wb = cycles.find((c) => c.cycle.id === picked) ?? cycles.at(-1);
+  const at = cycles.findIndex((c) => c.cycle.id === picked);
+  const index = at >= 0 ? at : cycles.length - 1;
+  const wb = cycles[index];
 
   if (!wb)
     return (
       <>
-        <PageHeader title="Workbook and readiness" />
+        <PageHeader title="Workbook" />
         <div className="flex flex-col gap-2 rounded-card border bg-card p-5">
           <DataLabel kind={company.kind} detail={company.label} />
           <p className="text-muted-foreground">
@@ -59,7 +54,7 @@ export function WorkbookView({
     );
     const a = document.createElement("a");
     a.href = url;
-    a.download = `payrollpilot-workbook-${wb.cycle.id}.csv`;
+    a.download = `rollpay-workbook-${wb.cycle.id}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -67,13 +62,8 @@ export function WorkbookView({
   return (
     <>
       <PageHeader
-        title="Workbook and readiness"
-        description={
-          <>
-            Payroll for {period}
-            {wb.draftId && ` · draft ${wb.draftId}`}
-          </>
-        }
+        title={`Payroll for ${period}`}
+        description="Wages, person by person. Every number traces to a Jobber or Gusto record."
         actions={
           <>
             {wb.basis === "engine" && (
@@ -86,12 +76,19 @@ export function WorkbookView({
                   />
                 }
               >
-                Payroll ready summary
+                Ready summary
               </Button>
             )}
             <Button variant="secondary" onClick={download}>
               <Download aria-hidden />
               Download CSV
+            </Button>
+            <Button
+              nativeButton={false}
+              variant="ghost"
+              render={<Link href={`/c/${companyId}`} />}
+            >
+              Back to Home
             </Button>
           </>
         }
@@ -101,8 +98,13 @@ export function WorkbookView({
           kind={company.kind}
           detail={`${company.label}, cycle ${wb.cycle.number}`}
         />
+        {wb.draftId && <span>Draft {wb.draftId}</span>}
         <span>Source: {data.source}</span>
       </div>
+      <p className="mb-6 max-w-2xl text-muted-foreground">
+        How each person’s wages were worked out. Nothing to do here. Job profit
+        and commissions are reviewed during payroll, on Home.
+      </p>
 
       <CycleArchive
         cycles={cycles}
@@ -118,27 +120,19 @@ export function WorkbookView({
         aria-labelledby={`cycle-tab-${wb.cycle.id}`}
         className="mt-6 flex flex-col gap-6"
       >
-        <ReadinessCard
-          companyId={companyId}
-          wb={wb}
-          readiness={wb.readiness}
-          lastQuestions={wb.lastQuestions}
-        />
-
-        <Tabs defaultValue="stage1">
-          <TabsList>
-            <TabsTrigger value="stage1">Stage 1 · Wages</TabsTrigger>
-            <TabsTrigger value="stage2">Stage 2 · Commissions</TabsTrigger>
-          </TabsList>
-          <TabsContent value="stage1" className="flex flex-col gap-6">
-            <Stage1Table names={names} wb={wb} />
-            <VenmoList names={names} wb={wb} />
-          </TabsContent>
-          <TabsContent value="stage2" className="flex flex-col gap-8">
-            <Stage2Table names={names} wb={wb} />
-            <ReconTable wb={wb} />
-          </TabsContent>
-        </Tabs>
+        <div className="flex flex-col gap-2">
+          <WageSummary
+            names={names}
+            wb={wb}
+            previous={index > 0 ? cycles[index - 1] : null}
+          />
+          {wb.basis === "paid" ? (
+            <PaidSum records={wb.stage1.lines.length} />
+          ) : (
+            <PreviewNote />
+          )}
+        </div>
+        <WageTable key={wb.cycle.id} names={names} wb={wb} />
       </div>
     </>
   );
