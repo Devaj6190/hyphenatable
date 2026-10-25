@@ -12,6 +12,8 @@ Status values: **tested** (ran here, evidence noted), **unverified** (docs read 
 | H6 | Claude: one structured-output call to `claude-opus-5-5` with `effort: "medium"`; billing confirmed | B | unverified | | OpenRouter route |
 | H7 | Embeddings: one Voyage or OpenAI call; one vector stored and searched with a company filter | B | unverified | | lexical match on structured rule fields |
 | H8 | Playwright `storageState` login to the Jobber tester account; one Timesheets report read | A (after G1) | unverified | | Browser Use Cloud |
+| H9 | Creao: account on Pro Plus; agent created by `cr_sk_` script; API Trigger run from Convex completes; webhook received and run re-fetched; schedule fires; one Auditor run under 5 min | B + Devaj | unverified | Sat 15:45 PDT: signup + booth email done (Devaj); no run yet | direct `complete()` adapter running the same prompts |
+| H10 | Jev (TypeSafe AI): one typed multiple-choice call with `JEV_API_KEY` from a Convex action; latency and probability recorded | B | unverified | | Haiku via `complete()`; numbered follow-up |
 
 ## Dated notes
 - Sat 15:10 · C · H4 **tested** on both phones (details in the H4 row). Verified: a vote's `pollTarget` equals the poll's sent message id, so `providerIdOf` is right and Convex can match votes to questions. **Found: a poll vote's `providerId` embeds the voter's phone number** (it is five `:`-separated segments: the poll id, the voter's E.164 number, a guid, `selected` and one more number-like value), so the courier currently passes phone numbers to `messages.inbound`. Not logged here for that reason. Fix before the Convex binding: hash or drop those segments in the courier. Also: a text sent to a different Photon number than this project's line does not reach the courier.

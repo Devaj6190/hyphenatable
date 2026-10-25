@@ -103,7 +103,8 @@ Hyphenate's engineers said a few agents that work well together beat a swarm nob
 
 We do not go to seven because a "Preparer" would be arithmetic (that stays in `packages/engine/payroll`), a "Collector" would be HTTP calls (that is `sync/run.ts`), and a "Supervisor" would duplicate the controller, which must stay plain code so that approvals and money never depend on a model's judgment. We do not collapse to one because a single prompt covering history mining, matching and texting would need the whole company in context on every call, would mix Opus-level judgment with Haiku-level parsing, and would make "which agent got this wrong" unanswerable. Three agents, one deterministic engine, one controller.
 
-### 4.3 Agents (`apps/web/convex/agents/`)
+\1**With Creao (see [creao-plan.md](creao-plan.md) section 9):** the Analyst, the Auditor and Messenger drafting run as saved Creao agents that call `/agent/*`; the prompts below become their instructions, and `complete()` runs the same prompts as the fallback. Reply interpretation and lesson classification stay in Convex through `complete()`.
+
 Every call goes through `packages/engine/src/llm/complete.ts`:
 
 ```ts
@@ -413,6 +414,13 @@ Each ticket is one PR to `main`, under 400 lines where possible (schema and prom
 - **Goal:** mirror confirmed lessons to Backboard (`add_memory`) for the MLH track; Jobber `TIMESHEET_*` webhook → `http.ts` → scheduled `sync.run` for the object.
 - **Priority:** P2. Only after G3 with nothing else pending.
 - **Time:** 30 min each. **Fallback:** skip; both are off the hero path.
+
+### B-19 Creao: agent HTTP API, controller trigger, webhook (P0 if the spike passes)
+- **Branch:** `b/creao-mcp` (endpoint, done), then `b/creao-controller`.
+- **Goal:** steps S1 and S3 to S6 of [creao-plan.md](creao-plan.md): the Analyst, Auditor and Messenger run as Creao agents started by the controller, reading and proposing only through our endpoints.
+- **Files:** `apps/web/convex/http.ts` (`/agent/*` with bearer `PAYROLLPILOT_KEY`, `/mcp`, `/creao/webhook`), `apps/web/convex/creao.ts` (tools, `start` action via API Trigger with `idempotencyKey`, `creaoRuns` table via a `contract:` PR).
+- **Acceptance:** the spike's five checks (creao-plan.md section 5); proposals are zod-validated and stored as `proposed`/`draft`; the webhook re-fetches the run before trusting it.
+- **Fallback:** drop Creao; the same prompts run through `complete()`.
 
 ---
 
