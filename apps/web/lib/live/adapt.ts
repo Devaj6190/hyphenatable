@@ -1,5 +1,6 @@
 import type { AgentKind } from "@/components/AgentChip";
 import type { Doc } from "@/convex/_generated/dataModel";
+import type { Rule } from "@/lib/rules";
 import type {
   AuditData,
   AuditEvent,
@@ -226,5 +227,20 @@ export function toAuditEvent(
     summary: doc.summary,
     refs: doc.refs,
     data: (doc.data as AuditData | null) ?? null,
+  };
+}
+
+/** A Convex rule row as the rules screen reads it; companyId becomes the dashboard's key. */
+export function toRule(doc: Doc<"rules">, companyKey: string): Rule {
+  return {
+    id: doc._id,
+    companyId: companyKey,
+    type: doc.type,
+    params: doc.params,
+    status: doc.status,
+    source: doc.source,
+    provenance: doc.provenance,
+    backtest: doc.backtest ?? null,
+    confidence: doc.confidence,
   };
 }
