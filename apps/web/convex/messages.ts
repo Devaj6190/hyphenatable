@@ -423,15 +423,23 @@ async function decide(
         backtest: null,
         confidence: 1,
       });
+      // The question goes to their manager instead (plan B-09); a manager who says STOP leaves it with the owner.
+      const toManager = question.toRole === "employee";
       await ctx.db.patch(flag._id, {
         status: "open",
         questionId: null,
-        routeTo: "owner",
+        routeTo: toManager ? "manager" : "owner",
       });
       await queueText(ctx, question, render("stopAck", {}));
+      if (toManager)
+        await ctx.scheduler.runAfter(0, internal.questions.draftForCycle, {
+          cycleId: question.cycleId,
+        });
       return audit(
         "reply.stop",
-        "STOP: no more texts to this person; flag moved to the owner",
+        toManager
+          ? "STOP: no more texts to this person; the question goes to their manager"
+          : "STOP: no more texts to this person; flag moved to the owner",
       );
     }
     case "hold": {
