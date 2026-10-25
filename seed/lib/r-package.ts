@@ -385,7 +385,13 @@ export function buildRPackage(
     for (const j of (q.jobIds as string[] | undefined) ?? [])
       if (!quoteForJob.has(j)) quoteForJob.set(j, String(q.id));
   const seenJob = new Set<string>();
-  const jobs = load("jobs", reports, (r) => {
+  // a job can appear in both the one-off and recurring reports: the row carrying a status fact goes first
+  const hasStatusFact = (r: Rec) => r.status != null || isDay(r.closedDate);
+  const ordered = [
+    ...reports.filter(hasStatusFact),
+    ...reports.filter((r) => !hasStatusFact(r)),
+  ];
+  const jobs = load("jobs", ordered, (r) => {
     if (!r.jobId) return { reasons: ["id: report row has no job id"] };
     if (seenJob.has(String(r.jobId))) {
       duplicateIds++;
@@ -394,6 +400,12 @@ export function buildRPackage(
       };
     }
     seenJob.add(String(r.jobId));
+    if (r.status == null && !isDay(r.closedDate))
+      return {
+        reasons: [
+          "status: no fact (the jobs report row has no Status value and no Closed date)",
+        ],
+      };
     const j = jobIndex.get(String(r.jobId));
     return {
       id: r.jobId,
@@ -401,7 +413,9 @@ export function buildRPackage(
       jobNumber: j?.jobNumber,
       title: j?.title,
       clientRef: r.clientRef ?? undefined,
-      status: r.status ?? undefined,
+      // Jobber's own Status column when the report has it; else a closed date is the fact "closed".
+      // Neither: no fact, so the job stays unloadable (jobsReport needs a Status or Closed date column).
+      status: r.status ?? (isDay(r.closedDate) ? "closed" : undefined),
       salespersonWorkerId: salesperson("jobs", r),
       quoteId: quoteForJob.get(String(r.jobId)) ?? null,
       parentJobId: null,

@@ -576,6 +576,70 @@ describe("Company R package (synthetic, A1-shaped inputs)", () => {
   });
 });
 
+describe("job status from facts only", () => {
+  const base = bundle.jobsReport[0];
+  const run = (rows: R[]) =>
+    buildRPackage(
+      [
+        {
+          ...bundle,
+          jobs: [
+            { id: "r:j:1", jobNumber: 1, title: "Job J001" },
+            { id: "r:j:2", jobNumber: 2, title: "Job J002" },
+            { id: "r:j:3", jobNumber: 3, title: "Job J003" },
+          ],
+          jobsReport: rows,
+        },
+      ] as never,
+      rules,
+      full,
+    );
+  test("Status column wins; else a closed date means closed; else no fact -> unloadable with the reason", () => {
+    const p = run([
+      { ...base, id: "a", jobId: "r:j:1", status: "Archived" },
+      {
+        ...base,
+        id: "b",
+        jobId: "r:j:2",
+        status: null,
+        closedDate: "2026-10-01",
+      },
+      { ...base, id: "c", jobId: "r:j:3", status: null, closedDate: null },
+    ]);
+    const jobs = (p.current as Record<string, R[]>)["jobs.json"];
+    expect(jobs.map((j) => [j.id, j.status])).toEqual([
+      ["r:j:1", "Archived"],
+      ["r:j:2", "closed"],
+    ]);
+    expect(p.unloadable.find((u) => u.id === "c")?.reasons[0]).toContain(
+      "no Status value and no Closed date",
+    );
+  });
+  test("a job in both reports loads from the row that carries the fact", () => {
+    const p = run([
+      {
+        ...base,
+        id: "one-off",
+        jobId: "r:j:2",
+        status: null,
+        closedDate: null,
+      },
+      {
+        ...base,
+        id: "recurring",
+        jobId: "r:j:2",
+        status: null,
+        closedDate: "2026-10-02",
+      },
+    ]);
+    const jobs = (p.current as Record<string, R[]>)["jobs.json"];
+    expect(jobs.map((j) => [j.id, j.status, j.sourceId])).toEqual([
+      ["r:j:2", "closed", base.sourceId],
+    ]);
+    expect(p.excluded.duplicateIds).toBe(1);
+  });
+});
+
 describe("end to end: A1's replicas through ingest-r, then the package", () => {
   test("loads strictly and nothing real-looking leaks", async () => {
     const dir = join(mkdtempSync(join(tmpdir(), "rpkg-e2e-")), "r");
