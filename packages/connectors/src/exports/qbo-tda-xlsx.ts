@@ -62,10 +62,13 @@ export const labelShape = (s: string): string =>
     .replace(/\p{Ll}/gu, "a")
     .replace(/\p{Nd}/gu, "9");
 
+/** QBO: "Total for X" covers X's own lines; "Total for X with sub-accounts" covers X and its sub-accounts. */
+const WITH_SUBS = /\s+with\s+sub-?\s*accounts?\s*$/i;
+
 /** "6000 Payroll expenses:6010 Manager pay (deleted)" -> "payroll expenses:manager pay" */
 const accountKey = (s: string): string =>
   s
-    .replace(/\s+with sub-?accounts\s*$/i, "")
+    .replace(WITH_SUBS, "")
     .split(":")
     .map((seg) =>
       seg
@@ -123,10 +126,16 @@ export async function readQboTransactionDetailXlsx(
     const { headerRow, cols } = header;
     const at = (row: Cell[], k: Key) =>
       cols[k] === undefined ? null : (row[cols[k] as number] ?? null);
-    const stack: { name: string; sum: number; row: number }[] = [];
-    const openShapes = () =>
-      stack.map((g) => `row ${g.row} "${labelShape(g.name)}"`).join(" > ") ||
-      "(none)";
+    // ownClosed: its own-lines total was seen; it stays as the parent of the sub-accounts that follow
+    type Group = { name: string; sum: number; row: number; ownClosed: boolean };
+    const stack: Group[] = [];
+    const openShapes = (gs: Group[] = stack) =>
+      gs
+        .map(
+          (g) =>
+            `row ${g.row} "${labelShape(g.name)}"${g.ownClosed ? " (own total seen)" : ""}`,
+        )
+        .join(" > ") || "(none)";
     let all = 0;
     for (let r = headerRow + 1; r < s.grid.length; r++) {
       const row = s.grid[r] ?? [];
@@ -136,13 +145,15 @@ export async function readQboTransactionDetailXlsx(
       try {
         if (totalFor) {
           const name = (totalFor[1] ?? "").trim();
-          // innermost open group this total names (full path, leaf, number prefix or "(deleted)" aside)
+          const withSubs = WITH_SUBS.test(name);
+          // innermost open group this total names (full path, leaf, number prefix or "(deleted)" aside); a
+          // plain total never names a group whose own total was already seen
           let idx = stack.length - 1;
-          while (
-            idx >= 0 &&
-            !closes((stack[idx] as { name: string }).name, name)
-          )
+          while (idx >= 0) {
+            const g = stack[idx] as Group;
+            if (closes(g.name, name) && (withSubs || !g.ownClosed)) break;
             idx--;
+          }
           const total = money(at(row, "amount"));
           if (idx < 0) {
             opts.diagnose?.(
@@ -153,16 +164,22 @@ export async function readQboTransactionDetailXlsx(
             );
             continue;
           }
-          // sub-accounts without their own total fold into this account
+          // groups opened after it (sub-accounts) fold into it
           while (stack.length - 1 > idx) {
-            const child = stack.pop() as { sum: number };
-            (stack[stack.length - 1] as { sum: number }).sum += child.sum;
+            const child = stack.pop() as Group;
+            (stack[stack.length - 1] as Group).sum += child.sum;
           }
-          const g = stack.pop() as { sum: number };
+          const g = stack[idx] as Group;
           if (total !== null && total !== g.sum)
             problems.push(
               `${where} row ${r + 1}: account lines ${g.sum}¢ vs its total row ${total}¢`,
             );
+          if (!withSubs) {
+            // own lines checked; sub-accounts may follow, closed by "Total for X with sub-accounts"
+            g.ownClosed = true;
+            continue;
+          }
+          stack.pop();
           const parent = stack[stack.length - 1];
           if (parent) parent.sum += g.sum;
           continue;
@@ -179,7 +196,7 @@ export async function readQboTransactionDetailXlsx(
         if (!date) {
           // an account header: text and no amount
           if (money(at(row, "amount")) === null && first) {
-            stack.push({ name: first, sum: 0, row: r + 1 });
+            stack.push({ name: first, sum: 0, row: r + 1, ownClosed: false });
             continue;
           }
           dataRows++;
@@ -207,11 +224,12 @@ export async function readQboTransactionDetailXlsx(
         problems.push(`${where} row ${r + 1}: unreadable amount`);
       }
     }
-    if (stack.length)
-      opts.diagnose?.(`${where} groups never closed: ${openShapes()}`);
-    if (stack.length)
+    const unclosed = stack.filter((g) => !g.ownClosed);
+    if (unclosed.length)
+      opts.diagnose?.(`${where} groups never closed: ${openShapes(unclosed)}`);
+    if (unclosed.length)
       notes.push(
-        `${where}: ${stack.length} account group(s) without a total row`,
+        `${where}: ${unclosed.length} account group(s) without a total row`,
       );
   }
   if (!sheetNo)

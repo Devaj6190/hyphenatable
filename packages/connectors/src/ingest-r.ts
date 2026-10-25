@@ -23,6 +23,7 @@ import {
   anonymizeJobberPull,
   chartWordsOf,
   findRealTokens,
+  leakReport,
   loadOrCreateSalt,
   type PseudonymMap,
 } from "./anonymize.ts";
@@ -188,6 +189,16 @@ export async function loadTokenAllow(privateDir: string): Promise<Set<string>> {
   }
 }
 
+/** The system word list, when there is one (macOS / most Linux): only to say "dictionary word or not". */
+async function dictionaryWords(): Promise<Set<string>> {
+  try {
+    const t = await readFile("/usr/share/dict/words", "utf8");
+    return new Set(t.split("\n").map((w) => w.trim().toLowerCase()));
+  } catch {
+    return new Set();
+  }
+}
+
 /** Check, then (unless dry run) persist map + token list and write the payload to out/. Returns the out path. */
 async function persist(
   privateDir: string,
@@ -196,9 +207,23 @@ async function persist(
   name: string,
   dryRun?: boolean,
   chartWords?: Set<string>,
+  diagnose?: (line: string) => void,
 ): Promise<string | null> {
-  const tokens = a.realTokens(chartWords, await loadTokenAllow(privateDir));
-  const json = assertSafeToWrite(payload, tokens);
+  const allow = await loadTokenAllow(privateDir);
+  const tokens = a.realTokens(chartWords, allow);
+  let json: string;
+  try {
+    json = assertSafeToWrite(payload, tokens);
+  } catch (e) {
+    if (diagnose)
+      for (const l of leakReport(
+        payload,
+        a.tokenSources(chartWords, allow),
+        await dictionaryWords(),
+      ))
+        diagnose(l);
+    throw e;
+  }
   if (dryRun) return null;
   await mkdir(join(privateDir, "out"), { recursive: true, mode: 0o700 });
   const outPath = join(privateDir, "out", `${name}.json`);
@@ -360,7 +385,8 @@ export async function ingestR(o: IngestOptions): Promise<IngestCounts> {
       {
         companyId,
         now,
-        diagnose: o.diagnose && ((l) => o.diagnose?.(`${fileTag} ${l}`)),
+        diagnose:
+          o.diagnose && ((l) => o.diagnose?.(`qbo-ledger ${fileTag} ${l}`)),
       },
     );
     syncRuns.push(scrub(r.syncRun, "qbo-transaction-detail", fileTag));
@@ -400,6 +426,7 @@ export async function ingestR(o: IngestOptions): Promise<IngestCounts> {
       ...bundle.expenses.map((x) => x.accountName),
       ...bundle.ledger.flatMap((x) => [x.accountName, x.splitAccount]),
     ]),
+    o.diagnose,
   );
   return {
     workers: bundle.workers.length,
@@ -577,7 +604,7 @@ if (import.meta.main) {
           venmo: values.venmo ?? [],
           dryRun: values["dry-run"],
           diagnose: values.diagnose
-            ? (l: string) => console.error(`diagnose qbo-ledger ${l}`)
+            ? (l: string) => console.error(`diagnose ${l}`)
             : undefined,
         });
   job

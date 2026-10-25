@@ -3,7 +3,12 @@ import { mkdir, mkdtemp, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { Anonymizer, anonymizeExports, nameKey } from "./anonymize.ts";
+import {
+  Anonymizer,
+  anonymizeExports,
+  leakReport,
+  nameKey,
+} from "./anonymize.ts";
 import type { PayrollJournalRow } from "./exports/gusto-payroll-journal-csv.ts";
 import type { TimesheetRow } from "./exports/jobber-timesheets-xlsx.ts";
 import { loadTokenAllow } from "./ingest-r.ts";
@@ -160,5 +165,36 @@ describe("token-allow.txt", () => {
     expect(t).not.toContain("pay");
     // a client word in the chart of accounts is still scanned unless the owner allowed it
     expect(t).toContain("dental");
+  });
+});
+
+describe("--diagnose leak report", () => {
+  it("names field paths (indexes collapsed), counts, token index and source; never the token or the value", () => {
+    const a = new Anonymizer(SALT, {
+      workers: { [nameKey("Avery Reed")]: "Casey Ashby" },
+      clients: { [nameKey("Brookside Dental")]: "Client C01" },
+      jobs: {},
+    });
+    const payload = {
+      namesAnonymized: true,
+      invoices: [
+        { status: "Paid" },
+        { status: "Sent to Brookside" },
+        { status: "brookside" },
+      ],
+      earnings: { "Reed bonus": 1 },
+    };
+    const lines = leakReport(
+      payload,
+      a.tokenSources(),
+      new Set(["reed", "paid"]),
+    );
+    // sorted tokens: avery, brookside, dental, reed
+    expect(lines).toEqual([
+      "leak: field $.invoices[].status count 2 token #1 of 4 from clients dictionary-word no",
+      "leak: field $.earnings.<key> count 1 token #3 of 4 from workers dictionary-word yes",
+    ]);
+    for (const w of ["brookside", "reed", "Sent", "bonus"])
+      expect(lines.join().toLowerCase()).not.toContain(w.toLowerCase());
   });
 });

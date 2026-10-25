@@ -289,22 +289,66 @@ export class Anonymizer {
     chartWords: Set<string> = new Set(),
     allow: Set<string> = new Set(),
   ): string[] {
-    const words = new Set<string>();
-    const add = (k: string, skip: Set<string>) => {
-      for (const w of k.split(" "))
-        if (w.length >= 3 && !STOP.has(w) && !skip.has(w) && !allow.has(w))
-          words.add(w);
-    };
-    for (const k of [
-      ...Object.keys(this.map.workers),
-      ...Object.keys(this.map.clients),
-    ])
-      add(k, new Set());
-    for (const k of Object.keys(this.map.vendors ?? {})) add(k, chartWords);
-    // Venmo counterparties who are not workers: people, always scanned
-    for (const k of Object.keys(this.map.parties ?? {})) add(k, new Set());
-    return [...words].sort();
+    return [...this.tokenSources(chartWords, allow).keys()].sort();
   }
+
+  /** realTokens with, for each token, the map sections it comes from (for --diagnose: never printed raw). */
+  tokenSources(
+    chartWords: Set<string> = new Set(),
+    allow: Set<string> = new Set(),
+  ): Map<string, Set<TokenSource>> {
+    const out = new Map<string, Set<TokenSource>>();
+    const add = (src: TokenSource, keys: string[], skip: Set<string>) => {
+      for (const k of keys)
+        for (const w of k.split(" "))
+          if (w.length >= 3 && !STOP.has(w) && !skip.has(w) && !allow.has(w))
+            out.set(w, (out.get(w) ?? new Set()).add(src));
+    };
+    add("workers", Object.keys(this.map.workers), new Set());
+    add("clients", Object.keys(this.map.clients), new Set());
+    add("vendors", Object.keys(this.map.vendors ?? {}), chartWords);
+    // Venmo counterparties who are not workers: people, always scanned
+    add("parties", Object.keys(this.map.parties ?? {}), new Set());
+    return out;
+  }
+}
+
+export type TokenSource = "workers" | "clients" | "vendors" | "parties";
+
+/**
+ * --diagnose leak report: for each hit, the JSON path (array indexes collapsed to []; "<key>" when the hit is
+ * in an object key), the hit count, the token's index in the sorted scanned list, its sources and whether it
+ * is a dictionary word. NEVER the token or the value.
+ */
+export function leakReport(
+  payload: unknown,
+  sources: Map<string, Set<TokenSource>>,
+  dictionary: Set<string> = new Set(),
+): string[] {
+  const tokens = [...sources.keys()].sort();
+  const index = new Map(tokens.map((t, i) => [t, i]));
+  const hits = new Map<string, number>();
+  const hit = (path: string, text: string) => {
+    for (const w of new Set(words(text)))
+      if (index.has(w)) {
+        const k = `${path}\u0000${w}`;
+        hits.set(k, (hits.get(k) ?? 0) + 1);
+      }
+  };
+  const walk = (v: unknown, path: string) => {
+    if (typeof v === "string" || typeof v === "number") hit(path, String(v));
+    else if (Array.isArray(v)) for (const x of v) walk(x, `${path}[]`);
+    else if (v && typeof v === "object")
+      for (const [k, x] of Object.entries(v)) {
+        hit(`${path}.<key>`, k);
+        walk(x, `${path}.${k}`);
+      }
+  };
+  walk(payload, "$");
+  return [...hits].map(([k, n]) => {
+    const [path, w] = k.split("\u0000") as [string, string];
+    return `leak: field ${path} count ${n} token #${index.get(w)} of ${tokens.length} from ${[...(sources.get(w) ?? [])].join("+")} dictionary-word ${dictionary.size ? (dictionary.has(w) ? "yes" : "no") : "unknown"}`;
+  });
 }
 
 /** Every real token found in `output` (case-insensitive, whole words). Empty means clean. */

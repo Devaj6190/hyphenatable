@@ -128,6 +128,58 @@ describe("QBO TDA total-row matching", () => {
     ]);
   });
 
+  it("QBO's layout: own lines, 'Total for X' (own only), sub-accounts, 'Total for X with sub-accounts' (any case / spelling)", async () => {
+    const layout = (subsTotal: number) => [
+      ["Fake Landscaping Co"],
+      [],
+      H,
+      ["Cost of goods sold - ABC"],
+      line("Hollis Supply", 400),
+      tot("Total for Cost of goods sold - ABC", 400),
+      ["Cost of goods sold - ABC:Off Site Fakeword"],
+      line("Hollis Supply", 100),
+      tot("Total for Off Site Fakeword", 100),
+      ["Cost of goods sold - ABC:Plants"],
+      line("Hollis Supply", 50),
+      tot("Total for Plants", 50),
+      tot("Total for Cost of goods sold - ABC with Sub-accounts", subsTotal),
+      ["Job Supplies"],
+      line("Hollis Supply", 25),
+      tot("Total for Job Supplies", 25),
+      ["Job Supplies:Mulch"],
+      line("Hollis Supply", 5),
+      tot("Total for Mulch", 5),
+      tot("Total for Job Supplies with subaccounts", 30),
+      ["Fuel"],
+      line("Quikfill Station", 10),
+      tot("Total for Fuel", 10),
+      tot("TOTAL", 590),
+    ];
+    const lines: string[] = [];
+    const r = await readQboTransactionDetailXlsx(
+      { bytes: await tdaWorkbook(layout(550)), fileName: "t.xlsx" },
+      { ...opts, diagnose: (l) => lines.push(l) },
+    );
+    expect(r.syncRun.error).toBeNull();
+    expect(r.syncRun.complete).toBe(true);
+    expect(lines).toEqual([]);
+    expect(r.rows.map((x) => x.accountName)).toEqual([
+      "Cost of goods sold - ABC",
+      "Cost of goods sold - ABC:Off Site Fakeword",
+      "Cost of goods sold - ABC:Plants",
+      "Job Supplies",
+      "Job Supplies:Mulch",
+      "Fuel",
+    ]);
+    const bad = await readQboTransactionDetailXlsx(
+      { bytes: await tdaWorkbook(layout(549)), fileName: "t.xlsx" },
+      opts,
+    );
+    expect(bad.syncRun.error).toContain(
+      "account lines 55000¢ vs its total row 54900¢",
+    );
+  });
+
   it("--diagnose prints label shapes only for a total that closes nothing and for groups never closed", async () => {
     const lines: string[] = [];
     const rows = [
