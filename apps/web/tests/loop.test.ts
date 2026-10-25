@@ -251,3 +251,48 @@ describe("rules and gates", () => {
     ).rejects.toThrow(/only the owner/);
   });
 });
+describe("settled flags stay settled", () => {
+  test("a reply to a question about a corrected flag changes nothing, and a stale draft can't be approved", async () => {
+    const s = await seed();
+    const { t } = s;
+    await askAndSend(s);
+    // Someone corrects the flag from the dashboard before the worker answers.
+    await t.run((ctx) => ctx.db.patch(s.flagId, { status: "corrected" }));
+    await reply(s, "1", 1);
+    await t.finishAllScheduledFunctions(vi.runAllTimers);
+    const state = await t.run(async (ctx) => ({
+      flag: await ctx.db.get(s.flagId),
+      corrections: await ctx.db.query("corrections").collect(),
+      interpretations: await ctx.db.query("interpretations").collect(),
+    }));
+    expect(state.flag?.status).toBe("corrected");
+    expect(state.corrections).toHaveLength(0);
+    expect(state.interpretations).toHaveLength(1);
+
+    const stale = await t.run((ctx) =>
+      ctx.db.insert("questions", {
+        companyId: s.companyId,
+        cycleId: s.cycleId,
+        flagIds: [s.flagId],
+        toWorkerId: s.fieldId,
+        toRole: "employee",
+        text: "Which one is right? 1 a 2 b",
+        options: ["a", "b"],
+        kind: "text",
+        status: "draft",
+        approvedBy: null,
+        approvedAt: null,
+        sentAt: null,
+        remindAt: null,
+        expiresAt: null,
+        interpretationId: null,
+      }),
+    );
+    await expect(
+      t.mutation(api.questions.approve, {
+        questionId: stale,
+        userId: s.ownerId,
+      }),
+    ).rejects.toThrow(/out of date/);
+  });
+});
