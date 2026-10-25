@@ -5,6 +5,9 @@
   "cycle": "a-c05",
   "flagsSource": "naive-fixture-checker (stand-in, not B's checks engine)",
   "synthetic": true,
+  "notes": [
+    "M1 scores only section 9 checks (CHK-01..CHK-23); CHK-23 on a sync run is an expected extra with no key row"
+  ],
   "m1": {
     "keyRows": 29,
     "flags": 30,
@@ -303,7 +306,8 @@
         "checkId": "CHK-23",
         "seen": "a-sr-04 jobber timeSheetEntries pulled 75 of 76"
       }
-    ]
+    ],
+    "otherFlags": {}
   },
   "m2": {
     "status": "pending",
