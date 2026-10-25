@@ -40,6 +40,17 @@ export const getFlags = internalQuery({
     })),
 });
 
+const companyArg = {
+  type: "object",
+  properties: {
+    companyId: {
+      type: "string",
+      description: "The companyId from your run input",
+    },
+  },
+  required: ["companyId"],
+} as const;
+
 const cycleArg = {
   type: "object",
   properties: {
@@ -114,6 +125,25 @@ export const TOOLS = [
       "Messenger: draft one short question per flag. proposals: [{ flagId, draft: { text ≤240, options ≤4 (≤40 chars each) or null, kind: text|poll, toRole: owner|manager|employee, reason ≤160 } }]. Never money; the owner or manager approves before anything is sent.",
     inputSchema: withList("proposals"),
   },
+  {
+    name: "get_history",
+    description:
+      "Analyst: code-built summaries of past cycles (paid rates, overtime paid, Venmo, off-cycle payrolls, expense accounts, payments on quotes vs invoices, who answered questions) plus the rules code already proposed. Ids only. Args: { companyId }.",
+    inputSchema: companyArg,
+  },
+  {
+    name: "propose_rules",
+    description:
+      "Analyst: payload { rules: [{ type, params: [{key, value}], statement ≤200, evidence: [record ids], seenInCycles, ofCycles, confidence }], missing: [{ question, why }] }. Code checks every evidence id, recounts cycles, backtests, and stores proposed rules for the owner. Args: { companyId, payload }.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        companyId: companyArg.properties.companyId,
+        payload: { type: "object" },
+      },
+      required: ["companyId", "payload"],
+    },
+  },
 ] as const;
 
 function withList(field: string) {
@@ -159,6 +189,16 @@ export async function callTool(
       });
     case "get_routed_flags":
       return ctx.runQuery(internal.agentApi.routedWithoutQuestion, { cycleId });
+    case "get_history":
+      return ctx.runQuery(internal.onboarding.history, {
+        companyId: args.companyId as Id<"companies">,
+      });
+    case "propose_rules":
+      return ctx.runMutation(internal.onboarding.proposeRules, {
+        companyId: args.companyId as Id<"companies">,
+        payload: args.payload,
+        by: "creao analyst",
+      });
     case "propose_questions":
       return ctx.runMutation(internal.agentApi.proposeQuestions, {
         cycleId,

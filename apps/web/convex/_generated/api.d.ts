@@ -9,6 +9,7 @@
  */
 
 import type * as agentApi from "../agentApi.js";
+import type * as agents_analyst from "../agents/analyst.js";
 import type * as agents_interpret from "../agents/interpret.js";
 import type * as agents_learn from "../agents/learn.js";
 import type * as agents_prompts from "../agents/prompts.js";
@@ -49,6 +50,7 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   agentApi: typeof agentApi;
+  "agents/analyst": typeof agents_analyst;
   "agents/interpret": typeof agents_interpret;
   "agents/learn": typeof agents_learn;
   "agents/prompts": typeof agents_prompts;
