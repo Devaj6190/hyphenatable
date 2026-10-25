@@ -1,5 +1,5 @@
 import type { Cycle, Flag } from "@payrollpilot/engine/schemas";
-import { issuePhrases, managerSummaryWording, render } from "./templates";
+import { issuePhrases, render, type TemplateKey } from "./templates";
 
 // The manager's summary text, built from the cycle's flags. Wording and the issue phrases live at the top of
 // templates.ts. Never a name other than the manager's first name, never a dollar amount.
@@ -11,15 +11,13 @@ export const NEEDS_MANAGER: readonly Flag["status"][] = [
   "answered",
 ];
 
-// The placeholder from managerSummaryWording until DASHBOARD_URL is set.
+// null when DASHBOARD_URL is not set: the text then leaves out the "Details here" line.
 export function managerLink(
   dashboardUrl: string | null | undefined,
   companyId: string,
-): string {
+): string | null {
   const base = dashboardUrl?.trim().replace(/\/+$/, "");
-  return base
-    ? `${base}/c/${companyId}/manager`
-    : managerSummaryWording.linkPlaceholder;
+  return base ? `${base}/c/${companyId}/manager` : null;
 }
 
 // "Oct 10–23", or "Sep 26–Oct 9" across a month, in the company's timezone.
@@ -75,11 +73,18 @@ export function managerSummary(input: {
   const one = mine.length === 1;
   const phrase = issuePhrases[topIssue(mine)];
   const link = managerLink(input.dashboardUrl, cycle.companyId);
-  return render(one ? "managerSummaryOne" : "managerSummary", {
+  const key: TemplateKey = one
+    ? link
+      ? "managerSummaryOne"
+      : "managerSummaryOneNoLink"
+    : link
+      ? "managerSummary"
+      : "managerSummaryNoLink";
+  return render(key, {
     name: input.managerFirstName,
     range: dateRange(cycle, input.timeZone),
     count: String(mine.length),
     issue: one ? phrase.one : phrase.many,
-    link,
+    ...(link ? { link } : {}),
   });
 }

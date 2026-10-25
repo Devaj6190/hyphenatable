@@ -3,12 +3,11 @@ import { PRODUCT_NAME } from "./brand";
 
 // ── Manager summary: edit wording here ─────────────────────────────────────────────────────────────────
 // The text a manager gets before payroll. {issue} is the most common flag type this cycle, from issuePhrases.
-// "one" is used when a single item needs them. linkPlaceholder stands in for the link until DASHBOARD_URL is set.
+// "one" is used when a single item needs them. The "Details here" line is left out when DASHBOARD_URL is not set.
 export const managerSummaryWording = {
   many: "Hi {name}, before we run payroll ({range}) there are {count} timesheet items to check, mostly {issue}.",
   one: "Hi {name}, before we run payroll ({range}) there is 1 timesheet item to check, about {issue}.",
   link: "\nDetails here: {link}",
-  linkPlaceholder: "[dashboard link coming soon]",
 } as const;
 
 // Every flag type in plain English: "many" follows "mostly", "one" follows "about".
@@ -97,7 +96,9 @@ export const templates = {
   ownerPage: `${PRODUCT_NAME}: {n} decisions are waiting for you before {day}'s payroll. Open: {link}`,
   // Filled by managerSummary() in summary.ts; wording lives in managerSummaryWording above.
   managerSummary: `${managerSummaryWording.many}${managerSummaryWording.link}`,
+  managerSummaryNoLink: managerSummaryWording.many,
   managerSummaryOne: `${managerSummaryWording.one}${managerSummaryWording.link}`,
+  managerSummaryOneNoLink: managerSummaryWording.one,
   entryNoJob:
     "{who}, on {date} your {hours}h entry has no job. Which job was it? 1 {jobA} 2 {jobB} 3 something else",
   overlap:
@@ -124,7 +125,9 @@ export const audience: Record<
 > = {
   managerPage: "manager",
   managerSummary: "manager",
+  managerSummaryNoLink: "manager",
   managerSummaryOne: "manager",
+  managerSummaryOneNoLink: "manager",
   ownerPage: "owner",
   entryNoJob: "employee",
   overlap: "employee",
