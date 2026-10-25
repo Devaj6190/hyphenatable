@@ -1,16 +1,16 @@
 {
-  "generatedAt": "2026-10-25T02:10:49.704Z",
-  "gitSha": "a90536eff9caf16bcbc50f230f3f39c64fa74ac8",
+  "generatedAt": "2026-10-25T13:53:31.838Z",
+  "gitSha": "4d3a59c0bad06eacedfa67e8650d8b48b3fe08bb",
   "company": "a",
   "cycle": "a-c05",
-  "flagsSource": "naive-fixture-checker (stand-in, not B's checks engine)",
+  "flagsSource": "checks engine (packages/engine runAll + rule settling), onboarding rules owner-approved",
   "synthetic": true,
   "notes": [
     "M1 scores only section 9 checks (CHK-01..CHK-23); CHK-23 on a sync run is an expected extra with no key row"
   ],
   "m1": {
     "keyRows": 29,
-    "flags": 30,
+    "flags": 29,
     "recall": {
       "num": 29,
       "den": 29,
@@ -18,8 +18,8 @@
     },
     "precision": {
       "num": 29,
-      "den": 30,
-      "value": 0.9667
+      "den": 29,
+      "value": 1
     },
     "perCheck": {
       "CHK-01": {
@@ -285,28 +285,10 @@
           "den": 2,
           "value": 1
         }
-      },
-      "CHK-23": {
-        "recall": {
-          "num": 0,
-          "den": 0,
-          "value": null
-        },
-        "precision": {
-          "num": 0,
-          "den": 1,
-          "value": 0
-        }
       }
     },
     "missedKeyRowIds": [],
-    "unmatchedFlags": [
-      {
-        "id": "naive-a-c05-030",
-        "checkId": "CHK-23",
-        "seen": "a-sr-04 jobber timeSheetEntries pulled 75 of 76"
-      }
-    ],
+    "unmatchedFlags": [],
     "otherFlags": {}
   },
   "m2": {
@@ -523,24 +505,213 @@
   },
   "m6": {
     "traceable": {
-      "num": 27,
-      "den": 30,
-      "value": 0.9
+      "num": 28,
+      "den": 29,
+      "value": 0.9655
     },
     "withWhere": {
-      "num": 30,
-      "den": 30,
+      "num": 29,
+      "den": 29,
       "value": 1
     },
     "withRuleOrModel": {
-      "num": 27,
-      "den": 30,
-      "value": 0.9
+      "num": 28,
+      "den": 29,
+      "value": 0.9655
     },
-    "untraceableFlagIds": [
-      "naive-a-c05-020",
-      "naive-a-c05-021",
-      "naive-a-c05-027"
+    "untraceableFlagIds": ["CHK-15:a-c05:a-ex-0003,a-ex-0009"]
+  },
+  "m1ByCycle": [
+    {
+      "cycleId": "a-c05",
+      "recall": {
+        "num": 29,
+        "den": 29,
+        "value": 1
+      },
+      "precision": {
+        "num": 29,
+        "den": 29,
+        "value": 1
+      },
+      "missedKeyRowIds": []
+    },
+    {
+      "cycleId": "a-c06",
+      "recall": {
+        "num": 30,
+        "den": 31,
+        "value": 0.9677
+      },
+      "precision": {
+        "num": 30,
+        "den": 30,
+        "value": 1
+      },
+      "missedKeyRowIds": ["a-ak-72"]
+    }
+  ],
+  "learning": {
+    "extraction": "oracle: each learned rule is what a correct Analyst writes from one cycle-1 answer-key row; backtest, approval, checks, settling and routing are the product's code",
+    "curve": [
+      {
+        "scenario": "day0",
+        "cycleId": "a-c05",
+        "rules": 0,
+        "flags": 30,
+        "outcomes": {
+          "needs_person": 27,
+          "rule_backed": 0,
+          "settled": 0,
+          "note": 3
+        }
+      },
+      {
+        "scenario": "day0",
+        "cycleId": "a-c06",
+        "rules": 0,
+        "flags": 31,
+        "outcomes": {
+          "needs_person": 28,
+          "rule_backed": 0,
+          "settled": 0,
+          "note": 3
+        }
+      },
+      {
+        "scenario": "onboarding",
+        "cycleId": "a-c05",
+        "rules": 23,
+        "flags": 29,
+        "outcomes": {
+          "needs_person": 20,
+          "rule_backed": 5,
+          "settled": 1,
+          "note": 3
+        }
+      },
+      {
+        "scenario": "onboarding",
+        "cycleId": "a-c06",
+        "rules": 23,
+        "flags": 30,
+        "outcomes": {
+          "needs_person": 21,
+          "rule_backed": 5,
+          "settled": 1,
+          "note": 3
+        }
+      },
+      {
+        "scenario": "learned",
+        "cycleId": "a-c06",
+        "rules": 26,
+        "flags": 29,
+        "outcomes": {
+          "needs_person": 17,
+          "rule_backed": 7,
+          "settled": 2,
+          "note": 3
+        }
+      }
+    ],
+    "learned": [
+      {
+        "fromKeyRow": "a-ak-06",
+        "type": "pay_rate",
+        "verdict": "duplicate",
+        "ruleId": "a-rule-17",
+        "backtest": null
+      },
+      {
+        "fromKeyRow": "a-ak-07",
+        "type": "venmo_rate",
+        "verdict": "approved",
+        "ruleId": "a-learned-02",
+        "backtest": {
+          "cycles": 4,
+          "agree": 4,
+          "disagree": 0
+        }
+      },
+      {
+        "fromKeyRow": "a-ak-08",
+        "type": "vendor_job_hint",
+        "verdict": "approved",
+        "ruleId": "a-learned-03",
+        "backtest": {
+          "cycles": 4,
+          "agree": 4,
+          "disagree": 0
+        }
+      },
+      {
+        "fromKeyRow": "a-ak-23",
+        "type": "expense_account_kind",
+        "verdict": "approved",
+        "ruleId": "a-learned-04",
+        "backtest": {
+          "cycles": 4,
+          "agree": 4,
+          "disagree": 0
+        }
+      }
+    ],
+    "resolvedRows": [
+      {
+        "id": "a-ak-74",
+        "checkId": "CHK-10",
+        "expected": "pay_rate",
+        "outcome": "settled"
+      },
+      {
+        "id": "a-ak-75",
+        "checkId": "CHK-11",
+        "expected": "venmo_rate",
+        "outcome": "settled"
+      },
+      {
+        "id": "a-ak-80",
+        "checkId": "CHK-14",
+        "expected": "vendor_job_hint",
+        "outcome": "rule_backed"
+      },
+      {
+        "id": "a-ak-82",
+        "checkId": "CHK-16",
+        "expected": "disposal_parent_link",
+        "outcome": "rule_backed"
+      },
+      {
+        "id": "a-ak-83",
+        "checkId": "CHK-17",
+        "expected": "expense_account_kind",
+        "outcome": "not_flagged"
+      },
+      {
+        "id": "a-ak-84",
+        "checkId": "CHK-18",
+        "expected": "pay_rate",
+        "outcome": "rule_backed"
+      },
+      {
+        "id": "a-ak-85",
+        "checkId": "CHK-19",
+        "expected": "deposit_vs_final",
+        "outcome": "rule_backed"
+      },
+      {
+        "id": "a-ak-86",
+        "checkId": "CHK-20",
+        "expected": "in_person_quoter",
+        "outcome": "rule_backed"
+      },
+      {
+        "id": "a-ak-91",
+        "checkId": "CHK-22",
+        "expected": "venmo_rate",
+        "outcome": "rule_backed"
+      }
     ]
   }
 }
