@@ -69,7 +69,7 @@ describe("manager summary", () => {
       summary({ flags: [timer] }),
     ] as string[]) {
       expect(text.startsWith("Hi Dakota,")).toBe(true);
-      expect(text).not.toMatch(/Rollpay:|·|•|\$/);
+      expect(text).not.toMatch(/RollPay:|·|•|\$/);
       expect(text.length).toBeLessThanOrEqual(MAX_LEN);
     }
   });

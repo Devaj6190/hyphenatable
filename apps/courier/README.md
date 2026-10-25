@@ -1,6 +1,6 @@
 # Courier
 
-The only Rollpay process that touches phones. It sends what Convex says is pending and relays what arrives; Convex decides everything else (shared-context section 10, ticket C-02).
+The only RollPay process that touches phones. It sends what Convex says is pending and relays what arrives; Convex decides everything else (shared-context section 10, ticket C-02).
 
 - **Out:** subscribes to `messages.pendingOutbound({ courierKey })`, sends each row with Photon (`space.send`, or an iMessage poll when `kind` is `"poll"`, falling back to numbered text), then calls `messages.markSent({ courierKey, messageId, providerId, conversationKey })`. A message that has a `providerId` is never sent again.
 - **In:** reads `app.messages` (no tunnel, no webhook) and calls `messages.inbound({ courierKey, conversationKey, providerId, text, kind, pollTarget })`. `kind` is `text`, `poll_vote` (with the poll's id as `pollTarget`) or `reaction` (with the reacted message's id). `STOP` goes through unchanged as text; Convex handles it in code.

@@ -9,13 +9,13 @@ Deadlines: draft submitted **Sat 23:00**; final text pasted by **Sun 08:30**; su
 ---
 
 ## Project name
-Rollpay
+RollPay
 
 ## Tagline (elevator pitch)
 It checks the pay before the paycheck.
 
 ## Seats it fills (Hyphenate asks for this line)
-Rollpay fills the seat of the person who prepares and checks payroll before it is submitted, and the half-seat of the job manager who answers "whose hours are these?" every other Friday.
+RollPay fills the seat of the person who prepares and checks payroll before it is submitted, and the half-seat of the job manager who answers "whose hours are these?" every other Friday.
 
 ## Inspiration
 - One of us runs a small service company and does payroll every other Friday. Payroll software does the math right; it assumes the inputs are right. In service businesses they aren't.
@@ -30,7 +30,7 @@ The four pillars, in Hyphenate's words:
 - **Escalates.** When something is missing or contradictory, it holds only that item and texts the right person one short question with numbered options, a confidence and a precedent note. The manager approves every message to an employee before it goes out. Texts never carry pay amounts.
 - **Improves.** Every answer becomes a lesson, is compared with what it already knows, is backtested over past cycles, and becomes a rule only when the owner approves it. The person who answered can't be the one who approves. Cycle 2 asks fewer questions: **[measured at G3]** vs **[measured at G3]**.
 
-The moment: Sam Okafor (a fake worker) has two overlapping entries on the same day. Rollpay catches it before the Gusto draft is filled, his manager approves one text, Sam replies, the owner approves the correction in the workbook (never in Jobber), and only Sam's disputed hours were held in the meantime.
+The moment: Sam Okafor (a fake worker) has two overlapping entries on the same day. RollPay catches it before the Gusto draft is filled, his manager approves one text, Sam replies, the owner approves the correction in the workbook (never in Jobber), and only Sam's disputed hours were held in the meantime.
 
 ## How we built it
 - **Convex** for the database, scheduler, live queries, HTTP actions and vector search, with a **Next.js 16** dashboard (Tailwind, shadcn).
@@ -55,7 +55,7 @@ Every number cites `docs/PROOF.md`. "Measured at G3" means not measured yet.
 | Backtest self-check, Company B | payroll math on four past weekly cycles | 120 of 120 worker-cycles match to the cent | synthetic | PROOF.md section 4 |
 | Planted-error precision and recall, questions in cycle 2 vs cycle 1, rules vs the owner's runbook | not yet measured | measured at G3 | synthetic (Company A) | PROOF.md section 5 |
 | Creao agent runs | real Creao runs once the spike passes; ids only | not yet measured | TODO(S7): agent ids and run share link | `docs/INTEGRATIONS.md` row H9 |
-| Texts | real iMessage through Photon on registered demo phones [TODO: confirm H4 wording at G3]; simulated-manager replies are labelled Simulated | measured at G3 | demo personas are fake | PROOF.md section 1 |
+| Texts | real iMessage through Photon on registered demo phones; simulated-manager replies are labelled Simulated | live round trip tested: owner approve → text in 3 s → reply back in 49 s → correction proposed | demo personas are fake | `docs/INTEGRATIONS.md` rows H4, H5 |
 
 Learned rules are graded against the owner's runbook, which the system never saw (aggregate only). Full statement: `docs/PROOF.md`.
 
@@ -75,20 +75,20 @@ Learned rules are graded against the owner's runbook, which the system never saw
 
 ## What's next
 - Gusto production partner approval.
-- Manager login (in the demo a role switch stands in).
+- Manager login (in the demo a role switch stands in; the texted link already opens the manager view).
 - A second real company.
 - **[TODO: anything cut from the plan's stretch list]**
 
 ## Built with
-TypeScript, Bun, Next.js, React, Tailwind CSS, shadcn/ui, Convex, Creao, Claude (Anthropic API), Photon Spectrum, Jobber API, Gusto API, QuickBooks Online API, Zod, Vitest, Biome. **[TODO: add Playwright, Voyage AI or OpenAI embeddings, Backboard, Apify only if they shipped]**
+TypeScript, Bun, Next.js, React, Tailwind CSS, shadcn/ui, Convex, Creao, Claude (Anthropic API), Photon Spectrum, Jobber API, Gusto API, QuickBooks Online API, Zod, Vitest, Playwright, Biome. **[TODO: add Voyage AI or OpenAI embeddings, Backboard, Apify only if they shipped]**
 
 ## Try it out
 - GitHub repo: https://github.com/Devaj6190/hyphenatable **[TODO: it is private; follow the organizers' instructions to grant judges access, and check `data/private/` and `.env` are absent]**
 - Demo video: **[TODO: YouTube unlisted link, under 3:00, opens on the moment]**
-- Live app: **[TODO: Vercel URL, or say the live demo is at the table]**
+- Live app: **[TODO: Vercel URL from Devaj, or say the live demo is at the table]**
 
 ## Media
-- Project image, 1280×720 PNG: the owner home at cycle 2 with one FlagCard showing `rule: certain` and a precedent, the phone with the text overlaid bottom-right, the label chips visible, "Rollpay" top-left. Exported from the real UI, fake names only. **[TODO: export after G3]**
+- Project image, 1280×720 PNG: the owner home at cycle 2 with one FlagCard showing `rule: certain` and a precedent, the phone with the text overlaid bottom-right, the label chips visible, "RollPay" top-left. Exported from the real UI, fake names only. **[TODO: export after G3]**
 - Video: as above.
 
 ## Team
@@ -112,7 +112,7 @@ TypeScript, Bun, Next.js, React, Tailwind CSS, shadcn/ui, Convex, Creao, Claude 
 ### Hyphenate (main track)
 - Seats line: above.
 - Is it real enough? Real Jobber and Gusto sandboxes, a real company's cycles anonymized, completeness on every pull, planted errors with an answer key and measured precision and recall.
-- Would you hire it? Read-only sources, draft-only Gusto with no submit function, segregation of duties on rules, every number traceable in the audit log, confidence and precedent on every flag, held items instead of guesses.
+- Would you hire it? **Limited access:** read-only sources; draft-only Gusto with no submit function; the manager's view never carries a pay amount (stripped on the server, proven by an end-to-end test that also scans every network response), and the manager's texted link opens their inbox as the manager; the agents see ids only. **A clean record:** an append-only audit log where every pull, flag, text, answer, correction and rule change names who did it, and the owner home shows each agent's latest run and the Auditor's brief. **Knows when to ask:** checks fire only on exact conditions; anything that needs judgment becomes a question with a confidence and a precedent, a vague case becomes an AGT-01 flag ("Unusual case, needs your decision") routed to the owner, and a held item is never guessed at.
 - Did we see something new? Payroll inputs verified across three systems before the payroll tool runs; workers outside the official sync handled; fixes made at the source are re-checked on the next sync; owner-approved, backtested rules with provenance.
 - The moment: Sam Okafor's overlapping hours, caught before the draft is filled.
 
@@ -135,7 +135,7 @@ TypeScript, Bun, Next.js, React, Tailwind CSS, shadcn/ui, Convex, Creao, Claude 
 - Claude does what matters (rule extraction from history, fuzzy matching, question drafting, reply interpretation); code does the money. Claude sees ids, never names or phone numbers.
 
 ### Convex
-**[TODO: one paragraph once the backend is built]**: scheduler for reminders and syncs, live queries for the owner home and LiveFeed, vector search for lessons, HTTP actions.
+Convex is the whole backend: the database and schema (mirrored by a zod contract with a drift test), the controller that owns each cycle's stage and approvals, the checks runner, the scheduler for syncs, reminders and question expiry, the HTTP actions the Creao agents and the courier talk to, and live queries that keep the owner home, flag pages, Agents section and LiveFeed current without a refresh. The audit log is an append-only Convex table (CI greps that nothing patches or deletes it). A manager's query is redacted on the server by viewer id, so pay never leaves Convex for a manager.
 
 ### MLH
 - Best Use of Gen AI: opt in.

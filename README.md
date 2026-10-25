@@ -1,8 +1,8 @@
-# Rollpay
+# RollPay
 
-Rollpay (formerly PayrollPilot) is the product name. Some code identifiers, env vars and URLs still use the old name.
+RollPay (formerly PayrollPilot) is the product name. Some code identifiers, env vars and URLs still use the old name.
 
-Rollpay is the agent a small service company hires to prepare and check payroll before a person submits it: it syncs Jobber, QuickBooks and Gusto with completeness checks, runs a deterministic checks engine, and texts the right manager or employee one short question when something is missing or contradictory. People approve every message, correction and rule, and each answer becomes a backtested rule the owner approves, so the next cycle asks less; Rollpay fills the Gusto draft and never submits it.
+RollPay is the agent a small service company hires to prepare and check payroll before a person submits it: it syncs Jobber, QuickBooks and Gusto with completeness checks, runs a deterministic checks engine, and texts the right manager or employee one short question when something is missing or contradictory. People approve every message, correction and rule, and each answer becomes a backtested rule the owner approves, so the next cycle asks less; RollPay fills the Gusto draft and never submits it.
 
 Built for the Cal Hacks 13.0 Hyphenate track ("The Hyphenated Enterprise: Autonomous Systems for Finance"). We also enter the Creao track, **Best One-Person Company**.
 
@@ -24,13 +24,13 @@ Every number below comes from [docs/PROOF.md](docs/PROOF.md); the section is nam
 | Backtest self-check on Company B | payroll math on four past weekly cycles, including California daily overtime | 120 of 120 worker-cycles match to the cent | synthetic | PROOF.md section 4 |
 | Planted-error precision and recall, questions per cycle, rules vs the owner's runbook, completeness, traceability | not yet measured | measured at G3 | synthetic (Company A) | PROOF.md section 5 |
 | Creao agent runs | the Auditor, Messenger and Analyst run as saved Creao agents started by our controller | not yet measured: the Creao spike (H9) is unverified | agent ids and run share link are TODO(S7) | [docs/INTEGRATIONS.md](docs/INTEGRATIONS.md) row H9 |
-| Texts | real iMessage through Photon on registered demo phones; replies written by the simulated-manager persona are labelled **Simulated** | measured at G3 | demo personas are fake | PROOF.md section 1; round-trip log in [docs/INTEGRATIONS.md](docs/INTEGRATIONS.md) rows H4, H5 |
+| Texts | real iMessage through Photon on registered demo phones; replies written by the simulated-manager persona are labelled **Simulated** | live round trip tested: owner approve → text in 3 s → reply back in 49 s → correction proposed | demo personas are fake | PROOF.md section 1; round-trip log in [docs/INTEGRATIONS.md](docs/INTEGRATIONS.md) rows H4, H5 |
 
 Company A is a synthetic landscaping crew in Pennsylvania, paid biweekly, with planted errors and an answer key for checks CHK-01 to CHK-22 in each of two cycles. The model never sees the answer key. Every name on screen, in this repo and in the video is fake.
 
 ## How Creao fits
 
-Three batch agents, the **Auditor**, the **Messenger** and the **Analyst**, run as saved agents on Creao behind our Convex controller. The controller starts each run; the agents never start each other or themselves. They read work from Rollpay's own HTTP API and return proposals only. Every proposal is validated, stored as `proposed` or `draft`, and waits for a person to approve it. Plain code owns the money, the checks, the holds and the approvals. The live reply path (reading a worker's text) stays in our own code, because a Creao run takes minutes.
+Three batch agents, the **Auditor**, the **Messenger** and the **Analyst**, run as saved agents on Creao behind our Convex controller. The controller starts each run; the agents never start each other or themselves. They read work from RollPay's own HTTP API and return proposals only. Every proposal is validated, stored as `proposed` or `draft`, and waits for a person to approve it. Plain code owns the money, the checks, the holds and the approvals. The live reply path (reading a worker's text) stays in our own code, because a Creao run takes minutes.
 
 **Creao only ever sees ids.** No names, phone numbers, notes or pay amounts are sent to a Creao agent or accepted back from one.
 
@@ -49,7 +49,7 @@ Jobber · QuickBooks · Gusto ──(connectors, read-only + completeness)──
                                                                        Courier ──Photon──▶ manager / employee phones
 ```
 
-- **Dashboard** (`apps/web`, Next.js 16, Tailwind, shadcn): the owner home (stage, "what we need from you", one-tap approve / edit / deny), problem detail, manager inbox, onboarding, rules, workbook and readiness, audit log. It reads Convex live and renders from fixtures when no deployment is configured. Manager views never show pay.
+- **Dashboard** (`apps/web`, Next.js 16, Tailwind, shadcn): the owner home (stage, "what we need from you", one-tap approve / edit / deny), problem detail, manager inbox, onboarding, rules, workbook and readiness, audit log, and an Agents section on the owner home (the Auditor's brief and each Creao agent's latest run). It reads Convex live and renders from fixtures when no deployment is configured. Manager views never show pay, and the manager's texted link opens their inbox as the manager.
 - **Convex** (`apps/web/convex`): the database, scheduler and live queries; the controller that owns each cycle's state and approvals; sync, the checks runner, three batch agents (Analyst, Auditor, Messenger) that run on Creao behind the controller and only return validated proposals, the learning loop, the Gusto draft writer, and an append-only audit log.
 - **Courier** (`apps/courier`, Bun + Photon `spectrum-ts`): the only process that touches phones. It sends what Convex approved and relays replies; Convex sees a sha256 key, never a phone number.
 - **Engine** (`packages/engine`, pure TypeScript, no IO, Vitest): the contract schemas, the 23 checks (CHK-01 to CHK-23), Stage 1 and Stage 2 payroll math in integer cents, and the message templates (under 240 characters, never a pay amount).
@@ -71,9 +71,9 @@ With a Convex deployment:
 cd apps/web && bunx convex dev    # in a second terminal; prints NEXT_PUBLIC_CONVEX_URL for .env
 ```
 
-Loading Company A into Convex: [TODO: `sync.ingestFixture` lands with the contract PR (#15)].
+Loading a company into Convex (needs `INGEST_KEY`, the same value as in the Convex env): `cd apps/web && bun run scripts/ingest.ts ../../data/fixtures/a` loads Company A's fixtures; with no folder it loads the engine's sample company. The dev deployment today holds only "Sample Landscaping (synthetic)".
 
-Texting: [TODO: once the courier PR is merged] put the Photon project id and secret in `apps/courier/.env` and the registered demo phones in `apps/courier/contacts.json` (both gitignored), then `bun run apps/courier/src/index.ts`. Without credentials it prints texts to the terminal instead. Details in `apps/courier/README.md`.
+Texting: put the Photon project id and secret in `apps/courier/.env` and the registered demo phones in `apps/courier/contacts.json` (both gitignored), set `DASHBOARD_URL` to the deployed dashboard so the manager's text carries its link, then `bun run courier` from the repo root (keeps the Mac awake, restarts on disconnect, prints "connected to Photon"). Without credentials it prints texts to the terminal instead. Details in `apps/courier/README.md`.
 
 Checks, tests and metrics:
 
