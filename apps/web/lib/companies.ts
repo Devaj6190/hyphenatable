@@ -40,9 +40,9 @@ export const companies: Record<string, CompanyInfo> = {
     name: "Company R",
     label: "Company R",
     kind: "real, anonymized",
-    // No fixture file and no documented zone (the ingest takes it as a parameter). UTC is named on every time,
-    // so it is never silently wrong. Replace with the company row's timezone once live.
-    timezone: "UTC",
+    // The Company R package's default zone (seed/lib/r-package.ts) until Shanin confirms it; replace with the
+    // company row's timezone once live.
+    timezone: "America/New_York",
     cycle: null,
   },
 };
