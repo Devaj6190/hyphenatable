@@ -1,6 +1,7 @@
 // B-10/B-11: rebuild the Stage 1 draft from the corrected records. A draft the owner already approved
 // goes back to `computed`, and the change is flagged to the owner (plan B 4.1 invariant).
 import { computeStage1 } from "@payrollpilot/engine/payroll/stage1";
+import { internal } from "../_generated/api";
 import type { Id } from "../_generated/dataModel";
 import type { MutationCtx } from "../_generated/server";
 import { write } from "../audit";
@@ -11,7 +12,7 @@ export async function recomputeDraft(
   cycleId: Id<"cycles">,
   why: { correctionId: Id<"corrections"> } | { reason: string },
 ) {
-  const p = await payrollInput(ctx, cycleId);
+  const p = await payrollInput(ctx, cycleId, { holdUnresolved: true });
   const previous = await ctx.db
     .query("drafts")
     .withIndex("by_cycle", (q) => q.eq("cycleId", cycleId).eq("stage", 1))
@@ -86,5 +87,10 @@ export async function recomputeDraft(
     },
     data: { version, reason: "reason" in why ? why.reason : null },
   });
+  // A correction may settle the last open flag: the controller re-checks Gate 1.
+  if ("correctionId" in why)
+    await ctx.scheduler.runAfter(0, internal.controller.cycle.gate1Check, {
+      cycleId,
+    });
   return draftId;
 }

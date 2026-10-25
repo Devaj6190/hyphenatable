@@ -5,7 +5,11 @@ import type { Flag } from "@payrollpilot/engine/schemas";
 import { ConvexError, v } from "convex/values";
 import { internal } from "./_generated/api";
 import type { Doc, Id } from "./_generated/dataModel";
-import { mutation } from "./_generated/server";
+import {
+  internalMutation,
+  type MutationCtx,
+  mutation,
+} from "./_generated/server";
 import { write } from "./audit";
 
 /** A Convex doc in the engine's shape: `_id` becomes `id`. */
@@ -27,7 +31,17 @@ const dedupeKey = (f: Pick<Flag, "checkId" | "subject">) =>
 /** Runs every deterministic check over one cycle, stores new flags, moves `checking → asking`. */
 export const run = mutation({
   args: { cycleId: v.id("cycles") },
-  handler: async (ctx, { cycleId }) => {
+  handler: (ctx, { cycleId }) => runChecks(ctx, cycleId),
+});
+
+/** The controller's call after a sync (controller/cycle.ts afterSync). */
+export const runInternal = internalMutation({
+  args: { cycleId: v.id("cycles") },
+  handler: (ctx, { cycleId }) => runChecks(ctx, cycleId),
+});
+
+async function runChecks(ctx: MutationCtx, cycleId: Id<"cycles">) {
+  {
     const cycle = await ctx.db.get(cycleId);
     if (!cycle) throw new ConvexError("cycle not found");
     const company = await ctx.db.get(cycle.companyId);
@@ -146,5 +160,5 @@ export const run = mutation({
       },
     });
     return { created, byCheck };
-  },
-});
+  }
+}

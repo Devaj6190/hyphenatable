@@ -52,6 +52,9 @@ export const proposeFromReply = internalMutation({
         "flag.confirmed",
         "The person asked confirmed the record is right; nothing changes",
       );
+      await ctx.scheduler.runAfter(0, internal.controller.cycle.gate1Check, {
+        cycleId: flag.cycleId,
+      });
       // Learning contract step 1: a confirmed answer is a lesson too.
       await ctx.scheduler.runAfter(0, internal.agents.learn.recordLesson, {
         companyId: flag.companyId,
@@ -60,7 +63,10 @@ export const proposeFromReply = internalMutation({
       return;
     }
 
-    const p = await payrollInput(ctx, flag.cycleId);
+    const p = await payrollInput(ctx, flag.cycleId, {
+      holdUnresolved: true,
+      except: flag._id,
+    });
     const jobs = await ctx.db
       .query("jobs")
       .withIndex("by_company", (q) => q.eq("companyId", flag.companyId))

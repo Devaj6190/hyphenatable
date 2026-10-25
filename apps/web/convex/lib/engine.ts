@@ -13,10 +13,18 @@ export function toEngine<T extends { _id: string; _creationTime: number }>(
   return { ...rest, id: _id };
 }
 
-/** Everything Stage 1 needs for one cycle, with held flags so held entries stay out of the draft. */
+/** Flags that still dispute their entries: those entries stay out of the draft (plan B 4.1). */
+const UNRESOLVED = new Set(["open", "asked", "answered", "held"]);
+
+/**
+ * Everything Stage 1 needs for one cycle. Held flags always hold their entries; with
+ * `holdUnresolved`, so does every flag still open, asked or answered (the Gate 1 draft), except
+ * `except` (the flag a correction is about, whose effect is being measured).
+ */
 export async function payrollInput(
   ctx: QueryCtx,
   cycleId: Id<"cycles">,
+  opts: { holdUnresolved?: boolean; except?: Id<"flags"> } = {},
 ): Promise<PayrollInput> {
   const cycle = await ctx.db.get(cycleId);
   if (!cycle) throw new ConvexError("cycle not found");
@@ -52,6 +60,17 @@ export async function payrollInput(
     entries: entries.map(toEngine),
     expenses: expenses.map(toEngine),
     rules: rules.map(toEngine),
-    heldFlags: flags.filter((f) => f.status === "held").map(toEngine),
+    heldFlags: flags
+      .filter(
+        (f) =>
+          f._id !== opts.except &&
+          (f.status === "held" ||
+            // Notes nobody needs to answer (routeTo "none") never hold pay.
+            (opts.holdUnresolved &&
+              f.routeTo !== "none" &&
+              UNRESOLVED.has(f.status))),
+      )
+      // The engine holds flags whose status is "held".
+      .map((f) => ({ ...toEngine(f), status: "held" })),
   } as unknown as PayrollInput;
 }
