@@ -232,11 +232,12 @@ export const TimeEntry = z.object({
   endAt: nul(Instant),
   durationSec: z.number().int(),
   ticking: z.boolean(),
-  approved: z.boolean(),
+  /** null: not in the source (a real company's Timesheets export has no approval, payable or category column). */
+  approved: nul(z.boolean()),
   approvedBy: nul(z.string()),
-  payable: z.boolean(),
+  payable: nul(z.boolean()),
   /** Jobber timeSheetCategory: BREAK, DRIVING, OFFICE, SUPPLIES, GENERAL, CUSTOM. */
-  category: z.string(),
+  category: nul(z.string()),
   label: nul(z.string()),
   hasNote: z.boolean(),
 });
@@ -308,7 +309,8 @@ export const Payment = z.object({
 export const Expense = z.object({
   id: Id,
   companyId: Id,
-  source: z.enum(["qbo", "jobber"]),
+  /** venmo: a real company's Venmo reimbursements. */
+  source: z.enum(["qbo", "jobber", "venmo"]),
   sourceId: z.string(),
   date: Day,
   amountCents: nul(Cents),

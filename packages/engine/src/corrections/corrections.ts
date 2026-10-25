@@ -214,7 +214,8 @@ function costOn(
   jobId: string,
 ): { cents: number | null; note: string | null } {
   if ("workerId" in record) {
-    if (record.jobId !== jobId || !record.payable)
+    // Unknown payable (null) counts, as in payroll hours: hours are never trimmed.
+    if (record.jobId !== jobId || record.payable === false)
       return { cents: 0, note: null };
     const w = p.workers.find((x) => x.id === record.workerId);
     const rate = w ? payRate(w, p.rules) : null;
