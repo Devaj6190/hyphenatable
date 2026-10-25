@@ -1,3 +1,4 @@
+import { pastGross } from "@payrollpilot/engine/checks/CHK-22";
 import { runAll } from "@payrollpilot/engine/checks/index";
 import { precedentFor } from "@payrollpilot/engine/checks/precedent";
 import type { CheckInput } from "@payrollpilot/engine/checks/types";
@@ -73,6 +74,17 @@ export const run = mutation({
       .query("timeEntries")
       .withIndex("by_cycle", (q) => q.eq("cycleId", cycleId))
       .collect();
+    // CHK-22 history: regular + Venmo gross of the last 3 earlier cycles with payroll rows.
+    const [cycles, pastPayrolls] = await Promise.all([
+      ctx.db
+        .query("cycles")
+        .withIndex("by_company", (q) => q.eq("companyId", companyId))
+        .collect(),
+      ctx.db
+        .query("pastPayrolls")
+        .withIndex("by_company", (q) => q.eq("companyId", companyId))
+        .collect(),
+    ]);
     const syncRuns = await ctx.db
       .query("syncRuns")
       .withIndex("by_cycle", (q) => q.eq("cycleId", cycleId))
@@ -95,8 +107,9 @@ export const run = mutation({
       invoices: invoices.map(toEngine),
       payments: payments.map(toEngine),
       expenses: expenses.map(toEngine),
-      // ponytail: CHK-22 is not in the registry yet; it fills this from pastPayrolls when it lands.
-      pastCycles: { gross: {} },
+      pastCycles: {
+        gross: pastGross(cycle, cycles.map(toEngine), pastPayrolls),
+      },
       rules: rules.map(toEngine),
       syncRuns: syncRuns.map(toEngine),
     } as unknown as CheckInput;

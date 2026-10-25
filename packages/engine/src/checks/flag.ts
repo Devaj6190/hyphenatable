@@ -1,4 +1,13 @@
-import type { CheckId, Flag, TimeEntry } from "../schemas";
+import { type Reconciliation, reconcile } from "../payroll/reconcile";
+import type { Payment as PayrollPayment } from "../payroll/types";
+import type {
+  CheckId,
+  Expense,
+  Flag,
+  Rule,
+  RuleType,
+  TimeEntry,
+} from "../schemas";
 import type { CheckInput } from "./types";
 
 /** The cycle's entries for this company, each id once (first copy wins). */
@@ -101,4 +110,126 @@ export function groupBy<T>(
     else groups.set(k, [item]);
   }
   return groups;
+}
+
+/** A source date as a company-local day: QuickBooks sends YYYY-MM-DD, Jobber a UTC instant. */
+export function sourceDay(input: CheckInput, d: string): string {
+  return d.length === 10 ? d : day(input, d);
+}
+
+/** First and last local day of the cycle (both inclusive; bounds may be days or instants). */
+export function periodDays(input: CheckInput): [string, string] {
+  return [
+    sourceDay(input, input.cycle.periodStart),
+    sourceDay(input, input.cycle.periodEnd),
+  ];
+}
+
+/** True when a date or instant falls on a local day of the cycle. */
+export function inPeriod(input: CheckInput, at: string | null): boolean {
+  if (at === null) return false;
+  const [from, to] = periodDays(input);
+  const d = sourceDay(input, at);
+  return d >= from && d <= to;
+}
+
+/** The company's expenses dated inside the cycle (local days, inclusive), each id once. */
+export function cycleExpenses(input: CheckInput): Expense[] {
+  const byId = new Map<string, Expense>();
+  for (const x of input.expenses) {
+    if (x.companyId !== input.company.id || byId.has(x.id)) continue;
+    if (inPeriod(input, x.date)) byId.set(x.id, x);
+  }
+  return [...byId.values()].sort((a, b) => cmp(a.id, b.id));
+}
+
+/** Active rules of one type for this company, in id order. */
+export function activeRules(input: CheckInput, type: RuleType): Rule[] {
+  return input.rules
+    .filter(
+      (r) =>
+        r.type === type &&
+        r.status === "active" &&
+        r.companyId === input.company.id,
+    )
+    .sort((a, b) => cmp(a.id, b.id));
+}
+
+/** Trimmed, case-folded text for comparing names such as vendors and accounts. */
+export const norm = (s: string | null | undefined): string =>
+  (s ?? "").trim().toLowerCase();
+
+/**
+ * Builds a deterministic flag over jobs, expenses or quotes. `key` names the subject records, so a
+ * re-run yields the same id. workerId and jobId in `affects` follow the subject.
+ */
+export function recordFlag(
+  input: CheckInput,
+  checkId: CheckId,
+  routeTo: Flag["routeTo"],
+  key: string,
+  subject: Partial<Flag["subject"]>,
+  seen: string,
+  where: Flag["where"],
+  extra: Partial<Pick<Flag, "confidence" | "precedent">> & {
+    dollarsCents?: number | null;
+  } = {},
+): Flag {
+  const workerId = subject.workerId ?? null;
+  const jobId = subject.jobId ?? null;
+  return {
+    id: `${checkId}:${input.cycle.id}:${key}`,
+    companyId: input.company.id,
+    cycleId: input.cycle.id,
+    checkId,
+    status: "open",
+    subject: {
+      workerId,
+      jobId,
+      entryIds: [...(subject.entryIds ?? [])].sort(cmp),
+      expenseIds: [...(subject.expenseIds ?? [])].sort(cmp),
+    },
+    seen,
+    where,
+    confidence: extra.confidence ?? "certain",
+    precedent: extra.precedent ?? null,
+    routeTo,
+    affects: { workerId, jobId, dollarsCents: extra.dollarsCents ?? null },
+    questionId: null,
+    correctionId: null,
+  };
+}
+
+/** Where an expense lives, by its own source. */
+export const expenseWhere = (x: Expense): Flag["where"][number] => ({
+  system: x.source,
+  recordId: x.sourceId,
+  url: null,
+});
+
+/** Cents for a sentence, e.g. "$214.37". */
+export const dollars = (cents: number): string =>
+  `${cents < 0 ? "-" : ""}$${(Math.abs(cents) / 100).toFixed(2)}`;
+
+/**
+ * The Stage 2 reconciliation (A-13) over this cycle: labor at the current cost rate, job costs,
+ * stale Jobber rates. Payments and quotes are not read for profit, so null amounts cannot leak in.
+ */
+export function reconcileCycle(input: CheckInput): Reconciliation {
+  const own = <T extends { companyId: string }>(xs: T[]) =>
+    xs.filter((x) => x.companyId === input.company.id);
+  // ponytail: payroll/types.ts mirrors section 6 with non-null payment amounts; reconcile only
+  // sums payments into deposit/final totals, which CHK-18 and CHK-21 do not read.
+  return reconcile({
+    periodStart: input.cycle.periodStart,
+    periodEnd: input.cycle.periodEnd,
+    timeZone: input.company.timezone,
+    jobs: own(input.jobs),
+    entries: cycleEntries(input),
+    expenses: own(input.expenses),
+    invoices: own(input.invoices),
+    payments: own(input.payments) as PayrollPayment[],
+    workers: own(input.workers),
+    rules: own(input.rules),
+  });
 }
