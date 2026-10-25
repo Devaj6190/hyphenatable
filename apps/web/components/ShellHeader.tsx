@@ -45,7 +45,7 @@ export function ShellHeader() {
         >
           <RollPayLogo height={18} />
         </Link>
-        <div className="flex min-w-0 items-baseline gap-3 text-[15px]">
+        <div className="hidden min-w-0 items-baseline gap-3 text-[15px] sm:flex">
           <span className="truncate font-medium">
             {company?.name ?? "Unknown company"}
           </span>
@@ -64,7 +64,8 @@ export function ShellHeader() {
             className="hidden md:inline-flex"
           />
         )}
-        <div className="ml-auto flex items-center gap-2">
+        {/* Controls keep their size; the company name truncates instead, so the role switch never overlaps. */}
+        <div className="ml-auto flex shrink-0 items-center gap-2">
           {DEMO_MODE && <RoleSwitch />}
           <nav
             aria-label="Company"
@@ -87,7 +88,11 @@ export function ShellHeader() {
               </Link>
             ))}
           </nav>
-          {DEMO_MODE && <ThemeToggle />}
+          {DEMO_MODE && (
+            <div className="hidden sm:block">
+              <ThemeToggle />
+            </div>
+          )}
         </div>
       </div>
       <div className="px-4 empty:hidden lg:px-6">
