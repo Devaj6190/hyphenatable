@@ -52,6 +52,27 @@ Both runners print counts only. Everything they read and write stays under `data
 bun run m2-run.ts   # "M2: N of M onboarding rules match the owner's runbook; K differ; J were not learned"
 ```
 
+### Sealed grading protocol (M2)
+
+This lets onboarding run blind, with the owner's runbook encrypted until the agent's answers are fixed.
+
+1. **Seal the key (owner, once).** Write `data/private/r/runbook-key.json` as `[{ id, ruleType, params, statement, scope, sourceSection }]` (`ruleType` is a RuleType or `"other"`). Then run `bun run m2-seal.ts encrypt` to make `runbook-key.json.enc` (AES-256-GCM, scrypt-derived key) and delete the plain file.
+   - **Passphrase:** set `M2_KEY_PASSPHRASE`, or you'll get a hidden prompt. The passphrase is never logged or written.
+2. **Run onboarding blind (Devaj's agent).** It writes its proposed rules to a file in either shape:
+   - an array of **Proposals** (`packages/engine/src/lessons/history.ts`: `{ type, params, statement, evidence, seenInCycles, ofCycles, confidence }`). These get ids `proposal-<n>` by position.
+   - an array of **Rule rows** (`{ id | _id, type, params, provenance.evidence, backtest, confidence }`).
+
+   Every rule needs at least one evidence id.
+3. **Freeze before unsealing.** Run `bun run m2-freeze.ts --rules <file>`. It validates the file, writes `out/m2-freeze.json` = `{ sha256, count, frozenAt }` and prints the hash. (`eval/out/` ignores its own contents.)
+4. **Grade.** Run `bun run m2-grade.ts --rules <file> --key data/private/r/runbook-key.json.enc [--write-grading]`.
+   - **Refusals:** it refuses without the freeze file, and refuses if the rules file's sha256 differs from it, so answers can't change after unsealing.
+   - **Key handling:** the key is decrypted in memory only.
+   - **Matching:** proposed `type` is matched against key `ruleType`, plus params.
+     - **Deterministic first:** the key's params must be equal, with a per-type tolerance (`TOLERANCE` in `m2-match.ts`). Strings are compared case-insensitively. Extra params in a proposal are not penalized.
+     - **Then the rest:** key rules of type `"other"`, or with no same-type proposal, go to the engine's model adapter if `ANTHROPIC_API_KEY` is set. The judge sees types and params only, never the key's statement. Input that fails the model-input scrub is not sent. Without a judge, or when the judge fails, the verdict is `needs_human_review`.
+   - **Verdicts:** `match`, `differs` (with the params named), `not_learned`, or `needs_human_review`. Proposals no key rule used are counted as `extra`.
+   - **Output:** stdout gets counts only. The per-rule detail goes **only** to `data/private/r/m2-grade-<time>.json`. `--write-grading` also writes `data/private/r/rule-grading.json`, which `run.ts` reads for `results.json` (`needs_human_review` rows left out).
+
 ### M4 setup from the owner's facts: `m4-rules-build.ts`
 
 ```bash
