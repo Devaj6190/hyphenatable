@@ -142,7 +142,7 @@ Every flag records: what was seen, where (system, record id, link), the rule or 
 
 ## 11. Sponsor tracks
 
-Enter: Hyphenate (main), Cal Hacks overall and Most Technically Complex, Microsoft Built for the Real World, Anthropic, MLH Best Use of Gen AI, MLH Commit Fellowship, Convex. If their pieces exist: MLH Backboard (lessons mirror), Apify (Playwright reader as an Actor). Skip: Atlassian (needs a Forge app), CRS (needs identity PII we refuse to collect), Bright Data (login scraping disqualified), voice tracks. Creao: criteria doc is restricted; Devaj reads it or asks the booth, then decides. Mana and Figma only if a teammate actually uses them.
+Enter: Hyphenate (main), Cal Hacks overall and Most Technically Complex, Microsoft Built for the Real World, Anthropic, MLH Best Use of Gen AI, MLH Commit Fellowship, Convex. If their pieces exist: MLH Backboard (lessons mirror), Apify (Playwright reader as an Actor). Skip: Atlassian (needs a Forge app), CRS (needs identity PII we refuse to collect), Bright Data (login scraping disqualified), voice tracks. Creao: **go, gated by a 90-minute spike** (decided Sat 15:10, B; verified against Creao's docs and hackathon pages in [../docs/plans/creao-plan.md](../docs/plans/creao-plan.md)). The three batch agents (Analyst, Auditor, Messenger drafting) run as saved Creao agents on Opus 5.5, started by our Convex controller through the API Trigger and calling our own HTTP API with a key kept in Creao Secrets. They only propose; money, approvals, rules and lessons stay in Convex. Reply interpretation stays in our code (poll and number parsing, then direct Haiku 5.5). Track: Best One-Person Company. If the spike fails, drop Creao and change nothing else. Mana and Figma only if a teammate actually uses them.
 
 ## 12. Demo and proof
 
@@ -182,6 +182,7 @@ Decided in the implementation plan: [../docs/plans/00-team-brief.md](../docs/pla
 | C-10-1 model | Opus 5.5 for judgment, Haiku 5.5 for structured extraction, one adapter. | Research section 4; swappable by design. |
 | C-10-2 memory | Own `rules` and `lessons` tables with a vector index and a classifier. | No hosted product documents the comparison step; research section 7. |
 | S-11-1 sponsors | Section 11. | Research section 3. |
+| S-11-2 Creao | The three batch agents run on Creao behind our controller; proposals only; the live reply path stays in code. Spike-gated. | Verified fit with our architecture and the One-Person Company track; Creao's Opus credits unblock agent work that the missing Anthropic key blocks today; no deal-breaker found (creao-plan.md section 6). |
 | S-12-1 judges' scenario | Keep, plus the catch-all. | Hyphenate says judges may bring a scenario. |
 | S-12-2 demo length | 3-minute video; 3-minute pitch plus 2 of questions. | Devpost, verified. |
 | S-13-1 timeline | Replaced by the plan's clock and gates. | Sized to 3 people and 32 hours. |

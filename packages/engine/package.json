@@ -4,6 +4,7 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
+    "./llm": "./src/llm/index.ts",
     "./*": "./src/*.ts"
   },
   "scripts": {
@@ -11,6 +12,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^1.3.0",
     "zod": "^4"
   },
   "devDependencies": {
