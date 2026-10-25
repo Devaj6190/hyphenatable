@@ -1,6 +1,6 @@
 # Role C: Product, Messaging and Demo (PayrollPilot, Cal Hacks 13.0)
 
-Binding context: `docs/plans/00-shared-context.md` (wins on any conflict), `specs/final.md` (sections 6, 9, 12), `docs/plan-research.md` (sections 3, 9a, 13). Written Sat 2026-10-24 about 1:30 AM PDT. All clock times are PDT. Anything not confirmed is marked **UNVERIFIED**. Every name in this file is fictional.
+Binding context: `docs/plans/00-shared-context.md` (wins on any conflict), `specs/final.md` (sections 6, 9, 12), `docs/sources/plan-research.md` (sections 3, 9a, 13). Written Sat 2026-10-24 about 1:30 AM PDT. All clock times are PDT. Anything not confirmed is marked **UNVERIFIED**. Every name in this file is fictional.
 
 ---
 
@@ -31,7 +31,7 @@ Binding context: `docs/plans/00-shared-context.md` (wins on any conflict), `spec
 ## 2. Role onboarding (15 minutes)
 
 1. **Accounts.** GitHub repo. Convex project (B invites you; you need the dashboard to read function logs). Vercel project `payrollpilot` (Shanin invites you). Photon dashboard (Shanin's project; he adds you or shares the project id and secret through the team vault message, never chat history). Devpost: join the team project page now, not Sunday.
-2. **Photon setup (read `docs/plan-research.md` section 9a first).** Free plan: shared pool number, max 10 registered users, no group messaging, recipients must be pre-registered or sends fail with "Target not allowed for this project". Register in Dashboard → Users: the owner's phone (Shanin) and the "manager" phone (whoever plays the manager; in the demo the owner stands in). Confirm the account has a phone set (the Oct 20 blocker was `account_phone_missing`). SMS is an automatic fallback on iMessage lines, so Android phones still work.
+2. **Photon setup (read `docs/sources/plan-research.md` section 9a first).** Free plan: shared pool number, max 10 registered users, no group messaging, recipients must be pre-registered or sends fail with "Target not allowed for this project". Register in Dashboard → Users: the owner's phone (Shanin) and the "manager" phone (whoever plays the manager; in the demo the owner stands in). Confirm the account has a phone set (the Oct 20 blocker was `account_phone_missing`). SMS is an automatic fallback on iMessage lines, so Android phones still work.
 3. **Tools.** Bun 1.4+, Node 22, Git, GitHub CLI. Playwright browsers for the e2e smoke test (`bunx playwright install chromium`). A phone with iMessage registered with Photon. Screen-recording tool (QuickTime on Mac is enough) and a video editor (iMovie, CapCut or Descript).
 4. **Repo.** `git clone`, `bun install`, `cp .env.example .env`, fill from the vault message. Terminal 1: `cd apps/web && bunx convex dev`. Terminal 2: `bun dev`. Terminal 3 (after C-02): `bun run apps/courier/src/index.ts`. Branch names `c/<feature>`. Every PR targets `main`.
 5. **Where things live.**

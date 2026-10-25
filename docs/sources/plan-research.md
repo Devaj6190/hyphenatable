@@ -1,6 +1,6 @@
 # Plan research: tools, integrations, tracks
 
-Written Sat 2026-10-24 (about 1:00 to 3:00 AM PT) for the implementation plan asked for in [plan-handoff.md](plan-handoff.md). Every item is labelled:
+Written Sat 2026-10-24 (about 1:00 to 3:00 AM PT) for the implementation plan (the handoff that asked for it is in git history at `a90563e`). Every item is labelled:
 
 - **VERIFIED**: read in the official doc or tested on this machine, with the source.
 - **PARTLY VERIFIED**: the main claim is from an official source, a detail is not.

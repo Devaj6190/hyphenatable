@@ -76,13 +76,7 @@ cd eval && bun run metrics    # writes eval/results.json
 
 ## For the team
 
-- [docs/plans/00-team-brief.md](docs/plans/00-team-brief.md): who does what, the clock, the first hour.
-- [docs/plans/00-shared-context.md](docs/plans/00-shared-context.md): binding contracts, stack, repo layout, checks catalogue, cut order.
-- Role plans: [A data and payroll](docs/plans/A-data-payroll.md), [B agent and backend](docs/plans/B-agent-backend.md), [C product, messaging and demo](docs/plans/C-product-messaging-demo.md).
-- [specs/final.md](specs/final.md): the product spec; [specs/conflicts.md](specs/conflicts.md): every decision and why.
-- [docs/plan-research.md](docs/plan-research.md): verified facts about every tool, sandbox and prize track.
-- [docs/sources/](docs/sources/README.md): Hyphenate track document, workshop notes, validation research.
-- [docs/STATUS.md](docs/STATUS.md): what is on `main` and what each person is doing now. [docs/INTEGRATIONS.md](docs/INTEGRATIONS.md): first-hour check results.
+Which doc answers what, and the rules every change follows: [AGENTS.md](AGENTS.md).
 
 ## Team
 

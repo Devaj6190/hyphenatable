@@ -1,6 +1,6 @@
 # Product spec
 
-The team's spec for the Cal Hacks 13.0 Hyphenate track. Built on Oct 24, 2026 from the agreed and resolved items in [conflicts.md](conflicts.md) (Devaj's merge at midnight), then completed at 1:00 AM by the implementation plan, which resolved the 30 items that were still open. Each of those decisions is listed in section 14 with its reason; the team can overrule any of them by editing this file and the plan in one PR. Research behind the decisions: [../docs/plan-research.md](../docs/plan-research.md). The implementation plan: [../docs/plans/](../docs/plans/00-shared-context.md).
+The team's spec for the Cal Hacks 13.0 Hyphenate track. Built on Oct 24, 2026 from the agreed and resolved items of the spec-conflicts file (Devaj's merge at midnight; in git history at `a90563e`), then completed at 1:00 AM by the implementation plan, which resolved the 30 items that were still open. Each of those decisions is listed in section 14 with its reason; the team can overrule any of them by editing this file and the plan in one PR. Research behind the decisions: [../docs/sources/plan-research.md](../docs/sources/plan-research.md). The implementation plan: [../docs/plans/](../docs/plans/00-shared-context.md).
 
 Working name: **PayrollPilot** ("it checks the pay before the paycheck"). Rename freely before the first gate; the code uses no product name.
 
@@ -153,7 +153,7 @@ Enter: Hyphenate (main), Cal Hacks overall and Most Technically Complex, Microso
 
 ## 13. Work split and timeline
 
-Decided in the implementation plan: [../docs/plans/00-team-brief.md](../docs/plans/00-team-brief.md). Shanin: data, Jobber, seed and payroll logic. Devaj: agent and backend. Varnika: product, messaging and demo.
+Decided in the implementation plan. Shanin: data, Jobber, seed and payroll logic. Devaj: agent and backend. Varnika: product, messaging and demo.
 
 ## 14. Decisions made by the plan on Oct 24, 1:00 AM (each can be overruled by PR)
 

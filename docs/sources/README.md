@@ -22,5 +22,5 @@ Everything the team has collected for the Cal Hacks 13.0 payroll agent (Hyphenat
 - The biggest single lever: a catch-all rule (net pay changed more than 25% from last period) plus a path where the controller refuses, so a judge's own scenario still gets caught.
 
 ## Implementation-plan research (Oct 24)
-- **[../plan-research.md](../plan-research.md):** verified facts about every tool, integration and prize track, with first-hour checks and the decisions that need Shanin.
+- **[plan-research.md](plan-research.md):** verified facts about every tool, integration and prize track, with first-hour checks and the decisions that need Shanin.
 - **[research/](research/):** the raw notes behind it, one file per area (Jobber, QuickBooks and Gusto, Photon and browser tools, memory and hosting, sponsors), each item labelled VERIFIED or UNVERIFIED with its URL.

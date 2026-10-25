@@ -3,7 +3,7 @@
 Shared tokens, shell and components for every `/c/[companyId]` page. See them all, in both themes, at
 `/styleguide` (dev page outside the company shell, 404 in production).
 
-Sources: style from `docs/plans/design-style-handoff.md` (Host Grotesk, light and dark, motion table), content and
+Sources: style from `docs/plans/design-style-handoff.md` (local to the main checkout, never committed) (Host Grotesk, light and dark, motion table), content and
 page placement from the mockup boards, product rules from `AGENTS.md` and `docs/plans/C-product-messaging-demo.md`
 sections 4 and 5. Where the style brief and C plan 4.1/4.2 disagree on tokens or font, the style brief wins.
 
