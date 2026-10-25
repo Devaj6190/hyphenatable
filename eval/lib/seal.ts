@@ -3,6 +3,7 @@
 import {
   createCipheriv,
   createDecipheriv,
+  pbkdf2Sync,
   randomBytes,
   scryptSync,
 } from "node:crypto";
@@ -28,13 +29,12 @@ export const Sealed = z.object({
 });
 export type Sealed = z.infer<typeof Sealed>;
 
-const key = (passphrase: string, salt: Buffer, n = N, r = R, p = P) => {
-  if (passphrase.length < 12)
-    throw new Error("passphrase must be at least 12 characters");
-  return scryptSync(passphrase, salt, 32, { N: n, r, p, maxmem: 256 * n * r });
-};
+const key = (passphrase: string, salt: Buffer, n = N, r = R, p = P) =>
+  scryptSync(passphrase, salt, 32, { N: n, r, p, maxmem: 256 * n * r });
 
 export function seal(plain: Buffer, passphrase: string): Sealed {
+  if (passphrase.length < 12)
+    throw new Error("passphrase must be at least 12 characters");
   const salt = randomBytes(16);
   const iv = randomBytes(12);
   const c = createCipheriv("aes-256-gcm", key(passphrase, salt), iv);
@@ -71,15 +71,68 @@ export function unseal(sealed: unknown, passphrase: string): Buffer {
   }
 }
 
-/** M2_KEY_PASSPHRASE, else a prompt that does not echo. */
+/** OpenSSL iteration counts tried when none is given: `openssl enc -pbkdf2` default, then the 200000 we suggested. */
+export const OPENSSL_ITERS = [10000, 200000];
+
+/**
+ * `openssl enc -aes-256-cbc -pbkdf2 [-iter N] [-a]` output: "Salted__" + 8-byte salt + ciphertext (base64 when -a);
+ * key and IV from PBKDF2-HMAC-SHA256. CBC has no authentication, so a wrong passphrase is caught by padding or by
+ * `accept` (the caller's check that the plaintext parses). Tries `iters` in order.
+ */
+export function unsealOpenssl(
+  file: Buffer,
+  passphrase: string,
+  accept: (plain: Buffer) => boolean,
+  iters: number[] = OPENSSL_ITERS,
+): Buffer {
+  const text = file.toString("latin1").trim();
+  const raw = text.startsWith("U2FsdGVkX1")
+    ? Buffer.from(text, "base64")
+    : file;
+  if (raw.subarray(0, 8).toString("latin1") !== "Salted__")
+    throw new Error("not an openssl enc file (no Salted__ header)");
+  const salt = raw.subarray(8, 16);
+  const body = raw.subarray(16);
+  for (const iter of iters) {
+    const k = pbkdf2Sync(passphrase, salt, iter, 48, "sha256");
+    try {
+      const d = createDecipheriv(
+        "aes-256-cbc",
+        k.subarray(0, 32),
+        k.subarray(32, 48),
+      );
+      const plain = Buffer.concat([d.update(body), d.final()]);
+      if (accept(plain)) return plain;
+    } catch {
+      // wrong passphrase or iteration count: try the next
+    }
+  }
+  throw new Error(
+    "cannot unseal: wrong passphrase, iteration count, or the file was changed",
+  );
+}
+
+/** Our JSON (GCM) envelope, or an openssl enc file. */
+export function unsealAny(
+  file: Buffer,
+  passphrase: string,
+  accept: (plain: Buffer) => boolean,
+  iters?: number[],
+): Buffer {
+  const head = file.toString("utf8").trimStart();
+  if (head.startsWith("{")) return unseal(JSON.parse(head), passphrase);
+  return unsealOpenssl(file, passphrase, accept, iters);
+}
+
+/** RUNBOOK_KEY_PASS (or M2_KEY_PASSPHRASE), else a prompt that does not echo. Never an argv value. */
 export async function passphrase(
   env: Record<string, string | undefined> = process.env,
 ): Promise<string> {
-  const fromEnv = env.M2_KEY_PASSPHRASE;
+  const fromEnv = env.RUNBOOK_KEY_PASS ?? env.M2_KEY_PASSPHRASE;
   if (fromEnv) return fromEnv;
   const stdin = process.stdin;
   if (!stdin.isTTY)
-    throw new Error("set M2_KEY_PASSPHRASE (no terminal for a hidden prompt)");
+    throw new Error("set RUNBOOK_KEY_PASS (no terminal for a hidden prompt)");
   process.stderr.write("M2 key passphrase: ");
   stdin.setRawMode(true);
   stdin.resume();

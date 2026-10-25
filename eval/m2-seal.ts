@@ -1,7 +1,8 @@
 // bun run m2-seal.ts encrypt|decrypt [--in <file>] [--out <file>]
 //   encrypt: runbook-key.json      → runbook-key.json.enc (default paths under data/private/r/)
 //   decrypt: runbook-key.json.enc  → runbook-key.json      (only for the owner's own review; m2-grade decrypts in memory)
-// Passphrase: M2_KEY_PASSPHRASE or a hidden prompt. Never logged.
+// Passphrase: RUNBOOK_KEY_PASS (or M2_KEY_PASSPHRASE) or a hidden prompt. Never logged, never an argv value.
+// m2-grade also accepts a key sealed with `openssl enc -aes-256-cbc -pbkdf2`.
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { REPO } from "./lib/io";

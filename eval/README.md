@@ -56,8 +56,11 @@ bun run m2-run.ts   # "M2: N of M onboarding rules match the owner's runbook; K 
 
 This lets onboarding run blind, with the owner's runbook encrypted until the agent's answers are fixed.
 
-1. **Seal the key (owner, once).** Write `data/private/r/runbook-key.json` as `[{ id, ruleType, params, statement, scope, sourceSection }]` (`ruleType` is a RuleType or `"other"`). Then run `bun run m2-seal.ts encrypt` to make `runbook-key.json.enc` (AES-256-GCM, scrypt-derived key) and delete the plain file.
-   - **Passphrase:** set `M2_KEY_PASSPHRASE`, or you'll get a hidden prompt. The passphrase is never logged or written.
+1. **Seal the key (owner, once).** Write `data/private/r/runbook-key.json` as `[{ id, ruleType, params, statement, scope, sourceSection }]` (`ruleType` is a RuleType or `"other"`). Encrypt it to `runbook-key.json.enc` and delete the plain file. Either way works:
+   - `openssl enc -aes-256-cbc -pbkdf2 [-iter N] [-a] -in runbook-key.json -out runbook-key.json.enc`. `m2-grade` tries the openssl default of 10000 iterations, then 200000; pass `--iter N` for any other count.
+   - `bun run m2-seal.ts encrypt` (AES-256-GCM, scrypt-derived key, authenticated).
+   - **Unstated values:** if the owner didn't state a value, set that param to `null`. A proposal then matches only with `null` or by leaving the param out (asking the question), never with a value.
+   - **Passphrase:** set `RUNBOOK_KEY_PASS` (or `M2_KEY_PASSPHRASE`), or you'll get a hidden prompt. It is never taken from the command line, logged or written.
 2. **Run onboarding blind (Devaj's agent).** It writes its proposed rules to a file in either shape:
    - an array of **Proposals** (`packages/engine/src/lessons/history.ts`: `{ type, params, statement, evidence, seenInCycles, ofCycles, confidence }`). These get ids `proposal-<n>` by position.
    - an array of **Rule rows** (`{ id | _id, type, params, provenance.evidence, backtest, confidence }`).
@@ -67,11 +70,14 @@ This lets onboarding run blind, with the owner's runbook encrypted until the age
 4. **Grade.** Run `bun run m2-grade.ts --rules <file> --key data/private/r/runbook-key.json.enc [--write-grading]`.
    - **Refusals:** it refuses without the freeze file, and refuses if the rules file's sha256 differs from it, so answers can't change after unsealing.
    - **Key handling:** the key is decrypted in memory only.
-   - **Matching:** proposed `type` is matched against key `ruleType`, plus params.
-     - **Deterministic first:** the key's params must be equal, with a per-type tolerance (`TOLERANCE` in `m2-match.ts`). Strings are compared case-insensitively. Extra params in a proposal are not penalized.
-     - **Then the rest:** key rules of type `"other"`, or with no same-type proposal, go to the engine's model adapter if `ANTHROPIC_API_KEY` is set. The judge sees types and params only, never the key's statement. Input that fails the model-input scrub is not sent. Without a judge, or when the judge fails, the verdict is `needs_human_review`.
-   - **Verdicts:** `match`, `differs` (with the params named), `not_learned`, or `needs_human_review`. Proposals no key rule used are counted as `extra`.
-   - **Output:** stdout gets counts only. The per-rule detail goes **only** to `data/private/r/m2-grade-<time>.json`. `--write-grading` also writes `data/private/r/rule-grading.json`, which `run.ts` reads for `results.json` (`needs_human_review` rows left out).
+   - **Headline: the typed rules only.** These are the key rules with a specific `ruleType`, matched deterministically: proposed `type` = key `ruleType`, and the key's params are equal within a per-type tolerance (`TOLERANCE` in `m2-match.ts`). Strings are compared case-insensitively, and extra params in a proposal are not penalized.
+     - **Verdicts:** `match`, `differs` (a wrong value; the params are named in the private detail) or `not_learned` (no proposal of that type).
+     - **Reported numbers:**
+       - recall = match / typed key rules
+       - precision = match / (match + differs + extra)
+       - the wrong-value count, plus not learned and extra
+   - **`"other"` rules (free-text statements) are never in the headline.** Each one is reported as `needs_human_review`. If `ANTHROPIC_API_KEY` is set, the engine's model adapter suggests the closest unused proposal. It sees types and params only, never the statement, and input that fails the model-input scrub is not sent. The suggestion goes in the private detail for the person reviewing.
+   - **Output:** stdout gets counts only. The per-rule detail goes **only** to `data/private/r/m2-grade-<time>.json`. `--write-grading` also writes `data/private/r/rule-grading.json` (typed rules only), which `run.ts` reads for `results.json`.
 
 ### M4 setup from the owner's facts: `m4-rules-build.ts`
 

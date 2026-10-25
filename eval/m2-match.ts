@@ -1,6 +1,9 @@
-// M2 matching: each runbook key rule vs the frozen proposed rules. Deterministic first (same rule type, the key's
-// params equal within a per-type tolerance); then, for ruleType "other" or a key rule with no same-type proposal,
-// an optional judge over the proposals still unused. Without a judge those are "needs_human_review".
+// M2 matching: runbook key rules vs the frozen proposed rules.
+//  - Headline: key rules with a specific ruleType, scored deterministically on type + params (a per-type
+//    tolerance for numbers; a key param that is null — unstated by the owner — matches only null or an absent
+//    param, never a value). Recall, precision and the wrong-value count come from these alone.
+//  - "other" key rules (free-text statements) are never in the headline: each is "needs_human_review", with an
+//    optional judge suggestion of the closest unused proposal (the judge never sees the statement).
 // Pure apart from the injected judge.
 import { z } from "zod";
 import type { ProposedRule } from "./m2-freeze";
@@ -27,18 +30,33 @@ export type Graded = {
   verdict: Verdict;
   proposedId: string | null;
   differingParams: string[];
+  /** "other" rules only: the judge's suggested proposal, for the person reviewing. */
+  suggestedProposedId?: string | null;
   by: "deterministic" | "judge" | "none";
 };
+export type Ratio = { num: number; den: number; value: number | null };
+const ratio = (num: number, den: number): Ratio => ({
+  num,
+  den,
+  value: den ? Math.round((num / den) * 10000) / 10000 : null,
+});
 export type GradeResult = {
   rules: Graded[];
+  /** Proposals no typed key rule used (they may correspond to "other" rules pending review). */
   extraProposedIds: string[];
   counts: {
-    total: number;
-    match: number;
-    differs: number;
-    notLearned: number;
-    needsReview: number;
-    extra: number;
+    typed: {
+      total: number;
+      match: number;
+      /** Same rule, wrong value: the params are named per rule in the private detail. */
+      differs: number;
+      notLearned: number;
+      extra: number;
+      recall: Ratio;
+      /** match / (match + differs + extra): every proposal not matched counts against it. */
+      precision: Ratio;
+    };
+    other: { total: number; needsReview: number; suggested: number };
   };
 };
 
@@ -108,15 +126,18 @@ export function sameParam(
   return norm(a) === norm(b);
 }
 
-/** The key's params the proposal gets wrong or leaves out (extra proposal params are not penalized). */
+/**
+ * The key's params the proposal gets wrong or leaves out. Extra proposal params are not penalized. A key param
+ * that is null (the owner did not state it) is satisfied only by null or by leaving it out (a question).
+ */
 export function differing(key: KeyRule, p: ProposedRule): string[] {
   return Object.keys(key.params)
     .sort()
-    .filter(
-      (k) =>
-        !(k in p.params) ||
-        !sameParam(key.ruleType, k, key.params[k], p.params[k]),
-    );
+    .filter((k) => {
+      const kv = key.params[k];
+      if (kv === null) return k in p.params && p.params[k] !== null;
+      return !(k in p.params) || !sameParam(key.ruleType, k, kv, p.params[k]);
+    });
 }
 
 export async function gradeRules(
@@ -124,142 +145,121 @@ export async function gradeRules(
   proposed: ProposedRule[],
   judge?: Judge,
 ): Promise<GradeResult> {
+  const typed = key.filter((k) => k.ruleType !== "other");
   const used = new Set<string>();
   const out = new Map<string, Graded>();
-  const pending: KeyRule[] = [];
-  // Pass 1: exact matches, so a perfect pair is never taken by a near miss.
-  for (const k of key) {
-    if (k.ruleType === "other") continue;
+  const g = (k: KeyRule, v: Omit<Graded, "keyId" | "ruleType">) =>
+    out.set(k.id, { keyId: k.id, ruleType: k.ruleType, ...v });
+  // Pass 1: exact matches first, so a perfect pair is never taken by a near miss.
+  for (const k of typed) {
     const p = proposed.find(
       (x) =>
         !used.has(x.id) &&
         x.type === k.ruleType &&
         differing(k, x).length === 0,
     );
-    if (p) {
-      used.add(p.id);
-      out.set(k.id, {
-        keyId: k.id,
-        ruleType: k.ruleType,
-        verdict: "match",
-        proposedId: p.id,
-        differingParams: [],
-        by: "deterministic",
-      });
-    }
+    if (!p) continue;
+    used.add(p.id);
+    g(k, {
+      verdict: "match",
+      proposedId: p.id,
+      differingParams: [],
+      by: "deterministic",
+    });
   }
-  // Pass 2: same type, closest proposal → differs (with the params).
-  for (const k of key) {
+  // Pass 2: same type, closest proposal → differs; no same-type proposal → not learned.
+  for (const k of typed) {
     if (out.has(k.id)) continue;
-    const same = proposed.filter(
-      (x) => !used.has(x.id) && x.type === k.ruleType && k.ruleType !== "other",
-    );
-    if (!same.length) {
-      pending.push(k);
-      continue;
-    }
-    const best = same
+    const best = proposed
+      .filter((x) => !used.has(x.id) && x.type === k.ruleType)
       .map((x) => ({ x, d: differing(k, x) }))
       .sort(
         (a, b) => a.d.length - b.d.length || a.x.id.localeCompare(b.x.id),
       )[0];
+    if (!best) {
+      g(k, {
+        verdict: "not_learned",
+        proposedId: null,
+        differingParams: [],
+        by: "deterministic",
+      });
+      continue;
+    }
     used.add(best.x.id);
-    out.set(k.id, {
-      keyId: k.id,
-      ruleType: k.ruleType,
+    g(k, {
       verdict: "differs",
       proposedId: best.x.id,
       differingParams: best.d,
       by: "deterministic",
     });
   }
-  // Pass 3: "other" or no same-type proposal → judge over unused proposals, else human review / not learned.
-  for (const k of pending) {
-    const candidates = proposed.filter((x) => !used.has(x.id));
-    if (!candidates.length) {
-      out.set(k.id, {
-        keyId: k.id,
-        ruleType: k.ruleType,
-        verdict: "not_learned",
-        proposedId: null,
-        differingParams: [],
-        by: "none",
-      });
-      continue;
-    }
-    if (!judge) {
-      out.set(k.id, {
-        keyId: k.id,
-        ruleType: k.ruleType,
-        verdict: "needs_human_review",
-        proposedId: null,
-        differingParams: [],
-        by: "none",
-      });
-      continue;
-    }
-    let j: JudgeOutput | null = null;
-    try {
-      j = await judge({
-        key: {
-          id: k.id,
-          ruleType: k.ruleType,
-          params: k.params,
-          scope: k.scope,
-          sourceSection: k.sourceSection,
-        },
-        candidates: candidates.map((x) => ({
-          id: x.id,
-          type: x.type,
-          params: x.params,
-          confidence: x.confidence,
-        })),
-      });
-    } catch {
-      // the input failed the model-input scrub (e.g. a name-like key), or the call failed: a person decides
-      j = null;
-    }
-    const pid = !j || j.verdict === "not_learned" ? null : j.proposedId;
-    if (
-      !j ||
-      (j.verdict !== "not_learned" &&
-        (!pid || !candidates.some((x) => x.id === pid)))
-    ) {
-      out.set(k.id, {
-        keyId: k.id,
-        ruleType: k.ruleType,
-        verdict: "needs_human_review",
-        proposedId: null,
-        differingParams: [],
-        by: "judge",
-      });
-      continue;
-    }
-    if (pid) used.add(pid);
-    out.set(k.id, {
-      keyId: k.id,
-      ruleType: k.ruleType,
-      verdict: j.verdict,
-      proposedId: pid,
-      differingParams: j.differingParams,
-      by: "judge",
-    });
-  }
-  const rules = key.map((k) => out.get(k.id) as Graded);
-  const n = (v: Verdict) => rules.filter((r) => r.verdict === v).length;
   const extraProposedIds = proposed
     .filter((x) => !used.has(x.id))
     .map((x) => x.id);
+  // "other": always a person's call; the judge (if any) only suggests the closest unused proposal.
+  let suggested = 0;
+  for (const k of key.filter((x) => x.ruleType === "other")) {
+    let suggestion: string | null = null;
+    const candidates = proposed.filter((x) => !used.has(x.id));
+    if (judge && candidates.length) {
+      try {
+        const j = await judge({
+          key: {
+            id: k.id,
+            ruleType: k.ruleType,
+            params: k.params,
+            scope: k.scope,
+            sourceSection: k.sourceSection,
+          },
+          candidates: candidates.map((x) => ({
+            id: x.id,
+            type: x.type,
+            params: x.params,
+            confidence: x.confidence,
+          })),
+        });
+        if (
+          j.verdict !== "not_learned" &&
+          j.proposedId &&
+          candidates.some((x) => x.id === j.proposedId)
+        )
+          suggestion = j.proposedId;
+      } catch {
+        // failed the model-input scrub or the call: no suggestion
+      }
+    }
+    if (suggestion) suggested++;
+    g(k, {
+      verdict: "needs_human_review",
+      proposedId: null,
+      differingParams: [],
+      suggestedProposedId: suggestion,
+      by: judge ? "judge" : "none",
+    });
+  }
+  const rules = key.map((k) => out.get(k.id) as Graded);
+  const n = (v: Verdict) =>
+    rules.filter((r) => r.ruleType !== "other" && r.verdict === v).length;
+  const match = n("match");
+  const differs = n("differs");
   return {
     rules,
     extraProposedIds,
     counts: {
-      total: key.length,
-      match: n("match"),
-      differs: n("differs"),
-      notLearned: n("not_learned"),
-      needsReview: n("needs_human_review"),
-      extra: extraProposedIds.length,
+      typed: {
+        total: typed.length,
+        match,
+        differs,
+        notLearned: n("not_learned"),
+        extra: extraProposedIds.length,
+        recall: ratio(match, typed.length),
+        precision: ratio(match, match + differs + extraProposedIds.length),
+      },
+      other: {
+        total: key.length - typed.length,
+        needsReview: key.length - typed.length,
+        suggested,
+      },
     },
   };
 }

@@ -1,4 +1,6 @@
 // Sealed M2 grading on a synthetic runbook key and synthetic proposed rules (invented ids and statements).
+import { execFileSync } from "node:child_process";
+import { createCipheriv, pbkdf2Sync, randomBytes } from "node:crypto";
 import {
   mkdirSync,
   mkdtempSync,
@@ -11,18 +13,25 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, describe, expect, test } from "vitest";
 import { REPO } from "../lib/io";
-import { seal, unseal } from "../lib/seal";
+import { seal, unseal, unsealAny, unsealOpenssl } from "../lib/seal";
 import { freeze, type ProposedRule, ProposedRules } from "../m2-freeze";
-import { checkFrozen, llmJudge, runGrade, toGrading } from "../m2-grade";
-import { gradeRules, type KeyRule } from "../m2-match";
+import {
+  checkFrozen,
+  describeCounts,
+  llmJudge,
+  runGrade,
+  toGrading,
+} from "../m2-grade";
+import { differing, gradeRules, type KeyRule } from "../m2-match";
 import { m2 } from "../m2-rules";
 
 const PASS = "correct horse battery staple";
 const key: KeyRule[] = [
+  // the owner did not state the multiplier: only null (or leaving it out) matches
   {
     id: "RB-01",
     ruleType: "overtime_policy",
-    params: { weeklyHours: 40, multiplier: 1.5, workweek: "Monday-Sunday" },
+    params: { weeklyHours: 40, multiplier: null, workweek: "Monday-Sunday" },
     statement: "Overtime after 40 hours, Monday to Sunday.",
     scope: "all hourly",
     sourceSection: "2.1",
@@ -77,27 +86,123 @@ const proposed: ProposedRule[] = [
     weeklyHours: 40,
     multiplier: 1.5,
     workweek: "monday-sunday",
-    dailyHours: null,
   }),
   rule("p2", "long_shift_threshold", { hours: 10.2 }),
   rule("p3", "pay_rate", { workerId: "r:w:x1", rateCents: 2400 }),
-  rule("p4", "expense_account_kind", { accountName: "Fuel", kind: "overhead" }),
+  rule("p4", "expense_account_kind", { account: "Fuel", kind: "overhead" }),
 ];
 
+/** What `openssl enc -aes-256-cbc -pbkdf2 -iter N [-a]` writes. */
+function opensslEnc(
+  plain: Buffer,
+  pass: string,
+  iter: number,
+  base64 = false,
+): Buffer {
+  const salt = randomBytes(8);
+  const k = pbkdf2Sync(pass, salt, iter, 48, "sha256");
+  const c = createCipheriv(
+    "aes-256-cbc",
+    k.subarray(0, 32),
+    k.subarray(32, 48),
+  );
+  const out = Buffer.concat([
+    Buffer.from("Salted__"),
+    salt,
+    c.update(plain),
+    c.final(),
+  ]);
+  return base64 ? Buffer.from(`${out.toString("base64")}\n`) : out;
+}
+const isJson = (b: Buffer) => {
+  try {
+    JSON.parse(b.toString("utf8"));
+    return true;
+  } catch {
+    return false;
+  }
+};
+
 describe("sealing", () => {
-  test("round trip; a wrong passphrase or a changed byte fails; short passphrases refused", () => {
+  test("our envelope: round trip; wrong passphrase or a changed byte fails; short passphrases refused", () => {
     const s = seal(Buffer.from("secret key"), PASS);
     expect(unseal(s, PASS).toString()).toBe("secret key");
     expect(() => unseal(s, `${PASS}!`)).toThrow(/wrong passphrase/);
-    const tampered = {
-      ...s,
-      data: Buffer.from("x".repeat(10)).toString("base64"),
-    };
-    expect(() => unseal(tampered, PASS)).toThrow(
-      /wrong passphrase or the file was changed/,
-    );
+    expect(() =>
+      unseal(
+        { ...s, data: Buffer.from("x".repeat(10)).toString("base64") },
+        PASS,
+      ),
+    ).toThrow(/wrong passphrase/);
     expect(() => seal(Buffer.from("x"), "short")).toThrow(/12 characters/);
     expect(JSON.stringify(s)).not.toContain("secret");
+  });
+  test("openssl enc -aes-256-cbc -pbkdf2: default 10000 or 200000 iterations, binary or base64; wrong passphrase fails", () => {
+    const plain = Buffer.from(JSON.stringify(key));
+    for (const [iter, b64] of [
+      [10000, false],
+      [200000, true],
+    ] as const)
+      expect(
+        unsealOpenssl(
+          opensslEnc(plain, PASS, iter, b64),
+          PASS,
+          isJson,
+        ).toString(),
+      ).toBe(plain.toString());
+    expect(
+      unsealAny(opensslEnc(plain, PASS, 10000), PASS, isJson).toString(),
+    ).toBe(plain.toString());
+    expect(() =>
+      unsealOpenssl(opensslEnc(plain, PASS, 10000), "wrong pass", isJson),
+    ).toThrow(/cannot unseal/);
+    expect(
+      unsealOpenssl(
+        opensslEnc(plain, PASS, 5000),
+        PASS,
+        isJson,
+        [5000],
+      ).toString(),
+    ).toBe(plain.toString());
+    expect(() =>
+      unsealOpenssl(Buffer.from("plain text"), PASS, isJson),
+    ).toThrow(/Salted__/);
+  });
+  test("a file made by the real openssl binary, when it supports -pbkdf2", () => {
+    const dir = mkdtempSync(join(tmpdir(), "m2-openssl-"));
+    try {
+      const inPath = join(dir, "k.json");
+      const outPath = join(dir, "k.json.enc");
+      writeFileSync(inPath, JSON.stringify(key));
+      try {
+        execFileSync(
+          "openssl",
+          [
+            "enc",
+            "-aes-256-cbc",
+            "-pbkdf2",
+            "-salt",
+            "-in",
+            inPath,
+            "-out",
+            outPath,
+            "-pass",
+            "env:M2_TEST_PASS",
+          ],
+          {
+            env: { ...process.env, M2_TEST_PASS: PASS },
+            stdio: "ignore",
+          },
+        );
+      } catch {
+        return; // no openssl, or one without -pbkdf2: covered by the synthetic files above
+      }
+      expect(
+        JSON.parse(unsealAny(readFileSync(outPath), PASS, isJson).toString()),
+      ).toEqual(key);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
   });
 });
 
@@ -130,11 +235,10 @@ describe("freezing", () => {
 });
 
 describe("both onboarding shapes: Proposals (lessons/history.ts) and Rule rows", () => {
-  // Proposal = { type, params, statement, evidence, seenInCycles, ofCycles, confidence } — no id.
   const proposals = [
     {
       type: "overtime_policy",
-      params: { weeklyHours: 40, multiplier: 1.5, workweek: "Monday-Sunday" },
+      params: { weeklyHours: 40, multiplier: null, workweek: "Monday-Sunday" },
       statement: "OT after 40 h",
       evidence: ["r:c:1", "r:c:2"],
       seenInCycles: 3,
@@ -151,13 +255,12 @@ describe("both onboarding shapes: Proposals (lessons/history.ts) and Rule rows",
       confidence: 0.9,
     },
   ];
-  // Convex `rules` rows: _id, type, params, provenance.evidence, backtest.
   const rows = [
     {
       _id: "k17abc",
       companyId: "r",
       type: "overtime_policy",
-      params: { weeklyHours: 40, multiplier: 1.5, workweek: "Monday-Sunday" },
+      params: { weeklyHours: 40, workweek: "Monday-Sunday" },
       status: "active",
       source: "history",
       provenance: {
@@ -190,11 +293,11 @@ describe("both onboarding shapes: Proposals (lessons/history.ts) and Rule rows",
       confidence: 0.8,
     },
   ];
-  test("Proposals get ids by position; Rule rows keep their _id; both freeze and grade on type + params", async () => {
-    const pBytes = Buffer.from(JSON.stringify(proposals));
-    const rBytes = Buffer.from(JSON.stringify(rows));
-    expect(freeze(pBytes, new Date()).count).toBe(2);
-    expect(freeze(rBytes, new Date()).count).toBe(2);
+  test("Proposals get ids by position; Rule rows keep their _id; both grade on type + params", async () => {
+    expect(
+      freeze(Buffer.from(JSON.stringify(proposals)), new Date()).count,
+    ).toBe(2);
+    expect(freeze(Buffer.from(JSON.stringify(rows)), new Date()).count).toBe(2);
     const p = ProposedRules.parse(proposals);
     expect(p.map((x) => [x.id, x.shape, x.evidence.length])).toEqual([
       ["proposal-1", "proposal", 2],
@@ -209,7 +312,7 @@ describe("both onboarding shapes: Proposals (lessons/history.ts) and Rule rows",
     expect(
       gp.rules.slice(0, 3).map((x) => [x.keyId, x.verdict, x.proposedId]),
     ).toEqual([
-      ["RB-01", "match", "proposal-1"],
+      ["RB-01", "match", "proposal-1"], // multiplier null = null
       ["RB-02", "not_learned", null],
       ["RB-03", "match", "proposal-2"],
     ]);
@@ -217,7 +320,7 @@ describe("both onboarding shapes: Proposals (lessons/history.ts) and Rule rows",
     expect(
       gr.rules.slice(0, 3).map((x) => [x.keyId, x.verdict, x.proposedId]),
     ).toEqual([
-      ["RB-01", "match", "k17abc"],
+      ["RB-01", "match", "k17abc"], // multiplier left out = a question, not a value
       ["RB-02", "match", "k17def"],
       ["RB-03", "not_learned", null],
     ]);
@@ -230,61 +333,78 @@ describe("both onboarding shapes: Proposals (lessons/history.ts) and Rule rows",
 });
 
 describe("matching", () => {
-  test("deterministic first: match within tolerance, differs names the param; the rest need a human without a judge", async () => {
+  test("an unstated (null) key param: any stated value is not a match", () => {
+    expect(differing(key[0], proposed[0])).toEqual(["multiplier"]);
+    expect(
+      differing(
+        key[0],
+        rule("x", "overtime_policy", {
+          weeklyHours: 40,
+          multiplier: null,
+          workweek: "Monday-Sunday",
+        }),
+      ),
+    ).toEqual([]);
+    expect(
+      differing(
+        key[0],
+        rule("x", "overtime_policy", {
+          weeklyHours: 40,
+          workweek: "Monday-Sunday",
+        }),
+      ),
+    ).toEqual([]);
+  });
+  test("headline on typed rules only: recall, precision, wrong values; 'other' apart as needs human review", async () => {
     const r = await gradeRules(key, proposed);
     expect(
       r.rules.map((x) => [x.keyId, x.verdict, x.proposedId, x.differingParams]),
     ).toEqual([
-      ["RB-01", "match", "p1", []],
+      ["RB-01", "differs", "p1", ["multiplier"]],
       ["RB-02", "match", "p2", []], // 10.2 vs 10 within 0.25 h
       ["RB-03", "differs", "p3", ["rateCents"]],
-      ["RB-04", "needs_human_review", null, []],
+      ["RB-04", "not_learned", null, []],
       ["RB-05", "needs_human_review", null, []],
     ]);
     expect(r.extraProposedIds).toEqual(["p4"]);
     expect(r.counts).toEqual({
-      total: 5,
-      match: 2,
-      differs: 1,
-      notLearned: 0,
-      needsReview: 2,
-      extra: 1,
+      typed: {
+        total: 4,
+        match: 1,
+        differs: 2,
+        notLearned: 1,
+        extra: 1,
+        recall: { num: 1, den: 4, value: 0.25 },
+        precision: { num: 1, den: 4, value: 0.25 },
+      },
+      other: { total: 1, needsReview: 1, suggested: 0 },
     });
+    expect(describeCounts(r.counts, false)).toEqual([
+      "M2 (typed rules, headline): 1 of 4 match (recall 25%); 2 wrong value; 1 not learned; 1 extra proposed; precision 25% (1/4)",
+      'M2 ("other" statements, not in the headline): 1 need human review (no ANTHROPIC_API_KEY: no judge suggestions)',
+      "per-rule detail written under data/private/r/ (m2-grade-<time>.json)",
+    ]);
   });
-  test("with a judge; a judge pointing at an unknown proposal is sent to human review", async () => {
-    const r = await gradeRules(key, proposed, async (i) =>
-      i.key.id === "RB-05"
-        ? { verdict: "match", proposedId: "p4", differingParams: [] }
-        : { verdict: "not_learned", proposedId: null, differingParams: [] },
-    );
-    expect(r.counts).toEqual({
-      total: 5,
-      match: 3,
-      differs: 1,
-      notLearned: 1,
-      needsReview: 0,
-      extra: 0,
-    });
-    // RB-04 is judged first and leaves p4 unused, so RB-05 can take it.
-    expect(r.rules.find((x) => x.keyId === "RB-05")).toMatchObject({
+  test("a judge only suggests for 'other' rules; the verdict stays human review and the headline is unchanged", async () => {
+    const r = await gradeRules(key, proposed, async () => ({
       verdict: "match",
       proposedId: "p4",
-      by: "judge",
+      differingParams: [],
+    }));
+    expect(r.rules.find((x) => x.keyId === "RB-05")).toMatchObject({
+      verdict: "needs_human_review",
+      suggestedProposedId: "p4",
     });
+    expect(r.counts.other.suggested).toBe(1);
+    expect(r.counts.typed.match).toBe(1);
     const bad = await gradeRules(key, proposed, async () => ({
       verdict: "match",
       proposedId: "nope",
       differingParams: [],
     }));
-    expect(bad.counts.needsReview).toBe(2);
+    expect(bad.counts.other.suggested).toBe(0);
   });
-  test("no proposals left → not learned", async () => {
-    const r = await gradeRules(key, proposed.slice(0, 3));
-    expect(r.rules.find((x) => x.keyId === "RB-05")?.verdict).toBe(
-      "not_learned",
-    );
-  });
-  test("the model judge gets types and params only, never the runbook statement", async () => {
+  test("the model judge gets types and params only; a scrub failure sends nothing", async () => {
     const sent: string[] = [];
     const client = {
       messages: {
@@ -307,26 +427,18 @@ describe("matching", () => {
         },
       },
     };
-    // A proposal with a name-like key ("accountName") fails the engine's model-input scrub: nothing is sent,
-    // and those key rules go to a person.
     // biome-ignore lint/suspicious/noExplicitAny: a minimal stand-in for the Anthropic client
     const judge = llmJudge(client as any);
-    const blocked = await gradeRules(key, proposed, judge);
-    expect(sent).toEqual([]);
-    expect(blocked.counts.needsReview).toBe(2);
-    const clean = proposed.map((p) =>
+    const named = proposed.map((p) =>
       p.id === "p4"
-        ? rule("p4", "expense_account_kind", {
-            account: "Fuel",
-            kind: "overhead",
-          })
+        ? rule("p4", "expense_account_kind", { accountName: "Fuel" })
         : p,
     );
-    const r = await gradeRules(key, clean, judge);
-    expect(sent.length).toBe(2);
-    for (const s of sent)
-      for (const k of key) expect(s).not.toContain(k.statement);
-    expect(r.counts.notLearned).toBe(2);
+    await gradeRules(key, named, judge);
+    expect(sent).toEqual([]);
+    await gradeRules(key, proposed, judge);
+    expect(sent.length).toBe(1);
+    for (const k of key) expect(sent[0]).not.toContain(k.statement);
   });
 });
 
@@ -344,7 +456,7 @@ describe("runGrade: frozen rules, sealed key, detail only under data/private/", 
   writeFileSync(rulesPath, JSON.stringify(proposed, null, 2));
   writeFileSync(
     keyPath,
-    JSON.stringify(seal(Buffer.from(JSON.stringify(key)), PASS)),
+    opensslEnc(Buffer.from(JSON.stringify(key)), PASS, 10000),
   );
   const now = new Date("2026-10-25T01:02:03.000Z");
   test("refuses without a freeze file, and outside data/private/", async () => {
@@ -372,8 +484,18 @@ describe("runGrade: frozen rules, sealed key, detail only under data/private/", 
         now,
       }),
     ).rejects.toThrow(/data\/private/);
+    await expect(
+      runGrade({
+        rulesPath,
+        keyPath,
+        freezePath,
+        outDir: priv,
+        passphrase: "wrong pass",
+        now,
+      }),
+    ).rejects.toThrow(/cannot unseal/);
   });
-  test("counts out; detail and rule-grading.json in the private dir; M2 reads the counts", async () => {
+  test("an openssl-sealed key: counts out; detail and typed rule-grading.json in the private dir; M2 reads them", async () => {
     const c = await runGrade({
       rulesPath,
       keyPath,
@@ -383,12 +505,11 @@ describe("runGrade: frozen rules, sealed key, detail only under data/private/", 
       now,
       writeGrading: true,
     });
-    expect(c).toEqual({
-      total: 5,
-      match: 2,
-      differs: 1,
-      notLearned: 0,
-      needsReview: 2,
+    expect(c.typed).toMatchObject({
+      total: 4,
+      match: 1,
+      differs: 2,
+      notLearned: 1,
       extra: 1,
     });
     expect(readdirSync(priv).sort()).toEqual([
@@ -397,10 +518,10 @@ describe("runGrade: frozen rules, sealed key, detail only under data/private/", 
     ]);
     expect(m2(join(priv, "rule-grading.json"))).toEqual({
       status: "measured",
-      total: 3,
-      match: 2,
-      differ: 1,
-      notLearned: 0,
+      total: 4,
+      match: 1,
+      differ: 2,
+      notLearned: 1,
     });
     expect(toGrading({ rules: [], extraProposedIds: [], counts: c })).toEqual(
       [],
