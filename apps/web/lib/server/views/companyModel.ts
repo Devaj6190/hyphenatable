@@ -4,6 +4,7 @@ import type {
   CompanyPerson,
   CompanyViewData,
   ConnectedApp,
+  HistoryRead,
   PayHistoryLine,
   PayKind,
   PersonTone,
@@ -522,9 +523,71 @@ export function buildCompanyView(
     .filter((t): t is string => t !== null)
     .sort();
 
+  // Onboarding's history read: past cycles' entry syncs and the past payroll lines, as counts.
+  const closed = sorted.slice(0, -1);
+  const closedIds = new Set(closed.map((c) => c.id));
+  const entryRuns = input.syncRuns.filter(
+    (r) =>
+      r.cycleId !== null &&
+      closedIds.has(r.cycleId) &&
+      r.source === "jobber" &&
+      r.object === "timeSheetEntries",
+  );
+  const pastLines = input.pastPayrolls.filter((p) => closedIds.has(p.cycleId));
+  const reads: HistoryRead[] = [];
+  if (entryRuns.length) {
+    const pulled = entryRuns.reduce((n, r) => n + r.pulled, 0);
+    const expected = entryRuns.every((r) => r.expected !== null)
+      ? entryRuns.reduce((n, r) => n + (r.expected ?? 0), 0)
+      : null;
+    const complete = entryRuns.every((r) => r.complete);
+    reads.push({
+      system: "jobber",
+      label: "Time entries",
+      pulled,
+      expected,
+      complete,
+      detail: complete
+        ? `${pulled} of ${expected ?? "?"} · matches Jobber`
+        : `${pulled} of ${expected ?? "?"} · ${entryRuns.filter((r) => !r.complete).length} sync incomplete, marked, nothing filled in`,
+    });
+  }
+  if (pastLines.length) {
+    const venmo = pastLines.filter((p) => p.paidVia === "venmo").length;
+    reads.push({
+      system: "gusto",
+      label: "Past pay lines",
+      pulled: pastLines.length,
+      expected: null,
+      complete: true,
+      detail: `${closed.length} payrolls · ${pastLines.length - venmo} Gusto lines, ${venmo} Venmo`,
+    });
+  }
+  if (input.roster.length) {
+    const inGusto = input.roster.filter((w) => w.gusto !== null).length;
+    reads.push({
+      system: "gusto",
+      label: "People",
+      pulled: input.roster.length,
+      expected: null,
+      complete: true,
+      detail: `${inGusto} in Gusto, ${input.roster.length - inGusto} on Venmo`,
+    });
+  }
+  const first = closed[0];
+  const last = closed.at(-1);
+
   return {
     people,
     settings,
+    history: {
+      cycles: closed.length,
+      period:
+        first && last
+          ? periodLabel({ ...first, periodEnd: last.periodEnd }, timeZone)
+          : null,
+      reads,
+    },
     routing: routingRule
       ? {
           ruleId: routingRule.id,

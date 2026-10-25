@@ -130,3 +130,17 @@ describe("companyView for the manager", () => {
     expect(byId(view, "a-w06")).toMatchObject({ label: "No hours" });
   });
 });
+
+describe("companyView history read (onboarding)", () => {
+  test("counts past records and keeps the incomplete sync visible", () => {
+    const { history } = buildCompanyView(owner, input);
+    expect(history.cycles).toBe(4);
+    expect(history.period).toBe("Aug 15 – Oct 9");
+    expect(history.reads[0]).toMatchObject({
+      label: "Time entries",
+      pulled: 302,
+      expected: 303,
+      complete: false,
+    });
+  });
+});

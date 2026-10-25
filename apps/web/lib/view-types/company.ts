@@ -85,6 +85,17 @@ export type ConnectedApp = {
   syncRunIds: string[];
 };
 
+/** What onboarding read from past cycles: record counts only, never amounts. */
+export type HistoryRead = {
+  system: "jobber" | "gusto" | "venmo";
+  label: string;
+  pulled: number;
+  /** Null when no count was checked against the source. */
+  expected: number | null;
+  complete: boolean;
+  detail: string;
+};
+
 export type CompanyViewData = {
   people: CompanyPerson[];
   settings: SettingCard[];
@@ -95,6 +106,8 @@ export type CompanyViewData = {
   } | null;
   employeesMayBeTexted: boolean | null;
   apps: ConnectedApp[];
+  /** Past (closed) cycles read at onboarding, and what was read from them. */
+  history: { cycles: number; period: string | null; reads: HistoryRead[] };
   /** When the current cycle's last sync finished (ISO). */
   syncedAt: string | null;
   canSeePay: boolean;
